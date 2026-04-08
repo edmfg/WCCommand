@@ -402,6 +402,40 @@ body.light .live-filter.active{background:var(--red);color:#fff}
 .status-live{background:rgba(0,200,83,0.2);color:#69f0ae;box-shadow:0 0 8px rgba(0,200,83,0.15)}
 
 /* ── CREATIVE TAB ── */
+.sub-tabs{display:flex;gap:4px;margin-bottom:20px}
+.sub-tab{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:1px;padding:8px 22px;
+  background:rgba(255,255,255,0.04);color:var(--text-dim);
+  border:1px solid rgba(255,255,255,0.06);border-radius:8px 8px 0 0;
+  cursor:pointer;transition:all 0.25s var(--transition);border-bottom:none;
+}
+.sub-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.sub-tab.active{
+  background:rgba(255,255,255,0.06);color:#fff;
+  border-color:rgba(255,255,255,0.1);
+  box-shadow:inset 0 2px 0 var(--gold);
+}
+body.light .sub-tab{background:rgba(0,0,0,0.03);color:#666;border-color:rgba(0,0,0,0.06)}
+body.light .sub-tab:hover{color:#333;background:rgba(0,0,0,0.06)}
+body.light .sub-tab.active{background:rgba(255,255,255,0.8);color:#1a1a2e;box-shadow:inset 0 2px 0 var(--red)}
+.sub-panel{display:none}
+.sub-panel.active{display:block;animation:fadeUp 0.3s var(--transition)}
+.empty-state{
+  text-align:center;padding:60px 20px;
+}
+.empty-icon{font-size:3rem;display:block;margin-bottom:16px;opacity:0.5}
+.empty-state h3{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.2rem;
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;
+  background:linear-gradient(90deg,#fff,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.empty-state p{font-size:0.85rem;color:var(--text-dim);max-width:400px;margin:0 auto}
+body.light .empty-state h3{
+  background:linear-gradient(90deg,#1a1a2e,var(--red));
+  -webkit-background-clip:text;background-clip:text;
+}
 .filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .filter-pill{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.75rem;
@@ -623,8 +657,29 @@ body.light .live-filter.active{background:var(--red);color:#fff}
   <!-- CREATIVE -->
   <div class="tab-panel" id="panel-creative">
     <h2 class="section-title">Creative Assets</h2>
-    <div class="filter-bar" id="filterBar"></div>
-    <div class="assets-grid" id="assetsGrid"></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-subtab="wc-engine" onclick="switchSubTab('wc-engine')">⚽ WC Engine</button>
+      <button class="sub-tab" data-subtab="yt-genius" onclick="switchSubTab('yt-genius')">▶️ YT x Genius</button>
+      <button class="sub-tab" data-subtab="fox-s2" onclick="switchSubTab('fox-s2')">📺 Fox S2</button>
+    </div>
+    <div class="sub-panel active" id="sub-wc-engine">
+      <div class="filter-bar" id="filterBar"></div>
+      <div class="assets-grid" id="assetsGrid"></div>
+    </div>
+    <div class="sub-panel" id="sub-yt-genius">
+      <div class="empty-state glass">
+        <span class="empty-icon">▶️</span>
+        <h3>YT x Genius</h3>
+        <p>Content coming soon. This section will house YouTube x Genius campaign assets.</p>
+      </div>
+    </div>
+    <div class="sub-panel" id="sub-fox-s2">
+      <div class="empty-state glass">
+        <span class="empty-icon">📺</span>
+        <h3>Fox S2</h3>
+        <p>Content coming soon. This section will house Fox Season 2 campaign assets.</p>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -929,6 +984,11 @@ function renderSocial() {
       <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
     </div>`;
   }).join('');
+}
+
+function switchSubTab(id) {
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.dataset.subtab === id));
+  document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === 'sub-' + id));
 }
 
 let fixtureView = 'date';
