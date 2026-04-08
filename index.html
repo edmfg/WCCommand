@@ -252,28 +252,29 @@ body.light .glass:hover{
 body.light .live-filter{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.1)}
 body.light .live-filter:hover{color:#333;background:rgba(0,0,0,0.08)}
 body.light .live-filter.active{background:var(--red);color:#fff}
-.live-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:0 24px;
-  grid-template-rows:auto 1fr;
-}
-.news-col,.social-col{display:contents}
-.carousel-controls{grid-row:1}
-.card-carousel{grid-row:2;align-self:start}
-/* Card carousel — shows 3 at a time, fixed height per card */
+.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.news-col,.social-col{}
+/* Card carousel — 3 visible, stacked absolutely for zero layout shift */
 .card-carousel{
-  position:relative;overflow:hidden;
-  display:flex;flex-direction:column;gap:10px;
+  position:relative;
+  height:calc(180px * 3 + 10px * 2); /* 3 cards + 2 gaps */
 }
-.card-carousel .carousel-card{
-  opacity:0;height:0;overflow:hidden;
-  transform:translateY(16px);
-  transition:opacity 0.45s ease, transform 0.45s ease, height 0.45s ease;
+.carousel-page{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;gap:10px;
+  opacity:0;transform:translateY(10px);
+  transition:opacity 0.4s ease,transform 0.4s ease;
   pointer-events:none;
 }
-.card-carousel .carousel-card.visible{
-  opacity:1;height:180px;transform:translateY(0);pointer-events:auto;
+.carousel-page.active{
+  opacity:1;transform:translateY(0);pointer-events:auto;
 }
-.card-carousel .carousel-card.visible .glass{height:100%;overflow:hidden}
+.carousel-page .carousel-card{
+  height:180px;
+}
+.carousel-page .carousel-card .glass{
+  height:100%;overflow:hidden;
+}
 .carousel-controls{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:12px;height:36px;
@@ -1282,21 +1283,19 @@ function matchesLiveFilter(item, type) {
   return true;
 }
 
-// ── Card Carousel Engine (3 visible at a time) ──
+// ── Card Carousel Engine (3 per page, absolute positioning, zero layout shift) ──
 function createCarousel(containerId, dotsId, interval = 5000) {
-  let page = 0, pageCount = 0, total = 0, timer = null;
+  let page = 0, pageCount = 0, timer = null;
   const perPage = 3;
   const container = document.getElementById(containerId);
   const dotsEl = document.getElementById(dotsId);
   const name = containerId === 'newsCards' ? 'newsCarousel' : 'socialCarousel';
 
   function showPage(p) {
-    const cards = container.querySelectorAll('.carousel-card');
-    if (!cards.length) return;
+    const pages = container.querySelectorAll('.carousel-page');
+    if (!pages.length) return;
     page = ((p % pageCount) + pageCount) % pageCount;
-    const start = page * perPage;
-    const end = start + perPage;
-    cards.forEach((c, i) => c.classList.toggle('visible', i >= start && i < end));
+    pages.forEach((pg, i) => pg.classList.toggle('active', i === page));
     dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === page));
   }
 
@@ -1309,15 +1308,20 @@ function createCarousel(containerId, dotsId, interval = 5000) {
     if (pageCount > 1) timer = setInterval(() => showPage(page + 1), interval);
   }
 
-  function setCards(html, count) {
-    total = count;
+  function setCards(cardHtmlArray, count) {
     pageCount = Math.ceil(count / perPage);
     page = 0;
-    container.innerHTML = html;
+    // Group cards into pages of 3
+    let pagesHtml = '';
+    for (let p = 0; p < pageCount; p++) {
+      const start = p * perPage;
+      const slice = cardHtmlArray.slice(start, start + perPage);
+      pagesHtml += `<div class="carousel-page${p === 0 ? ' active' : ''}">${slice.join('')}</div>`;
+    }
+    container.innerHTML = pagesHtml;
     dotsEl.innerHTML = Array.from({length: pageCount}, (_,i) =>
       `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="${name}.goTo(${i})"></span>`
     ).join('');
-    showPage(0);
     resetTimer();
   }
 
@@ -1337,7 +1341,7 @@ function renderNews() {
     document.getElementById('newsDots').innerHTML = '';
     return;
   }
-  const html = filtered.map(n => {
+  const cards = filtered.map(n => {
     const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
@@ -1348,8 +1352,8 @@ function renderNews() {
       <p class="meta">${n.source} \u2022 ${timeStr}</p>
       <p class="summary">${n.summary}</p>
     </div></div>`;
-  }).join('');
-  newsCarousel.setCards(html, filtered.length);
+  });
+  newsCarousel.setCards(cards, filtered.length);
 }
 
 function renderSocial() {
@@ -1359,7 +1363,7 @@ function renderSocial() {
     document.getElementById('socialDots').innerHTML = '';
     return;
   }
-  const html = filtered.map(s => {
+  const cards = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
     return `<div class="carousel-card"><div class="social-card glass">
@@ -1371,7 +1375,7 @@ function renderSocial() {
       <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
     </div></div>`;
   }).join('');
-  socialCarousel.setCards(html, filtered.length);
+  socialCarousel.setCards(cards, filtered.length);
 }
 
 function switchSubTab(id) {
