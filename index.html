@@ -578,9 +578,84 @@ body.light .empty-state h3{
   .team{justify-content:center !important;text-align:center !important;min-width:auto}
   .vs-divider{padding:2px 0}
 }
+/* ── BROADCAST INTRO ── */
+.intro-overlay{
+  position:fixed;inset:0;z-index:10000;background:#000;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  opacity:1;transition:opacity 0.3s ease;
+}
+.intro-overlay.done{opacity:0;pointer-events:none}
+.intro-live{
+  position:absolute;top:20px;right:24px;display:flex;align-items:center;gap:6px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--red);opacity:0;
+  animation:introFadeIn 0.2s 0.1s forwards;
+}
+.intro-live-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--red);
+  animation:introPulse 0.4s infinite alternate;
+}
+@keyframes introPulse{0%{opacity:1}100%{opacity:0.3}}
+.intro-count{
+  font-family:'Oswald',sans-serif;font-weight:900;
+  font-size:clamp(80px,15vw,160px);letter-spacing:4px;
+  color:transparent;
+  -webkit-text-stroke:2px var(--red);
+  opacity:0;transform:scale(1.5);
+  animation:introCountPop 0.35s forwards;
+}
+.intro-count.c2{animation-delay:0s;color:var(--red);-webkit-text-stroke:none}
+.intro-count.c1{animation-delay:0.35s;color:var(--gold);-webkit-text-stroke:none}
+@keyframes introCountPop{
+  0%{opacity:0;transform:scale(2)}
+  60%{opacity:1;transform:scale(0.95)}
+  100%{opacity:1;transform:scale(1)}
+}
+.intro-flash{
+  position:absolute;inset:0;background:#fff;opacity:0;
+  animation:introFlash 0.25s 0.7s forwards;
+}
+@keyframes introFlash{
+  0%{opacity:0}15%{opacity:0.9}100%{opacity:0}
+}
+.intro-title{
+  font-family:'Oswald',sans-serif;font-weight:900;
+  font-size:clamp(24px,5vw,48px);text-transform:uppercase;
+  letter-spacing:6px;opacity:0;
+  background:linear-gradient(135deg,#fff,var(--gold),var(--red));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:introTitleIn 0.4s 0.85s forwards;
+}
+@keyframes introTitleIn{
+  0%{opacity:0;transform:translateY(20px) scale(0.9)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes introFadeIn{0%{opacity:0}100%{opacity:1}}
+
+/* Dashboard hidden until intro done */
+.dashboard-hidden .header,
+.dashboard-hidden .ticker-bar,
+.dashboard-hidden .main{opacity:0}
+.dashboard-reveal .header{animation:revealSlideDown 0.4s 0s forwards}
+.dashboard-reveal .ticker-bar{animation:revealSlideDown 0.3s 0.05s forwards}
+.dashboard-reveal .main{animation:revealFadeUp 0.4s 0.1s forwards}
+@keyframes revealSlideDown{
+  0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}
+}
+@keyframes revealFadeUp{
+  0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}
+}
 </style>
 </head>
-<body>
+<body class="dashboard-hidden">
+
+<!-- BROADCAST INTRO -->
+<div class="intro-overlay" id="introOverlay" style="display:none">
+  <div class="intro-live"><span class="intro-live-dot"></span>LIVE</div>
+  <div class="intro-count c2" id="introC2">3</div>
+  <div class="intro-flash"></div>
+  <div class="intro-title" id="introTitle">MFG World Cup Command</div>
+</div>
 
 <!-- BG -->
 <div class="bg-blobs">
@@ -1225,6 +1300,37 @@ function setupTheme() {
   });
 }
 
+// ── Broadcast Intro ──
+function runIntro() {
+  if (sessionStorage.getItem('wc-intro-seen')) {
+    document.body.classList.remove('dashboard-hidden');
+    document.getElementById('introOverlay').remove();
+    return;
+  }
+  sessionStorage.setItem('wc-intro-seen', '1');
+
+  const overlay = document.getElementById('introOverlay');
+  const counter = document.getElementById('introC2');
+  overlay.style.display = 'flex';
+
+  // Sequence: "3" at 0ms → "2" at 300ms → "1" at 600ms → flash at 700ms → title at 850ms → reveal at 1300ms
+  setTimeout(() => { counter.textContent = '2'; }, 300);
+  setTimeout(() => {
+    counter.textContent = '1';
+    counter.classList.remove('c2');
+    counter.classList.add('c1');
+  }, 600);
+  setTimeout(() => { counter.style.display = 'none'; }, 750);
+  // Title shows via CSS at 850ms, hold for a beat
+  setTimeout(() => {
+    overlay.classList.add('done');
+    document.body.classList.remove('dashboard-hidden');
+    document.body.classList.add('dashboard-reveal');
+  }, 1400);
+  setTimeout(() => { overlay.remove(); }, 1800);
+}
+
+runIntro();
 setupTheme();
 init();
 </script>
