@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFG World Cup Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#cc0000;--red-dark:#990000;--gold:#ffd700;--blue:#1a3a6b;
+  --bg:#0a0c14;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+  --text:#e8e8e8;--text-dim:#8a8fa0;--glass-blur:16px;--radius:12px;
+  --transition:cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;line-height:1.5;
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
+
+/* ── ANIMATED BACKGROUND BLOBS ── */
+.bg-blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(120px);will-change:transform}
+.blob-red{width:600px;height:600px;background:rgba(204,0,0,0.15);top:-10%;left:-5%;animation:drift1 18s ease-in-out infinite alternate}
+.blob-gold{width:500px;height:500px;background:rgba(255,215,0,0.12);top:40%;right:-8%;animation:drift2 22s ease-in-out infinite alternate}
+.blob-blue{width:550px;height:550px;background:rgba(26,58,107,0.18);bottom:-10%;left:30%;animation:drift3 20s ease-in-out infinite alternate}
+@keyframes drift1{0%{transform:translate(0,0) scale(1)}100%{transform:translate(80px,60px) scale(1.15)}}
+@keyframes drift2{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-70px,-50px) scale(1.1)}}
+@keyframes drift3{0%{transform:translate(0,0) scale(1)}100%{transform:translate(50px,-70px) scale(1.2)}}
+
+/* ── STADIUM RADIAL ── */
+.stadium-light{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.03) 0%,transparent 60%)}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(180deg,#14161e 0%,#0c0e16 100%);
+  backdrop-filter:blur(20px);
+  border-bottom:3px solid var(--red);
+  box-shadow:0 4px 30px rgba(204,0,0,0.2);
+  padding:0 24px;
+}
+.header-inner{
+  max-width:1400px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;gap:16px;flex-wrap:wrap;
+}
+.brand{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.35rem;
+  text-transform:uppercase;letter-spacing:2px;
+  background:linear-gradient(135deg,#fff 0%,#c0c0c0 50%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;white-space:nowrap;
+}
+.header-nav{display:flex;align-items:center;gap:6px}
+.tab-btn{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.85rem;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:8px 20px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  transition:all 0.3s var(--transition);position:relative;
+}
+.tab-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+.tab-btn.active{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(204,0,0,0.3)}
+.header-actions{display:flex;align-items:center;gap:10px}
+.mfg-link{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:7px 18px;text-decoration:none;color:var(--gold);
+  background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.3s var(--transition);
+}
+.mfg-link:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 16px rgba(255,215,0,0.15)}
+.gemini-toggle{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:7px 18px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,rgba(66,133,244,0.15),rgba(219,68,55,0.15),rgba(244,180,0,0.15));
+  color:#fff;border:1px solid rgba(255,255,255,0.1);
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.3s var(--transition);
+}
+.gemini-toggle:hover{box-shadow:0 0 20px rgba(244,180,0,0.2)}
+
+/* ── TICKER ── */
+.ticker-bar{
+  position:sticky;top:63px;z-index:99;
+  background:linear-gradient(90deg,var(--red-dark),var(--red));
+  backdrop-filter:blur(12px);
+  border-bottom:2px solid var(--gold);
+  overflow:hidden;display:flex;align-items:center;height:36px;
+}
+.ticker-label{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.75rem;
+  text-transform:uppercase;letter-spacing:2px;color:#fff;
+  background:rgba(0,0,0,0.4);padding:0 20px 0 14px;height:100%;
+  display:flex;align-items:center;white-space:nowrap;
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  z-index:1;flex-shrink:0;
+}
+.ticker-track{
+  display:flex;animation:marquee 60s linear infinite;white-space:nowrap;
+}
+.ticker-bar:hover .ticker-track{animation-play-state:paused}
+.ticker-item{
+  font-family:'Inter',sans-serif;font-weight:500;font-size:0.8rem;
+  color:#fff;padding:0 40px;white-space:nowrap;opacity:0.95;
+}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── MAIN CONTENT ── */
+.main{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:24px}
+.tab-panel{display:none;animation:fadeUp 0.4s var(--transition)}
+.tab-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.section-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.3rem;
+  text-transform:uppercase;letter-spacing:2px;
+  border-left:4px solid var(--red);padding-left:14px;margin-bottom:20px;
+}
+.updated{font-size:0.75rem;color:var(--text-dim);margin-bottom:24px}
+
+/* ── GLASS CARD ── */
+.glass{
+  background:var(--surface);backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--border);border-radius:var(--radius);
+  transition:all 0.35s var(--transition);
+}
+.glass:hover{border-color:rgba(255,255,255,0.14)}
+
+/* ── LIVE TAB ── */
+.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.news-col,.social-col{display:flex;flex-direction:column;gap:16px}
+
+/* News cards */
+.news-card{padding:20px;position:relative;overflow:hidden}
+.news-card:hover{box-shadow:0 0 24px rgba(204,0,0,0.15)}
+.news-card .tag{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:4px 14px;display:inline-block;margin-bottom:10px;
+  clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);
+}
+.tag-canada{background:rgba(255,0,0,0.2);color:#ff6b6b}
+.tag-germany{background:rgba(255,215,0,0.15);color:var(--gold)}
+.tag-general{background:rgba(255,255,255,0.08);color:var(--text-dim)}
+.news-card h3{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:1.05rem;
+  text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;line-height:1.3;
+}
+.news-card .meta{font-size:0.72rem;color:var(--text-dim);margin-bottom:8px}
+.news-card .summary{font-size:0.85rem;color:rgba(255,255,255,0.7);line-height:1.55}
+.news-card .read-more{
+  display:inline-block;margin-top:10px;font-size:0.75rem;font-weight:600;
+  color:var(--red);text-decoration:none;text-transform:uppercase;letter-spacing:1px;
+  transition:color 0.2s;
+}
+.news-card .read-more:hover{color:#ff4444}
+
+/* Social cards */
+.social-card{padding:20px}
+.social-card:hover{box-shadow:0 0 24px rgba(255,215,0,0.12)}
+.social-card .topic{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:1rem;
+  text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;
+}
+.social-card .volume{font-size:0.8rem;margin-bottom:8px}
+.social-card .summary{font-size:0.82rem;color:rgba(255,255,255,0.65);margin-bottom:10px;line-height:1.5}
+.social-card .quote{
+  font-style:italic;font-size:0.8rem;color:rgba(255,255,255,0.5);
+  border-left:2px solid var(--gold);padding-left:10px;margin-bottom:10px;
+}
+.social-card .platforms{display:flex;gap:6px;flex-wrap:wrap}
+.platform-pill{
+  font-size:0.65rem;font-weight:600;padding:3px 10px;border-radius:20px;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+}
+.sentiment-badge{
+  display:inline-block;font-family:'Oswald',sans-serif;font-weight:600;
+  font-size:0.6rem;text-transform:uppercase;letter-spacing:1.5px;
+  padding:3px 12px;margin-bottom:8px;
+  clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);
+}
+.sentiment-positive{background:rgba(0,200,83,0.15);color:#00c853;box-shadow:0 0 10px rgba(0,200,83,0.1)}
+.sentiment-mixed{background:rgba(255,193,7,0.15);color:#ffc107;box-shadow:0 0 10px rgba(255,193,7,0.1)}
+
+/* ── FIXTURES TAB ── */
+.fixtures-controls{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.view-btn{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:1.5px;padding:6px 16px;
+  background:transparent;color:var(--text-dim);border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.2s;
+}
+.view-btn:hover{color:#fff;border-color:rgba(255,255,255,0.2)}
+.view-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
+.group-filter{
+  font-family:'Inter',sans-serif;font-size:12px;padding:6px 10px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);border-radius:6px;outline:none;margin-left:auto;
+}
+.group-filter option{background:#1a1a2e;color:#e8e8e8}
+
+.date-group{margin-bottom:28px}
+.date-header{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.95rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--gold);
+  padding:8px 0;margin-bottom:10px;
+  border-bottom:1px solid rgba(255,215,0,0.15);
+  display:flex;align-items:center;gap:8px;
+}
+.date-header .match-count{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:500;
+  color:var(--text-dim);letter-spacing:0;text-transform:none;
+}
+.stage-group{margin-bottom:28px}
+.stage-group h3{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.95rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--gold);
+  margin-bottom:10px;padding:8px 0;
+  border-bottom:1px solid rgba(255,215,0,0.15);
+}
+.matches-list{display:flex;flex-direction:column;gap:6px}
+
+/* ESPN-style match row */
+.match-row{
+  display:grid;grid-template-columns:1fr auto 1fr auto;
+  align-items:center;padding:0;overflow:hidden;min-height:56px;
+  transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.match-row:hover{box-shadow:0 0 20px rgba(204,0,0,0.1);border-color:rgba(255,255,255,0.15)}
+.team{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.team-home{justify-content:flex-end;text-align:right}
+.team-away{justify-content:flex-start}
+.team-flag{font-size:1.3rem}
+.team-name{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.85rem;
+  text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;
+}
+.team-code{font-size:0.65rem;color:var(--text-dim);letter-spacing:1px}
+.match-center{
+  text-align:center;padding:8px 12px;min-width:80px;
+  border-left:1px solid rgba(255,255,255,0.05);
+  border-right:1px solid rgba(255,255,255,0.05);
+}
+.match-center .kickoff{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;color:#fff;
+}
+.match-center .score{
+  font-family:'Oswald',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:2px;
+}
+.match-center .group-tag{
+  font-size:0.6rem;color:var(--text-dim);letter-spacing:1px;
+  text-transform:uppercase;font-family:'Oswald',sans-serif;
+}
+.match-detail{
+  background:rgba(204,0,0,0.15);
+  padding:8px 16px;display:flex;flex-direction:column;
+  justify-content:center;gap:1px;min-width:180px;
+  border-left:2px solid var(--red);
+}
+.match-detail .venue{font-size:0.7rem;color:var(--text-dim)}
+.match-detail .date{font-family:'Oswald',sans-serif;font-size:0.7rem;color:rgba(255,255,255,0.6);letter-spacing:0.5px}
+.match-detail .status-badge{
+  display:inline-block;font-size:0.55rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:2px 8px;border-radius:20px;width:fit-content;margin-top:2px;
+}
+.status-upcoming{background:rgba(33,150,243,0.2);color:#64b5f6;box-shadow:0 0 6px rgba(33,150,243,0.1)}
+.status-live{background:rgba(0,200,83,0.2);color:#69f0ae;box-shadow:0 0 8px rgba(0,200,83,0.15)}
+
+/* ── CREATIVE TAB ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-pill{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.75rem;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:7px 20px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text-dim);
+  cursor:pointer;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.3s var(--transition);
+}
+.filter-pill:hover{border-color:rgba(255,255,255,0.2);color:#fff}
+.filter-pill.active{background:var(--red);color:#fff;border-color:var(--red)}
+.assets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.asset-card{overflow:hidden;display:flex;flex-direction:column}
+.asset-card:hover{box-shadow:0 0 24px rgba(204,0,0,0.12)}
+.asset-thumb{
+  width:100%;height:180px;object-fit:cover;background:rgba(255,255,255,0.02);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.8rem;color:var(--text-dim);position:relative;overflow:hidden;
+}
+.asset-thumb img{width:100%;height:100%;object-fit:cover}
+.asset-thumb .fallback{
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  background:linear-gradient(135deg,rgba(204,0,0,0.08),rgba(255,215,0,0.05));
+  font-family:'Oswald',sans-serif;font-size:0.85rem;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:2px;
+}
+.asset-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px}
+.asset-body h4{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.9rem;
+  text-transform:uppercase;letter-spacing:0.5px;line-height:1.3;
+}
+.asset-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.asset-format{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.6rem;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:3px 12px;background:rgba(255,255,255,0.08);color:var(--text-dim);
+  clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);
+}
+.asset-status-pill{
+  font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  padding:3px 10px;border-radius:20px;
+}
+.astatus-live{background:rgba(0,200,83,0.2);color:#69f0ae;box-shadow:0 0 8px rgba(0,200,83,0.15)}
+.astatus-scheduled{background:rgba(33,150,243,0.2);color:#64b5f6;box-shadow:0 0 8px rgba(33,150,243,0.15)}
+.astatus-review{background:rgba(255,193,7,0.2);color:#ffc107}
+.astatus-concept{background:rgba(255,255,255,0.08);color:var(--text-dim)}
+.asset-date{font-size:0.72rem;color:var(--text-dim)}
+.asset-link{
+  display:inline-block;margin-top:auto;padding-top:8px;
+  font-size:0.75rem;font-weight:600;color:var(--gold);
+  text-decoration:none;text-transform:uppercase;letter-spacing:1px;
+  transition:color 0.2s;
+}
+.asset-link:hover{color:#ffe44d}
+
+/* ── GEMINI PANEL ── */
+.gemini-overlay{
+  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);opacity:0;pointer-events:none;
+  transition:opacity 0.35s var(--transition);
+}
+.gemini-overlay.open{opacity:1;pointer-events:auto}
+.gemini-panel{
+  position:fixed;top:0;right:0;bottom:0;z-index:201;
+  width:420px;max-width:90vw;
+  background:rgba(14,16,24,0.92);backdrop-filter:blur(24px);
+  border-left:1px solid var(--border);
+  transform:translateX(100%);transition:transform 0.4s var(--transition);
+  display:flex;flex-direction:column;
+}
+.gemini-panel.open{transform:translateX(0)}
+.gemini-header{
+  padding:20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.gemini-brand{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.1rem;
+  text-transform:uppercase;letter-spacing:2px;
+  background:linear-gradient(135deg,#4285f4,#db4437,#f4b400,#0f9d58);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.gemini-close{
+  background:none;border:none;color:var(--text-dim);font-size:1.2rem;
+  cursor:pointer;padding:4px 8px;transition:color 0.2s;
+}
+.gemini-close:hover{color:#fff}
+.gemini-messages{
+  flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;
+}
+.gemini-msg{
+  padding:12px 16px;border-radius:10px;font-size:0.85rem;line-height:1.55;
+  max-width:90%;
+}
+.gemini-msg.assistant{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  align-self:flex-start;
+}
+.gemini-msg.user{
+  background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.2);
+  align-self:flex-end;
+}
+.gemini-input-area{
+  padding:16px;border-top:1px solid var(--border);display:flex;gap:8px;
+}
+.gemini-input{
+  flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.85rem;
+  font-family:'Inter',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.gemini-input:focus{border-color:rgba(255,255,255,0.2)}
+.gemini-send{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:10px 20px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#4285f4,#f4b400);color:#fff;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.3s var(--transition);
+}
+.gemini-send:hover{box-shadow:0 0 16px rgba(66,133,244,0.3)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .live-grid{grid-template-columns:1fr}
+  .header-inner{height:auto;padding:10px 0;flex-wrap:wrap}
+  .match-row{grid-template-columns:1fr auto 1fr;gap:0}
+  .match-detail{display:none}
+  .team{min-width:90px}
+}
+@media(max-width:600px){
+  .header-nav{order:3;width:100%;justify-content:center}
+  .brand{font-size:1.1rem}
+  .tab-btn{padding:6px 14px;font-size:0.75rem}
+  .assets-grid{grid-template-columns:1fr}
+  .gemini-panel{width:100%;max-width:100%}
+  .section-title{font-size:1.1rem}
+  .match-teams{flex-direction:column;gap:4px}
+  .team{justify-content:center !important;text-align:center !important;min-width:auto}
+  .vs-divider{padding:2px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-blobs">
+  <div class="blob blob-red"></div>
+  <div class="blob blob-gold"></div>
+  <div class="blob blob-blue"></div>
+</div>
+<div class="stadium-light"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">MFG World Cup Command</div>
+    <nav class="header-nav">
+      <button class="tab-btn active" data-tab="live">Live</button>
+      <button class="tab-btn" data-tab="calendar">Fixtures</button>
+      <button class="tab-btn" data-tab="creative">Creative</button>
+    </nav>
+    <div class="header-actions">
+      <a href="mfg.html" class="mfg-link">MFG Mode</a>
+      <button class="gemini-toggle" id="geminiToggle">Gemini</button>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">Breaking</div>
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <p class="updated" id="lastUpdated"></p>
+
+  <!-- LIVE -->
+  <div class="tab-panel active" id="panel-live">
+    <div class="live-grid">
+      <div class="news-col">
+        <h2 class="section-title">Latest News</h2>
+        <div id="newsCards"></div>
+      </div>
+      <div class="social-col">
+        <h2 class="section-title">Social Trends</h2>
+        <div id="socialCards"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIXTURES -->
+  <div class="tab-panel" id="panel-calendar">
+    <h2 class="section-title">Match Schedule — 104 Matches</h2>
+    <div class="fixtures-controls">
+      <button class="view-btn active" data-view="date" onclick="setFixtureView('date')">📅 By Date</button>
+      <button class="view-btn" data-view="group" onclick="setFixtureView('group')">🏟️ By Group</button>
+      <select class="group-filter" id="groupFilter" onchange="renderMatches()">
+        <option value="all">All Stages</option>
+        <option value="Group A">Group A</option><option value="Group B">Group B</option>
+        <option value="Group C">Group C</option><option value="Group D">Group D</option>
+        <option value="Group E">Group E</option><option value="Group F">Group F</option>
+        <option value="Group G">Group G</option><option value="Group H">Group H</option>
+        <option value="Group I">Group I</option><option value="Group J">Group J</option>
+        <option value="Group K">Group K</option><option value="Group L">Group L</option>
+        <option value="Round of 32">Round of 32</option><option value="Round of 16">Round of 16</option>
+        <option value="Quarterfinal">Quarterfinal</option><option value="Semifinal">Semifinal</option>
+        <option value="Third Place">Third Place</option><option value="Final 🏆">Final</option>
+      </select>
+    </div>
+    <div id="matchList"></div>
+  </div>
+
+  <!-- CREATIVE -->
+  <div class="tab-panel" id="panel-creative">
+    <h2 class="section-title">Creative Assets</h2>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="assets-grid" id="assetsGrid"></div>
+  </div>
+</main>
+
+<!-- GEMINI -->
+<div class="gemini-overlay" id="geminiOverlay"></div>
+<div class="gemini-panel" id="geminiPanel">
+  <div class="gemini-header">
+    <span class="gemini-brand">Gemini Assistant</span>
+    <button class="gemini-close" id="geminiClose">&times;</button>
+  </div>
+  <div class="gemini-messages" id="geminiMessages">
+    <div class="gemini-msg assistant">Hey! I'm your Gemini-powered World Cup assistant. Ask me about matches, social trends, creative assets, or campaign strategy.</div>
+  </div>
+  <div class="gemini-input-area">
+    <input class="gemini-input" id="geminiInput" placeholder="Ask about the World Cup campaign..." />
+    <button class="gemini-send" id="geminiSend">Send</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const DASHBOARD_DATA = {
+  lastUpdated: "2026-04-08T14:30:00Z",
+  ticker: [
+    "\u{1f6a8} BREAKING: Canada announces final 26-man roster for 2026 World Cup \u{1f1e8}\u{1f1e6}",
+    "\u26bd Germany vs Brazil friendly draws 4.2M viewers in Berlin \u{1f1e9}\u{1f1ea}\u{1f1e7}\u{1f1f7}",
+    "\u{1f389} FIFA confirms expanded fan zone locations in Toronto and Vancouver",
+    "\u{1f4aa} Alphonso Davies declared fully fit after knee scare \u2014 ready for action",
+    "\u{1f3df}\ufe0f Mexico announces Estadio Azteca renovations complete ahead of opener",
+    "\u{1f451} Messi confirms 2026 World Cup will be his last tournament \u{1f410}",
+    "\u{1f39f}\ufe0f USMNT sells out all group stage matches at MetLife Stadium \u{1f1fa}\u{1f1f8}",
+    "\u26bd New FIFA 26 Official Match Ball 'Continente' unveiled in NYC \u{1f30e}"
+  ],
+  news: [
+    { id: "n1", headline: "\u{1f1e8}\u{1f1e6} Alphonso Davies Named Canada Captain for 2026 World Cup", source: "TSN", timestamp: "2026-04-08T12:00:00Z", summary: "Bayern Munich star Alphonso Davies has been named captain of the Canadian Men\u2019s National Team ahead of the 2026 FIFA World Cup on home soil. \u{1fae1}\u{1f525}", url: "https://tsn.ca", tag: "Canada" },
+    { id: "n2", headline: "\u{1f1e9}\u{1f1ea} Germany Unveils Bold New Home Kit for World Cup Campaign \u{1f455}", source: "Kicker", timestamp: "2026-04-08T10:30:00Z", summary: "Adidas reveals Germany\u2019s 2026 World Cup home jersey featuring a return to classic design with modern performance fabric. Fashion accounts are loving it \u{1f525}", url: "https://kicker.de", tag: "Germany" },
+    { id: "n3", headline: "\u{1f3df}\ufe0f FIFA Releases Full Match Schedule \u2014 Opening Ceremony in Mexico City \u{1f1f2}\u{1f1fd}", source: "FIFA.com", timestamp: "2026-04-07T18:00:00Z", summary: "The full 104-match schedule has been confirmed! Mexico City\u2019s Estadio Azteca will host the opening ceremony and first match on June 11. \u{1f4c5}\u26bd", url: "https://fifa.com", tag: null },
+    { id: "n4", headline: "\u{1f1e8}\u{1f1e6} Jonathan David Hits 30-Goal Season Mark Ahead of World Cup \u26bd\u{1f525}", source: "RDS", timestamp: "2026-04-07T14:00:00Z", summary: "Canada\u2019s star striker Jonathan David has scored his 30th goal of the club season \u2014 entering the World Cup in absolutely lethal form \u{1f3af}\u{1f4a5}", url: "https://rds.ca", tag: "Canada" },
+    { id: "n5", headline: "\u{1f1e9}\u{1f1ea} Jamal Musiala Named in Germany\u2019s Preliminary 30-Man Squad \u2705", source: "DFB", timestamp: "2026-04-06T20:00:00Z", summary: "Manager Julian Nagelsmann includes Musiala in expanded squad \u2014 final cuts expected by June 1. The kid is ready \u{1f31f}", url: "https://dfb.de", tag: "Germany" }
+  ],
+  matches: [
+    // ── GROUP A ──
+    { id:"m1", date:"2026-06-11", kickoff:"3:00 PM ET", stage:"Group A", home:{name:"Mexico",code:"MEX",flag:"🇲🇽"}, away:{name:"South Africa",code:"RSA",flag:"🇿🇦"}, venue:"Estadio Azteca, Mexico City", status:"upcoming", score:null },
+    { id:"m2", date:"2026-06-11", kickoff:"10:00 PM ET", stage:"Group A", home:{name:"South Korea",code:"KOR",flag:"🇰🇷"}, away:{name:"Czechia",code:"CZE",flag:"🇨🇿"}, venue:"Estadio Akron, Guadalajara", status:"upcoming", score:null },
+    { id:"m3", date:"2026-06-18", kickoff:"12:00 PM ET", stage:"Group A", home:{name:"Czechia",code:"CZE",flag:"🇨🇿"}, away:{name:"South Africa",code:"RSA",flag:"🇿🇦"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    { id:"m4", date:"2026-06-18", kickoff:"9:00 PM ET", stage:"Group A", home:{name:"Mexico",code:"MEX",flag:"🇲🇽"}, away:{name:"South Korea",code:"KOR",flag:"🇰🇷"}, venue:"Estadio Akron, Guadalajara", status:"upcoming", score:null },
+    { id:"m5", date:"2026-06-24", kickoff:"9:00 PM ET", stage:"Group A", home:{name:"Czechia",code:"CZE",flag:"🇨🇿"}, away:{name:"Mexico",code:"MEX",flag:"🇲🇽"}, venue:"Estadio Azteca, Mexico City", status:"upcoming", score:null },
+    { id:"m6", date:"2026-06-24", kickoff:"9:00 PM ET", stage:"Group A", home:{name:"South Africa",code:"RSA",flag:"🇿🇦"}, away:{name:"South Korea",code:"KOR",flag:"🇰🇷"}, venue:"Estadio BBVA, Monterrey", status:"upcoming", score:null },
+    // ── GROUP B ──
+    { id:"m7", date:"2026-06-12", kickoff:"3:00 PM ET", stage:"Group B", home:{name:"Canada",code:"CAN",flag:"🇨🇦"}, away:{name:"Bosnia & Herzegovina",code:"BIH",flag:"🇧🇦"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    { id:"m8", date:"2026-06-13", kickoff:"3:00 PM ET", stage:"Group B", home:{name:"Qatar",code:"QAT",flag:"🇶🇦"}, away:{name:"Switzerland",code:"SUI",flag:"🇨🇭"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    { id:"m9", date:"2026-06-18", kickoff:"3:00 PM ET", stage:"Group B", home:{name:"Switzerland",code:"SUI",flag:"🇨🇭"}, away:{name:"Bosnia & Herzegovina",code:"BIH",flag:"🇧🇦"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m10", date:"2026-06-18", kickoff:"6:00 PM ET", stage:"Group B", home:{name:"Canada",code:"CAN",flag:"🇨🇦"}, away:{name:"Qatar",code:"QAT",flag:"🇶🇦"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    { id:"m11", date:"2026-06-24", kickoff:"3:00 PM ET", stage:"Group B", home:{name:"Switzerland",code:"SUI",flag:"🇨🇭"}, away:{name:"Canada",code:"CAN",flag:"🇨🇦"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    { id:"m12", date:"2026-06-24", kickoff:"3:00 PM ET", stage:"Group B", home:{name:"Bosnia & Herzegovina",code:"BIH",flag:"🇧🇦"}, away:{name:"Qatar",code:"QAT",flag:"🇶🇦"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    // ── GROUP C ──
+    { id:"m13", date:"2026-06-13", kickoff:"6:00 PM ET", stage:"Group C", home:{name:"Brazil",code:"BRA",flag:"🇧🇷"}, away:{name:"Morocco",code:"MAR",flag:"🇲🇦"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m14", date:"2026-06-13", kickoff:"9:00 PM ET", stage:"Group C", home:{name:"Haiti",code:"HAI",flag:"🇭🇹"}, away:{name:"Scotland",code:"SCO",flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m15", date:"2026-06-19", kickoff:"6:00 PM ET", stage:"Group C", home:{name:"Scotland",code:"SCO",flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"}, away:{name:"Morocco",code:"MAR",flag:"🇲🇦"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m16", date:"2026-06-19", kickoff:"9:00 PM ET", stage:"Group C", home:{name:"Brazil",code:"BRA",flag:"🇧🇷"}, away:{name:"Haiti",code:"HAI",flag:"🇭🇹"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    { id:"m17", date:"2026-06-24", kickoff:"6:00 PM ET", stage:"Group C", home:{name:"Scotland",code:"SCO",flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"}, away:{name:"Brazil",code:"BRA",flag:"🇧🇷"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m18", date:"2026-06-24", kickoff:"6:00 PM ET", stage:"Group C", home:{name:"Morocco",code:"MAR",flag:"🇲🇦"}, away:{name:"Haiti",code:"HAI",flag:"🇭🇹"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    // ── GROUP D ──
+    { id:"m19", date:"2026-06-12", kickoff:"9:00 PM ET", stage:"Group D", home:{name:"USA",code:"USA",flag:"🇺🇸"}, away:{name:"Paraguay",code:"PAR",flag:"🇵🇾"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m20", date:"2026-06-13", kickoff:"12:00 AM ET", stage:"Group D", home:{name:"Australia",code:"AUS",flag:"🇦🇺"}, away:{name:"Türkiye",code:"TUR",flag:"🇹🇷"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    { id:"m21", date:"2026-06-19", kickoff:"3:00 PM ET", stage:"Group D", home:{name:"USA",code:"USA",flag:"🇺🇸"}, away:{name:"Australia",code:"AUS",flag:"🇦🇺"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    { id:"m22", date:"2026-06-19", kickoff:"12:00 AM ET", stage:"Group D", home:{name:"Türkiye",code:"TUR",flag:"🇹🇷"}, away:{name:"Paraguay",code:"PAR",flag:"🇵🇾"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    { id:"m23", date:"2026-06-25", kickoff:"10:00 PM ET", stage:"Group D", home:{name:"Türkiye",code:"TUR",flag:"🇹🇷"}, away:{name:"USA",code:"USA",flag:"🇺🇸"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m24", date:"2026-06-25", kickoff:"10:00 PM ET", stage:"Group D", home:{name:"Paraguay",code:"PAR",flag:"🇵🇾"}, away:{name:"Australia",code:"AUS",flag:"🇦🇺"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    // ── GROUP E ──
+    { id:"m25", date:"2026-06-14", kickoff:"1:00 PM ET", stage:"Group E", home:{name:"Germany",code:"GER",flag:"🇩🇪"}, away:{name:"Curaçao",code:"CUW",flag:"🇨🇼"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m26", date:"2026-06-14", kickoff:"7:00 PM ET", stage:"Group E", home:{name:"Ivory Coast",code:"CIV",flag:"🇨🇮"}, away:{name:"Ecuador",code:"ECU",flag:"🇪🇨"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    { id:"m27", date:"2026-06-20", kickoff:"4:00 PM ET", stage:"Group E", home:{name:"Germany",code:"GER",flag:"🇩🇪"}, away:{name:"Ivory Coast",code:"CIV",flag:"🇨🇮"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    { id:"m28", date:"2026-06-20", kickoff:"8:00 PM ET", stage:"Group E", home:{name:"Ecuador",code:"ECU",flag:"🇪🇨"}, away:{name:"Curaçao",code:"CUW",flag:"🇨🇼"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    { id:"m29", date:"2026-06-25", kickoff:"4:00 PM ET", stage:"Group E", home:{name:"Ecuador",code:"ECU",flag:"🇪🇨"}, away:{name:"Germany",code:"GER",flag:"🇩🇪"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m30", date:"2026-06-25", kickoff:"4:00 PM ET", stage:"Group E", home:{name:"Curaçao",code:"CUW",flag:"🇨🇼"}, away:{name:"Ivory Coast",code:"CIV",flag:"🇨🇮"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    // ── GROUP F ──
+    { id:"m31", date:"2026-06-14", kickoff:"4:00 PM ET", stage:"Group F", home:{name:"Netherlands",code:"NED",flag:"🇳🇱"}, away:{name:"Japan",code:"JPN",flag:"🇯🇵"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m32", date:"2026-06-14", kickoff:"10:00 PM ET", stage:"Group F", home:{name:"Sweden",code:"SWE",flag:"🇸🇪"}, away:{name:"Tunisia",code:"TUN",flag:"🇹🇳"}, venue:"Estadio BBVA, Monterrey", status:"upcoming", score:null },
+    { id:"m33", date:"2026-06-20", kickoff:"1:00 PM ET", stage:"Group F", home:{name:"Netherlands",code:"NED",flag:"🇳🇱"}, away:{name:"Sweden",code:"SWE",flag:"🇸🇪"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m34", date:"2026-06-20", kickoff:"12:00 AM ET", stage:"Group F", home:{name:"Tunisia",code:"TUN",flag:"🇹🇳"}, away:{name:"Japan",code:"JPN",flag:"🇯🇵"}, venue:"Estadio BBVA, Monterrey", status:"upcoming", score:null },
+    { id:"m35", date:"2026-06-25", kickoff:"7:00 PM ET", stage:"Group F", home:{name:"Japan",code:"JPN",flag:"🇯🇵"}, away:{name:"Sweden",code:"SWE",flag:"🇸🇪"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m36", date:"2026-06-25", kickoff:"7:00 PM ET", stage:"Group F", home:{name:"Tunisia",code:"TUN",flag:"🇹🇳"}, away:{name:"Netherlands",code:"NED",flag:"🇳🇱"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    // ── GROUP G ──
+    { id:"m37", date:"2026-06-15", kickoff:"3:00 PM ET", stage:"Group G", home:{name:"Belgium",code:"BEL",flag:"🇧🇪"}, away:{name:"Egypt",code:"EGY",flag:"🇪🇬"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    { id:"m38", date:"2026-06-15", kickoff:"9:00 PM ET", stage:"Group G", home:{name:"Iran",code:"IRN",flag:"🇮🇷"}, away:{name:"New Zealand",code:"NZL",flag:"🇳🇿"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m39", date:"2026-06-21", kickoff:"3:00 PM ET", stage:"Group G", home:{name:"Belgium",code:"BEL",flag:"🇧🇪"}, away:{name:"Iran",code:"IRN",flag:"🇮🇷"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m40", date:"2026-06-21", kickoff:"9:00 PM ET", stage:"Group G", home:{name:"New Zealand",code:"NZL",flag:"🇳🇿"}, away:{name:"Egypt",code:"EGY",flag:"🇪🇬"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    { id:"m41", date:"2026-06-26", kickoff:"11:00 PM ET", stage:"Group G", home:{name:"Egypt",code:"EGY",flag:"🇪🇬"}, away:{name:"Iran",code:"IRN",flag:"🇮🇷"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    { id:"m42", date:"2026-06-26", kickoff:"11:00 PM ET", stage:"Group G", home:{name:"New Zealand",code:"NZL",flag:"🇳🇿"}, away:{name:"Belgium",code:"BEL",flag:"🇧🇪"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    // ── GROUP H ──
+    { id:"m43", date:"2026-06-15", kickoff:"12:00 PM ET", stage:"Group H", home:{name:"Spain",code:"ESP",flag:"🇪🇸"}, away:{name:"Cape Verde",code:"CPV",flag:"🇨🇻"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    { id:"m44", date:"2026-06-15", kickoff:"6:00 PM ET", stage:"Group H", home:{name:"Saudi Arabia",code:"KSA",flag:"🇸🇦"}, away:{name:"Uruguay",code:"URU",flag:"🇺🇾"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m45", date:"2026-06-21", kickoff:"12:00 PM ET", stage:"Group H", home:{name:"Spain",code:"ESP",flag:"🇪🇸"}, away:{name:"Saudi Arabia",code:"KSA",flag:"🇸🇦"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    { id:"m46", date:"2026-06-21", kickoff:"6:00 PM ET", stage:"Group H", home:{name:"Uruguay",code:"URU",flag:"🇺🇾"}, away:{name:"Cape Verde",code:"CPV",flag:"🇨🇻"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m47", date:"2026-06-26", kickoff:"8:00 PM ET", stage:"Group H", home:{name:"Cape Verde",code:"CPV",flag:"🇨🇻"}, away:{name:"Saudi Arabia",code:"KSA",flag:"🇸🇦"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m48", date:"2026-06-26", kickoff:"8:00 PM ET", stage:"Group H", home:{name:"Uruguay",code:"URU",flag:"🇺🇾"}, away:{name:"Spain",code:"ESP",flag:"🇪🇸"}, venue:"Estadio Akron, Guadalajara", status:"upcoming", score:null },
+    // ── GROUP I ──
+    { id:"m49", date:"2026-06-16", kickoff:"3:00 PM ET", stage:"Group I", home:{name:"France",code:"FRA",flag:"🇫🇷"}, away:{name:"Senegal",code:"SEN",flag:"🇸🇳"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m50", date:"2026-06-16", kickoff:"6:00 PM ET", stage:"Group I", home:{name:"Iraq",code:"IRQ",flag:"🇮🇶"}, away:{name:"Norway",code:"NOR",flag:"🇳🇴"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m51", date:"2026-06-22", kickoff:"5:00 PM ET", stage:"Group I", home:{name:"France",code:"FRA",flag:"🇫🇷"}, away:{name:"Iraq",code:"IRQ",flag:"🇮🇶"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    { id:"m52", date:"2026-06-22", kickoff:"8:00 PM ET", stage:"Group I", home:{name:"Norway",code:"NOR",flag:"🇳🇴"}, away:{name:"Senegal",code:"SEN",flag:"🇸🇳"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m53", date:"2026-06-26", kickoff:"3:00 PM ET", stage:"Group I", home:{name:"Norway",code:"NOR",flag:"🇳🇴"}, away:{name:"France",code:"FRA",flag:"🇫🇷"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m54", date:"2026-06-26", kickoff:"3:00 PM ET", stage:"Group I", home:{name:"Senegal",code:"SEN",flag:"🇸🇳"}, away:{name:"Iraq",code:"IRQ",flag:"🇮🇶"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    // ── GROUP J ──
+    { id:"m55", date:"2026-06-16", kickoff:"9:00 PM ET", stage:"Group J", home:{name:"Argentina",code:"ARG",flag:"🇦🇷"}, away:{name:"Algeria",code:"ALG",flag:"🇩🇿"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    { id:"m56", date:"2026-06-16", kickoff:"12:00 AM ET", stage:"Group J", home:{name:"Austria",code:"AUT",flag:"🇦🇹"}, away:{name:"Jordan",code:"JOR",flag:"🇯🇴"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    { id:"m57", date:"2026-06-22", kickoff:"1:00 PM ET", stage:"Group J", home:{name:"Argentina",code:"ARG",flag:"🇦🇷"}, away:{name:"Austria",code:"AUT",flag:"🇦🇹"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m58", date:"2026-06-22", kickoff:"11:00 PM ET", stage:"Group J", home:{name:"Jordan",code:"JOR",flag:"🇯🇴"}, away:{name:"Algeria",code:"ALG",flag:"🇩🇿"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    { id:"m59", date:"2026-06-27", kickoff:"10:00 PM ET", stage:"Group J", home:{name:"Algeria",code:"ALG",flag:"🇩🇿"}, away:{name:"Austria",code:"AUT",flag:"🇦🇹"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    { id:"m60", date:"2026-06-27", kickoff:"10:00 PM ET", stage:"Group J", home:{name:"Jordan",code:"JOR",flag:"🇯🇴"}, away:{name:"Argentina",code:"ARG",flag:"🇦🇷"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    // ── GROUP K ──
+    { id:"m61", date:"2026-06-17", kickoff:"1:00 PM ET", stage:"Group K", home:{name:"Portugal",code:"POR",flag:"🇵🇹"}, away:{name:"DR Congo",code:"COD",flag:"🇨🇩"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m62", date:"2026-06-17", kickoff:"10:00 PM ET", stage:"Group K", home:{name:"Uzbekistan",code:"UZB",flag:"🇺🇿"}, away:{name:"Colombia",code:"COL",flag:"🇨🇴"}, venue:"Estadio Azteca, Mexico City", status:"upcoming", score:null },
+    { id:"m63", date:"2026-06-23", kickoff:"1:00 PM ET", stage:"Group K", home:{name:"Portugal",code:"POR",flag:"🇵🇹"}, away:{name:"Uzbekistan",code:"UZB",flag:"🇺🇿"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m64", date:"2026-06-23", kickoff:"10:00 PM ET", stage:"Group K", home:{name:"Colombia",code:"COL",flag:"🇨🇴"}, away:{name:"DR Congo",code:"COD",flag:"🇨🇩"}, venue:"Estadio Akron, Guadalajara", status:"upcoming", score:null },
+    { id:"m65", date:"2026-06-27", kickoff:"7:30 PM ET", stage:"Group K", home:{name:"Colombia",code:"COL",flag:"🇨🇴"}, away:{name:"Portugal",code:"POR",flag:"🇵🇹"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m66", date:"2026-06-27", kickoff:"7:30 PM ET", stage:"Group K", home:{name:"DR Congo",code:"COD",flag:"🇨🇩"}, away:{name:"Uzbekistan",code:"UZB",flag:"🇺🇿"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    // ── GROUP L ──
+    { id:"m67", date:"2026-06-17", kickoff:"4:00 PM ET", stage:"Group L", home:{name:"England",code:"ENG",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"}, away:{name:"Croatia",code:"CRO",flag:"🇭🇷"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m68", date:"2026-06-17", kickoff:"7:00 PM ET", stage:"Group L", home:{name:"Ghana",code:"GHA",flag:"🇬🇭"}, away:{name:"Panama",code:"PAN",flag:"🇵🇦"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    { id:"m69", date:"2026-06-23", kickoff:"4:00 PM ET", stage:"Group L", home:{name:"England",code:"ENG",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"}, away:{name:"Ghana",code:"GHA",flag:"🇬🇭"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m70", date:"2026-06-23", kickoff:"7:00 PM ET", stage:"Group L", home:{name:"Panama",code:"PAN",flag:"🇵🇦"}, away:{name:"Croatia",code:"CRO",flag:"🇭🇷"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    { id:"m71", date:"2026-06-27", kickoff:"5:00 PM ET", stage:"Group L", home:{name:"Panama",code:"PAN",flag:"🇵🇦"}, away:{name:"England",code:"ENG",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m72", date:"2026-06-27", kickoff:"5:00 PM ET", stage:"Group L", home:{name:"Croatia",code:"CRO",flag:"🇭🇷"}, away:{name:"Ghana",code:"GHA",flag:"🇬🇭"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    // ── ROUND OF 32 ──
+    { id:"m73", date:"2026-06-28", kickoff:"3:00 PM ET", stage:"Round of 32", home:{name:"A2",code:"A2",flag:"🏳️"}, away:{name:"B2",code:"B2",flag:"🏳️"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m74", date:"2026-06-29", kickoff:"4:30 PM ET", stage:"Round of 32", home:{name:"E1",code:"E1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m75", date:"2026-06-29", kickoff:"9:00 PM ET", stage:"Round of 32", home:{name:"F1",code:"F1",flag:"🏳️"}, away:{name:"C2",code:"C2",flag:"🏳️"}, venue:"Estadio BBVA, Monterrey", status:"upcoming", score:null },
+    { id:"m76", date:"2026-06-29", kickoff:"1:00 PM ET", stage:"Round of 32", home:{name:"C1",code:"C1",flag:"🏳️"}, away:{name:"F2",code:"F2",flag:"🏳️"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m77", date:"2026-06-30", kickoff:"5:00 PM ET", stage:"Round of 32", home:{name:"I1",code:"I1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m78", date:"2026-06-30", kickoff:"1:00 PM ET", stage:"Round of 32", home:{name:"E2",code:"E2",flag:"🏳️"}, away:{name:"I2",code:"I2",flag:"🏳️"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m79", date:"2026-06-30", kickoff:"9:00 PM ET", stage:"Round of 32", home:{name:"A1",code:"A1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Estadio Azteca, Mexico City", status:"upcoming", score:null },
+    { id:"m80", date:"2026-07-01", kickoff:"12:00 PM ET", stage:"Round of 32", home:{name:"L1",code:"L1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    { id:"m81", date:"2026-07-01", kickoff:"8:00 PM ET", stage:"Round of 32", home:{name:"D1",code:"D1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Levi's Stadium, San Francisco", status:"upcoming", score:null },
+    { id:"m82", date:"2026-07-01", kickoff:"4:00 PM ET", stage:"Round of 32", home:{name:"G1",code:"G1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    { id:"m83", date:"2026-07-02", kickoff:"7:00 PM ET", stage:"Round of 32", home:{name:"K2",code:"K2",flag:"🏳️"}, away:{name:"L2",code:"L2",flag:"🏳️"}, venue:"BMO Field, Toronto", status:"upcoming", score:null },
+    { id:"m84", date:"2026-07-02", kickoff:"3:00 PM ET", stage:"Round of 32", home:{name:"H1",code:"H1",flag:"🏳️"}, away:{name:"J2",code:"J2",flag:"🏳️"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m85", date:"2026-07-02", kickoff:"11:00 PM ET", stage:"Round of 32", home:{name:"B1",code:"B1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    { id:"m86", date:"2026-07-03", kickoff:"6:00 PM ET", stage:"Round of 32", home:{name:"J1",code:"J1",flag:"🏳️"}, away:{name:"H2",code:"H2",flag:"🏳️"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m87", date:"2026-07-03", kickoff:"9:30 PM ET", stage:"Round of 32", home:{name:"K1",code:"K1",flag:"🏳️"}, away:{name:"3rd",code:"3rd",flag:"🏳️"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    { id:"m88", date:"2026-07-03", kickoff:"2:00 PM ET", stage:"Round of 32", home:{name:"D2",code:"D2",flag:"🏳️"}, away:{name:"G2",code:"G2",flag:"🏳️"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    // ── ROUND OF 16 ──
+    { id:"m89", date:"2026-07-04", kickoff:"5:00 PM ET", stage:"Round of 16", home:{name:"W74",code:"W74",flag:"🏳️"}, away:{name:"W77",code:"W77",flag:"🏳️"}, venue:"Lincoln Financial Field, Philadelphia", status:"upcoming", score:null },
+    { id:"m90", date:"2026-07-04", kickoff:"1:00 PM ET", stage:"Round of 16", home:{name:"W73",code:"W73",flag:"🏳️"}, away:{name:"W75",code:"W75",flag:"🏳️"}, venue:"NRG Stadium, Houston", status:"upcoming", score:null },
+    { id:"m91", date:"2026-07-05", kickoff:"4:00 PM ET", stage:"Round of 16", home:{name:"W76",code:"W76",flag:"🏳️"}, away:{name:"W78",code:"W78",flag:"🏳️"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null },
+    { id:"m92", date:"2026-07-05", kickoff:"8:00 PM ET", stage:"Round of 16", home:{name:"W79",code:"W79",flag:"🏳️"}, away:{name:"W80",code:"W80",flag:"🏳️"}, venue:"Estadio Azteca, Mexico City", status:"upcoming", score:null },
+    { id:"m93", date:"2026-07-06", kickoff:"3:00 PM ET", stage:"Round of 16", home:{name:"W83",code:"W83",flag:"🏳️"}, away:{name:"W84",code:"W84",flag:"🏳️"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m94", date:"2026-07-06", kickoff:"8:00 PM ET", stage:"Round of 16", home:{name:"W81",code:"W81",flag:"🏳️"}, away:{name:"W82",code:"W82",flag:"🏳️"}, venue:"Lumen Field, Seattle", status:"upcoming", score:null },
+    { id:"m95", date:"2026-07-07", kickoff:"12:00 PM ET", stage:"Round of 16", home:{name:"W86",code:"W86",flag:"🏳️"}, away:{name:"W88",code:"W88",flag:"🏳️"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    { id:"m96", date:"2026-07-07", kickoff:"4:00 PM ET", stage:"Round of 16", home:{name:"W85",code:"W85",flag:"🏳️"}, away:{name:"W87",code:"W87",flag:"🏳️"}, venue:"BC Place, Vancouver", status:"upcoming", score:null },
+    // ── QUARTERFINALS ──
+    { id:"m97", date:"2026-07-09", kickoff:"4:00 PM ET", stage:"Quarterfinal", home:{name:"W89",code:"W89",flag:"🏳️"}, away:{name:"W90",code:"W90",flag:"🏳️"}, venue:"Gillette Stadium, Boston", status:"upcoming", score:null },
+    { id:"m98", date:"2026-07-10", kickoff:"3:00 PM ET", stage:"Quarterfinal", home:{name:"W93",code:"W93",flag:"🏳️"}, away:{name:"W94",code:"W94",flag:"🏳️"}, venue:"SoFi Stadium, Los Angeles", status:"upcoming", score:null },
+    { id:"m99", date:"2026-07-11", kickoff:"5:00 PM ET", stage:"Quarterfinal", home:{name:"W91",code:"W91",flag:"🏳️"}, away:{name:"W92",code:"W92",flag:"🏳️"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    { id:"m100", date:"2026-07-11", kickoff:"9:00 PM ET", stage:"Quarterfinal", home:{name:"W95",code:"W95",flag:"🏳️"}, away:{name:"W96",code:"W96",flag:"🏳️"}, venue:"Arrowhead Stadium, Kansas City", status:"upcoming", score:null },
+    // ── SEMIFINALS ──
+    { id:"m101", date:"2026-07-14", kickoff:"3:00 PM ET", stage:"Semifinal", home:{name:"W97",code:"W97",flag:"🏳️"}, away:{name:"W98",code:"W98",flag:"🏳️"}, venue:"AT&T Stadium, Dallas", status:"upcoming", score:null },
+    { id:"m102", date:"2026-07-15", kickoff:"3:00 PM ET", stage:"Semifinal", home:{name:"W99",code:"W99",flag:"🏳️"}, away:{name:"W100",code:"W100",flag:"🏳️"}, venue:"Mercedes-Benz Stadium, Atlanta", status:"upcoming", score:null },
+    // ── THIRD PLACE ──
+    { id:"m103", date:"2026-07-18", kickoff:"5:00 PM ET", stage:"Third Place", home:{name:"L101",code:"L101",flag:"🏳️"}, away:{name:"L102",code:"L102",flag:"🏳️"}, venue:"Hard Rock Stadium, Miami", status:"upcoming", score:null },
+    // ── FINAL ──
+    { id:"m104", date:"2026-07-19", kickoff:"3:00 PM ET", stage:"Final 🏆", home:{name:"W101",code:"W101",flag:"🏳️"}, away:{name:"W102",code:"W102",flag:"🏳️"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null }
+  ],
+  social: [
+    { id: "s1", topic: "\u{1f451} Messi's Final World Cup Announcement", category: "game", volume: "\u{1f525}\u{1f525}\u{1f525}", sentiment: "mixed", summary: "Massive reaction to Messi confirming 2026 as his farewell tournament \u{1f622}\u{1f410} Split between celebration of his legacy and heartbreak.", sampleQuote: "\"The GOAT deserves one last dance on the biggest stage \u{1f410}\u{1f44f}\"", platforms: ["IG", "TikTok", "X"] },
+    { id: "s2", topic: "\u{1f32e}\u{1f35f} North American Street Food World Cup Rankings", category: "food", volume: "\u{1f525}\u{1f525}", sentiment: "positive", summary: "Viral thread ranking host city street food \u{1f60b} Tacos al pastor (Mexico City) vs poutine (Toronto) vs NYC halal cart \u2014 the debate is HEATED", sampleQuote: "\"If you're going to the WC and not hitting up a taco stand in CDMX you're doing it wrong \u{1f32e}\u{1f4af}\"", platforms: ["TikTok", "X"] },
+    { id: "s3", topic: "\u{1f3b5} Drake Teases World Cup Anthem Collab \u{1f50a}", category: "music", volume: "\u{1f525}\u{1f525}\u{1f525}", sentiment: "positive", summary: "Drake hints at collaboration with Bad Bunny for an unofficial World Cup anthem \u{1f92f} IG Story showed studio session with FIFA merch in background.", sampleQuote: "\"Drake x Bad Bunny WC anthem?? SUMMER IS SAVED \u{1f525}\u{1f3b6}\"", platforms: ["IG", "X"] },
+    { id: "s4", topic: "\u{1f602} Alphonso Davies Canada Captain Memes", category: "memes", volume: "\u{1f525}\u{1f525}", sentiment: "positive", summary: "Wholesome memes celebrating Davies going from refugee to World Cup captain on home soil \u{1f979}\u{1f1e8}\u{1f1e6} Also jokes about him being 'too fast' for the armband \u{1f4a8}", sampleQuote: null, platforms: ["IG", "TikTok", "X"] },
+    { id: "s5", topic: "\u{1f455} World Cup Kit Fashion Rankings \u{1f485}", category: "fashion", volume: "\u{1f525}", sentiment: "mixed", summary: "Fashion accounts ranking all 48 team kits. Germany\u2019s retro kit winning praise \u{1f1e9}\u{1f1ea}\u2728 USA\u2019s away kit getting absolutely roasted \u{1f1fa}\u{1f1f8}\u{1f62c}", sampleQuote: "\"Germany understood the assignment. USA... did not. \u{1f480}\"", platforms: ["IG", "TikTok"] },
+    { id: "s6", topic: "\u{1faf6} K-Pop Fans Rally Behind South Korea \u{1f1f0}\u{1f1f7}", category: "fandom", volume: "\u{1f525}\u{1f525}", sentiment: "positive", summary: "BTS ARMY and other K-pop fandoms organizing mass support campaigns for Korea\u2019s WC run \u{1f49c} Custom banners and chants going viral across TikTok", sampleQuote: "\"If ARMY can sell out stadiums for concerts, we can sell out stadiums for Korea \u{1f1f0}\u{1f1f7}\u{1f4aa}\"", platforms: ["X", "TikTok"] }
+  ],
+  assets: [
+    { id: "a1", headline: "\u{1f1e8}\u{1f1e6} Canada vs Mexico \u2014 Opener Hype Reel \u{1f3ac}", market: "Canada", status: "Live", deployDate: "2026-06-10", format: "Reel", driveFileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz", driveUrl: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view" },
+    { id: "a2", headline: "\u{1f1e8}\u{1f1e6} Alphonso Davies \u2014 Captain Announcement Post \u{1fae1}", market: "Canada", status: "Live", deployDate: "2026-04-08", format: "Carousel", driveFileId: "2BcDeFgHiJkLmNoPqRsTuVwXyZ", driveUrl: "https://drive.google.com/file/d/2BcDeFgHiJkLmNoPqRsTuVwXyZ/view" },
+    { id: "a3", headline: "\u{1f1e9}\u{1f1ea} Germany Kit Reveal \u2014 Reaction Template \u{1f455}", market: "Germany", status: "Scheduled", deployDate: "2026-04-12", format: "Story", driveFileId: "3CdEfGhIjKlMnOpQrStUvWxYz1", driveUrl: "https://drive.google.com/file/d/3CdEfGhIjKlMnOpQrStUvWxYz1/view" },
+    { id: "a4", headline: "\u{1f30d} Global \u2014 Countdown to Kickoff (30 Days) \u23f3", market: "Global", status: "In Review", deployDate: "2026-05-12", format: "Static", driveFileId: "4DeFgHiJkLmNoPqRsTuVwXyZ12", driveUrl: "https://drive.google.com/file/d/4DeFgHiJkLmNoPqRsTuVwXyZ12/view" },
+    { id: "a5", headline: "\u{1f1e8}\u{1f1e6} Canada \u2014 Group Stage Match Day Graphics Pack \u26bd", market: "Canada", status: "In Review", deployDate: "2026-06-11", format: "Static", driveFileId: "5EfGhIjKlMnOpQrStUvWxYz123", driveUrl: "https://drive.google.com/file/d/5EfGhIjKlMnOpQrStUvWxYz123/view" },
+    { id: "a6", headline: "\u{1f1e9}\u{1f1ea} Germany \u2014 Musiala Spotlight Reel \u{1f31f}", market: "Germany", status: "Concept", deployDate: "2026-06-12", format: "Reel", driveFileId: "6FgHiJkLmNoPqRsTuVwXyZ1234", driveUrl: "https://drive.google.com/file/d/6FgHiJkLmNoPqRsTuVwXyZ1234/view" },
+    { id: "a7", headline: "\u{1f30d} Global \u2014 World Cup Fan Culture Carousel \u{1faf6}", market: "Global", status: "Scheduled", deployDate: "2026-05-20", format: "Carousel", driveFileId: "7GhIjKlMnOpQrStUvWxYz12345", driveUrl: "https://drive.google.com/file/d/7GhIjKlMnOpQrStUvWxYz12345/view" },
+    { id: "a8", headline: "\u{1f1e8}\u{1f1e6} Canada \u2014 Jonathan David Goal Reactive Template \u{1f3af}", market: "Canada", status: "Concept", deployDate: "2026-06-11", format: "Static", driveFileId: "8HiJkLmNoPqRsTuVwXyZ123456", driveUrl: "https://drive.google.com/file/d/8HiJkLmNoPqRsTuVwXyZ123456/view" }
+  ]
+};
+
+function driveThumbnail(fileId, size = 800) {
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
+}
+
+// ── RENDER ──
+function init() {
+  renderTicker();
+  renderTimestamp();
+  renderNews();
+  renderSocial();
+  renderMatches();
+  renderAssets();
+  setupTabs();
+  setupGemini();
+  setupKeyboard();
+  handleHash();
+}
+
+function renderTicker() {
+  const track = document.getElementById('tickerTrack');
+  const items = DASHBOARD_DATA.ticker.map(t => `<span class="ticker-item">${t}</span>`).join('');
+  track.innerHTML = items + items;
+}
+
+function renderTimestamp() {
+  const d = new Date(DASHBOARD_DATA.lastUpdated);
+  document.getElementById('lastUpdated').textContent = `Last updated: ${d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZoneName:'short'})}`;
+}
+
+function renderNews() {
+  const container = document.getElementById('newsCards');
+  container.innerHTML = DASHBOARD_DATA.news.map(n => {
+    const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
+    const tagLabel = n.tag || 'General';
+    const time = new Date(n.timestamp);
+    const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    return `<div class="news-card glass">
+      <span class="tag ${tagClass}">${tagLabel}</span>
+      <h3>${n.headline}</h3>
+      <p class="meta">${n.source} \u2022 ${timeStr}</p>
+      <p class="summary">${n.summary}</p>
+      <a href="${n.url}" target="_blank" rel="noopener" class="read-more">Read More \u2192</a>
+    </div>`;
+  }).join('');
+}
+
+function renderSocial() {
+  const container = document.getElementById('socialCards');
+  container.innerHTML = DASHBOARD_DATA.social.map(s => {
+    const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : 'sentiment-mixed';
+    const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
+    return `<div class="social-card glass">
+      <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
+      <h3 class="topic">${s.topic}</h3>
+      <p class="volume">${s.volume}</p>
+      <p class="summary">${s.summary}</p>
+      ${quoteHtml}
+      <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+let fixtureView = 'date';
+function setFixtureView(view) {
+  fixtureView = view;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  renderMatches();
+}
+
+function renderMatchRow(m) {
+  const statusClass = m.status === 'live' ? 'status-live' : 'status-upcoming';
+  const dateStr = new Date(m.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const scoreOrTime = m.score
+    ? `<div class="score">${m.score.home} – ${m.score.away}</div><div class="group-tag">FT</div>`
+    : `<div class="kickoff">${m.kickoff}</div><div class="group-tag">${m.stage}</div>`;
+  return `<div class="match-row glass">
+    <div class="team team-home">
+      <div><div class="team-name">${m.home.name}</div><div class="team-code">${m.home.code}</div></div>
+      <span class="team-flag">${m.home.flag}</span>
+    </div>
+    <div class="match-center">${scoreOrTime}</div>
+    <div class="team team-away">
+      <span class="team-flag">${m.away.flag}</span>
+      <div><div class="team-name">${m.away.name}</div><div class="team-code">${m.away.code}</div></div>
+    </div>
+    <div class="match-detail">
+      <span class="venue">${m.venue}</span>
+      <span class="date">${dateStr}</span>
+      <span class="status-badge ${statusClass}">${m.status}</span>
+    </div>
+  </div>`;
+}
+
+function renderMatches() {
+  const container = document.getElementById('matchList');
+  const filterVal = document.getElementById('groupFilter').value;
+  let matches = DASHBOARD_DATA.matches;
+  if (filterVal !== 'all') {
+    matches = matches.filter(m => m.stage === filterVal);
+  }
+
+  if (fixtureView === 'date') {
+    // Group by date (ESPN-style)
+    const byDate = {};
+    matches.forEach(m => {
+      if (!byDate[m.date]) byDate[m.date] = [];
+      byDate[m.date].push(m);
+    });
+    container.innerHTML = Object.entries(byDate).map(([date, games]) => {
+      const dateStr = new Date(date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+      return `<div class="date-group">
+        <div class="date-header">${dateStr} <span class="match-count">${games.length} match${games.length > 1 ? 'es' : ''}</span></div>
+        <div class="matches-list">${games.map(renderMatchRow).join('')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    // Group by stage
+    const byStage = {};
+    matches.forEach(m => {
+      if (!byStage[m.stage]) byStage[m.stage] = [];
+      byStage[m.stage].push(m);
+    });
+    container.innerHTML = Object.entries(byStage).map(([stage, games]) => {
+      return `<div class="stage-group">
+        <h3>${stage} <span style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:rgba(255,255,255,0.4);letter-spacing:0;text-transform:none">${games.length} matches</span></h3>
+        <div class="matches-list">${games.map(renderMatchRow).join('')}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderAssets(filter = 'All') {
+  const grid = document.getElementById('assetsGrid');
+  const filtered = filter === 'All' ? DASHBOARD_DATA.assets : DASHBOARD_DATA.assets.filter(a => a.market === filter);
+  grid.innerHTML = filtered.map(a => {
+    const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
+    const sc = statusMap[a.status] || 'astatus-concept';
+    return `<div class="asset-card glass">
+      <div class="asset-thumb">
+        <img src="${driveThumbnail(a.driveFileId, 400)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="fallback" style="display:none;position:absolute;inset:0">${a.format}</div>
+      </div>
+      <div class="asset-body">
+        <h4>${a.headline}</h4>
+        <div class="asset-meta">
+          <span class="asset-format">${a.format}</span>
+          <span class="asset-status-pill ${sc}">${a.status}</span>
+        </div>
+        <span class="asset-date">Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+        <a href="${a.driveUrl}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>
+      </div>
+    </div>`;
+  }).join('');
+
+  const bar = document.getElementById('filterBar');
+  const markets = ['All', 'Canada', 'Germany', 'Global'];
+  bar.innerHTML = markets.map(m => `<button class="filter-pill${m === filter ? ' active' : ''}" data-market="${m}">${m}</button>`).join('');
+  bar.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => renderAssets(btn.dataset.market));
+  });
+}
+
+function setupTabs() {
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  const panel = document.getElementById(`panel-${tab}`);
+  if (btn) btn.classList.add('active');
+  if (panel) { panel.classList.add('active'); panel.style.animation = 'none'; panel.offsetHeight; panel.style.animation = ''; }
+  history.replaceState(null, '', `#${tab}`);
+}
+
+function handleHash() {
+  const hash = location.hash.replace('#', '');
+  if (['live', 'calendar', 'creative'].includes(hash)) switchTab(hash);
+}
+window.addEventListener('hashchange', handleHash);
+
+function setupGemini() {
+  const overlay = document.getElementById('geminiOverlay');
+  const panel = document.getElementById('geminiPanel');
+  const toggle = document.getElementById('geminiToggle');
+  const close = document.getElementById('geminiClose');
+  const input = document.getElementById('geminiInput');
+  const send = document.getElementById('geminiSend');
+  const messages = document.getElementById('geminiMessages');
+  const chatHistory = [];
+
+  function openGemini() { overlay.classList.add('open'); panel.classList.add('open'); input.focus(); }
+  function closeGemini() { overlay.classList.remove('open'); panel.classList.remove('open'); }
+
+  toggle.addEventListener('click', openGemini);
+  close.addEventListener('click', closeGemini);
+  overlay.addEventListener('click', closeGemini);
+
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    messages.innerHTML += `<div class="gemini-msg user">${escapeHtml(text)}</div>`;
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    // Show typing indicator
+    const typingEl = document.createElement('div');
+    typingEl.className = 'gemini-msg assistant';
+    typingEl.style.opacity = '0.5';
+    typingEl.textContent = 'Thinking...';
+    messages.appendChild(typingEl);
+    messages.scrollTop = messages.scrollHeight;
+
+    chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+    try {
+      const systemInstruction = `You are a strategic analyst embedded in the MFG World Cup Command dashboard — an internal war room for a global strategy team running premade and reactive Instagram content during the 2026 FIFA World Cup.
+
+You have full access to the dashboard data below. Use it to answer questions about:
+- Match schedule, fixtures, venues, dates, kickoff times (104 matches total, Groups A-L)
+- Latest news headlines and sources
+- Social media trends, sentiment, volume, and platform distribution
+- Creative assets pipeline (status, market, format, deploy dates)
+- Campaign strategy recommendations
+
+Be concise, actionable, and strategic. Use data from the dashboard to back up your answers. When discussing matches, reference actual teams, dates, and venues. When discussing social trends, reference specific topics and their metrics.
+
+DASHBOARD DATA:
+${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
+
+      const payload = {
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: chatHistory,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+      };
+
+      const res = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyDHNF5_acv1YF_sgiy3SMFK5xnqnIqQJGc',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
+      );
+
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+
+      chatHistory.push({ role: "model", parts: [{ text: reply }] });
+
+      typingEl.remove();
+      messages.innerHTML += `<div class="gemini-msg assistant">${escapeHtml(reply)}</div>`;
+    } catch (e) {
+      typingEl.remove();
+      messages.innerHTML += `<div class="gemini-msg assistant" style="color:#ff4444">Error: ${escapeHtml(e.message)}</div>`;
+    }
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  send.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+}
+
+function setupKeyboard() {
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === '1') switchTab('live');
+    else if (e.key === '2') switchTab('calendar');
+    else if (e.key === '3') switchTab('creative');
+    else if (e.key === 'g' || e.key === 'G') {
+      document.getElementById('geminiOverlay').classList.add('open');
+      document.getElementById('geminiPanel').classList.add('open');
+      document.getElementById('geminiInput').focus();
+    }
+    else if (e.key === 'Escape') {
+      document.getElementById('geminiOverlay').classList.remove('open');
+      document.getElementById('geminiPanel').classList.remove('open');
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>

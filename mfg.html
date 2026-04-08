@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFG World Cup Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0c14;
+  --bg-secondary: #0e1019;
+  --text: #f0f0f5;
+  --text-secondary: #a0a0b5;
+  --text-muted: #6a6a80;
+  --red: #cc0000;
+  --gold: #ffd700;
+  --green: #2ecc71;
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-blur: blur(16px);
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animated background blobs */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+  animation: blobFloat 20s ease-in-out infinite alternate;
+}
+.blob-1 { width: 500px; height: 500px; background: var(--red); top: -100px; left: -100px; }
+.blob-2 { width: 400px; height: 400px; background: var(--gold); bottom: -80px; right: -80px; animation-delay: -10s; }
+.blob-3 { width: 300px; height: 300px; background: var(--red); top: 50%; right: 10%; animation-delay: -5s; }
+
+@keyframes blobFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 30px) scale(0.95); }
+  100% { transform: translate(10px, 10px) scale(1.02); }
+}
+
+a { color: var(--gold); text-decoration: none; transition: opacity 0.2s; }
+a:hover { opacity: 0.8; }
+
+/* Glass card */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+/* Password Gate */
+#gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gate-box {
+  text-align: center;
+  padding: 48px 40px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.gate-box h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.gate-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 28px; }
+
+.gate-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s;
+  margin-bottom: 14px;
+}
+.gate-input:focus { border-color: var(--gold); }
+
+.gate-btn {
+  width: 100%;
+  background: var(--red);
+  border: none;
+  padding: 14px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%);
+  transition: opacity 0.2s;
+}
+.gate-btn:hover { opacity: 0.9; }
+
+.gate-error {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 14px;
+  display: none;
+}
+
+/* Main content wrapper */
+#app { display: none; position: relative; z-index: 1; }
+
+/* Header */
+.header {
+  background: rgba(10,12,20,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0 28px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.mfg-badge {
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.header-back {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.header-back:hover { color: var(--text); border-color: rgba(255,255,255,0.2); opacity: 1; }
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  padding: 16px 28px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tab-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 28px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+
+.tab-btn.active {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+/* Tab panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Main container */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 28px 60px;
+}
+
+/* Section headers */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Steps */
+.steps-box {
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.step + .step { border-top: 1px solid rgba(255,255,255,0.04); }
+
+.step-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.step-text strong {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text);
+  display: block;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.step-text code {
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--gold);
+}
+
+/* Form area */
+.form-card {
+  padding: 28px;
+  margin-bottom: 32px;
+  border-color: rgba(204,0,0,0.25);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.form-group textarea {
+  width: 100%;
+  min-height: 200px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group textarea:focus { border-color: var(--gold); }
+.form-group textarea::placeholder { color: var(--text-muted); }
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 28px;
+  border: none;
+  background: var(--gold);
+  color: #000;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-secondary {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 11px 22px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text);
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+.btn-danger {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 18px;
+  border: 1px solid rgba(204,0,0,0.3);
+  background: rgba(204,0,0,0.1);
+  color: var(--red);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(204,0,0,0.2); }
+
+.toast {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+.toast.success { color: var(--green); }
+.toast.error { color: var(--red); }
+
+/* JSON output preview */
+.output-area {
+  margin-top: 20px;
+  display: none;
+}
+
+.output-area pre {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 12px;
+  color: var(--green);
+  overflow-x: auto;
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* History */
+.history-section { margin-top: 40px; }
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.history-card {
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+.history-card:hover { border-color: rgba(255,255,255,0.15); }
+
+.history-card-date {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gold);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.history-card-section {
+  margin-bottom: 12px;
+}
+
+.history-card-section h4 {
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.history-card-section p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.history-card-json {
+  margin-top: 12px;
+}
+
+.history-card-json summary {
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.history-card-json pre {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 11px;
+  color: var(--green);
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Tables */
+.table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+
+.data-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+
+.data-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+
+.data-table td:first-child { color: var(--text); font-weight: 600; }
+
+.status-pill {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 14px;
+  display: inline-block;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+}
+.status-pill.in-progress { background: rgba(255,215,0,0.15); color: var(--gold); }
+.status-pill.complete { background: rgba(46,204,113,0.15); color: var(--green); }
+.status-pill.blocked { background: rgba(204,0,0,0.15); color: var(--red); }
+.status-pill.draft { background: rgba(106,106,128,0.15); color: var(--text-muted); }
+
+@media (max-width: 768px) {
+  .header { padding: 0 14px; gap: 12px; }
+  .header-brand { font-size: 16px; }
+  .tab-nav { padding: 12px 14px 0; overflow-x: auto; }
+  .tab-btn { font-size: 12px; padding: 10px 18px; }
+  .main { padding: 16px 14px 48px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-actions { flex-direction: column; align-items: stretch; }
+  .btn-primary, .btn-secondary { text-align: center; }
+  .data-table { font-size: 12px; }
+  .data-table th, .data-table td { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Password Gate -->
+<div id="gate">
+  <div class="gate-box glass">
+    <h1>MFG World Cup Command</h1>
+    <p>Enter password to access the production dashboard.</p>
+    <input type="password" class="gate-input" id="gateInput" placeholder="Password" autofocus>
+    <button class="gate-btn" id="gateBtn">Enter</button>
+    <div class="gate-error" id="gateError">Incorrect password. Access denied.</div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <header class="header">
+    <div class="header-brand">
+      &#127942; MFG World Cup Command
+      <span class="mfg-badge">MFG</span>
+    </div>
+    <a href="index.html" class="header-back">&larr; Dashboard</a>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="update" onclick="switchTab('update')">&#128229; Daily Update</button>
+    <button class="tab-btn" data-tab="production" onclick="switchTab('production')">&#127959; Production Tracker</button>
+    <button class="tab-btn" data-tab="prompts" onclick="switchTab('prompts')">&#128172; Prompts Tracker</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- Tab 1: Daily Update -->
+    <div class="tab-panel active" id="panel-update">
+
+      <div class="section-title">&#128229; Daily Dashboard Update</div>
+
+      <div class="steps-box glass">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-text">
+            <strong>Paste your raw content</strong>
+            Drop today's news headlines, match scores, and social trends into the two boxes below.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-text">
+            <strong>Click "Generate JSON"</strong>
+            Converts your raw text into a structured update package.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-text">
+            <strong>Click "Copy to Clipboard"</strong>
+            Copies the generated JSON so you can hand it to Claude Code.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-text">
+            <strong>Open Claude Code and paste</strong>
+            Run <code>claude</code> in the WCCommand repo and paste the JSON with:<br>
+            <code>"Update DASHBOARD_DATA in index.html with this content"</code>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div class="step-text">
+            <strong>Review, commit, and push</strong>
+            Claude will edit <code>index.html</code>. Review, then: <code>"commit and push"</code>. Dashboard updates in ~30 seconds.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card glass">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>News &amp; Match Outcomes</label>
+            <textarea id="newsInput" placeholder="Paste headlines, scores, news items...&#10;&#10;Example:&#10;Canada 2-1 Mexico (Davies 23', David 67')&#10;Germany announces starting XI for Japan match&#10;Messi ruled out of group stage opener with calf strain"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Social Conversations &amp; Trends</label>
+            <textarea id="socialInput" placeholder="Paste trending topics, viral moments, fan reactions...&#10;&#10;Example:&#10;Davies goal celebration going viral on TikTok (2M views)&#10;Fans debating best food at Toronto fan zone&#10;Drake spotted at Canada match wearing custom jersey"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" id="generateBtn">Generate JSON</button>
+          <button class="btn-secondary" id="copyBtn" style="display:none">Copy to Clipboard</button>
+          <button class="btn-secondary" id="saveBtn" style="display:none">Save to History</button>
+          <span class="toast" id="toast"></span>
+        </div>
+        <div class="output-area" id="outputArea">
+          <pre id="outputCode"></pre>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="history-section">
+        <div class="history-header">
+          <div class="section-title" style="margin-bottom:0">Update History</div>
+          <button class="btn-danger" id="clearHistoryBtn">Clear History</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+
+    </div>
+
+    <!-- Tab 2: Production Tracker -->
+    <div class="tab-panel" id="panel-production">
+      <div class="section-title">&#127959; Production Tracker</div>
+      <div class="table-card glass" style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr><th>Asset</th><th>Status</th><th>Owner</th><th>Deadline</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pre-Tournament Hype Reel</td>
+              <td><span class="status-pill complete">Complete</span></td>
+              <td>Sarah K.</td>
+              <td>Jun 1, 2026</td>
+              <td>Final cut approved. Delivered to social team.</td>
+            </tr>
+            <tr>
+              <td>Daily Match Recap Template</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>Marcus T.</td>
+              <td>Jun 5, 2026</td>
+              <td>Motion graphics 80% done. Audio pending.</td>
+            </tr>
+            <tr>
+              <td>Fan Zone Interview Kit</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>Lisa R.</td>
+              <td>Jun 8, 2026</td>
+              <td>Shooting schedule confirmed. Gear packed.</td>
+            </tr>
+            <tr>
+              <td>Sponsor Integration Package</td>
+              <td><span class="status-pill blocked">Blocked</span></td>
+              <td>James W.</td>
+              <td>Jun 3, 2026</td>
+              <td>Waiting on brand guidelines from sponsor.</td>
+            </tr>
+            <tr>
+              <td>Player Profile Cards (Series)</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>Amy D.</td>
+              <td>Jun 10, 2026</td>
+              <td>12 of 24 cards designed. Batch 2 in review.</td>
+            </tr>
+            <tr>
+              <td>Post-Match Social Templates</td>
+              <td><span class="status-pill complete">Complete</span></td>
+              <td>Chris P.</td>
+              <td>May 28, 2026</td>
+              <td>All platforms covered. Templates in Figma.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Prompts Tracker -->
+    <div class="tab-panel" id="panel-prompts">
+      <div class="section-title">&#128172; Prompts Tracker</div>
+      <div class="table-card glass" style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr><th>Prompt</th><th>Status</th><th>Owner</th><th>Due Date</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Opening Day Hype Thread Generator</td>
+              <td><span class="status-pill complete">Complete</span></td>
+              <td>Sarah K.</td>
+              <td>Jun 1, 2026</td>
+              <td>Tested across 3 tone variations.</td>
+            </tr>
+            <tr>
+              <td>Match Recap Auto-Summary</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>Marcus T.</td>
+              <td>Jun 6, 2026</td>
+              <td>Prompt v2 in testing. Output quality at 85%.</td>
+            </tr>
+            <tr>
+              <td>Fan Sentiment Analyzer</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>Lisa R.</td>
+              <td>Jun 7, 2026</td>
+              <td>Needs more training examples for sarcasm detection.</td>
+            </tr>
+            <tr>
+              <td>Viral Moment Caption Writer</td>
+              <td><span class="status-pill blocked">Blocked</span></td>
+              <td>Amy D.</td>
+              <td>Jun 4, 2026</td>
+              <td>Dependent on brand voice doc (still in review).</td>
+            </tr>
+            <tr>
+              <td>Daily Dashboard News Formatter</td>
+              <td><span class="status-pill complete">Complete</span></td>
+              <td>Chris P.</td>
+              <td>May 30, 2026</td>
+              <td>Integrated into this page. Working well.</td>
+            </tr>
+            <tr>
+              <td>Player Quote Highlight Generator</td>
+              <td><span class="status-pill in-progress">In Progress</span></td>
+              <td>James W.</td>
+              <td>Jun 9, 2026</td>
+              <td>Draft prompt done. Needs multilingual support.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function() {
+  // --- Constants ---
+  const PASSWORD = 'mfg';
+  const SUPABASE_URL = 'https://ypisjfefbccgtxesteja.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d';
+  const LS_KEY = 'mfg_dashboard_updates';
+  let supabase = null;
+
+  // --- Init Supabase ---
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+  } catch(e) {
+    console.warn('Supabase init failed, using localStorage fallback.', e);
+  }
+
+  // --- Password Gate ---
+  const gate = document.getElementById('gate');
+  const app = document.getElementById('app');
+  const gateInput = document.getElementById('gateInput');
+  const gateBtn = document.getElementById('gateBtn');
+  const gateError = document.getElementById('gateError');
+
+  function tryAuth() {
+    if (gateInput.value === PASSWORD) {
+      gate.style.display = 'none';
+      app.style.display = 'block';
+      initApp();
+    } else {
+      gateError.style.display = 'block';
+      gateInput.value = '';
+      gateInput.focus();
+    }
+  }
+
+  gateBtn.addEventListener('click', tryAuth);
+  gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
+
+  // --- Tab Navigation ---
+  window.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tabId));
+    history.replaceState(null, '', '#' + tabId);
+  };
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === '1') switchTab('update');
+    if (e.key === '2') switchTab('production');
+    if (e.key === '3') switchTab('prompts');
+  });
+
+  // Hash routing
+  function applyHash() {
+    const hash = location.hash.replace('#', '');
+    if (['update', 'production', 'prompts'].includes(hash)) {
+      switchTab(hash);
+    }
+  }
+  window.addEventListener('hashchange', applyHash);
+
+  // --- Supabase helpers ---
+  async function sbFetch() {
+    if (!supabase) return null;
+    try {
+      const { data, error } = await supabase
+        .from('dashboard_updates')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    } catch(e) {
+      console.warn('Supabase fetch failed:', e);
+      return null;
+    }
+  }
+
+  async function sbInsert(record) {
+    if (!supabase) return false;
+    try {
+      const { error } = await supabase
+        .from('dashboard_updates')
+        .insert([record]);
+      if (error) throw error;
+      return true;
+    } catch(e) {
+      console.warn('Supabase insert failed:', e);
+      return false;
+    }
+  }
+
+  async function sbDeleteAll() {
+    if (!supabase) return false;
+    try {
+      const { error } = await supabase
+        .from('dashboard_updates')
+        .delete()
+        .neq('id', 0); // delete all rows
+      if (error) throw error;
+      return true;
+    } catch(e) {
+      console.warn('Supabase delete failed:', e);
+      return false;
+    }
+  }
+
+  // --- localStorage helpers ---
+  function lsGet() {
+    try {
+      return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    } catch { return []; }
+  }
+
+  function lsSet(data) {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+    } catch(e) { console.warn('localStorage write failed:', e); }
+  }
+
+  function lsClear() {
+    localStorage.removeItem(LS_KEY);
+  }
+
+  // --- Toast ---
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (type || 'success');
+    setTimeout(() => t.className = 'toast', 2500);
+  }
+
+  // --- Render History ---
+  function renderHistory(updates) {
+    const container = document.getElementById('historyList');
+    if (!updates || updates.length === 0) {
+      container.innerHTML = '<div class="empty-state">No updates yet. Generate and save your first update above.</div>';
+      return;
+    }
+
+    container.innerHTML = updates.map(u => {
+      const date = new Date(u.created_at).toLocaleString('en-US', {
+        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      const newsHtml = u.news_raw ? `<div class="history-card-section"><h4>News &amp; Match Outcomes</h4><p>${escHtml(u.news_raw)}</p></div>` : '';
+      const socialHtml = u.social_raw ? `<div class="history-card-section"><h4>Social Conversations &amp; Trends</h4><p>${escHtml(u.social_raw)}</p></div>` : '';
+      const jsonHtml = u.generated_json ? `<details class="history-card-json"><summary>View Generated JSON</summary><pre>${escHtml(u.generated_json)}</pre></details>` : '';
+
+      return `<div class="history-card glass">\n<div class="history-card-date">${date}</div>\n${newsHtml}${socialHtml}${jsonHtml}\n</div>`;
+    }).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // --- Load history ---
+  async function loadHistory() {
+    const sbData = await sbFetch();
+    if (sbData !== null) {
+      renderHistory(sbData);
+      // Also sync to localStorage as backup
+      lsSet(sbData);
+    } else {
+      // Fallback to localStorage
+      renderHistory(lsGet());
+    }
+  }
+
+  // --- Init App ---
+  function initApp() {
+    applyHash();
+
+    const generateBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const outputArea = document.getElementById('outputArea');
+    const outputCode = document.getElementById('outputCode');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+    let currentJson = '';
+    let currentNewsRaw = '';
+    let currentSocialRaw = '';
+
+    generateBtn.addEventListener('click', () => {
+      const newsRaw = document.getElementById('newsInput').value.trim();
+      const socialRaw = document.getElementById('socialInput').value.trim();
+
+      if (!newsRaw && !socialRaw) {
+        showToast('Please enter content in at least one field.', 'error');
+        return;
+      }
+
+      const now = new Date().toISOString();
+      const output = {
+        instruction: 'Update DASHBOARD_DATA in index.html with the following content.',
+        lastUpdated: now,
+      };
+
+      if (newsRaw) {
+        output.news_raw = newsRaw;
+        output.ticker_items = newsRaw.split('\n').filter(l => l.trim()).map(l => l.trim());
+      }
+      if (socialRaw) {
+        output.social_raw = socialRaw;
+      }
+
+      currentJson = JSON.stringify(output, null, 2);
+      currentNewsRaw = newsRaw;
+      currentSocialRaw = socialRaw;
+
+      outputCode.textContent = currentJson;
+      outputArea.style.display = 'block';
+      copyBtn.style.display = 'inline-block';
+      saveBtn.style.display = 'inline-block';
+      showToast('JSON generated successfully!', 'success');
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(currentJson).then(() => {
+        showToast('Copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Copy failed. Try selecting manually.', 'error');
+      });
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      if (!currentJson) return;
+
+      const record = {
+        created_at: new Date().toISOString(),
+        news_raw: currentNewsRaw,
+        social_raw: currentSocialRaw,
+        generated_json: currentJson
+      };
+
+      // Save to Supabase
+      const sbOk = await sbInsert(record);
+
+      // Also save to localStorage as backup
+      const local = lsGet();
+      local.unshift(record);
+      lsSet(local);
+
+      if (sbOk) {
+        showToast('Saved to history!', 'success');
+      } else {
+        showToast('Saved locally (Supabase unavailable).', 'success');
+      }
+
+      // Reload history
+      await loadHistory();
+    });
+
+    clearHistoryBtn.addEventListener('click', async () => {
+      if (!confirm('Clear all update history? This cannot be undone.')) return;
+
+      await sbDeleteAll();
+      lsClear();
+      renderHistory([]);
+      showToast('History cleared.', 'success');
+    });
+
+    // Load history on init
+    loadHistory();
+  }
+})();
+</script>
+
+</body>
+</html>
