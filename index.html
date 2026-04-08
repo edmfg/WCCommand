@@ -654,14 +654,51 @@ body.light .empty-state h3{
 .pitch-box.left{top:30%;left:0;border-left:none}
 .pitch-box.right{top:30%;right:0;border-right:none}
 
-/* Ball drop */
+/* 3D Soccer Ball */
 .intro-ball{
   position:absolute;top:50%;left:50%;
-  font-size:2.5rem;
+  width:60px;height:60px;
   transform:translate(-50%,-50%) scale(0);
   opacity:0;
   animation:ballDrop 0.5s 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
   z-index:2;
+  perspective:200px;
+}
+.ball-sphere{
+  width:100%;height:100%;border-radius:50%;position:relative;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(220,220,220,0.6) 40%, rgba(180,180,180,0.4) 70%, rgba(100,100,100,0.5));
+  box-shadow:
+    inset -8px -8px 20px rgba(0,0,0,0.4),
+    inset 4px 4px 10px rgba(255,255,255,0.3),
+    0 8px 30px rgba(0,0,0,0.6),
+    0 0 20px rgba(255,255,255,0.1);
+  animation:ballSpin 3s 1.5s linear infinite;
+  overflow:hidden;
+}
+/* Pentagon pattern overlay */
+.ball-sphere::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 20%, #222 8px, transparent 8px),
+    radial-gradient(circle at 25% 55%, #222 7px, transparent 7px),
+    radial-gradient(circle at 75% 55%, #222 7px, transparent 7px),
+    radial-gradient(circle at 35% 80%, #222 6px, transparent 6px),
+    radial-gradient(circle at 65% 80%, #222 6px, transparent 6px);
+  opacity:0.7;
+}
+/* Specular highlight */
+.ball-sphere::after{
+  content:'';position:absolute;
+  top:8px;left:12px;width:22px;height:16px;
+  background:rgba(255,255,255,0.6);
+  border-radius:50%;
+  transform:rotate(-30deg);
+  filter:blur(3px);
+}
+@keyframes ballSpin{
+  0%{transform:rotateY(0deg) rotateX(5deg)}
+  100%{transform:rotateY(360deg) rotateX(5deg)}
 }
 @keyframes ballDrop{
   0%{opacity:0;transform:translate(-50%,-200%) scale(0.5)}
@@ -757,7 +794,7 @@ body.light .empty-state h3{
     <div class="pitch-center-dot"></div>
     <div class="pitch-box left"></div>
     <div class="pitch-box right"></div>
-    <div class="intro-ball">⚽</div>
+    <div class="intro-ball"><div class="ball-sphere"></div></div>
     <div class="pitch-glow"></div>
   </div>
   <div class="intro-title" id="introTitle">MFG World Cup Command</div>
@@ -1409,12 +1446,12 @@ function setupTheme() {
 // ── Stadium Flyover Intro ──
 function runIntro() {
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-v4') === today) {
+  if (localStorage.getItem('wc-intro-v5') === today) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-v4', today);
+  localStorage.setItem('wc-intro-v5', today);
 
   const overlay = document.getElementById('introOverlay');
   const pitch = document.getElementById('introPitch');
