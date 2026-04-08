@@ -253,7 +253,7 @@ body.light .live-filter{background:rgba(0,0,0,0.04);color:#666;border-color:rgba
 body.light .live-filter:hover{color:#333;background:rgba(0,0,0,0.08)}
 body.light .live-filter.active{background:var(--red);color:#fff}
 .live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.news-col,.social-col{display:flex;flex-direction:column;gap:12px}
+.news-col,.social-col{display:flex;flex-direction:column}
 /* Card carousel — shows 3 at a time, fixed height per card */
 .card-carousel{
   position:relative;overflow:hidden;
@@ -271,7 +271,7 @@ body.light .live-filter.active{background:var(--red);color:#fff}
 .card-carousel .carousel-card.visible .glass{height:100%;overflow:hidden}
 .carousel-controls{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:12px;
+  margin-bottom:12px;height:36px;
 }
 .carousel-counter{
   font-family:'Oswald',sans-serif;font-size:0.7rem;font-weight:600;
