@@ -582,8 +582,10 @@ body.light .empty-state h3{
 .intro-overlay{
   position:fixed;inset:0;z-index:10000;background:#000;
   display:flex;align-items:center;justify-content:center;flex-direction:column;
-  opacity:1;transition:opacity 0.3s ease;
+  opacity:1;
+  transition:background 0.6s ease, opacity 0.3s ease;
 }
+.intro-overlay.bg-fade{background:transparent}
 .intro-overlay.done{opacity:0;pointer-events:none}
 .intro-live{
   position:absolute;top:20px;right:24px;display:flex;align-items:center;gap:6px;
@@ -627,6 +629,12 @@ body.light .empty-state h3{
   background-size:200% 200%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   animation:introTitleIn 0.6s 2.4s forwards,introTitleShimmer 2s 2.4s ease-in-out;
+  position:absolute;
+  will-change:transform,font-size,letter-spacing,top,left;
+  transition:all 0.7s cubic-bezier(0.4,0,0.1,1);
+}
+.intro-title.collapsing{
+  animation:none !important;opacity:1 !important;
 }
 @keyframes introTitleIn{
   0%{opacity:0;transform:translateY(30px) scale(0.85);filter:blur(6px)}
@@ -642,14 +650,19 @@ body.light .empty-state h3{
 .dashboard-hidden .header,
 .dashboard-hidden .ticker-bar,
 .dashboard-hidden .main{opacity:0}
-.dashboard-reveal .header{animation:revealSlideDown 0.4s 0s forwards}
-.dashboard-reveal .ticker-bar{animation:revealSlideDown 0.3s 0.05s forwards}
-.dashboard-reveal .main{animation:revealFadeUp 0.4s 0.1s forwards}
+.dashboard-hidden .brand{opacity:0}
+.dashboard-reveal .header{animation:revealFadeIn 0.4s 0s forwards}
+.dashboard-reveal .brand{animation:revealFadeIn 0.3s 0.6s forwards}
+.dashboard-reveal .ticker-bar{animation:revealSlideDown 0.4s 0.15s forwards}
+.dashboard-reveal .main{animation:revealFadeUp 0.5s 0.25s forwards}
+@keyframes revealFadeIn{
+  0%{opacity:0}100%{opacity:1}
+}
 @keyframes revealSlideDown{
-  0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}
+  0%{opacity:0;transform:translateY(-12px)}100%{opacity:1;transform:translateY(0)}
 }
 @keyframes revealFadeUp{
-  0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}
+  0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}
 }
 </style>
 </head>
@@ -1349,12 +1362,41 @@ function runIntro() {
   setTimeout(() => { counter.style.display = 'none'; }, 2100);
 
   // Title + flash handled by CSS delays (2.2s flash, 2.4s title)
+
+  // At 3.2s: start collapse — title flies to header brand position
   setTimeout(() => {
-    overlay.classList.add('done');
+    const title = document.getElementById('introTitle');
+    const brand = document.querySelector('.brand');
+    const brandRect = brand.getBoundingClientRect();
+
+    // Show the header (but brand stays invisible)
     document.body.classList.remove('dashboard-hidden');
     document.body.classList.add('dashboard-reveal');
-  }, 3600);
-  setTimeout(() => { overlay.remove(); }, 4200);
+
+    // Measure where title needs to go
+    title.classList.add('collapsing');
+
+    // Animate to brand position
+    title.style.position = 'fixed';
+    title.style.top = brandRect.top + 'px';
+    title.style.left = brandRect.left + 'px';
+    title.style.fontSize = '2.2rem';
+    title.style.letterSpacing = '3px';
+    title.style.transform = 'none';
+
+    // Fade overlay background
+    overlay.classList.add('bg-fade');
+  }, 3200);
+
+  // At 3.9s: title has landed — hide it, reveal real brand
+  setTimeout(() => {
+    const title = document.getElementById('introTitle');
+    if (title) title.style.opacity = '0';
+    overlay.classList.add('done');
+  }, 3900);
+
+  // Cleanup
+  setTimeout(() => { overlay.remove(); }, 4300);
 }
 
 runIntro();
