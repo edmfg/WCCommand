@@ -255,19 +255,19 @@ body.light .live-filter.active{background:var(--red);color:#fff}
 .live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .news-col,.social-col{display:flex;flex-direction:column;gap:16px}
 
-/* Card carousel */
-.card-carousel{position:relative;min-height:200px}
+/* Card carousel — shows 3 at a time */
+.card-carousel{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:12px;
+}
 .card-carousel .carousel-card{
-  position:absolute;inset:0;opacity:0;
-  transform:translateY(12px);
-  transition:opacity 0.5s ease, transform 0.5s ease;
+  opacity:0;max-height:0;overflow:hidden;
+  transform:translateY(16px);
+  transition:opacity 0.45s ease, transform 0.45s ease, max-height 0.45s ease;
   pointer-events:none;
 }
-.card-carousel .carousel-card.active{
-  position:relative;opacity:1;transform:translateY(0);pointer-events:auto;
-}
-.card-carousel .carousel-card.exit{
-  opacity:0;transform:translateY(-12px);
+.card-carousel .carousel-card.visible{
+  opacity:1;max-height:500px;transform:translateY(0);pointer-events:auto;
 }
 .carousel-controls{
   display:flex;align-items:center;justify-content:space-between;
@@ -1221,44 +1221,45 @@ function matchesLiveFilter(item, type) {
   return true;
 }
 
-// ── Card Carousel Engine ──
+// ── Card Carousel Engine (3 visible at a time) ──
 function createCarousel(containerId, dotsId, interval = 5000) {
-  let idx = 0, count = 0, timer = null;
+  let page = 0, pageCount = 0, total = 0, timer = null;
+  const perPage = 3;
   const container = document.getElementById(containerId);
   const dotsEl = document.getElementById(dotsId);
+  const name = containerId === 'newsCards' ? 'newsCarousel' : 'socialCarousel';
 
-  function show(newIdx) {
+  function showPage(p) {
     const cards = container.querySelectorAll('.carousel-card');
     if (!cards.length) return;
-    cards[idx]?.classList.remove('active');
-    cards[idx]?.classList.add('exit');
-    setTimeout(() => cards[idx]?.classList.remove('exit'), 500);
-    idx = ((newIdx % count) + count) % count;
-    cards[idx]?.classList.add('active');
-    dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+    page = ((p % pageCount) + pageCount) % pageCount;
+    const start = page * perPage;
+    const end = start + perPage;
+    cards.forEach((c, i) => c.classList.toggle('visible', i >= start && i < end));
+    dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === page));
   }
 
-  function next() { show(idx + 1); resetTimer(); }
-  function prev() { show(idx - 1); resetTimer(); }
-  function goTo(i) { show(i); resetTimer(); }
+  function next() { showPage(page + 1); resetTimer(); }
+  function prev() { showPage(page - 1); resetTimer(); }
+  function goTo(i) { showPage(i); resetTimer(); }
 
   function resetTimer() {
     if (timer) clearInterval(timer);
-    timer = setInterval(next, interval);
+    if (pageCount > 1) timer = setInterval(() => showPage(page + 1), interval);
   }
 
-  function setCards(html, total) {
-    count = total;
-    idx = 0;
+  function setCards(html, count) {
+    total = count;
+    pageCount = Math.ceil(count / perPage);
+    page = 0;
     container.innerHTML = html;
-    dotsEl.innerHTML = Array.from({length: count}, (_,i) =>
-      `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="${containerId === 'newsCards' ? 'newsCarousel' : 'socialCarousel'}.goTo(${i})"></span>`
+    dotsEl.innerHTML = Array.from({length: pageCount}, (_,i) =>
+      `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="${name}.goTo(${i})"></span>`
     ).join('');
-    if (count > 0) container.querySelector('.carousel-card')?.classList.add('active');
+    showPage(0);
     resetTimer();
   }
 
-  // Pause on hover
   container.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
   container.addEventListener('mouseleave', resetTimer);
 
