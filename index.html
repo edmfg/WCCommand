@@ -1374,7 +1374,7 @@ function renderSocial() {
       ${quoteHtml}
       <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
     </div></div>`;
-  }).join('');
+  });
   socialCarousel.setCards(cards, filtered.length);
 }
 
