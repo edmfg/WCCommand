@@ -1322,12 +1322,12 @@ function setupTheme() {
 // ── Broadcast Intro ──
 function runIntro() {
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-date') === today) {
+  if (localStorage.getItem('wc-intro-v2') === today) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-date', today);
+  localStorage.setItem('wc-intro-v2', today);
 
   const overlay = document.getElementById('introOverlay');
   const counter = document.getElementById('introC2');
