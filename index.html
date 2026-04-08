@@ -582,119 +582,156 @@ body.light .empty-state h3{
 /* ── STADIUM FLYOVER INTRO ── */
 .intro-overlay{
   position:fixed;inset:0;z-index:10000;
-  background:#030a04;
+  background:#020304;
   display:flex;align-items:center;justify-content:center;
-  perspective:800px;overflow:hidden;
+  perspective:900px;overflow:hidden;
   transition:opacity 0.5s ease;
 }
 .intro-overlay.done{opacity:0;pointer-events:none}
 
-/* The pitch — top-down view */
-.intro-pitch{
-  width:500px;max-width:80vw;aspect-ratio:1.5/1;
-  border:2px solid transparent;
-  position:relative;
-  transform:rotateX(55deg) scale(0.9);
-  transform-origin:center center;
-  transition:transform 1s cubic-bezier(0.25,0.1,0.25,1);
+/* Ambient glow behind pitch */
+.intro-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 50% 55%, rgba(0,200,80,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 45%, rgba(204,0,0,0.06) 0%, transparent 40%);
+  pointer-events:none;
 }
 
-/* Pitch lines — draw themselves in */
+/* Scanline texture */
+.intro-overlay::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);
+  pointer-events:none;z-index:1;
+}
+
+/* The pitch — 3D perspective */
+.intro-pitch{
+  width:560px;max-width:85vw;aspect-ratio:1.5/1;
+  position:relative;
+  transform:rotateX(58deg) scale(0.85);
+  transform-origin:center 60%;
+  transition:transform 1.2s cubic-bezier(0.25,0.1,0.25,1), opacity 0.8s ease;
+}
+
+/* Neon pitch lines */
 .pitch-outline{
   position:absolute;inset:0;
-  border:2px solid rgba(255,255,255,0);
-  animation:pitchDraw 0.6s 0.2s forwards;
+  border:1.5px solid transparent;
+  box-shadow:none;
+  animation:neonDraw 0.8s 0.2s forwards;
 }
-@keyframes pitchDraw{
-  0%{border-color:rgba(255,255,255,0)}
-  100%{border-color:rgba(255,255,255,0.7)}
+@keyframes neonDraw{
+  0%{border-color:transparent;box-shadow:none}
+  50%{border-color:rgba(255,255,255,0.9);box-shadow:0 0 15px rgba(255,255,255,0.3),inset 0 0 15px rgba(255,255,255,0.05)}
+  100%{border-color:rgba(255,255,255,0.6);box-shadow:0 0 8px rgba(255,255,255,0.15),inset 0 0 8px rgba(255,255,255,0.03)}
 }
 
 .pitch-half{
-  position:absolute;top:0;bottom:0;left:50%;
-  width:2px;background:rgba(255,255,255,0);
-  animation:lineDraw 0.4s 0.5s forwards;
+  position:absolute;top:0;bottom:0;left:50%;width:1.5px;
+  background:transparent;
+  box-shadow:none;
+  animation:neonLine 0.5s 0.6s forwards;
 }
-@keyframes lineDraw{
-  0%{background:rgba(255,255,255,0)}
-  100%{background:rgba(255,255,255,0.7)}
+@keyframes neonLine{
+  0%{background:transparent;box-shadow:none}
+  50%{background:rgba(255,255,255,0.9);box-shadow:0 0 12px rgba(255,255,255,0.4)}
+  100%{background:rgba(255,255,255,0.6);box-shadow:0 0 6px rgba(255,255,255,0.15)}
 }
 
 .pitch-circle{
   position:absolute;top:50%;left:50%;
-  width:100px;height:100px;
-  transform:translate(-50%,-50%);
-  border:2px solid rgba(255,255,255,0);
-  border-radius:50%;
-  animation:circleDraw 0.5s 0.8s forwards;
+  width:110px;height:110px;
+  transform:translate(-50%,-50%) scale(0);
+  border:1.5px solid transparent;border-radius:50%;
+  animation:neonCircle 0.6s 0.9s forwards;
 }
-@keyframes circleDraw{
-  0%{border-color:rgba(255,255,255,0);transform:translate(-50%,-50%) scale(0.3)}
-  100%{border-color:rgba(255,255,255,0.7);transform:translate(-50%,-50%) scale(1)}
+@keyframes neonCircle{
+  0%{border-color:transparent;transform:translate(-50%,-50%) scale(0);box-shadow:none}
+  50%{border-color:rgba(255,255,255,0.9);box-shadow:0 0 20px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.1)}
+  100%{border-color:rgba(255,255,255,0.6);transform:translate(-50%,-50%) scale(1);box-shadow:0 0 8px rgba(255,255,255,0.12),inset 0 0 8px rgba(255,255,255,0.05)}
 }
 
 .pitch-center-dot{
   position:absolute;top:50%;left:50%;
   width:8px;height:8px;border-radius:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(255,255,255,0);
-  animation:dotDraw 0.3s 1.1s forwards;
+  transform:translate(-50%,-50%) scale(0);
+  background:transparent;
+  animation:neonDot 0.4s 1.2s forwards;
 }
-@keyframes dotDraw{
-  0%{background:rgba(255,255,255,0);transform:translate(-50%,-50%) scale(0)}
-  100%{background:rgba(255,255,255,0.9);transform:translate(-50%,-50%) scale(1)}
+@keyframes neonDot{
+  0%{background:transparent;transform:translate(-50%,-50%) scale(0);box-shadow:none}
+  50%{background:#fff;box-shadow:0 0 16px rgba(255,255,255,0.8),0 0 40px rgba(204,0,0,0.4)}
+  100%{background:rgba(255,255,255,0.9);transform:translate(-50%,-50%) scale(1);box-shadow:0 0 8px rgba(255,255,255,0.4),0 0 20px rgba(204,0,0,0.2)}
 }
 
 /* Penalty boxes */
 .pitch-box{
-  position:absolute;width:30%;height:40%;
-  border:2px solid rgba(255,255,255,0);
-  animation:pitchDraw 0.4s 0.6s forwards;
+  position:absolute;width:28%;height:38%;
+  border:1.5px solid transparent;
+  animation:neonDraw 0.5s 0.7s forwards;
 }
-.pitch-box.left{top:30%;left:0;border-left:none}
-.pitch-box.right{top:30%;right:0;border-right:none}
+.pitch-box.left{top:31%;left:0;border-left:none}
+.pitch-box.right{top:31%;right:0;border-right:none}
 
-/* 3D Soccer Ball — SVG-based */
-.intro-ball{
-  position:absolute;top:50%;left:50%;
-  width:64px;height:64px;
-  transform:translate(-50%,-50%) scale(0);
-  opacity:0;
-  animation:ballDrop 0.5s 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  z-index:2;
-  filter:drop-shadow(0 6px 16px rgba(0,0,0,0.6)) drop-shadow(0 0 8px rgba(255,255,255,0.08));
+/* Goal arcs */
+.pitch-arc{
+  position:absolute;width:14%;height:16%;
+  border:1.5px solid transparent;
+  border-radius:50%;
+  animation:neonDraw 0.4s 1.0s forwards;
 }
-@keyframes ballDrop{
-  0%{opacity:0;transform:translate(-50%,-200%) scale(0.5)}
-  60%{opacity:1;transform:translate(-50%,-40%) scale(1.1)}
-  80%{transform:translate(-50%,-55%) scale(0.95)}
-  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-}
+.pitch-arc.left{top:42%;left:0;border-left:none;border-top-left-radius:0;border-bottom-left-radius:0}
+.pitch-arc.right{top:42%;right:0;border-right:none;border-top-right-radius:0;border-bottom-right-radius:0}
 
-/* Pitch glow after ball drops */
-.pitch-glow{
+/* Center pulse — dramatic energy burst when lines complete */
+.pitch-pulse{
   position:absolute;top:50%;left:50%;
   width:0;height:0;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,0.3),transparent 70%);
   transform:translate(-50%,-50%);
-  animation:pitchGlow 0.6s 1.8s forwards;
+  background:radial-gradient(circle,rgba(204,0,0,0.5),rgba(255,215,0,0.2) 40%,transparent 70%);
+  animation:centerPulse 0.8s 1.5s forwards;
+  z-index:1;
 }
-@keyframes pitchGlow{
+@keyframes centerPulse{
   0%{width:0;height:0;opacity:1}
-  100%{width:400px;height:400px;opacity:0}
+  100%{width:600px;height:600px;opacity:0}
 }
 
-/* Brand title over pitch */
+/* Laser sweep across pitch */
+.pitch-sweep{
+  position:absolute;top:0;left:-100%;
+  width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),rgba(204,0,0,0.08),transparent);
+  animation:laserSweep 0.8s 1.3s forwards;
+  z-index:2;
+}
+@keyframes laserSweep{
+  0%{left:-40%}
+  100%{left:140%}
+}
+
+/* Ground turf texture */
+.pitch-turf{
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 48%, rgba(255,255,255,0.01) 48%, rgba(255,255,255,0.01) 52%);
+  opacity:0;
+  animation:turfReveal 0.6s 0.3s forwards;
+}
+@keyframes turfReveal{0%{opacity:0}100%{opacity:1}}
+
+/* Brand title */
 .intro-title{
   position:absolute;
   font-family:'Oswald',sans-serif;font-weight:900;
-  font-size:clamp(24px,5vw,44px);text-transform:uppercase;
-  letter-spacing:6px;opacity:0;
+  font-size:clamp(26px,5.5vw,48px);text-transform:uppercase;
+  letter-spacing:8px;opacity:0;
   background:linear-gradient(135deg,#fff,var(--gold),var(--red),var(--gold));
   background-size:200% 200%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:introTitleIn 0.5s 2.2s forwards, introTitleShimmer 1.5s 2.2s ease-in-out;
-  z-index:3;filter:drop-shadow(0 0 20px rgba(255,215,0,0.3));
+  animation:introTitleIn 0.6s 2.0s forwards, introTitleShimmer 1.5s 2.0s ease-in-out;
+  z-index:5;filter:drop-shadow(0 0 24px rgba(255,215,0,0.3)) drop-shadow(0 0 60px rgba(204,0,0,0.15));
   will-change:transform,top,left,font-size,letter-spacing,filter;
   transition:top 0.9s cubic-bezier(0.22,1,0.36,1),
              left 0.9s cubic-bezier(0.22,1,0.36,1),
@@ -705,24 +742,18 @@ body.light .empty-state h3{
 }
 .intro-title.collapsing{animation:none !important;opacity:1 !important}
 @keyframes introTitleIn{
-  0%{opacity:0;transform:translateY(20px) scale(0.85)}
+  0%{opacity:0;transform:translateY(24px) scale(0.9);filter:blur(8px) drop-shadow(0 0 0 transparent)}
+  60%{opacity:1;filter:blur(0) drop-shadow(0 0 24px rgba(255,215,0,0.3))}
   100%{opacity:1;transform:translateY(0) scale(1)}
 }
 @keyframes introTitleShimmer{
   0%{background-position:0% 50%}100%{background-position:100% 50%}
 }
 
-/* Pullback — pitch shrinks away */
+/* Pullback */
 .intro-pitch.pullback{
-  transform:rotateX(55deg) scale(0.15);
+  transform:rotateX(58deg) scale(0.1);
   opacity:0;
-}
-
-/* Green turf glow on overlay */
-.intro-overlay::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 60%,rgba(0,80,20,0.25),transparent 70%);
-  pointer-events:none;
 }
 
 /* Dashboard hidden until intro done */
@@ -752,50 +783,17 @@ body.light .empty-state h3{
 <!-- STADIUM FLYOVER INTRO -->
 <div class="intro-overlay" id="introOverlay" style="display:none">
   <div class="intro-pitch" id="introPitch">
+    <div class="pitch-turf"></div>
     <div class="pitch-outline"></div>
     <div class="pitch-half"></div>
     <div class="pitch-circle"></div>
     <div class="pitch-center-dot"></div>
     <div class="pitch-box left"></div>
     <div class="pitch-box right"></div>
-    <div class="intro-ball">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="ballShade" cx="35%" cy="30%" r="65%">
-            <stop offset="0%" stop-color="#fff"/>
-            <stop offset="40%" stop-color="#e8e8e8"/>
-            <stop offset="75%" stop-color="#b0b0b0"/>
-            <stop offset="100%" stop-color="#666"/>
-          </radialGradient>
-          <radialGradient id="ballHighlight" cx="30%" cy="25%" r="25%">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.8)"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-          </radialGradient>
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="url(#ballShade)" stroke="#555" stroke-width="0.5"/>
-        <!-- Pentagon panels -->
-        <polygon points="50,18 42,28 46,38 54,38 58,28" fill="#222" stroke="#444" stroke-width="0.5"/>
-        <polygon points="24,42 18,52 24,60 34,58 34,48" fill="#222" stroke="#444" stroke-width="0.5"/>
-        <polygon points="76,42 82,52 76,60 66,58 66,48" fill="#222" stroke="#444" stroke-width="0.5"/>
-        <polygon points="34,72 40,82 50,84 60,82 66,72" fill="#222" stroke="#444" stroke-width="0.5"/>
-        <!-- White panel edges (seams) -->
-        <line x1="50" y1="18" x2="42" y2="28" stroke="#999" stroke-width="0.4"/>
-        <line x1="50" y1="18" x2="58" y2="28" stroke="#999" stroke-width="0.4"/>
-        <line x1="42" y1="28" x2="34" y2="48" stroke="#999" stroke-width="0.4"/>
-        <line x1="58" y1="28" x2="66" y2="48" stroke="#999" stroke-width="0.4"/>
-        <line x1="46" y1="38" x2="34" y2="48" stroke="#999" stroke-width="0.4"/>
-        <line x1="54" y1="38" x2="66" y2="48" stroke="#999" stroke-width="0.4"/>
-        <line x1="34" y1="58" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
-        <line x1="66" y1="58" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
-        <line x1="24" y1="60" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
-        <line x1="76" y1="60" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
-        <line x1="40" y1="82" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
-        <line x1="60" y1="82" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
-        <!-- Specular highlight -->
-        <circle cx="38" cy="32" r="18" fill="url(#ballHighlight)"/>
-      </svg>
-    </div>
-    <div class="pitch-glow"></div>
+    <div class="pitch-arc left"></div>
+    <div class="pitch-arc right"></div>
+    <div class="pitch-sweep"></div>
+    <div class="pitch-pulse"></div>
   </div>
   <div class="intro-title" id="introTitle">MFG World Cup Command</div>
 </div>
@@ -1446,12 +1444,12 @@ function setupTheme() {
 // ── Stadium Flyover Intro ──
 function runIntro() {
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-v6') === today) {
+  if (localStorage.getItem('wc-intro-v7') === today) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-v6', today);
+  localStorage.setItem('wc-intro-v7', today);
 
   const overlay = document.getElementById('introOverlay');
   const pitch = document.getElementById('introPitch');
@@ -1493,7 +1491,6 @@ function runIntro() {
     const brandRect = brand.getBoundingClientRect();
 
     // Animate to brand position (0.9s smooth cubic-bezier)
-    title.style.top = (brandRect.top + brandRect.height / 2 - titleRect.height * (2.2 / 44 * 16) / 2 / 16 * 8) + 'px';
     title.style.top = brandRect.top + 'px';
     title.style.left = brandRect.left + 'px';
     title.style.fontSize = '2.2rem';
