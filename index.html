@@ -579,85 +579,156 @@ body.light .empty-state h3{
   .vs-divider{padding:2px 0}
 }
 /* ── BROADCAST INTRO ── */
+/* ── STADIUM FLYOVER INTRO ── */
 .intro-overlay{
-  position:fixed;inset:0;z-index:10000;background:#000;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  opacity:1;
-  transition:background 0.6s ease, opacity 0.3s ease;
+  position:fixed;inset:0;z-index:10000;
+  background:#030a04;
+  display:flex;align-items:center;justify-content:center;
+  perspective:800px;overflow:hidden;
+  transition:opacity 0.5s ease;
 }
-.intro-overlay.bg-fade{background:transparent}
 .intro-overlay.done{opacity:0;pointer-events:none}
-.intro-live{
-  position:absolute;top:20px;right:24px;display:flex;align-items:center;gap:6px;
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.7rem;
-  text-transform:uppercase;letter-spacing:2px;color:var(--red);opacity:0;
-  animation:introFadeIn 0.2s 0.1s forwards;
+
+/* The pitch — top-down view */
+.intro-pitch{
+  width:500px;max-width:80vw;aspect-ratio:1.5/1;
+  border:2px solid transparent;
+  position:relative;
+  transform:rotateX(55deg) scale(0.9);
+  transform-origin:center center;
+  transition:transform 1s cubic-bezier(0.25,0.1,0.25,1);
 }
-.intro-live-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--red);
-  animation:introPulse 0.4s infinite alternate;
+
+/* Pitch lines — draw themselves in */
+.pitch-outline{
+  position:absolute;inset:0;
+  border:2px solid rgba(255,255,255,0);
+  animation:pitchDraw 0.6s 0.2s forwards;
 }
-@keyframes introPulse{0%{opacity:1}100%{opacity:0.3}}
-.intro-count{
-  font-family:'Oswald',sans-serif;font-weight:900;
-  font-size:clamp(100px,20vw,200px);letter-spacing:4px;
-  color:transparent;
-  -webkit-text-stroke:2px var(--red);
-  opacity:0;transform:scale(1.5);
-  animation:introCountPop 0.5s forwards;
+@keyframes pitchDraw{
+  0%{border-color:rgba(255,255,255,0)}
+  100%{border-color:rgba(255,255,255,0.7)}
 }
-.intro-count.c3{color:var(--red);-webkit-text-stroke:none}
-.intro-count.c2{color:var(--red);-webkit-text-stroke:none}
-.intro-count.c1{color:var(--gold);-webkit-text-stroke:none}
-@keyframes introCountPop{
-  0%{opacity:0;transform:scale(2.5);filter:blur(4px)}
-  50%{opacity:1;transform:scale(0.92);filter:blur(0)}
-  100%{opacity:1;transform:scale(1);filter:blur(0)}
+
+.pitch-half{
+  position:absolute;top:0;bottom:0;left:50%;
+  width:2px;background:rgba(255,255,255,0);
+  animation:lineDraw 0.4s 0.5s forwards;
 }
-.intro-flash{
-  position:absolute;inset:0;background:#fff;opacity:0;
-  animation:introFlash 0.4s 2.2s forwards;
+@keyframes lineDraw{
+  0%{background:rgba(255,255,255,0)}
+  100%{background:rgba(255,255,255,0.7)}
 }
-@keyframes introFlash{
-  0%{opacity:0}10%{opacity:1}100%{opacity:0}
+
+.pitch-circle{
+  position:absolute;top:50%;left:50%;
+  width:100px;height:100px;
+  transform:translate(-50%,-50%);
+  border:2px solid rgba(255,255,255,0);
+  border-radius:50%;
+  animation:circleDraw 0.5s 0.8s forwards;
 }
+@keyframes circleDraw{
+  0%{border-color:rgba(255,255,255,0);transform:translate(-50%,-50%) scale(0.3)}
+  100%{border-color:rgba(255,255,255,0.7);transform:translate(-50%,-50%) scale(1)}
+}
+
+.pitch-center-dot{
+  position:absolute;top:50%;left:50%;
+  width:8px;height:8px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(255,255,255,0);
+  animation:dotDraw 0.3s 1.1s forwards;
+}
+@keyframes dotDraw{
+  0%{background:rgba(255,255,255,0);transform:translate(-50%,-50%) scale(0)}
+  100%{background:rgba(255,255,255,0.9);transform:translate(-50%,-50%) scale(1)}
+}
+
+/* Penalty boxes */
+.pitch-box{
+  position:absolute;width:30%;height:40%;
+  border:2px solid rgba(255,255,255,0);
+  animation:pitchDraw 0.4s 0.6s forwards;
+}
+.pitch-box.left{top:30%;left:0;border-left:none}
+.pitch-box.right{top:30%;right:0;border-right:none}
+
+/* Ball drop */
+.intro-ball{
+  position:absolute;top:50%;left:50%;
+  font-size:2.5rem;
+  transform:translate(-50%,-50%) scale(0);
+  opacity:0;
+  animation:ballDrop 0.5s 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  z-index:2;
+}
+@keyframes ballDrop{
+  0%{opacity:0;transform:translate(-50%,-200%) scale(0.5)}
+  60%{opacity:1;transform:translate(-50%,-40%) scale(1.1)}
+  80%{transform:translate(-50%,-55%) scale(0.95)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+
+/* Pitch glow after ball drops */
+.pitch-glow{
+  position:absolute;top:50%;left:50%;
+  width:0;height:0;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,0.3),transparent 70%);
+  transform:translate(-50%,-50%);
+  animation:pitchGlow 0.6s 1.8s forwards;
+}
+@keyframes pitchGlow{
+  0%{width:0;height:0;opacity:1}
+  100%{width:400px;height:400px;opacity:0}
+}
+
+/* Brand title over pitch */
 .intro-title{
+  position:absolute;
   font-family:'Oswald',sans-serif;font-weight:900;
-  font-size:clamp(28px,6vw,56px);text-transform:uppercase;
-  letter-spacing:8px;opacity:0;
+  font-size:clamp(24px,5vw,44px);text-transform:uppercase;
+  letter-spacing:6px;opacity:0;
   background:linear-gradient(135deg,#fff,var(--gold),var(--red),var(--gold));
   background-size:200% 200%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:introTitleIn 0.6s 2.4s forwards,introTitleShimmer 2s 2.4s ease-in-out;
-  position:absolute;
-  will-change:transform,font-size,letter-spacing,top,left;
+  animation:introTitleIn 0.5s 2.2s forwards, introTitleShimmer 1.5s 2.2s ease-in-out;
+  z-index:3;filter:drop-shadow(0 0 20px rgba(255,215,0,0.3));
+  will-change:transform,font-size,letter-spacing;
   transition:all 0.7s cubic-bezier(0.4,0,0.1,1);
 }
-.intro-title.collapsing{
-  animation:none !important;opacity:1 !important;
-}
+.intro-title.collapsing{animation:none !important;opacity:1 !important}
 @keyframes introTitleIn{
-  0%{opacity:0;transform:translateY(30px) scale(0.85);filter:blur(6px)}
-  60%{opacity:1;filter:blur(0)}
-  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+  0%{opacity:0;transform:translateY(20px) scale(0.85)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
 }
 @keyframes introTitleShimmer{
   0%{background-position:0% 50%}100%{background-position:100% 50%}
 }
-@keyframes introFadeIn{0%{opacity:0}100%{opacity:1}}
+
+/* Pullback — pitch shrinks away */
+.intro-pitch.pullback{
+  transform:rotateX(55deg) scale(0.15);
+  opacity:0;
+}
+
+/* Green turf glow on overlay */
+.intro-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 60%,rgba(0,80,20,0.25),transparent 70%);
+  pointer-events:none;
+}
 
 /* Dashboard hidden until intro done */
 .dashboard-hidden .header,
 .dashboard-hidden .ticker-bar,
 .dashboard-hidden .main{opacity:0}
 .dashboard-hidden .brand{opacity:0}
-.dashboard-reveal .header{animation:revealFadeIn 0.4s 0s forwards}
+.dashboard-reveal .header{animation:revealFadeIn 0.3s 0s forwards}
 .dashboard-reveal .brand{animation:revealFadeIn 0.3s 0.6s forwards}
-.dashboard-reveal .ticker-bar{animation:revealSlideDown 0.4s 0.15s forwards}
-.dashboard-reveal .main{animation:revealFadeUp 0.5s 0.25s forwards}
-@keyframes revealFadeIn{
-  0%{opacity:0}100%{opacity:1}
-}
+.dashboard-reveal .ticker-bar{animation:revealSlideDown 0.3s 0.1s forwards}
+.dashboard-reveal .main{animation:revealFadeUp 0.4s 0.2s forwards}
+@keyframes revealFadeIn{0%{opacity:0}100%{opacity:1}}
 @keyframes revealSlideDown{
   0%{opacity:0;transform:translateY(-12px)}100%{opacity:1;transform:translateY(0)}
 }
@@ -668,11 +739,18 @@ body.light .empty-state h3{
 </head>
 <body class="dashboard-hidden">
 
-<!-- BROADCAST INTRO -->
+<!-- STADIUM FLYOVER INTRO -->
 <div class="intro-overlay" id="introOverlay" style="display:none">
-  <div class="intro-live"><span class="intro-live-dot"></span>LIVE</div>
-  <div class="intro-count" id="introC2">3</div>
-  <div class="intro-flash"></div>
+  <div class="intro-pitch" id="introPitch">
+    <div class="pitch-outline"></div>
+    <div class="pitch-half"></div>
+    <div class="pitch-circle"></div>
+    <div class="pitch-center-dot"></div>
+    <div class="pitch-box left"></div>
+    <div class="pitch-box right"></div>
+    <div class="intro-ball">⚽</div>
+    <div class="pitch-glow"></div>
+  </div>
   <div class="intro-title" id="introTitle">MFG World Cup Command</div>
 </div>
 
@@ -1319,84 +1397,58 @@ function setupTheme() {
   });
 }
 
-// ── Broadcast Intro ──
+// ── Stadium Flyover Intro ──
 function runIntro() {
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-v2') === today) {
+  if (localStorage.getItem('wc-intro-v3') === today) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-v2', today);
+  localStorage.setItem('wc-intro-v3', today);
 
   const overlay = document.getElementById('introOverlay');
-  const counter = document.getElementById('introC2');
+  const pitch = document.getElementById('introPitch');
+  const title = document.getElementById('introTitle');
   overlay.style.display = 'flex';
-  counter.classList.add('c3');
 
-  // 4-second sequence:
-  // 0ms      — "3" appears (red, big pop)
-  // 700ms    — "2" replaces (red, re-pop)
-  // 1400ms   — "1" replaces (gold, re-pop)
-  // 2100ms   — counter hides, white flash fires (CSS at 2.2s)
-  // 2400ms   — title slams in (CSS at 2.4s), shimmer plays
-  // 3600ms   — overlay fades, dashboard reveals
-  // 4200ms   — cleanup
+  // Timeline:
+  // 0.0s — Pitch lines draw in (CSS: outline 0.2s, half 0.5s, circle 0.8s, boxes 0.6s, dot 1.1s)
+  // 1.5s — Ball drops onto center with bounce (CSS)
+  // 1.8s — Gold glow pulse from center (CSS)
+  // 2.2s — Title appears with shimmer (CSS)
+  // 3.0s — Pitch pulls back (shrinks + fades), title collapses to header
+  // 3.5s — Dashboard reveals (header, ticker, main stagger in)
+  // 4.0s — Cleanup
 
+  // 3.0s: pullback + collapse
   setTimeout(() => {
-    counter.style.animation = 'none'; counter.offsetHeight; // reset
-    counter.textContent = '2';
-    counter.classList.remove('c3');
-    counter.classList.add('c2');
-    counter.style.animation = 'introCountPop 0.5s forwards';
-  }, 700);
+    pitch.classList.add('pullback');
 
-  setTimeout(() => {
-    counter.style.animation = 'none'; counter.offsetHeight;
-    counter.textContent = '1';
-    counter.classList.remove('c2');
-    counter.classList.add('c1');
-    counter.style.animation = 'introCountPop 0.5s forwards';
-  }, 1400);
-
-  setTimeout(() => { counter.style.display = 'none'; }, 2100);
-
-  // Title + flash handled by CSS delays (2.2s flash, 2.4s title)
-
-  // At 3.2s: start collapse — title flies to header brand position
-  setTimeout(() => {
-    const title = document.getElementById('introTitle');
     const brand = document.querySelector('.brand');
     const brandRect = brand.getBoundingClientRect();
 
-    // Show the header (but brand stays invisible)
-    document.body.classList.remove('dashboard-hidden');
-    document.body.classList.add('dashboard-reveal');
-
-    // Measure where title needs to go
     title.classList.add('collapsing');
-
-    // Animate to brand position
     title.style.position = 'fixed';
     title.style.top = brandRect.top + 'px';
     title.style.left = brandRect.left + 'px';
     title.style.fontSize = '2.2rem';
     title.style.letterSpacing = '3px';
     title.style.transform = 'none';
+    title.style.filter = 'none';
 
-    // Fade overlay background
-    overlay.classList.add('bg-fade');
-  }, 3200);
+    document.body.classList.remove('dashboard-hidden');
+    document.body.classList.add('dashboard-reveal');
+  }, 3000);
 
-  // At 3.9s: title has landed — hide it, reveal real brand
+  // 3.7s: hide title, fade overlay
   setTimeout(() => {
-    const title = document.getElementById('introTitle');
-    if (title) title.style.opacity = '0';
+    title.style.opacity = '0';
     overlay.classList.add('done');
-  }, 3900);
+  }, 3700);
 
-  // Cleanup
-  setTimeout(() => { overlay.remove(); }, 4300);
+  // 4.2s: cleanup
+  setTimeout(() => { overlay.remove(); }, 4200);
 }
 
 runIntro();
