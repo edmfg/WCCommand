@@ -571,6 +571,58 @@ a:hover { opacity: 0.8; }
 .status-pill.blocked { background: rgba(204,0,0,0.15); color: var(--red); }
 .status-pill.draft { background: rgba(106,106,128,0.15); color: var(--text-muted); }
 
+/* ── SETTINGS ── */
+.settings-section { padding: 28px; }
+.settings-title {
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.4rem;
+  text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;
+  background: linear-gradient(90deg, #fff 0%, var(--gold) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.setting-group {
+  padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.setting-group:last-child { border-bottom: none; }
+.setting-label {
+  font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 0.95rem;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block;
+}
+.setting-desc {
+  font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5;
+}
+.setting-row {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.setting-btn {
+  font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 1px; padding: 8px 18px;
+  background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: all 0.2s;
+}
+.setting-btn:hover { background: rgba(255,255,255,0.1); }
+.setting-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+.setting-btn-danger { border-color: rgba(204,0,0,0.3); color: #ff6666; }
+.setting-btn-danger:hover { background: rgba(204,0,0,0.15); }
+.setting-input {
+  font-family: 'Inter', sans-serif; font-size: 0.8rem; padding: 8px 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; color: var(--text); outline: none; min-width: 200px;
+  transition: border-color 0.2s;
+}
+.setting-input:focus { border-color: rgba(255,215,0,0.3); }
+.setting-select {
+  font-family: 'Inter', sans-serif; font-size: 0.8rem; padding: 8px 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; color: var(--text); outline: none;
+}
+.setting-select option { background: #1a1a2e; }
+.setting-toast {
+  display: inline-block; font-size: 0.75rem; color: var(--green); font-weight: 600;
+  margin-top: 6px; opacity: 0; transition: opacity 0.3s;
+}
+.setting-toast.show { opacity: 1; }
+
 @media (max-width: 768px) {
   .header { padding: 0 14px; gap: 12px; }
   .header-brand { font-size: 16px; }
@@ -617,6 +669,7 @@ a:hover { opacity: 0.8; }
     <button class="tab-btn active" data-tab="update" onclick="switchTab('update')">&#128229; Daily Update</button>
     <button class="tab-btn" data-tab="production" onclick="switchTab('production')">&#127959; Production Tracker</button>
     <button class="tab-btn" data-tab="prompts" onclick="switchTab('prompts')">&#128172; Prompts Tracker</button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️ Settings</button>
   </nav>
 
   <main class="main">
@@ -810,6 +863,69 @@ a:hover { opacity: 0.8; }
       </div>
     </div>
 
+    <!-- Tab 4: Settings -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="settings-section glass">
+        <h3 class="settings-title">⚙️ Dashboard Settings</h3>
+
+        <div class="setting-group">
+          <label class="setting-label">🎨 Theme</label>
+          <p class="setting-desc">Switch between dark and light mode across the dashboard.</p>
+          <div class="setting-row">
+            <button class="setting-btn" id="themeDark" onclick="setTheme('dark')">🌙 Dark Mode</button>
+            <button class="setting-btn" id="themeLight" onclick="setTheme('light')">☀️ Light Mode</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">🔑 MFG Password</label>
+          <p class="setting-desc">Change the password required to access MFG mode.</p>
+          <div class="setting-row">
+            <input type="text" class="setting-input" id="newPassword" placeholder="Enter new password" />
+            <button class="setting-btn" onclick="updatePassword()">Update Password</button>
+          </div>
+          <span class="setting-toast" id="passwordToast"></span>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">🔗 Supabase Connection</label>
+          <p class="setting-desc">Current Supabase project for storing update history.</p>
+          <div class="setting-row">
+            <input type="text" class="setting-input" id="supabaseUrl" placeholder="Supabase URL" />
+            <input type="text" class="setting-input" id="supabaseKey" placeholder="Supabase Anon Key" />
+            <button class="setting-btn" onclick="updateSupabase()">Save</button>
+          </div>
+          <span class="setting-toast" id="supabaseToast"></span>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">📰 Ticker Speed</label>
+          <p class="setting-desc">Adjust how fast the news ticker scrolls on the main dashboard.</p>
+          <div class="setting-row">
+            <select class="setting-select" id="tickerSpeed" onchange="saveTickerSpeed()">
+              <option value="slow">Slow (90s)</option>
+              <option value="normal" selected>Normal (60s)</option>
+              <option value="fast">Fast (30s)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">🗑️ Data Management</label>
+          <p class="setting-desc">Clear cached data and reset settings.</p>
+          <div class="setting-row">
+            <button class="setting-btn setting-btn-danger" onclick="clearAllData()">Clear All Local Data</button>
+            <button class="setting-btn setting-btn-danger" onclick="clearUpdateHistory()">Clear Update History</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">ℹ️ About</label>
+          <p class="setting-desc">MFG World Cup Command — Internal war room dashboard for the 2026 FIFA World Cup social media campaign. Built with Claude Code.</p>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -866,12 +982,13 @@ a:hover { opacity: 0.8; }
     if (e.key === '1') switchTab('update');
     if (e.key === '2') switchTab('production');
     if (e.key === '3') switchTab('prompts');
+    if (e.key === '4') switchTab('settings');
   });
 
   // Hash routing
   function applyHash() {
     const hash = location.hash.replace('#', '');
-    if (['update', 'production', 'prompts'].includes(hash)) {
+    if (['update', 'production', 'prompts', 'settings'].includes(hash)) {
       switchTab(hash);
     }
   }
@@ -1082,6 +1199,70 @@ a:hover { opacity: 0.8; }
     // Load history on init
     loadHistory();
   }
+})();
+
+// ── Settings functions (global scope) ──
+window.setTheme = function(theme) {
+  localStorage.setItem('wc-theme', theme);
+  document.getElementById('themeDark').classList.toggle('active', theme === 'dark');
+  document.getElementById('themeLight').classList.toggle('active', theme === 'light');
+  // Show confirmation
+  alert('Theme set to ' + theme + ' mode. This applies to the main dashboard.');
+};
+
+window.updatePassword = function() {
+  const pw = document.getElementById('newPassword').value.trim();
+  if (!pw) return;
+  localStorage.setItem('mfg-password', pw);
+  const toast = document.getElementById('passwordToast');
+  toast.textContent = '✅ Password updated to: ' + pw;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+  document.getElementById('newPassword').value = '';
+};
+
+window.updateSupabase = function() {
+  const url = document.getElementById('supabaseUrl').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+  if (url) localStorage.setItem('mfg-supabase-url', url);
+  if (key) localStorage.setItem('mfg-supabase-key', key);
+  const toast = document.getElementById('supabaseToast');
+  toast.textContent = '✅ Supabase settings saved. Reload to apply.';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+};
+
+window.saveTickerSpeed = function() {
+  const speed = document.getElementById('tickerSpeed').value;
+  localStorage.setItem('wc-ticker-speed', speed);
+};
+
+window.clearAllData = function() {
+  if (!confirm('Clear ALL local data including settings, history, and preferences?')) return;
+  localStorage.clear();
+  alert('All local data cleared. Reloading...');
+  location.reload();
+};
+
+window.clearUpdateHistory = function() {
+  if (!confirm('Clear all update history from localStorage?')) return;
+  localStorage.removeItem('mfg_dashboard_updates');
+  alert('Update history cleared. Reload to refresh.');
+  location.reload();
+};
+
+// Init settings state
+(function initSettings() {
+  const theme = localStorage.getItem('wc-theme') || 'dark';
+  const el = theme === 'light' ? document.getElementById('themeLight') : document.getElementById('themeDark');
+  if (el) el.classList.add('active');
+  const speed = localStorage.getItem('wc-ticker-speed');
+  if (speed) { const sel = document.getElementById('tickerSpeed'); if (sel) sel.value = speed; }
+  // Pre-fill Supabase fields
+  const sbUrl = document.getElementById('supabaseUrl');
+  const sbKey = document.getElementById('supabaseKey');
+  if (sbUrl) sbUrl.value = localStorage.getItem('mfg-supabase-url') || 'https://ypisjfefbccgtxesteja.supabase.co';
+  if (sbKey) sbKey.value = localStorage.getItem('mfg-supabase-key') || '';
 })();
 </script>
 

@@ -43,10 +43,11 @@ body{
 /* ── HEADER ── */
 .header{
   position:sticky;top:0;z-index:100;
-  background:linear-gradient(180deg,#14161e 0%,#0c0e16 100%);
-  backdrop-filter:blur(20px);
+  background:rgba(14,16,22,0.85);
+  backdrop-filter:blur(30px) saturate(200%);
+  -webkit-backdrop-filter:blur(30px) saturate(200%);
   border-bottom:3px solid var(--red);
-  box-shadow:0 4px 30px rgba(204,0,0,0.2);
+  box-shadow:0 4px 40px rgba(0,0,0,0.3),0 0 20px rgba(204,0,0,0.1);
   padding:0 24px;
 }
 .header-inner{
@@ -73,8 +74,9 @@ body{
   background:rgba(255,255,255,0.06);color:var(--text-dim);
   clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
   transition:all 0.3s var(--transition);position:relative;
+  backdrop-filter:blur(8px);
 }
-.tab-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+.tab-btn:hover{background:rgba(255,255,255,0.12);color:#fff}
 .tab-btn.active{
   background:linear-gradient(135deg,var(--red) 0%,#ff3333 50%,var(--red-dark) 100%);
   color:#fff;box-shadow:0 0 20px rgba(204,0,0,0.4);
@@ -99,6 +101,69 @@ body{
   transition:all 0.3s var(--transition);
 }
 .gemini-toggle:hover{box-shadow:0 0 20px rgba(244,180,0,0.2)}
+.theme-toggle{
+  font-size:1.1rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:50%;width:36px;height:36px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s var(--transition);
+}
+.theme-toggle:hover{background:rgba(255,255,255,0.12);box-shadow:0 0 12px rgba(255,255,255,0.1)}
+
+/* ── LIGHT MODE ── */
+body.light{
+  --bg:#f0f1f5;--surface:rgba(0,0,0,0.03);--border:rgba(0,0,0,0.1);
+  --text:#1a1a2e;--text-dim:#555;--glass-blur:12px;
+}
+body.light{background:var(--bg);color:var(--text)}
+body.light .bg-blobs{opacity:0.3}
+body.light .stadium-light{background:radial-gradient(ellipse at 50% 0%,rgba(204,0,0,0.04) 0%,transparent 60%)}
+body.light .header{background:linear-gradient(180deg,#fff 0%,#f5f5fa 100%);border-bottom-color:var(--red)}
+body.light .brand{
+  background:linear-gradient(135deg,#1a1a2e 0%,var(--red) 40%,var(--gold) 70%,var(--red) 100%);
+  background-size:200% 200%;-webkit-background-clip:text;background-clip:text;
+}
+body.light .tab-btn{background:rgba(0,0,0,0.04);color:#666}
+body.light .tab-btn:hover{background:rgba(0,0,0,0.08);color:#333}
+body.light .tab-btn.active{
+  background:linear-gradient(135deg,var(--red) 0%,#ff3333 50%,var(--red-dark) 100%);color:#fff;
+}
+body.light .mfg-link{color:var(--red-dark);background:rgba(204,0,0,0.06);border-color:rgba(204,0,0,0.2)}
+body.light .gemini-toggle{background:rgba(0,0,0,0.05);color:#333;border-color:rgba(0,0,0,0.1)}
+body.light .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+body.light .ticker-bar{background:linear-gradient(90deg,var(--red-dark),var(--red))}
+body.light .glass{background:rgba(255,255,255,0.7);border-color:rgba(0,0,0,0.08);backdrop-filter:blur(12px)}
+body.light .glass:hover{border-color:rgba(0,0,0,0.15)}
+body.light .section-title{
+  background:linear-gradient(90deg,#1a1a2e 0%,var(--red) 100%);
+  -webkit-background-clip:text;background-clip:text;
+}
+body.light .news-card h3{
+  background:linear-gradient(90deg,#1a1a2e 0%,#333 60%,var(--red) 100%);
+  -webkit-background-clip:text;background-clip:text;
+}
+body.light .social-card .topic{
+  background:linear-gradient(90deg,#1a1a2e 0%,var(--red-dark) 80%,var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;
+}
+body.light .news-card .meta,body.light .news-card .summary{color:#555}
+body.light .social-card .summary,body.light .social-card .quote{color:#555}
+body.light .match-detail{background:linear-gradient(135deg,rgba(204,0,0,0.08),rgba(153,0,0,0.05))}
+body.light .match-detail .venue,body.light .match-detail .date{color:#666}
+body.light .date-header{
+  background:linear-gradient(90deg,var(--red-dark) 0%,var(--red) 50%,var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  border-bottom-color:rgba(204,0,0,0.15);
+}
+body.light .stage-group h3{color:var(--red-dark)}
+body.light .group-filter{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);color:#333}
+body.light .view-btn{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.1)}
+body.light .view-btn.active{background:var(--red);color:#fff}
+body.light .filter-pill{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.1)}
+body.light .filter-pill.active{background:var(--red);color:#fff;border-color:var(--red)}
+body.light ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15)}
+body.light .gemini-panel{background:rgba(255,255,255,0.95)}
+body.light .gemini-msg.assistant{background:rgba(0,0,0,0.04);color:#333}
+body.light .gemini-input{background:rgba(0,0,0,0.04);color:#333;border-color:rgba(0,0,0,0.1)}
 
 /* ── TICKER ── */
 .ticker-bar{
@@ -142,15 +207,51 @@ body{
 }
 .updated{font-size:0.75rem;color:var(--text-dim);margin-bottom:24px}
 
-/* ── GLASS CARD ── */
+/* ── GLASS CARD (Apple-style) ── */
 .glass{
-  background:var(--surface);backdrop-filter:blur(var(--glass-blur));
-  border:1px solid var(--border);border-radius:var(--radius);
-  transition:all 0.35s var(--transition);
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  box-shadow:0 4px 30px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
+  transition:all 0.4s var(--transition);
 }
-.glass:hover{border-color:rgba(255,255,255,0.14)}
+.glass:hover{
+  border-color:rgba(255,255,255,0.16);
+  box-shadow:0 8px 40px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+  transform:translateY(-2px);
+}
+body.light .glass{
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-color:rgba(0,0,0,0.06);
+  box-shadow:0 4px 30px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.8);
+}
+body.light .glass:hover{
+  border-color:rgba(0,0,0,0.12);
+  box-shadow:0 8px 40px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.9);
+}
 
 /* ── LIVE TAB ── */
+.live-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.live-filter{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:1.5px;padding:6px 16px;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  border:1px solid rgba(255,255,255,0.08);cursor:pointer;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  transition:all 0.2s;
+}
+.live-filter:hover{color:#fff;background:rgba(255,255,255,0.1)}
+.live-filter.active{
+  background:linear-gradient(135deg,var(--red),#ff3333);color:#fff;
+  border-color:var(--red);box-shadow:0 0 12px rgba(204,0,0,0.2);
+}
+body.light .live-filter{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.1)}
+body.light .live-filter:hover{color:#333;background:rgba(0,0,0,0.08)}
+body.light .live-filter.active{background:var(--red);color:#fff}
 .live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .news-col,.social-col{display:flex;flex-direction:column;gap:16px}
 
@@ -467,6 +568,7 @@ body{
     <div class="header-actions">
       <a href="mfg.html" class="mfg-link">MFG Mode</a>
       <button class="gemini-toggle" id="geminiToggle">Gemini</button>
+      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">☀️</button>
     </div>
   </div>
 </header>
@@ -483,6 +585,7 @@ body{
 
   <!-- LIVE -->
   <div class="tab-panel active" id="panel-live">
+    <div class="live-filters" id="liveFilters"></div>
     <div class="live-grid">
       <div class="news-col">
         <h2 class="section-title">Latest News</h2>
@@ -714,6 +817,7 @@ function driveThumbnail(fileId, size = 800) {
 function init() {
   renderTicker();
   renderTimestamp();
+  renderLiveFilters();
   renderNews();
   renderSocial();
   renderMatches();
@@ -735,9 +839,63 @@ function renderTimestamp() {
   document.getElementById('lastUpdated').textContent = `Last updated: ${d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZoneName:'short'})}`;
 }
 
+let liveFilter = 'all';
+const liveFilterDefs = [
+  { id: 'all', label: '🌐 All' },
+  { id: 'canada', label: '🇨🇦 Canada' },
+  { id: 'germany', label: '🇩🇪 Germany' },
+  { id: 'game', label: '⚽ Game' },
+  { id: 'culture', label: '🎵 Culture' },
+  { id: 'viral', label: '🔥 Trending' },
+];
+
+function setLiveFilter(id) {
+  liveFilter = id;
+  renderLiveFilters();
+  renderNews();
+  renderSocial();
+}
+
+function renderLiveFilters() {
+  const bar = document.getElementById('liveFilters');
+  bar.innerHTML = liveFilterDefs.map(f =>
+    `<button class="live-filter${f.id === liveFilter ? ' active' : ''}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`
+  ).join('');
+}
+
+function matchesLiveFilter(item, type) {
+  if (liveFilter === 'all') return true;
+  if (liveFilter === 'canada') {
+    if (type === 'news') return item.tag === 'Canada';
+    return item.topic?.toLowerCase().includes('canada') || item.summary?.toLowerCase().includes('canada');
+  }
+  if (liveFilter === 'germany') {
+    if (type === 'news') return item.tag === 'Germany';
+    return item.topic?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('kit');
+  }
+  if (liveFilter === 'game') {
+    if (type === 'news') return true; // all news is game-related
+    return item.category === 'game';
+  }
+  if (liveFilter === 'culture') {
+    if (type === 'news') return false;
+    return ['food','music','fashion','fandom'].includes(item.category);
+  }
+  if (liveFilter === 'viral') {
+    if (type === 'news') return false;
+    return item.volume?.includes('🔥🔥🔥');
+  }
+  return true;
+}
+
 function renderNews() {
   const container = document.getElementById('newsCards');
-  container.innerHTML = DASHBOARD_DATA.news.map(n => {
+  const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news'));
+  if (!filtered.length) {
+    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
+    return;
+  }
+  container.innerHTML = filtered.map(n => {
     const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
@@ -754,7 +912,12 @@ function renderNews() {
 
 function renderSocial() {
   const container = document.getElementById('socialCards');
-  container.innerHTML = DASHBOARD_DATA.social.map(s => {
+  const filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social'));
+  if (!filtered.length) {
+    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No social trends match this filter.</p>';
+    return;
+  }
+  container.innerHTML = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
     return `<div class="social-card glass">
@@ -989,6 +1152,20 @@ function setupKeyboard() {
   });
 }
 
+// Theme toggle
+function setupTheme() {
+  const toggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('wc-theme');
+  if (saved === 'light') { document.body.classList.add('light'); toggle.textContent = '🌙'; }
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    const isLight = document.body.classList.contains('light');
+    toggle.textContent = isLight ? '🌙' : '☀️';
+    localStorage.setItem('wc-theme', isLight ? 'light' : 'dark');
+  });
+}
+
+setupTheme();
 init();
 </script>
 </body>
