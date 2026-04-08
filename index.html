@@ -255,6 +255,50 @@ body.light .live-filter.active{background:var(--red);color:#fff}
 .live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .news-col,.social-col{display:flex;flex-direction:column;gap:16px}
 
+/* Card carousel */
+.card-carousel{position:relative;min-height:200px}
+.card-carousel .carousel-card{
+  position:absolute;inset:0;opacity:0;
+  transform:translateY(12px);
+  transition:opacity 0.5s ease, transform 0.5s ease;
+  pointer-events:none;
+}
+.card-carousel .carousel-card.active{
+  position:relative;opacity:1;transform:translateY(0);pointer-events:auto;
+}
+.card-carousel .carousel-card.exit{
+  opacity:0;transform:translateY(-12px);
+}
+.carousel-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.carousel-counter{
+  font-family:'Oswald',sans-serif;font-size:0.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);
+}
+.carousel-dots{display:flex;gap:4px}
+.carousel-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,0.15);cursor:pointer;
+  transition:all 0.3s;
+}
+.carousel-dot.active{background:var(--red);box-shadow:0 0 6px rgba(204,0,0,0.4);width:18px;border-radius:3px}
+body.light .carousel-dot{background:rgba(0,0,0,0.12)}
+body.light .carousel-dot.active{background:var(--red)}
+.carousel-nav{display:flex;gap:4px}
+.carousel-nav button{
+  font-family:'Oswald',sans-serif;font-size:0.7rem;font-weight:600;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  border:1px solid rgba(255,255,255,0.08);
+  width:28px;height:28px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.carousel-nav button:hover{background:rgba(255,255,255,0.12);color:#fff}
+body.light .carousel-nav button{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.08)}
+body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
+
 /* News cards */
 .news-card{padding:20px;position:relative;overflow:hidden}
 .news-card:hover{box-shadow:0 0 24px rgba(204,0,0,0.15)}
@@ -838,12 +882,30 @@ body.light .empty-state h3{
     <div class="live-filters" id="liveFilters"></div>
     <div class="live-grid">
       <div class="news-col">
-        <h2 class="section-title">Latest News</h2>
-        <div id="newsCards"></div>
+        <div class="carousel-controls">
+          <h2 class="section-title" style="margin-bottom:0">Latest News</h2>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="carousel-dots" id="newsDots"></div>
+            <div class="carousel-nav">
+              <button onclick="newsCarousel.prev()">‹</button>
+              <button onclick="newsCarousel.next()">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-carousel" id="newsCards"></div>
       </div>
       <div class="social-col">
-        <h2 class="section-title">Social Trends</h2>
-        <div id="socialCards"></div>
+        <div class="carousel-controls">
+          <h2 class="section-title" style="margin-bottom:0">Social Trends</h2>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="carousel-dots" id="socialDots"></div>
+            <div class="carousel-nav">
+              <button onclick="socialCarousel.prev()">‹</button>
+              <button onclick="socialCarousel.next()">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-carousel" id="socialCards"></div>
       </div>
     </div>
   </div>
@@ -1159,47 +1221,96 @@ function matchesLiveFilter(item, type) {
   return true;
 }
 
+// ── Card Carousel Engine ──
+function createCarousel(containerId, dotsId, interval = 5000) {
+  let idx = 0, count = 0, timer = null;
+  const container = document.getElementById(containerId);
+  const dotsEl = document.getElementById(dotsId);
+
+  function show(newIdx) {
+    const cards = container.querySelectorAll('.carousel-card');
+    if (!cards.length) return;
+    cards[idx]?.classList.remove('active');
+    cards[idx]?.classList.add('exit');
+    setTimeout(() => cards[idx]?.classList.remove('exit'), 500);
+    idx = ((newIdx % count) + count) % count;
+    cards[idx]?.classList.add('active');
+    dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+  }
+
+  function next() { show(idx + 1); resetTimer(); }
+  function prev() { show(idx - 1); resetTimer(); }
+  function goTo(i) { show(i); resetTimer(); }
+
+  function resetTimer() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(next, interval);
+  }
+
+  function setCards(html, total) {
+    count = total;
+    idx = 0;
+    container.innerHTML = html;
+    dotsEl.innerHTML = Array.from({length: count}, (_,i) =>
+      `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="${containerId === 'newsCards' ? 'newsCarousel' : 'socialCarousel'}.goTo(${i})"></span>`
+    ).join('');
+    if (count > 0) container.querySelector('.carousel-card')?.classList.add('active');
+    resetTimer();
+  }
+
+  // Pause on hover
+  container.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
+  container.addEventListener('mouseleave', resetTimer);
+
+  return { next, prev, goTo, setCards };
+}
+
+let newsCarousel = createCarousel('newsCards', 'newsDots', 5000);
+let socialCarousel = createCarousel('socialCards', 'socialDots', 6000);
+
 function renderNews() {
-  const container = document.getElementById('newsCards');
   const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news'));
   if (!filtered.length) {
-    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
+    document.getElementById('newsCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
+    document.getElementById('newsDots').innerHTML = '';
     return;
   }
-  container.innerHTML = filtered.map(n => {
+  const html = filtered.map(n => {
     const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
     const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    return `<div class="news-card glass">
+    return `<div class="carousel-card"><div class="news-card glass">
       <span class="tag ${tagClass}">${tagLabel}</span>
       <h3>${n.headline}</h3>
       <p class="meta">${n.source} \u2022 ${timeStr}</p>
       <p class="summary">${n.summary}</p>
       <a href="${n.url}" target="_blank" rel="noopener" class="read-more">Read More \u2192</a>
-    </div>`;
+    </div></div>`;
   }).join('');
+  newsCarousel.setCards(html, filtered.length);
 }
 
 function renderSocial() {
-  const container = document.getElementById('socialCards');
   const filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social'));
   if (!filtered.length) {
-    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No social trends match this filter.</p>';
+    document.getElementById('socialCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No social trends match this filter.</p>';
+    document.getElementById('socialDots').innerHTML = '';
     return;
   }
-  container.innerHTML = filtered.map(s => {
+  const html = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
-    return `<div class="social-card glass">
+    return `<div class="carousel-card"><div class="social-card glass">
       <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
       <h3 class="topic">${s.topic}</h3>
       <p class="volume">${s.volume}</p>
       <p class="summary">${s.summary}</p>
       ${quoteHtml}
       <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
-    </div>`;
+    </div></div>`;
   }).join('');
+  socialCarousel.setCards(html, filtered.length);
 }
 
 function switchSubTab(id) {
