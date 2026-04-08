@@ -654,51 +654,15 @@ body.light .empty-state h3{
 .pitch-box.left{top:30%;left:0;border-left:none}
 .pitch-box.right{top:30%;right:0;border-right:none}
 
-/* 3D Soccer Ball */
+/* 3D Soccer Ball — SVG-based */
 .intro-ball{
   position:absolute;top:50%;left:50%;
-  width:60px;height:60px;
+  width:64px;height:64px;
   transform:translate(-50%,-50%) scale(0);
   opacity:0;
   animation:ballDrop 0.5s 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
   z-index:2;
-  perspective:200px;
-}
-.ball-sphere{
-  width:100%;height:100%;border-radius:50%;position:relative;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(220,220,220,0.6) 40%, rgba(180,180,180,0.4) 70%, rgba(100,100,100,0.5));
-  box-shadow:
-    inset -8px -8px 20px rgba(0,0,0,0.4),
-    inset 4px 4px 10px rgba(255,255,255,0.3),
-    0 8px 30px rgba(0,0,0,0.6),
-    0 0 20px rgba(255,255,255,0.1);
-  animation:ballSpin 3s 1.5s linear infinite;
-  overflow:hidden;
-}
-/* Pentagon pattern overlay */
-.ball-sphere::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:
-    radial-gradient(circle at 50% 20%, #222 8px, transparent 8px),
-    radial-gradient(circle at 25% 55%, #222 7px, transparent 7px),
-    radial-gradient(circle at 75% 55%, #222 7px, transparent 7px),
-    radial-gradient(circle at 35% 80%, #222 6px, transparent 6px),
-    radial-gradient(circle at 65% 80%, #222 6px, transparent 6px);
-  opacity:0.7;
-}
-/* Specular highlight */
-.ball-sphere::after{
-  content:'';position:absolute;
-  top:8px;left:12px;width:22px;height:16px;
-  background:rgba(255,255,255,0.6);
-  border-radius:50%;
-  transform:rotate(-30deg);
-  filter:blur(3px);
-}
-@keyframes ballSpin{
-  0%{transform:rotateY(0deg) rotateX(5deg)}
-  100%{transform:rotateY(360deg) rotateX(5deg)}
+  filter:drop-shadow(0 6px 16px rgba(0,0,0,0.6)) drop-shadow(0 0 8px rgba(255,255,255,0.08));
 }
 @keyframes ballDrop{
   0%{opacity:0;transform:translate(-50%,-200%) scale(0.5)}
@@ -794,7 +758,43 @@ body.light .empty-state h3{
     <div class="pitch-center-dot"></div>
     <div class="pitch-box left"></div>
     <div class="pitch-box right"></div>
-    <div class="intro-ball"><div class="ball-sphere"></div></div>
+    <div class="intro-ball">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="ballShade" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#fff"/>
+            <stop offset="40%" stop-color="#e8e8e8"/>
+            <stop offset="75%" stop-color="#b0b0b0"/>
+            <stop offset="100%" stop-color="#666"/>
+          </radialGradient>
+          <radialGradient id="ballHighlight" cx="30%" cy="25%" r="25%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.8)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="url(#ballShade)" stroke="#555" stroke-width="0.5"/>
+        <!-- Pentagon panels -->
+        <polygon points="50,18 42,28 46,38 54,38 58,28" fill="#222" stroke="#444" stroke-width="0.5"/>
+        <polygon points="24,42 18,52 24,60 34,58 34,48" fill="#222" stroke="#444" stroke-width="0.5"/>
+        <polygon points="76,42 82,52 76,60 66,58 66,48" fill="#222" stroke="#444" stroke-width="0.5"/>
+        <polygon points="34,72 40,82 50,84 60,82 66,72" fill="#222" stroke="#444" stroke-width="0.5"/>
+        <!-- White panel edges (seams) -->
+        <line x1="50" y1="18" x2="42" y2="28" stroke="#999" stroke-width="0.4"/>
+        <line x1="50" y1="18" x2="58" y2="28" stroke="#999" stroke-width="0.4"/>
+        <line x1="42" y1="28" x2="34" y2="48" stroke="#999" stroke-width="0.4"/>
+        <line x1="58" y1="28" x2="66" y2="48" stroke="#999" stroke-width="0.4"/>
+        <line x1="46" y1="38" x2="34" y2="48" stroke="#999" stroke-width="0.4"/>
+        <line x1="54" y1="38" x2="66" y2="48" stroke="#999" stroke-width="0.4"/>
+        <line x1="34" y1="58" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
+        <line x1="66" y1="58" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
+        <line x1="24" y1="60" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
+        <line x1="76" y1="60" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
+        <line x1="40" y1="82" x2="34" y2="72" stroke="#999" stroke-width="0.4"/>
+        <line x1="60" y1="82" x2="66" y2="72" stroke="#999" stroke-width="0.4"/>
+        <!-- Specular highlight -->
+        <circle cx="38" cy="32" r="18" fill="url(#ballHighlight)"/>
+      </svg>
+    </div>
     <div class="pitch-glow"></div>
   </div>
   <div class="intro-title" id="introTitle">MFG World Cup Command</div>
@@ -1446,12 +1446,12 @@ function setupTheme() {
 // ── Stadium Flyover Intro ──
 function runIntro() {
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-v5') === today) {
+  if (localStorage.getItem('wc-intro-v6') === today) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-v5', today);
+  localStorage.setItem('wc-intro-v6', today);
 
   const overlay = document.getElementById('introOverlay');
   const pitch = document.getElementById('introPitch');
