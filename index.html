@@ -252,8 +252,13 @@ body.light .glass:hover{
 body.light .live-filter{background:rgba(0,0,0,0.04);color:#666;border-color:rgba(0,0,0,0.1)}
 body.light .live-filter:hover{color:#333;background:rgba(0,0,0,0.08)}
 body.light .live-filter.active{background:var(--red);color:#fff}
-.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.news-col,.social-col{display:flex;flex-direction:column}
+.live-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:0 24px;
+  grid-template-rows:auto 1fr;
+}
+.news-col,.social-col{display:contents}
+.carousel-controls{grid-row:1}
+.card-carousel{grid-row:2;align-self:start}
 /* Card carousel — shows 3 at a time, fixed height per card */
 .card-carousel{
   position:relative;overflow:hidden;
