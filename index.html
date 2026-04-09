@@ -584,6 +584,12 @@ body.light .empty-state h3{
   background:rgba(255,255,255,0.04);border:1px solid var(--border);
   align-self:flex-start;
 }
+.gemini-msg.assistant ul,.gemini-msg.assistant ol{margin:6px 0 6px 18px}
+.gemini-msg.assistant li{margin-bottom:3px}
+.gemini-msg.assistant p{margin-bottom:6px}
+.gemini-msg.assistant p:last-child{margin-bottom:0}
+.gemini-msg.assistant strong{color:#fff}
+.gemini-msg.assistant h3,.gemini-msg.assistant h4{font-size:0.9rem;color:#fff;margin:8px 0 4px}
 .gemini-msg.user{
   background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.2);
   align-self:flex-end;
@@ -1525,6 +1531,35 @@ function setupGemini() {
 
   function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+  function renderMarkdown(text) {
+    let html = escapeHtml(text);
+    // Bold
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Headers
+    html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    // Unordered lists — collect consecutive lines starting with - or *
+    html = html.replace(/((?:^[\-\*] .+\n?)+)/gm, function(block) {
+      const items = block.trim().split('\n').map(l => '<li>' + l.replace(/^[\-\*] /, '') + '</li>').join('');
+      return '<ul>' + items + '</ul>';
+    });
+    // Numbered lists
+    html = html.replace(/((?:^\d+\. .+\n?)+)/gm, function(block) {
+      const items = block.trim().split('\n').map(l => '<li>' + l.replace(/^\d+\. /, '') + '</li>').join('');
+      return '<ol>' + items + '</ol>';
+    });
+    // Paragraphs — split on double newlines
+    html = html.replace(/\n\n+/g, '</p><p>');
+    html = '<p>' + html + '</p>';
+    // Clean up empty paragraphs and paragraphs wrapping block elements
+    html = html.replace(/<p><(ul|ol|h3|h4)/g, '<$1');
+    html = html.replace(/<\/(ul|ol|h3|h4)><\/p>/g, '</$1>');
+    html = html.replace(/<p><\/p>/g, '');
+    // Single newlines to <br> within paragraphs
+    html = html.replace(/\n/g, '<br>');
+    return html;
+  }
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -1554,6 +1589,13 @@ You have full access to the dashboard data below. Use it to answer questions abo
 
 Be concise, actionable, and strategic. Use data from the dashboard to back up your answers. When discussing matches, reference actual teams, dates, and venues. When discussing social trends, reference specific topics and their metrics.
 
+Always format responses with clear structure:
+- Use **bold** for key terms and emphasis
+- Use bullet points for lists of items, recommendations, or data points
+- Use numbered lists for step-by-step actions or ranked items
+- Use short paragraphs — never write a wall of text
+- Use ### headers to separate sections when answering complex questions
+
 DASHBOARD DATA:
 ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
 
@@ -1574,7 +1616,7 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
       chatHistory.push({ role: "model", parts: [{ text: reply }] });
 
       typingEl.remove();
-      messages.innerHTML += `<div class="gemini-msg assistant">${escapeHtml(reply)}</div>`;
+      messages.innerHTML += `<div class="gemini-msg assistant">${renderMarkdown(reply)}</div>`;
     } catch (e) {
       typingEl.remove();
       messages.innerHTML += `<div class="gemini-msg assistant" style="color:#ff4444">Error: ${escapeHtml(e.message)}</div>`;
