@@ -362,6 +362,8 @@ body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
 }
 .sentiment-positive{background:rgba(0,200,83,0.15);color:#00c853;box-shadow:0 0 10px rgba(0,200,83,0.1)}
 .sentiment-mixed{background:rgba(255,193,7,0.15);color:#ffc107;box-shadow:0 0 10px rgba(255,193,7,0.1)}
+.sentiment-negative{background:rgba(255,51,51,0.2);color:#ff4444;box-shadow:0 0 10px rgba(255,51,51,0.15);animation:pulseNeg 2s ease-in-out infinite}
+@keyframes pulseNeg{0%,100%{box-shadow:0 0 10px rgba(255,51,51,0.15)}50%{box-shadow:0 0 18px rgba(255,51,51,0.35)}}
 
 /* ── FIXTURES TAB ── */
 .fixtures-controls{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
@@ -613,6 +615,87 @@ body.light .empty-state h3{
   transition:all 0.3s var(--transition);
 }
 .gemini-send:hover{box-shadow:0 0 16px rgba(66,133,244,0.3)}
+
+/* ── COUNTDOWN TIMER ── */
+.countdown-bar{
+  display:flex;align-items:center;gap:16px;padding:16px 20px;margin-bottom:20px;
+  background:linear-gradient(135deg,rgba(204,0,0,0.12),rgba(255,215,0,0.08));
+  border:1px solid rgba(204,0,0,0.2);border-radius:12px;
+  position:relative;overflow:hidden;
+}
+.countdown-bar::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--red),var(--gold));
+}
+.countdown-label{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--red);
+  white-space:nowrap;
+}
+.countdown-match{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:1rem;
+  color:#fff;white-space:nowrap;
+}
+.countdown-match .countdown-flags{font-size:1.2rem}
+.countdown-time{
+  display:flex;gap:10px;margin-left:auto;
+}
+.countdown-unit{
+  text-align:center;background:rgba(0,0,0,0.3);border-radius:8px;
+  padding:6px 10px;min-width:52px;
+}
+.countdown-unit .num{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.3rem;
+  color:#fff;display:block;line-height:1;
+}
+.countdown-unit .lbl{
+  font-family:'Inter',sans-serif;font-size:0.55rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);
+}
+body.light .countdown-bar{background:linear-gradient(135deg,rgba(204,0,0,0.06),rgba(255,215,0,0.04));border-color:rgba(204,0,0,0.12)}
+body.light .countdown-unit{background:rgba(0,0,0,0.05)}
+body.light .countdown-unit .num{color:#1a1a2e}
+
+/* ── GLOBAL SEARCH ── */
+.global-search{
+  position:relative;width:100%;max-width:480px;margin-bottom:16px;
+}
+.global-search input{
+  width:100%;padding:10px 16px 10px 40px;font-family:'Inter',sans-serif;
+  font-size:0.85rem;background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+  color:var(--text);outline:none;transition:all 0.2s;
+}
+.global-search input:focus{border-color:rgba(255,215,0,0.3);box-shadow:0 0 16px rgba(255,215,0,0.08)}
+.global-search input::placeholder{color:var(--text-dim)}
+.global-search .search-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:0.9rem;color:var(--text-dim);pointer-events:none;
+}
+.global-search .search-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text-dim);cursor:pointer;
+  font-size:1rem;display:none;padding:2px 6px;
+}
+.global-search .search-clear.visible{display:block}
+body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.1);color:#1a1a2e}
+
+/* ── NEWS CARD CLICKABLE ── */
+.news-card-link{text-decoration:none;color:inherit;display:block;height:100%}
+.news-card-link:hover .news-card{box-shadow:0 0 24px rgba(204,0,0,0.15)}
+
+/* ── TODAY'S MATCH HIGHLIGHT ── */
+.match-row.match-today{
+  border:1px solid rgba(255,215,0,0.3) !important;
+  box-shadow:0 0 16px rgba(255,215,0,0.1);
+  position:relative;
+}
+.match-row.match-today::after{
+  content:'TODAY';position:absolute;top:4px;right:230px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.5rem;
+  text-transform:uppercase;letter-spacing:2px;
+  color:var(--gold);opacity:0.7;
+}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -888,6 +971,16 @@ body.light .empty-state h3{
 <!-- MAIN -->
 <main class="main">
   <p class="updated" id="lastUpdated"></p>
+
+  <!-- COUNTDOWN -->
+  <div id="countdownBar" class="countdown-bar" style="display:none"></div>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="global-search">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="globalSearch" placeholder="Search news, social trends, matches, assets..." />
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+  </div>
 
   <!-- LIVE -->
   <div class="tab-panel active" id="panel-live">
@@ -1218,6 +1311,7 @@ function driveThumbnail(fileId, size = 800) {
 function init() {
   renderTicker();
   renderTimestamp();
+  renderCountdown();
   renderLiveFilters();
   renderNews();
   renderSocial();
@@ -1226,6 +1320,7 @@ function init() {
   setupTabs();
   setupGemini();
   setupKeyboard();
+  setupSearch();
   handleHash();
 }
 
@@ -1238,6 +1333,48 @@ function renderTicker() {
 function renderTimestamp() {
   const d = new Date(DASHBOARD_DATA.lastUpdated);
   document.getElementById('lastUpdated').textContent = `Last updated: ${d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZoneName:'short'})}`;
+}
+
+// ── Feature 1: Countdown to next match ──
+function renderCountdown() {
+  const bar = document.getElementById('countdownBar');
+  const now = new Date();
+  const upcoming = DASHBOARD_DATA.matches
+    .filter(m => m.status === 'upcoming')
+    .map(m => {
+      const [h, min] = (m.kickoff || '12:00 ET').replace(' ET','').split(':');
+      const dt = new Date(m.date + 'T' + h.padStart(2,'0') + ':' + min + ':00-04:00');
+      return { ...m, kickoffDate: dt };
+    })
+    .filter(m => m.kickoffDate > now)
+    .sort((a, b) => a.kickoffDate - b.kickoffDate);
+
+  if (!upcoming.length) { bar.style.display = 'none'; return; }
+
+  const next = upcoming[0];
+  bar.style.display = 'flex';
+
+  function tick() {
+    const diff = next.kickoffDate - new Date();
+    if (diff <= 0) { bar.innerHTML = '<span class="countdown-label">⚽ MATCH UNDERWAY</span>'; return; }
+    const days = Math.floor(diff / 86400000);
+    const hrs = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+    bar.innerHTML = `
+      <span class="countdown-label">⏱ Next Match</span>
+      <span class="countdown-match">
+        <span class="countdown-flags">${next.home.flag}</span> ${next.home.code} vs ${next.away.code} <span class="countdown-flags">${next.away.flag}</span>
+      </span>
+      <div class="countdown-time">
+        <div class="countdown-unit"><span class="num">${days}</span><span class="lbl">Days</span></div>
+        <div class="countdown-unit"><span class="num">${hrs}</span><span class="lbl">Hrs</span></div>
+        <div class="countdown-unit"><span class="num">${mins}</span><span class="lbl">Min</span></div>
+        <div class="countdown-unit"><span class="num">${secs}</span><span class="lbl">Sec</span></div>
+      </div>`;
+  }
+  tick();
+  setInterval(tick, 1000);
 }
 
 let liveFilter = 'all';
@@ -1341,7 +1478,7 @@ let newsCarousel = createCarousel('newsCards', 'newsDots', 5000);
 let socialCarousel = createCarousel('socialCards', 'socialDots', 6000);
 
 function renderNews() {
-  const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news'));
+  const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news') && matchesSearch(n));
   if (!filtered.length) {
     document.getElementById('newsCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
     document.getElementById('newsDots').innerHTML = '';
@@ -1352,25 +1489,27 @@ function renderNews() {
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
     const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    return `<div class="carousel-card"><div class="news-card glass">
+    const linkOpen = n.url ? `<a href="${n.url}" target="_blank" rel="noopener" class="news-card-link">` : '<div class="news-card-link">';
+    const linkClose = n.url ? '</a>' : '</div>';
+    return `<div class="carousel-card">${linkOpen}<div class="news-card glass">
       <span class="tag ${tagClass}">${tagLabel}</span>
       <h3>${n.headline}</h3>
       <p class="meta">${n.source} \u2022 ${timeStr}</p>
       <p class="summary">${n.summary}</p>
-    </div></div>`;
+    </div>${linkClose}</div>`;
   });
   newsCarousel.setCards(cards, filtered.length);
 }
 
 function renderSocial() {
-  const filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social'));
+  const filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social') && matchesSearch(s));
   if (!filtered.length) {
     document.getElementById('socialCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No social trends match this filter.</p>';
     document.getElementById('socialDots').innerHTML = '';
     return;
   }
   const cards = filtered.map(s => {
-    const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : 'sentiment-mixed';
+    const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
     return `<div class="carousel-card"><div class="social-card glass">
       <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
@@ -1399,10 +1538,12 @@ function setFixtureView(view) {
 function renderMatchRow(m) {
   const statusClass = m.status === 'live' ? 'status-live' : 'status-upcoming';
   const dateStr = new Date(m.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const today = new Date().toISOString().slice(0,10);
+  const isToday = m.date === today;
   const scoreOrTime = m.score
     ? `<div class="score">${m.score.home} – ${m.score.away}</div><div class="group-tag">FT</div>`
     : `<div class="kickoff">${m.kickoff}</div><div class="group-tag">${m.stage}</div>`;
-  return `<div class="match-row glass">
+  return `<div class="match-row glass${isToday ? ' match-today' : ''}"
     <div class="team team-home">
       <div><div class="team-name">${m.home.name}</div><div class="team-code">${m.home.code}</div></div>
       <span class="team-flag">${m.home.flag}</span>
@@ -1423,7 +1564,7 @@ function renderMatchRow(m) {
 function renderMatches() {
   const container = document.getElementById('matchList');
   const filterVal = document.getElementById('groupFilter').value;
-  let matches = DASHBOARD_DATA.matches;
+  let matches = DASHBOARD_DATA.matches.filter(m => matchesSearch(m));
   if (filterVal !== 'all') {
     matches = matches.filter(m => m.stage === filterVal);
   }
@@ -1460,7 +1601,7 @@ function renderMatches() {
 
 function renderAssets(filter = 'All') {
   const grid = document.getElementById('assetsGrid');
-  const filtered = filter === 'All' ? DASHBOARD_DATA.assets : DASHBOARD_DATA.assets.filter(a => a.market === filter);
+  const filtered = DASHBOARD_DATA.assets.filter(a => (filter === 'All' || a.market === filter) && matchesSearch(a));
   grid.innerHTML = filtered.map(a => {
     const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
     const sc = statusMap[a.status] || 'astatus-concept';
@@ -1644,6 +1785,38 @@ function setupKeyboard() {
       document.getElementById('geminiPanel').classList.remove('open');
     }
   });
+}
+
+// ── Feature 4: Global Search ──
+let searchQuery = '';
+function setupSearch() {
+  const input = document.getElementById('globalSearch');
+  const clearBtn = document.getElementById('searchClear');
+  input.addEventListener('input', () => {
+    searchQuery = input.value.trim().toLowerCase();
+    clearBtn.classList.toggle('visible', searchQuery.length > 0);
+    applySearch();
+  });
+}
+function clearSearch() {
+  searchQuery = '';
+  document.getElementById('globalSearch').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  applySearch();
+}
+function applySearch() {
+  renderNews();
+  renderSocial();
+  renderMatches();
+  renderAssets(document.querySelector('.filter-pill.active')?.textContent?.trim() || 'All');
+}
+function matchesSearch(item) {
+  if (!searchQuery) return true;
+  const fields = [item.headline, item.topic, item.summary, item.source, item.tag,
+    item.home?.name, item.away?.name, item.home?.code, item.away?.code,
+    item.venue, item.stage, item.market, item.status, item.category,
+    item.sampleQuote].filter(Boolean);
+  return fields.some(f => f.toLowerCase().includes(searchQuery));
 }
 
 // Theme toggle
