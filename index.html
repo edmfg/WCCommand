@@ -43,13 +43,26 @@ body{
 /* ── HEADER ── */
 .header{
   position:sticky;top:0;z-index:100;
-  background:rgba(14,16,22,0.85);
+  background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
   backdrop-filter:blur(30px) saturate(200%);
   -webkit-backdrop-filter:blur(30px) saturate(200%);
   border-bottom:3px solid var(--red);
-  box-shadow:0 4px 40px rgba(0,0,0,0.3),0 0 20px rgba(204,0,0,0.1);
+  box-shadow:0 4px 30px rgba(0,0,0,0.5),0 0 20px rgba(204,0,0,0.12);
   padding:0 24px;
 }
+.header .brand{
+  background:linear-gradient(135deg,#0a1628 0%,#1a3a6b 50%,#cc0000 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 1px rgba(0,0,0,0.1));
+}
+.header .tab-btn{color:#444;background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08)}
+.header .tab-btn:hover{color:#000;background:rgba(0,0,0,0.08)}
+.header .tab-btn.active{background:linear-gradient(135deg,var(--red) 0%,#ff3333 50%,var(--red-dark) 100%);color:#fff;border-color:transparent}
+.header .mfg-link{color:#0284c7;background:rgba(2,132,199,0.08);border-color:rgba(2,132,199,0.25)}
+.header .mfg-link:hover{background:rgba(2,132,199,0.15);box-shadow:0 0 16px rgba(2,132,199,0.2)}
+.header .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12);color:#333}
+.header .theme-toggle:hover{background:rgba(0,0,0,0.1)}
 .header-inner{
   max-width:1400px;margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;
