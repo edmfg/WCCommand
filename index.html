@@ -820,6 +820,25 @@ body.light .sub-tab.active{background:linear-gradient(135deg,var(--red),#ff3333)
   border:none;color:#fff;
 }
 .creative-upload-btn:hover{filter:brightness(1.1);color:#fff}
+
+.creative-unlock-modal{max-width:420px;padding:24px 26px}
+.creative-unlock-input{
+  width:100%;padding:12px 14px;border-radius:8px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);font-size:14px;
+  font-family:'Inter',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
+.creative-unlock-input:focus{border-color:var(--gold)}
+.creative-unlock-error{
+  display:none;color:#ff8a8a;font-size:12px;font-weight:600;
+  margin-top:8px;letter-spacing:0.3px;
+}
+.creative-unlock-error.shown{display:block}
+.creative-unlock-actions{
+  display:flex;gap:10px;justify-content:flex-end;margin-top:18px;
+}
 .empty-state{
   text-align:center;padding:60px 20px;
 }
@@ -2069,6 +2088,22 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   <div class="card-modal" id="cardModal" role="dialog" aria-modal="true">
     <button class="card-modal-close" id="cardModalClose" aria-label="Close">×</button>
     <div id="cardModalBody"></div>
+  </div>
+</div>
+
+<div class="card-modal-overlay" id="creativeUnlockOverlay">
+  <div class="card-modal creative-unlock-modal" role="dialog" aria-modal="true" aria-labelledby="creativeUnlockTitle">
+    <button class="card-modal-close" id="creativeUnlockClose" aria-label="Close">×</button>
+    <h3 id="creativeUnlockTitle" style="font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🔒 Unlock Upload</h3>
+    <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:16px;line-height:1.5">
+      Enter the MFG password to enable uploads in the creative tabs. Anyone you share this password with will be able to publish assets visible to all visitors.
+    </p>
+    <input type="password" id="creativeUnlockInput" class="creative-unlock-input" placeholder="MFG password" autocomplete="off">
+    <p id="creativeUnlockError" class="creative-unlock-error">Incorrect password.</p>
+    <div class="creative-unlock-actions">
+      <button type="button" class="creative-lock-btn" id="creativeUnlockCancel">Cancel</button>
+      <button type="button" class="creative-lock-btn creative-upload-btn" id="creativeUnlockSubmit">Unlock</button>
+    </div>
   </div>
 </div>
 
@@ -3331,6 +3366,20 @@ function refreshCreativeLockUI() {
     t.style.display = unlocked ? '' : 'none';
   });
 }
+function openCreativeUnlockModal() {
+  const overlay = document.getElementById('creativeUnlockOverlay');
+  const input = document.getElementById('creativeUnlockInput');
+  const err = document.getElementById('creativeUnlockError');
+  if (!overlay) return;
+  err.classList.remove('shown');
+  input.value = '';
+  overlay.classList.add('open');
+  setTimeout(() => input.focus(), 50);
+}
+function closeCreativeUnlockModal() {
+  document.getElementById('creativeUnlockOverlay')?.classList.remove('open');
+}
+
 function setupCreativeLock() {
   refreshCreativeLockUI();
   document.getElementById('creativeLockBtn')?.addEventListener('click', () => {
@@ -3338,19 +3387,39 @@ function setupCreativeLock() {
       setCreativeUnlocked(false);
       return;
     }
-    const pw = window.prompt('Enter MFG password to unlock upload:');
-    if (pw === null) return;
-    if (pw === CREATIVE_PASSWORD) {
-      setCreativeUnlocked(true);
-    } else {
-      alert('Incorrect password.');
-    }
+    openCreativeUnlockModal();
   });
   document.querySelectorAll('.creative-upload-btn, .creative-upload-tile').forEach(b => {
     b.addEventListener('click', () => {
       if (!isCreativeUnlocked()) return;
       openAssetUploadModal();
     });
+  });
+
+  const overlay = document.getElementById('creativeUnlockOverlay');
+  const input = document.getElementById('creativeUnlockInput');
+  const err = document.getElementById('creativeUnlockError');
+  const submitBtn = document.getElementById('creativeUnlockSubmit');
+  const cancelBtn = document.getElementById('creativeUnlockCancel');
+  const closeBtn = document.getElementById('creativeUnlockClose');
+
+  function tryUnlock() {
+    if (input.value === CREATIVE_PASSWORD) {
+      err.classList.remove('shown');
+      closeCreativeUnlockModal();
+      setCreativeUnlocked(true);
+    } else {
+      err.classList.add('shown');
+      input.select();
+    }
+  }
+  submitBtn?.addEventListener('click', tryUnlock);
+  cancelBtn?.addEventListener('click', closeCreativeUnlockModal);
+  closeBtn?.addEventListener('click', closeCreativeUnlockModal);
+  overlay?.addEventListener('click', e => { if (e.target === overlay) closeCreativeUnlockModal(); });
+  input?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); }
+    if (e.key === 'Escape') closeCreativeUnlockModal();
   });
 }
 

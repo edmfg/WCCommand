@@ -74,7 +74,7 @@ a:hover { opacity: 0.8; }
 }
 
 /* Password Gate */
-#gate, #marketGate {
+#gate, #marketGate, #adminAuthOverlay {
   position: fixed;
   inset: 0;
   background: var(--bg);
@@ -84,6 +84,8 @@ a:hover { opacity: 0.8; }
   justify-content: center;
   padding: 24px;
 }
+#adminAuthOverlay { display: none; background: rgba(8,10,18,0.85); backdrop-filter: blur(8px); z-index: 1100; }
+#adminAuthOverlay.shown { display: flex; }
 #marketGate { display: none; }
 #marketGate.shown { display: flex; }
 #marketGate .gate-box { max-width: 460px; }
@@ -880,6 +882,20 @@ a:hover { opacity: 0.8; }
   </div>
 </div>
 
+<!-- Admin Password Gate (in-site modal) -->
+<div id="adminAuthOverlay">
+  <div class="gate-box glass" style="max-width:420px">
+    <h1 style="font-size:20px">🛡 Admin Mode</h1>
+    <p>Enter the admin password to view the activity log and market controls.</p>
+    <input type="password" class="gate-input" id="adminAuthInput" placeholder="Admin password" autocomplete="off">
+    <div class="gate-error" id="adminAuthError">Incorrect admin password.</div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button type="button" class="setting-btn" id="adminAuthCancel" style="flex:1">Cancel</button>
+      <button type="button" class="gate-btn" id="adminAuthSubmit" style="flex:1">Enter</button>
+    </div>
+  </div>
+</div>
+
 <!-- Admin Panel -->
 <div id="adminPanel">
   <div class="admin-header">
@@ -1175,18 +1191,41 @@ a:hover { opacity: 0.8; }
   const adminExit = document.getElementById('adminExit');
   const adminRefresh = document.getElementById('adminRefresh');
 
+  const adminAuthOverlay = document.getElementById('adminAuthOverlay');
+  const adminAuthInput = document.getElementById('adminAuthInput');
+  const adminAuthError = document.getElementById('adminAuthError');
+  const adminAuthSubmit = document.getElementById('adminAuthSubmit');
+  const adminAuthCancel = document.getElementById('adminAuthCancel');
+
   function openAdmin() {
-    const pw = window.prompt('Admin password:');
-    if (pw !== ADMIN_PASSWORD) {
-      if (pw !== null) alert('Incorrect admin password.');
-      return;
-    }
-    marketGate.classList.remove('shown');
-    gate.style.display = 'none';
-    app.style.display = 'none';
-    adminPanel.classList.add('shown');
-    loadAdminLog();
+    adminAuthError.style.display = 'none';
+    adminAuthInput.value = '';
+    adminAuthOverlay.classList.add('shown');
+    setTimeout(() => adminAuthInput.focus(), 50);
   }
+  function closeAdminAuth() {
+    adminAuthOverlay.classList.remove('shown');
+  }
+  function tryAdminAuth() {
+    if (adminAuthInput.value === ADMIN_PASSWORD) {
+      closeAdminAuth();
+      marketGate.classList.remove('shown');
+      gate.style.display = 'none';
+      app.style.display = 'none';
+      adminPanel.classList.add('shown');
+      loadAdminLog();
+    } else {
+      adminAuthError.style.display = 'block';
+      adminAuthInput.select();
+    }
+  }
+  adminAuthSubmit.addEventListener('click', tryAdminAuth);
+  adminAuthCancel.addEventListener('click', closeAdminAuth);
+  adminAuthInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); tryAdminAuth(); }
+    if (e.key === 'Escape') closeAdminAuth();
+  });
+  adminAuthOverlay.addEventListener('click', e => { if (e.target === adminAuthOverlay) closeAdminAuth(); });
   function closeAdmin() {
     adminPanel.classList.remove('shown');
     if (currentMarket && currentUserLabel) {
