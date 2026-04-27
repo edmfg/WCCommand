@@ -586,12 +586,7 @@ body.light .empty-state h3{
 .asset-link:hover{color:#ffe44d}
 
 /* ── GEMINI PANEL ── */
-.gemini-overlay{
-  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);
-  backdrop-filter:blur(4px);opacity:0;pointer-events:none;
-  transition:opacity 0.35s var(--transition);
-}
-.gemini-overlay.open{opacity:1;pointer-events:auto}
+.gemini-overlay{display:none}
 .gemini-panel{
   position:fixed;top:0;right:0;bottom:0;z-index:201;
   width:420px;max-width:90vw;
