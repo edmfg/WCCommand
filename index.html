@@ -808,6 +808,14 @@ body.light .card-modal-close:hover{color:#000}
   padding:3px 9px;border-radius:10px;background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.1);margin-top:6px;
 }
+.trend-date{
+  display:inline-block;margin-left:10px;font-family:'Oswald',sans-serif;
+  font-size:0.6rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;
+  color:var(--text-dim);background:rgba(255,255,255,0.06);
+  padding:2px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);
+  vertical-align:middle;
+}
+body.light .trend-date{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08)}
 body.light .quote-more-pill{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08)}
 
 /* Modal multi-quote stack */
@@ -2596,6 +2604,23 @@ function renderNews() {
   newsCarousel.setCards(cards, filtered.length);
 }
 
+// Trend start / peak dates (date the trend kicked off or refers to)
+const SOCIAL_DATES = {
+  s1: '2026-04-21', s2: '2026-04-26', s3: '2026-04-25', s4: '2026-04-23', s5: '2026-04-21',
+  s6: '2026-04-25', s7: '2026-04-24', s8: '2026-04-25', s9: '2026-04-22', s10: '2026-04-20',
+  s11: '2026-04-03', s12: '2026-04-20', s13: '2026-04-22', s14: '2026-04-22', s15: '2026-04-20',
+  s16: '2026-04-22', s17: '2026-04-25', s18: '2026-04-26', s19: '2026-04-23', s20: '2026-04-21',
+  s21: '2026-04-19', s22: '2026-04-26', s23: '2026-04-22', s24: '2026-04-21', s25: '2026-04-24',
+};
+function trendDateShort(id) {
+  const d = SOCIAL_DATES[id]; if (!d) return '';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function trendDateLong(id) {
+  const d = SOCIAL_DATES[id]; if (!d) return '';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
 function renderSocial() {
   let filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social') && matchesSearch(s));
   if (heatmapFilter.market) {
@@ -2623,7 +2648,7 @@ function renderSocial() {
       <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${s.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '★' : '☆'}</button>
       <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
       <h3 class="topic">${s.topic}</h3>
-      <p class="volume">${s.volume}</p>
+      <p class="volume">${s.volume}${trendDateShort(s.id) ? `<span class="trend-date">📅 trending ${trendDateShort(s.id)}</span>` : ''}</p>
       <p class="summary">${s.summary}</p>
       ${quoteHtml}
       ${moreHtml}
@@ -3374,7 +3399,9 @@ function setupCardExpand() {
               </div>`).join('')}</div>`
         : '';
       const platforms = s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('');
-      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3><p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quotesBlock}<div class="platforms">${platforms}</div>`);
+      const dateLong = trendDateLong(s.id);
+      const dateLine = dateLong ? `<p class="meta">📅 Trend started ${dateLong}</p>` : '';
+      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3>${dateLine}<p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quotesBlock}<div class="platforms">${platforms}</div>`);
     }
   });
 
