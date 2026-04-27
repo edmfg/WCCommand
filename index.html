@@ -20,6 +20,7 @@ html{scroll-behavior:smooth}
 body{
   font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
   min-height:100vh;overflow-x:hidden;line-height:1.5;
+  padding-bottom:38px;
 }
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -188,7 +189,7 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
 }
 .mfg-link:hover{background:rgba(125,211,252,0.15);box-shadow:0 0 16px rgba(125,211,252,0.2)}
 .gemini-toggle{
-  position:fixed;bottom:24px;right:24px;z-index:9000;
+  position:fixed;bottom:62px;right:24px;z-index:9000;
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
   text-transform:uppercase;letter-spacing:1.5px;color:#fff;
   padding:14px 22px;border-radius:999px;cursor:pointer;
@@ -258,7 +259,7 @@ body:has(.gemini-panel.open) .gemini-toggle{
   100% {background-position:0% 0%;opacity:0.5}
 }
 @media (max-width:600px){
-  .gemini-toggle{bottom:16px;right:16px;padding:12px 18px;font-size:0.78rem}
+  .gemini-toggle{bottom:54px;right:14px;padding:11px 16px;font-size:0.74rem}
 }
 .theme-toggle{
   font-size:1.1rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
@@ -785,6 +786,47 @@ body.light .card-modal h3{background:linear-gradient(90deg,#1a1a2e,var(--red));-
 body.light .card-modal-close:hover{color:#000}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+/* ── SOCIAL CARD QUOTES ── */
+.quote-plat{
+  display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.55rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);
+  padding:1px 6px;border-radius:3px;background:rgba(255,215,0,0.1);
+  margin-right:6px;vertical-align:middle;
+}
+.quote-more-pill{
+  display:inline-block;font-family:'Oswald',sans-serif;font-weight:600;font-size:0.62rem;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);
+  padding:3px 9px;border-radius:10px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);margin-top:6px;
+}
+body.light .quote-more-pill{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08)}
+
+/* Modal multi-quote stack */
+.modal-quotes-header{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.7rem;
+  letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  margin:18px 0 10px;
+}
+.modal-quotes{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.modal-quote{
+  background:rgba(255,255,255,0.04);border-left:3px solid var(--gold);
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  display:flex;align-items:flex-start;gap:10px;line-height:1.5;
+}
+body.light .modal-quote{background:rgba(0,0,0,0.03)}
+.modal-quote-text{font-style:italic;color:var(--text);font-size:0.92rem;flex:1}
+.modal-quote-plat{
+  flex-shrink:0;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.6rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:#fff;
+  padding:3px 9px;border-radius:4px;background:#374151;
+  margin-top:2px;min-width:54px;text-align:center;
+}
+.modal-quote-plat.plat-x{background:#000}
+.modal-quote-plat.plat-tiktok{background:linear-gradient(135deg,#ff0050,#000)}
+.modal-quote-plat.plat-ig{background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)}
+.modal-quote-plat.plat-reddit{background:#ff4500}
+.modal-quote-plat.plat-youtube{background:#ff0000}
+
 /* ── STANDINGS ── */
 .standings-banner{padding:12px 18px;margin-bottom:18px;font-size:0.82rem;color:var(--text-dim);border-radius:10px;border-left:3px solid var(--gold)}
 .standings-banner strong{color:var(--text);margin-right:6px}
@@ -1111,6 +1153,36 @@ body.light .asset-upload-form input,body.light .asset-upload-form select{
   transition:filter 0.2s,transform 0.2s;
 }
 .asset-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
+/* ── FUN FACTS BOTTOM TICKER ── */
+.fact-bar{
+  position:fixed;left:0;right:0;bottom:0;height:38px;z-index:8000;
+  display:flex;align-items:center;
+  background:linear-gradient(90deg,#0a1628,#1a3a6b,#0a1628);
+  border-top:1px solid rgba(255,215,0,0.4);
+  box-shadow:0 -4px 24px rgba(0,0,0,0.4);
+  overflow:hidden;
+}
+.fact-label{
+  flex-shrink:0;padding:0 16px;height:100%;display:flex;align-items:center;
+  font-family:'Oswald',sans-serif;font-weight:800;font-size:0.7rem;
+  letter-spacing:2px;text-transform:uppercase;color:#1a1a2e;
+  background:linear-gradient(135deg,var(--gold),#ffae00);
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  z-index:2;box-shadow:2px 0 12px rgba(255,215,0,0.3);
+}
+.fact-track{
+  display:flex;animation:fact-marquee 240s linear infinite;
+  white-space:nowrap;flex:1;
+}
+.fact-bar:hover .fact-track{animation-play-state:paused}
+.fact-item{
+  font-family:'Inter',sans-serif;font-weight:500;font-size:0.78rem;
+  color:#fff;padding:0 28px;white-space:nowrap;opacity:0.92;
+  border-right:1px solid rgba(255,255,255,0.1);
+}
+@keyframes fact-marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+body.light .fact-bar{background:linear-gradient(90deg,#1a3a6b,#0a1628,#1a3a6b)}
 
 /* ── BETA BADGE ── */
 .beta-badge{
@@ -1704,6 +1776,11 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   </div>
 </div>
 
+<div class="fact-bar" id="factBar">
+  <div class="fact-label">⚽ Fun Fact</div>
+  <div class="fact-track" id="factTrack"></div>
+</div>
+
 <button class="gemini-toggle" id="geminiToggle" aria-label="Open Gemini Assistant">✨ Gemini</button>
 <div class="gemini-overlay" id="geminiOverlay"></div>
 <div class="gemini-panel" id="geminiPanel">
@@ -1893,31 +1970,156 @@ const DASHBOARD_DATA = {
     { id:"m104", date:"2026-07-19", kickoff:"3:00 PM ET", stage:"Final 🏆", home:{name:"W101",code:"W101",flag:"🏳️"}, away:{name:"W102",code:"W102",flag:"🏳️"}, venue:"MetLife Stadium, New Jersey", status:"upcoming", score:null }
   ],
   social: [
-    { id: "s1", topic: "🎵 'Lighter' by Jelly Roll WC Song Backlash", category: "music", volume: "🔥🔥🔥", sentiment: "negative", summary: "FIFA's first 2026 WC song — 'Lighter' by Jelly Roll — is getting roasted across TikTok and X. Fans questioning how a country track fits a global football event. 'This has to be a joke' is the dominant reaction 🎤🚫", sampleQuote: "\"Oh my god, bro, what the hell is this?\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s2", topic: "🇪🇸 Yamal Injury Sends Spain Fans Into Panic", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Barcelona ruling Yamal out for the rest of the club season has Spain fans panicking 7 weeks before kickoff. 4-6 week recovery means his WC participation is genuinely doubtful 🇪🇸🩼", sampleQuote: "\"7 weeks before the World Cup. SEVEN. We need a miracle 😭\"", platforms: ["X", "TikTok", "IG"] },
-    { id: "s3", topic: "🇪🇬 Salah Hamstring — Egypt in Mourning", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Mo Salah's hamstring injury vs Crystal Palace has Egyptian fans devastated. Top Egyptian football official confirmed he'll miss the rest of Liverpool's season — WC fitness is now the only question 🇪🇬💔", sampleQuote: "\"This is OUR World Cup. Salah HAS to make it. He has to.\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s4", topic: "🛂 US Travel Advisory Trends — ACLU + Amnesty Statement", category: "fandom", volume: "🔥🔥", sentiment: "negative", summary: "120 rights groups issuing a US travel advisory ahead of the WC sparked huge online debate. Threads about ICE, detention risks, and visa hurdles spreading across X, Reddit r/soccer, and TikTok 🚨", sampleQuote: "\"Imagine traveling for the world's biggest party and worrying about being detained at the border\"", platforms: ["X", "TikTok"] },
-    { id: "s5", topic: "💵 $435 Visa Fee for Mexican & Brazilian Fans Outrage", category: "fandom", volume: "🔥🔥🔥", sentiment: "negative", summary: "New $250 'visa integrity fee' on top of existing costs pushes total US tourist visa to $435 for fans from Mexico and Brazil. Fan accounts in Latin America calling it a 'tax to watch the World Cup' 🚪💸", sampleQuote: "\"$435 to watch a single match? FIFA said 'el fútbol es del pueblo' and then locked the door\"", platforms: ["X", "IG", "TikTok"] },
-    { id: "s6", topic: "🇫🇷 Ekitike Achilles Tear Reaction — France Crushed", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Hugo Ekitike's Achilles tear vs PSG ruling him out of the WC entirely has French fans devastated. Edits and tribute videos to his Champions League run going viral on TikTok 🇫🇷😢", sampleQuote: "\"Cruel game. Cruel timing. Allez Hugo. 🇫🇷\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s7", topic: "🇧🇷 Rodrygo ACL — Brazil Meltdown on Social", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Rodrygo's torn meniscus + ACL ending his WC has triggered a full-blown Brazilian fan meltdown. Combined with Militão out, Brazil's social timelines are doom-posting non-stop 🇧🇷🚑", sampleQuote: "\"First Rodrygo, now Militão. The football gods hate Brazil this year.\"", platforms: ["X", "TikTok", "IG"] },
-    { id: "s8", topic: "🇳🇱 Xavi Simons ACL Reaction — Netherlands Grief", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Tottenham's confirmation that Xavi Simons ruptured his ACL vs Wolves has Dutch fans in shock. Threads breaking down what Koeman's midfield looks like without him going viral 🟧😔", sampleQuote: "\"Lost our most creative player. Tournament hasn't even started. Painful.\"", platforms: ["X", "IG"] },
-    { id: "s9", topic: "🎟️ Phase 4 Last-Minute Ticket Chaos", category: "game", volume: "🔥🔥🔥", sentiment: "mixed", summary: "FIFA's Phase 4 'last-minute' first-come-first-served sales are creating real-time queue chaos. Cheapest seats from $118 in KC/Boston, but every popular match flips to resale at 3-5x markup within minutes 🎫", sampleQuote: "\"Refreshed for 40 minutes, got a Group F ticket in Kansas City for $138. WORTH IT 🙌\"", platforms: ["X", "TikTok"] },
-    { id: "s10", topic: "🎬 'Team Announcement Reaction' TikTok Format", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "The viral format right now: coaches revealing squads, fans in the comments treating every inclusion and snub like a Marvel plot twist. Lamine Yamal callup videos already racking up millions 🎥⚽", sampleQuote: "\"Bro is treating Tuchel's 55-man list like the MCU phase 5 announcement 💀\"", platforms: ["TikTok", "IG"] },
-    { id: "s11", topic: "🇨🇩 DR Congo Fan Qualification Celebration Goes Viral", category: "fandom", volume: "🔥🔥", sentiment: "positive", summary: "A DR Congo fan went viral after the Leopards' WC qualification — full street parade clip ricocheting across TikTok, X, and Reddit. Pure unfiltered joy is winning the algorithm 🇨🇩🎉", sampleQuote: "\"This is the kind of energy the World Cup is supposed to have. Forget the politics — LOOK AT THIS MAN.\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s12", topic: "🇲🇽 Group A 'Group of Death' Debate Reignites", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/soccer and r/WorldCup spending hours dissecting Group A — Mexico, South Africa, South Korea, Czechia. Most threads landing on 'no walkover, this is genuinely tough for Mexico' 🇲🇽🇿🇦🇰🇷🇨🇿", sampleQuote: "\"Mexico fans calling this 'easy.' Mexico fans have not watched South Korea or Czechia recently.\"", platforms: ["X", "Reddit"] },
-    { id: "s13", topic: "📺 'VAR Monitor' Watch Party Setup Memes", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "The most viral format right now: fans posting videos of themselves setting up living rooms for watch parties, zooming in on a tiny TV in the corner labeled 'VAR monitor,' then cutting to someone screaming. Peak comedy 🛋️📺", sampleQuote: "\"Setting up the WC bunker. Yes, that 6-inch TV is the VAR monitor. Yes, it's necessary.\"", platforms: ["TikTok", "IG"] },
-    { id: "s14", topic: "📈 r/WC2026Tix Surge — Reddit WC Activity Tripled YoY", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "Per Reddit's own data: 77M+ views to 'FIFA World Cup' mentions in the US over the past year, with conversation more than tripling year over year. r/soccer, r/WorldCup, r/USSoccer, r/WC2026Tix all surging 📊", sampleQuote: "\"r/WC2026Tix is the most chaotic, useful, and emotionally damaging subreddit on the entire site rn\"", platforms: ["Reddit", "X"] },
-    { id: "s15", topic: "🇮🇷 Iran Will Play — Infantino Statement Reaction", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Infantino confirming Iran will play despite Trump's earlier suggestion they should skip generated mixed reactions. Iranian football fans celebrating; debate continues over whether Iranian fans will be allowed entry 🇮🇷⚽", sampleQuote: "\"The team plays. The fans can't come watch. What kind of World Cup is this?\"", platforms: ["X", "Reddit", "IG"] },
-    { id: "s16", topic: "🇺🇸 Diego Luna Hype TikTok Edits Going Viral", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Diego Luna becoming Pochettino's right-hand man has triggered a wave of USMNT TikTok edits — Real Salt Lake skill compilations and 'America's new #10' captions racking up millions of views 🇺🇸⚡", sampleQuote: "\"Diego Luna is what USMNT was missing. Pure street creativity. Pochettino unlocked him.\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s17", topic: "🇺🇸 Pochettino Roster Bubble Drama on r/USSoccer", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/USSoccer hosting marathon threads dissecting Pochettino's bubble — Freese vs Turner, Robinson's slide, Diego Luna's rise. ESPN Big Board 6.0 dropped this week and triggered another 800-comment debate ⚖️", sampleQuote: "\"Robinson was supposed to be a lock. Now I'd genuinely take Dest over him. What a fall.\"", platforms: ["Reddit", "X"] },
-    { id: "s18", topic: "🇺🇸 Klinsmann Broken Neck — USMNT Fans Stunned", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Reaction to Jonathan Klinsmann's broken neck at Cesena — a freak injury that closes the door on a fairy-tale WC redemption arc. Send-well posts dominating r/USSoccer and X Spaces 🤕🇺🇸", sampleQuote: "\"A broken NECK. Just utterly cruel. Get well Klinsi.\"", platforms: ["X", "Reddit", "IG"] },
-    { id: "s19", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Bellingham Hamstring Anxiety Threads on X", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Every Bellingham minute for Real Madrid is being live-tracked by England fans on X. Tuchel's 'no matter the cost' line is a meme — and a coping mechanism. Threads regularly hit 5K+ replies 🦁🩹", sampleQuote: "\"He limped on the bench and the entire UK held its breath. This is going to be a long 6 weeks.\"", platforms: ["X", "TikTok", "Reddit"] },
-    { id: "s20", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 'Best England Team in Decades' — Optimism vs Trauma", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "ESPN's call that this is England's strongest squad in decades has split fans on r/soccer and r/England. Kane + Bellingham + Rice spine has hype peaking — but 60 years of hurt has fans hedging 🏴󠁧󠁢󠁥󠁮󠁧󠁿😅", sampleQuote: "\"On paper this is the best England squad of my lifetime. Which is why I'm absolutely terrified.\"", platforms: ["Reddit", "X", "IG"] },
-    { id: "s21", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Tuchel Decision-Making Memes Trending", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "Tuchel's chess-master vibe + scientific selection process has triggered a meme wave on TikTok and X. 'POV: Tuchel deciding between Grealish and Foden for 90 seconds straight' edits topping FYPs 😂♟️", sampleQuote: "\"Tuchel staring at his squad list like it's a quantum physics problem 🧠📋\"", platforms: ["TikTok", "X"] },
-    { id: "s22", topic: "🇨🇦 Davies Bayern Goal Reaction — Canada Fans Lose It", category: "game", volume: "🔥🔥🔥", sentiment: "positive", summary: "Davies coming off the bench and scoring for Bayern post-ACL had Canadian football X in literal tears. Clip of his celebration looped 8M+ times across TikTok and X. 'He's BACK' is the dominant emotion 🇨🇦💪", sampleQuote: "\"After everything? After the ACL? After the surgery? He scores. I'm crying. We're all crying.\"", platforms: ["TikTok", "X", "IG"] },
-    { id: "s23", topic: "🇨🇦 13 Days From CL Final to WC Opener Discourse", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Canada fans on Reddit r/CanadaSoccer war-gaming Davies' May/June schedule. CL semi vs PSG, possible Final May 30, then WC opener vs Bosnia June 11. 'Marsch is a chess player playing Tetris' is the line 🇨🇦📅", sampleQuote: "\"Pray for Phonzie's hamstrings. Light a candle for his ACL. Sacrifice a goat for his calves.\"", platforms: ["Reddit", "X", "TikTok"] },
-    { id: "s24", topic: "🇩🇪 Wirtz vs Musiala Tactical Discourse Hits New Peak", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Wirtz's 2 goals + 2 assists vs Switzerland reignited Germany's golden generation discourse. Tactical creators on YouTube and TikTok comparing Nagelsmann's Wirtz/Musiala/Havertz front 4 to Germany 2014 in elite breakdowns 🇩🇪🧠", sampleQuote: "\"Wirtz is operating on a different frequency. Musiala fit + this guy = Germany are winning the World Cup.\"", platforms: ["YouTube", "X", "IG"] },
-    { id: "s25", topic: "🇩🇪 Nagelsmann '9 Guaranteed Starters' List Goes Viral", category: "game", volume: "🔥", sentiment: "positive", summary: "Bavarian Football Works' breakdown of Nagelsmann's 9 locked starters became one of the most-shared Germany pieces of April. Open competition for the last two spots is dominating r/Bundesliga discussion 🇩🇪⚽", sampleQuote: "\"9 starters locked, 2 spots open, 4 guys who think they should start. April is going to be brutal.\"", platforms: ["Reddit", "X"] }
+    { id: "s1", topic: "🎵 'Lighter' by Jelly Roll WC Song Backlash", category: "music", volume: "🔥🔥🔥", sentiment: "negative", summary: "FIFA's first 2026 WC song — 'Lighter' by Jelly Roll — is getting roasted across TikTok and X. Fans questioning how a country track fits a global football event. 'This has to be a joke' is the dominant reaction 🎤🚫", sampleQuote: "\"Oh my god, bro, what the hell is this?\"", quotes: [
+      { platform: "X", text: "Oh my god, bro, what the hell is this?" },
+      { platform: "TikTok", text: "Imagine following Waka Waka with… this 💀 FIFA we need to talk." },
+      { platform: "IG", text: "Country music for a global football tournament. Make it make sense." },
+      { platform: "Reddit", text: "Even my dad who LOVES country said 'this isn't it.' That's how bad." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s2", topic: "🇪🇸 Yamal Injury Sends Spain Fans Into Panic", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Barcelona ruling Yamal out for the rest of the club season has Spain fans panicking 7 weeks before kickoff. 4-6 week recovery means his WC participation is genuinely doubtful 🇪🇸🩼", sampleQuote: "\"7 weeks before the World Cup. SEVEN. We need a miracle 😭\"", quotes: [
+      { platform: "X", text: "7 weeks before the World Cup. SEVEN. We need a miracle 😭" },
+      { platform: "TikTok", text: "POV: you're a Spain fan refreshing Yamal's Instagram every 30 seconds for an injury update" },
+      { platform: "IG", text: "Vamos Lamine, descansa bien. La Roja te necesita en junio 🇪🇸❤️" },
+      { platform: "Reddit", text: "r/Barca and r/Spain are the same shade of beige right now. Rest the kid. WC > La Liga." }
+    ], platforms: ["X", "TikTok", "IG"] },
+    { id: "s3", topic: "🇪🇬 Salah Hamstring — Egypt in Mourning", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Mo Salah's hamstring injury vs Crystal Palace has Egyptian fans devastated. Top Egyptian football official confirmed he'll miss the rest of Liverpool's season — WC fitness is now the only question 🇪🇬💔", sampleQuote: "\"This is OUR World Cup. Salah HAS to make it. He has to.\"", quotes: [
+      { platform: "X", text: "This is OUR World Cup. Salah HAS to make it. He has to." },
+      { platform: "TikTok", text: "Egypt's last WC was 2018. Salah didn't get to play the opener. We will not survive this happening again." },
+      { platform: "IG", text: "يا محمد سلام. ارجع لنا قوي. مصر معاك 🇪🇬🦅" },
+      { platform: "Reddit", text: "If he plays the WC at 70%, he's still better than 80% of strikers there. Just rest, king." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s4", topic: "🛂 US Travel Advisory Trends — ACLU + Amnesty Statement", category: "fandom", volume: "🔥🔥", sentiment: "negative", summary: "120 rights groups issuing a US travel advisory ahead of the WC sparked huge online debate. Threads about ICE, detention risks, and visa hurdles spreading across X, Reddit r/soccer, and TikTok 🚨", sampleQuote: "\"Imagine traveling for the world's biggest party and worrying about being detained at the border\"", quotes: [
+      { platform: "X", text: "Imagine traveling for the world's biggest party and worrying about being detained at the border" },
+      { platform: "Reddit", text: "r/soccer megathread on the advisory is at 4.2K comments. Half are 'I'm canceling my Atlanta trip.'" },
+      { platform: "TikTok", text: "American friends inviting us to watch the WC: 'come!' Their government: 'maybe don't.'" },
+      { platform: "IG", text: "120 rights groups don't issue a joint statement for nothing. This is serious." }
+    ], platforms: ["X", "TikTok"] },
+    { id: "s5", topic: "💵 $435 Visa Fee for Mexican & Brazilian Fans Outrage", category: "fandom", volume: "🔥🔥🔥", sentiment: "negative", summary: "New $250 'visa integrity fee' on top of existing costs pushes total US tourist visa to $435 for fans from Mexico and Brazil. Fan accounts in Latin America calling it a 'tax to watch the World Cup' 🚪💸", sampleQuote: "\"$435 to watch a single match? FIFA said 'el fútbol es del pueblo' and then locked the door\"", quotes: [
+      { platform: "X", text: "$435 to watch a single match? FIFA said 'el fútbol es del pueblo' and then locked the door" },
+      { platform: "TikTok", text: "Brazilian fan: I save 2 years for tickets. US: pay another $250 just to enter. Cool. Cool cool cool." },
+      { platform: "IG", text: "El fútbol no tiene fronteras. Los Estados Unidos sí. 🚷" },
+      { platform: "Reddit", text: "Charging Mexico $435 to attend a World Cup that Mexico is co-hosting is genuinely insane." }
+    ], platforms: ["X", "IG", "TikTok"] },
+    { id: "s6", topic: "🇫🇷 Ekitike Achilles Tear Reaction — France Crushed", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Hugo Ekitike's Achilles tear vs PSG ruling him out of the WC entirely has French fans devastated. Edits and tribute videos to his Champions League run going viral on TikTok 🇫🇷😢", sampleQuote: "\"Cruel game. Cruel timing. Allez Hugo. 🇫🇷\"", quotes: [
+      { platform: "X", text: "Cruel game. Cruel timing. Allez Hugo. 🇫🇷" },
+      { platform: "TikTok", text: "His CL season was the breakout we needed. Now he watches the WC from a couch. Football hurts." },
+      { platform: "IG", text: "Bon courage Hugo. On t'attend pour 2030 🤍🇫🇷" },
+      { platform: "Reddit", text: "Now Deschamps has to pivot the entire striker rotation. France's depth gets tested." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s7", topic: "🇧🇷 Rodrygo ACL — Brazil Meltdown on Social", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Rodrygo's torn meniscus + ACL ending his WC has triggered a full-blown Brazilian fan meltdown. Combined with Militão out, Brazil's social timelines are doom-posting non-stop 🇧🇷🚑", sampleQuote: "\"First Rodrygo, now Militão. The football gods hate Brazil this year.\"", quotes: [
+      { platform: "X", text: "First Rodrygo, now Militão. The football gods hate Brazil this year." },
+      { platform: "TikTok", text: "Brazilian fan: Neymar comes back. Rodrygo dies. Militão dies. The cycle continues. ⚱️" },
+      { platform: "IG", text: "Força Rodry. Força Eder. Brasil sempre 💛💚" },
+      { platform: "Reddit", text: "Ancelotti's first WC tournament with Brazil and the squad is being held together with tape." }
+    ], platforms: ["X", "TikTok", "IG"] },
+    { id: "s8", topic: "🇳🇱 Xavi Simons ACL Reaction — Netherlands Grief", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Tottenham's confirmation that Xavi Simons ruptured his ACL vs Wolves has Dutch fans in shock. Threads breaking down what Koeman's midfield looks like without him going viral 🟧😔", sampleQuote: "\"Lost our most creative player. Tournament hasn't even started. Painful.\"", quotes: [
+      { platform: "X", text: "Lost our most creative player. Tournament hasn't even started. Painful." },
+      { platform: "Reddit", text: "Without Xavi, the Dutch midfield runs through Reijnders + Gravenberch only. Suddenly very thin." },
+      { platform: "IG", text: "Sterkte Xavi. Kom sterker terug. Oranje voor altijd 🧡" },
+      { platform: "TikTok", text: "Netherlands kit reveal hype turned into Xavi farewell montage in under 48 hours 💔" }
+    ], platforms: ["X", "IG"] },
+    { id: "s9", topic: "🎟️ Phase 4 Last-Minute Ticket Chaos", category: "game", volume: "🔥🔥🔥", sentiment: "mixed", summary: "FIFA's Phase 4 'last-minute' first-come-first-served sales are creating real-time queue chaos. Cheapest seats from $118 in KC/Boston, but every popular match flips to resale at 3-5x markup within minutes 🎫", sampleQuote: "\"Refreshed for 40 minutes, got a Group F ticket in Kansas City for $138. WORTH IT 🙌\"", quotes: [
+      { platform: "X", text: "Refreshed for 40 minutes, got a Group F ticket in Kansas City for $138. WORTH IT 🙌" },
+      { platform: "Reddit", text: "r/WC2026Tix is genuinely better than the FIFA support team. Crowdsourced live queue tips saved me." },
+      { platform: "TikTok", text: "POV: you finally got a ticket and now you have to figure out how to afford the flight + hotel + visa fee" },
+      { platform: "IG", text: "Phase 4 is the Hunger Games but with 2 million tickets and everyone is Katniss." }
+    ], platforms: ["X", "TikTok"] },
+    { id: "s10", topic: "🎬 'Team Announcement Reaction' TikTok Format", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "The viral format right now: coaches revealing squads, fans in the comments treating every inclusion and snub like a Marvel plot twist. Lamine Yamal callup videos already racking up millions 🎥⚽", sampleQuote: "\"Bro is treating Tuchel's 55-man list like the MCU phase 5 announcement 💀\"", quotes: [
+      { platform: "TikTok", text: "Bro is treating Tuchel's 55-man list like the MCU phase 5 announcement 💀" },
+      { platform: "X", text: "Squad reveal reactions > the actual matches. Tell me I'm wrong." },
+      { platform: "IG", text: "When the coach calls your guy: 🥹 When the coach DOESN'T call your guy: 😡 Every. Single. Time." },
+      { platform: "Reddit", text: "The fact that 'team announcement reaction' is a genre now tells you everything about how WC content is consumed in 2026." }
+    ], platforms: ["TikTok", "IG"] },
+    { id: "s11", topic: "🇨🇩 DR Congo Fan Qualification Celebration Goes Viral", category: "fandom", volume: "🔥🔥", sentiment: "positive", summary: "A DR Congo fan went viral after the Leopards' WC qualification — full street parade clip ricocheting across TikTok, X, and Reddit. Pure unfiltered joy is winning the algorithm 🇨🇩🎉", sampleQuote: "\"This is the kind of energy the World Cup is supposed to have. Forget the politics — LOOK AT THIS MAN.\"", quotes: [
+      { platform: "X", text: "This is the kind of energy the World Cup is supposed to have. Forget the politics — LOOK AT THIS MAN." },
+      { platform: "TikTok", text: "DR Congo fans dancing in the streets at 2am is the most football thing I've seen all month 🇨🇩❤️" },
+      { platform: "IG", text: "Les Léopards 🐆 On y va! Première Coupe du Monde depuis 1974. ALLEZ!" },
+      { platform: "Reddit", text: "Africa got 9 spots in the new format and DRC qualifying is exactly why the expansion was worth it." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s12", topic: "🇲🇽 Group A 'Group of Death' Debate Reignites", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/soccer and r/WorldCup spending hours dissecting Group A — Mexico, South Africa, South Korea, Czechia. Most threads landing on 'no walkover, this is genuinely tough for Mexico' 🇲🇽🇿🇦🇰🇷🇨🇿", sampleQuote: "\"Mexico fans calling this 'easy.' Mexico fans have not watched South Korea or Czechia recently.\"", quotes: [
+      { platform: "Reddit", text: "Mexico fans calling this 'easy.' Mexico fans have not watched South Korea or Czechia recently." },
+      { platform: "X", text: "Group A on paper is the trap group. Mexico can absolutely go out at home. Mark my words." },
+      { platform: "TikTok", text: "Korean fans pulling up Czechia footage, Czech fans pulling up SA footage — Group A is locked in 🔥" },
+      { platform: "IG", text: "Sudáfrica está jugando un fútbol increíble este año. Cuidado, México 🇿🇦⚠️" }
+    ], platforms: ["X", "Reddit"] },
+    { id: "s13", topic: "📺 'VAR Monitor' Watch Party Setup Memes", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "The most viral format right now: fans posting videos of themselves setting up living rooms for watch parties, zooming in on a tiny TV in the corner labeled 'VAR monitor,' then cutting to someone screaming. Peak comedy 🛋️📺", sampleQuote: "\"Setting up the WC bunker. Yes, that 6-inch TV is the VAR monitor. Yes, it's necessary.\"", quotes: [
+      { platform: "TikTok", text: "Setting up the WC bunker. Yes, that 6-inch TV is the VAR monitor. Yes, it's necessary." },
+      { platform: "IG", text: "My VAR monitor is just my phone duct-taped to a tripod and I refuse to be embarrassed about it 📱" },
+      { platform: "X", text: "Wife: 'why do we need 4 screens?' Me, motioning to the 6-inch one: 'this one is for ENGLAND ONLY'" },
+      { platform: "Reddit", text: "The VAR monitor bit became a meme because we genuinely don't trust real VAR. Iconic." }
+    ], platforms: ["TikTok", "IG"] },
+    { id: "s14", topic: "📈 r/WC2026Tix Surge — Reddit WC Activity Tripled YoY", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "Per Reddit's own data: 77M+ views to 'FIFA World Cup' mentions in the US over the past year, with conversation more than tripling year over year. r/soccer, r/WorldCup, r/USSoccer, r/WC2026Tix all surging 📊", sampleQuote: "\"r/WC2026Tix is the most chaotic, useful, and emotionally damaging subreddit on the entire site rn\"", quotes: [
+      { platform: "Reddit", text: "r/WC2026Tix is the most chaotic, useful, and emotionally damaging subreddit on the entire site rn" },
+      { platform: "X", text: "77 million views on FIFA WC mentions and that's just the US. The internet is locked in." },
+      { platform: "TikTok", text: "r/soccer's average post quality has fallen off a cliff in the best possible way. WC fever is here." },
+      { platform: "IG", text: "Reddit is unironically the only place left online where you can have a real WC debate without bots. 🏆" }
+    ], platforms: ["Reddit", "X"] },
+    { id: "s15", topic: "🇮🇷 Iran Will Play — Infantino Statement Reaction", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Infantino confirming Iran will play despite Trump's earlier suggestion they should skip generated mixed reactions. Iranian football fans celebrating; debate continues over whether Iranian fans will be allowed entry 🇮🇷⚽", sampleQuote: "\"The team plays. The fans can't come watch. What kind of World Cup is this?\"", quotes: [
+      { platform: "X", text: "The team plays. The fans can't come watch. What kind of World Cup is this?" },
+      { platform: "Reddit", text: "Infantino actually pushing back on a US president for the sake of football is genuinely surprising. Credit where due." },
+      { platform: "IG", text: "تیم ملی ایران در جام جهانی! 🇮🇷❤️ ولی هواداران؟ این انصاف نیست." },
+      { platform: "TikTok", text: "Imagine being a player and your country says 'go play' and the host country says 'don't come.' Surreal." }
+    ], platforms: ["X", "Reddit", "IG"] },
+    { id: "s16", topic: "🇺🇸 Diego Luna Hype TikTok Edits Going Viral", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Diego Luna becoming Pochettino's right-hand man has triggered a wave of USMNT TikTok edits — Real Salt Lake skill compilations and 'America's new #10' captions racking up millions of views 🇺🇸⚡", sampleQuote: "\"Diego Luna is what USMNT was missing. Pure street creativity. Pochettino unlocked him.\"", quotes: [
+      { platform: "TikTok", text: "Diego Luna is what USMNT was missing. Pure street creativity. Pochettino unlocked him." },
+      { platform: "X", text: "MLS players don't get respect until one of them breaks into the USMNT 11. Diego Luna's about to do that." },
+      { platform: "IG", text: "Hometown kid from Sunnyvale. Now Pochettino's right hand. America's #10. Story writes itself 🇺🇸" },
+      { platform: "Reddit", text: "Watching Luna's 8-second turn vs Atlanta on loop. He's so unbothered with the ball. We needed this." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s17", topic: "🇺🇸 Pochettino Roster Bubble Drama on r/USSoccer", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/USSoccer hosting marathon threads dissecting Pochettino's bubble — Freese vs Turner, Robinson's slide, Diego Luna's rise. ESPN Big Board 6.0 dropped this week and triggered another 800-comment debate ⚖️", sampleQuote: "\"Robinson was supposed to be a lock. Now I'd genuinely take Dest over him. What a fall.\"", quotes: [
+      { platform: "Reddit", text: "Robinson was supposed to be a lock. Now I'd genuinely take Dest over him. What a fall." },
+      { platform: "X", text: "Freese for #1 over Turner is the bubble debate of the cycle. Both have legitimate cases." },
+      { platform: "TikTok", text: "Bro Pochettino is running USMNT like a Champions League side. Cuts are gonna be brutal 🪓" },
+      { platform: "IG", text: "There are 6 LBs fighting for 2 spots. The depth USMNT has never had — and it's rough on the bubble guys." }
+    ], platforms: ["Reddit", "X"] },
+    { id: "s18", topic: "🇺🇸 Klinsmann Broken Neck — USMNT Fans Stunned", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Reaction to Jonathan Klinsmann's broken neck at Cesena — a freak injury that closes the door on a fairy-tale WC redemption arc. Send-well posts dominating r/USSoccer and X Spaces 🤕🇺🇸", sampleQuote: "\"A broken NECK. Just utterly cruel. Get well Klinsi.\"", quotes: [
+      { platform: "X", text: "A broken NECK. Just utterly cruel. Get well Klinsi." },
+      { platform: "Reddit", text: "Wanted to see him get one more shot under Pochettino. Football is sometimes just unfair." },
+      { platform: "IG", text: "Wishing Jonathan a fast and full recovery. Family first, football later. 🙏" },
+      { platform: "TikTok", text: "Cesena's medical team needs flowers, full stop. Stabilizing a broken neck on the pitch — heroes." }
+    ], platforms: ["X", "Reddit", "IG"] },
+    { id: "s19", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Bellingham Hamstring Anxiety Threads on X", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Every Bellingham minute for Real Madrid is being live-tracked by England fans on X. Tuchel's 'no matter the cost' line is a meme — and a coping mechanism. Threads regularly hit 5K+ replies 🦁🩹", sampleQuote: "\"He limped on the bench and the entire UK held its breath. This is going to be a long 6 weeks.\"", quotes: [
+      { platform: "X", text: "He limped on the bench and the entire UK held its breath. This is going to be a long 6 weeks." },
+      { platform: "TikTok", text: "Tuchel said 'no matter the cost' and the entire England fanbase has chosen to interpret that as 'we are taking him on a stretcher'" },
+      { platform: "Reddit", text: "Bellingham played 9 minutes off the bench yesterday and r/soccer wrote 4,000 words about it. We are unwell." },
+      { platform: "IG", text: "Bring him to camp. Wrap him in cotton wool. Don't let Madrid touch him until June 1st 🦁🇬🇧" }
+    ], platforms: ["X", "TikTok", "Reddit"] },
+    { id: "s20", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 'Best England Team in Decades' — Optimism vs Trauma", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "ESPN's call that this is England's strongest squad in decades has split fans on r/soccer and r/England. Kane + Bellingham + Rice spine has hype peaking — but 60 years of hurt has fans hedging 🏴󠁧󠁢󠁥󠁮󠁧󠁿😅", sampleQuote: "\"On paper this is the best England squad of my lifetime. Which is why I'm absolutely terrified.\"", quotes: [
+      { platform: "Reddit", text: "On paper this is the best England squad of my lifetime. Which is why I'm absolutely terrified." },
+      { platform: "X", text: "Every World Cup we say 'this is our year' and every WC we get bounced by Croatia. Football is pain." },
+      { platform: "TikTok", text: "Three Lions starting to play. England fans gathering ibuprofen, cigarettes, and therapy appointments." },
+      { platform: "IG", text: "Kane / Bellingham / Rice / Saka / Foden / Palmer / Bowen. Best front 8 we've ever taken. ⚽🦁" }
+    ], platforms: ["Reddit", "X", "IG"] },
+    { id: "s21", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Tuchel Decision-Making Memes Trending", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "Tuchel's chess-master vibe + scientific selection process has triggered a meme wave on TikTok and X. 'POV: Tuchel deciding between Grealish and Foden for 90 seconds straight' edits topping FYPs 😂♟️", sampleQuote: "\"Tuchel staring at his squad list like it's a quantum physics problem 🧠📋\"", quotes: [
+      { platform: "TikTok", text: "Tuchel staring at his squad list like it's a quantum physics problem 🧠📋" },
+      { platform: "X", text: "Tuchel: I will pick the best 26. Tabloids: REVEALED — 47 different Tuchel headlines per week." },
+      { platform: "IG", text: "Tuchel's selection meeting room is just him, a whiteboard, and 14 markers. We KNOW. ♟️" },
+      { platform: "Reddit", text: "Genuinely the most lowkey overthought England manager era. He'll pick a pure left-back and we'll all lose it." }
+    ], platforms: ["TikTok", "X"] },
+    { id: "s22", topic: "🇨🇦 Davies Bayern Goal Reaction — Canada Fans Lose It", category: "game", volume: "🔥🔥🔥", sentiment: "positive", summary: "Davies coming off the bench and scoring for Bayern post-ACL had Canadian football X in literal tears. Clip of his celebration looped 8M+ times across TikTok and X. 'He's BACK' is the dominant emotion 🇨🇦💪", sampleQuote: "\"After everything? After the ACL? After the surgery? He scores. I'm crying. We're all crying.\"", quotes: [
+      { platform: "X", text: "After everything? After the ACL? After the surgery? He scores. I'm crying. We're all crying." },
+      { platform: "TikTok", text: "Phonzie celebration clip on loop with 'Glory' by John Legend on top. I'm not OK 🇨🇦😭" },
+      { platform: "IG", text: "Captain. Comeback. Canada. The trifecta we manifested 🇨🇦🐐" },
+      { platform: "Reddit", text: "Came off the bench at 70', took 8 minutes to score. Still the fastest player in the Allianz. Welcome back." }
+    ], platforms: ["TikTok", "X", "IG"] },
+    { id: "s23", topic: "🇨🇦 13 Days From CL Final to WC Opener Discourse", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Canada fans on Reddit r/CanadaSoccer war-gaming Davies' May/June schedule. CL semi vs PSG, possible Final May 30, then WC opener vs Bosnia June 11. 'Marsch is a chess player playing Tetris' is the line 🇨🇦📅", sampleQuote: "\"Pray for Phonzie's hamstrings. Light a candle for his ACL. Sacrifice a goat for his calves.\"", quotes: [
+      { platform: "Reddit", text: "Pray for Phonzie's hamstrings. Light a candle for his ACL. Sacrifice a goat for his calves." },
+      { platform: "X", text: "Marsch is playing 4D chess with Davies' minutes and we're all just praying he gets to June healthy 🇨🇦" },
+      { platform: "TikTok", text: "Imagine winning the Champions League and 13 days later opening your home WC. Phonzie is HIM." },
+      { platform: "IG", text: "Edmonton hometown send-off vs Uzbekistan is going to be the loudest match in Canadian soccer history 🍁" }
+    ], platforms: ["Reddit", "X", "TikTok"] },
+    { id: "s24", topic: "🇩🇪 Wirtz vs Musiala Tactical Discourse Hits New Peak", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Wirtz's 2 goals + 2 assists vs Switzerland reignited Germany's golden generation discourse. Tactical creators on YouTube and TikTok comparing Nagelsmann's Wirtz/Musiala/Havertz front 4 to Germany 2014 in elite breakdowns 🇩🇪🧠", sampleQuote: "\"Wirtz is operating on a different frequency. Musiala fit + this guy = Germany are winning the World Cup.\"", quotes: [
+      { platform: "YouTube", text: "Wirtz is operating on a different frequency. Musiala fit + this guy = Germany are winning the World Cup." },
+      { platform: "X", text: "Wirtz played 65 minutes vs Switzerland and ended with 2G/2A. The chemistry with Havertz is back." },
+      { platform: "IG", text: "Wenn Musi und Wirtz beide fit sind, sind wir nicht zu schlagen. 🇩🇪⭐⭐⭐⭐⭐" },
+      { platform: "Reddit", text: "Nagelsmann finally has the personnel for his ideal 4-2-3-1. This is what we missed in 2024." }
+    ], platforms: ["YouTube", "X", "IG"] },
+    { id: "s25", topic: "🇩🇪 Nagelsmann '9 Guaranteed Starters' List Goes Viral", category: "game", volume: "🔥", sentiment: "positive", summary: "Bavarian Football Works' breakdown of Nagelsmann's 9 locked starters became one of the most-shared Germany pieces of April. Open competition for the last two spots is dominating r/Bundesliga discussion 🇩🇪⚽", sampleQuote: "\"9 starters locked, 2 spots open, 4 guys who think they should start. April is going to be brutal.\"", quotes: [
+      { platform: "Reddit", text: "9 starters locked, 2 spots open, 4 guys who think they should start. April is going to be brutal." },
+      { platform: "X", text: "Pavlović as the locked DM was the surprise. He's earned it but didn't expect Kimmich pushed forward." },
+      { platform: "IG", text: "Tah, Schlotterbeck, Raum hinten. Pavlović als 6. Wirtz/Musi/Havertz vorne. Stark 💪🇩🇪" },
+      { platform: "TikTok", text: "Germany's 9 confirmed starters list dropping mid-April was Nagelsmann's way of saying 'no more debate.' Respect." }
+    ], platforms: ["Reddit", "X"] }
   ],
   assets: []
 };
@@ -1929,6 +2131,7 @@ function driveThumbnail(fileId, size = 800) {
 // ── RENDER ──
 function init() {
   renderTicker();
+  renderFactTicker();
   renderTimestamp();
   renderCountdown();
   renderLiveFilters();
@@ -1950,6 +2153,68 @@ function renderTicker() {
   const track = document.getElementById('tickerTrack');
   const items = DASHBOARD_DATA.ticker.map(t => `<span class="ticker-item">${t}</span>`).join('');
   track.innerHTML = items + items;
+}
+
+const WC_FUN_FACTS = [
+  "⚽ The first ever World Cup goal was scored by France's Lucien Laurent on July 13, 1930.",
+  "🇧🇷 Brazil is the only nation to appear at every single World Cup since 1930.",
+  "🏆 Brazil has won the most World Cups — 5 titles (1958, 1962, 1970, 1994, 2002).",
+  "🎯 Miroslav Klose holds the all-time WC scoring record with 16 goals across 4 tournaments.",
+  "🚀 Just Fontaine scored 13 goals in a SINGLE tournament for France in 1958 — still untouched.",
+  "🟥 Uruguay's José Batista was sent off after just 56 seconds vs Scotland in 1986 — fastest red card ever.",
+  "⚡ László Kiss scored a hat-trick in 7 minutes 42 seconds for Hungary vs El Salvador in 1982.",
+  "👴 Egypt's Essam El Hadary was 45 years 161 days old at Russia 2018 — oldest WC player in history.",
+  "🐆 Cameroon's Roger Milla scored at 42 years 39 days — the only player over 40 to score at a WC.",
+  "👶 Pelé scored at 17 years 239 days in 1958 — the youngest goalscorer in World Cup history.",
+  "🥅 Austria 7-5 Switzerland in 1954 — the highest-scoring WC match ever, 12 total goals.",
+  "📺 Nearly 3.2 billion people watched at least one minute of the 2010 World Cup — 46% of humanity.",
+  "🎩 Mario Zagallo was the first man to win the World Cup as both a player and as a manager.",
+  "🇺🇾 Uruguay won the very first World Cup in 1930 on home soil — and again 20 years later.",
+  "🇩🇪 Germany 7-1 Brazil at Brazil 2014 is the most shocking semifinal scoreline in WC history.",
+  "🏟️ The 1950 Maracanã Final drew an estimated 199,854 fans — the largest WC crowd ever.",
+  "🎽 The 1930 Final used TWO different balls — one chosen by each team for each half.",
+  "⏱️ Hakan Şükür scored after 11 seconds vs South Korea in 2002 — the fastest WC goal ever.",
+  "🐕 The original Jules Rimet trophy was stolen in 1966 and recovered by a dog named Pickles.",
+  "🌍 The 2026 World Cup is the FIRST to feature 48 teams and the first hosted by 3 nations.",
+  "🛡️ Walter Zenga (Italy 1990) didn't concede for 517 minutes — the longest WC clean-sheet streak.",
+  "❄️ Iceland (population ~330,000) became the smallest country ever to qualify, at Russia 2018.",
+  "🏆 The original Jules Rimet Trophy was permanently kept by Brazil after their 3rd win in 1970 — then stolen for good in 1983.",
+  "🇺🇸 The USA beat England 1-0 in 1950 — Joe Gaetjens, Haitian-born, scored the winner. One of football's biggest upsets.",
+  "🦷 Geoff Hurst's 'Wembley goal' off the bar in the 1966 Final is still debated 60 years later.",
+  "📜 The official WC ball has been redesigned for every tournament since the Telstar in 1970.",
+  "🇦🇷 Diego Maradona scored 5 of Argentina's 14 goals at Mexico 1986 en route to the title.",
+  "🎮 Norman Whiteside (N. Ireland, 1982) is the youngest player ever at a WC — 17 years 41 days old.",
+  "🇨🇲 Cameroon's run to the 1990 quarterfinals is still the deepest by an African nation.",
+  "🐐 Pelé is the only player to win 3 World Cups — 1958, 1962 (squad), and 1970.",
+  "🎯 Geoff Hurst's hat-trick in the 1966 Final is the ONLY hat-trick in a World Cup Final.",
+  "💸 Qatar 2022 was the most expensive WC ever — estimated total cost: $220 billion.",
+  "🌡️ The 1994 USA WC matches were the hottest on record — Dallas hit 105°F at kickoff.",
+  "🏠 Host nations have won 6 of 22 World Cups — Uruguay 1930, Italy 1934, England 1966, Argentina 1978, France 1998.",
+  "🇰🇷 South Korea's run to the 2002 semifinals is the deepest by any Asian team.",
+  "🇮🇹 Italy is the only team to win consecutive World Cups outside Brazil — 1934 and 1938.",
+  "🥇 Pelé is the only player to score in 4 different World Cups (1958, 1962, 1966, 1970).",
+  "🇫🇷 France 1998 was the first WC where the host nation also lifted the trophy in 30+ years.",
+  "🇰🇷🇯🇵 The 2002 World Cup was the FIRST hosted in Asia — co-hosted by South Korea and Japan.",
+  "🇨🇮 32 teams expanded to 48 for 2026 — the largest field in WC history, with 104 total matches.",
+  "📐 The 1950 World Cup had no Final — Brazil-Uruguay was a final-round group game that decided the title.",
+  "💔 Maracanazo: Uruguay's 1950 win over Brazil at the Maracanã is still called Brazil's national tragedy.",
+  "🦵 Diego Maradona's 'Hand of God' AND his 'Goal of the Century' came in the same match — vs England, 1986.",
+  "🎂 Pelé played his first WC at 17 and won. His last at 29. His career WC record: 14 games, 12 goals.",
+  "🐊 The Crocodile is one of FIFA's earliest WC mascots — 'World Cup Willie' in 1966 was the first ever.",
+  "🌎 The 1950 WC was the only one with no actual final match — and the only one Brazil hosted before 2014.",
+  "⚖️ A WC squad limit of 26 (vs the previous 23) was first allowed at Qatar 2022 and continues for 2026.",
+  "🦁 England has only won the World Cup ONCE — in 1966, on home soil.",
+  "🌟 Lionel Messi finally won the WC in Qatar 2022 at age 35 — his 5th attempt.",
+  "🇸🇦 Saudi Arabia stunned eventual champions Argentina 2-1 in their opening 2022 group game — biggest upset of the modern era.",
+];
+
+function renderFactTicker() {
+  const track = document.getElementById('factTrack');
+  if (!track) return;
+  // Shuffle for variety on each load
+  const shuffled = [...WC_FUN_FACTS].sort(() => Math.random() - 0.5);
+  const items = shuffled.map(f => `<span class="fact-item">${f}</span>`).join('');
+  track.innerHTML = items + items; // double for seamless loop
 }
 
 function renderTimestamp() {
@@ -2190,7 +2455,10 @@ function renderSocial() {
   }
   const cards = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
-    const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
+    const quoteCount = (s.quotes && s.quotes.length) || (s.sampleQuote ? 1 : 0);
+    const firstQuote = (s.quotes && s.quotes[0]) ? s.quotes[0] : (s.sampleQuote ? { text: s.sampleQuote.replace(/^"|"$/g,''), platform: (s.platforms && s.platforms[0]) || '' } : null);
+    const quoteHtml = firstQuote ? `<p class="quote">${firstQuote.platform ? `<span class="quote-plat">${firstQuote.platform}</span>` : ''}"${firstQuote.text}"</p>` : '';
+    const moreHtml = quoteCount > 1 ? `<span class="quote-more-pill">💬 +${quoteCount - 1} more reactions</span>` : '';
     const isPinned = pinned.has(s.id);
     return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${s.id}">
       <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${s.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '★' : '☆'}</button>
@@ -2199,6 +2467,7 @@ function renderSocial() {
       <p class="volume">${s.volume}</p>
       <p class="summary">${s.summary}</p>
       ${quoteHtml}
+      ${moreHtml}
       <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
     </div></div>`;
   });
@@ -2871,9 +3140,17 @@ function setupCardExpand() {
       const s = DASHBOARD_DATA.social.find(x => x.id === id);
       if (!s) return;
       const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
-      const quote = s.sampleQuote ? `<div class="quote">${s.sampleQuote}</div>` : '';
+      const quotesArr = (s.quotes && s.quotes.length) ? s.quotes : (s.sampleQuote ? [{ platform: (s.platforms && s.platforms[0]) || '', text: s.sampleQuote.replace(/^"|"$/g,'') }] : []);
+      const quotesBlock = quotesArr.length
+        ? `<div class="modal-quotes-header">💬 ${quotesArr.length} reaction${quotesArr.length === 1 ? '' : 's'} across platforms</div>
+           <div class="modal-quotes">${quotesArr.map(q =>
+             `<div class="modal-quote">
+                ${q.platform ? `<span class="modal-quote-plat plat-${q.platform.toLowerCase().replace(/[^a-z]/g,'')}">${q.platform}</span>` : ''}
+                <span class="modal-quote-text">"${q.text}"</span>
+              </div>`).join('')}</div>`
+        : '';
       const platforms = s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('');
-      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3><p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quote}<div class="platforms">${platforms}</div>`);
+      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3><p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quotesBlock}<div class="platforms">${platforms}</div>`);
     }
   });
 
