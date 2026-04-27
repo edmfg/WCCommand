@@ -196,6 +196,7 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
   border-radius:999px;transition:all 0.25s var(--transition);
 }
 .help-link:hover{background:rgba(167,139,250,0.2);box-shadow:0 0 16px rgba(167,139,250,0.3);transform:translateY(-1px)}
+.help-cross{width:13px;height:13px;vertical-align:-2px;margin-right:4px;filter:drop-shadow(0 0 4px rgba(220,38,38,0.45))}
 .gemini-toggle{
   position:fixed;bottom:62px;right:24px;z-index:9000;
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
@@ -1681,7 +1682,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
       <button class="tab-btn" data-tab="creative">Creative</button>
     </nav>
     <div class="header-actions">
-      <button class="help-link" id="helpBtn" type="button">🇨🇭 Help</button>
+      <button class="help-link" id="helpBtn" type="button"><svg class="help-cross" viewBox="0 0 14 14" aria-hidden="true"><rect x="5" y="0" width="4" height="14" rx="0.5" fill="#dc2626"/><rect x="0" y="5" width="14" height="4" rx="0.5" fill="#dc2626"/></svg> Help</button>
       <a href="mfg.html" class="mfg-link">MFG Mode</a>
       <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">☀️</button>
     </div>
