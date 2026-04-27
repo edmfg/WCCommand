@@ -314,8 +314,13 @@ body.light .live-filter.active{background:var(--red);color:#fff}
   height:180px;
 }
 .carousel-page .carousel-card .glass{
-  height:100%;overflow:hidden;
+  height:100%;overflow-y:auto;cursor:pointer;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent;
 }
+.carousel-page .carousel-card .glass::-webkit-scrollbar{width:6px}
+.carousel-page .carousel-card .glass::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:3px}
+.carousel-page .carousel-card .glass::-webkit-scrollbar-track{background:transparent}
+body.light .carousel-page .carousel-card .glass::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18)}
 .carousel-controls{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:12px;height:36px;
@@ -347,7 +352,7 @@ body.light .carousel-nav button{background:rgba(0,0,0,0.04);color:#666;border-co
 body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
 
 /* News cards */
-.news-card{padding:16px 20px;position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%}
+.news-card{padding:16px 20px;position:relative;display:flex;flex-direction:column;min-height:100%}
 .news-card:hover{box-shadow:0 0 24px rgba(204,0,0,0.15)}
 .news-card .tag{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.65rem;
@@ -376,7 +381,7 @@ body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
 .news-card .read-more:hover{filter:brightness(1.3)}
 
 /* Social cards */
-.social-card{padding:16px 20px;display:flex;flex-direction:column;height:100%}
+.social-card{padding:16px 20px;display:flex;flex-direction:column;min-height:100%}
 .social-card:hover{box-shadow:0 0 24px rgba(255,215,0,0.12)}
 .social-card .topic{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:1rem;
@@ -587,6 +592,69 @@ body.light .empty-state h3{
 
 /* ── GEMINI PANEL ── */
 .gemini-overlay{display:none}
+
+/* ── CARD EXPAND MODAL ── */
+.card-modal-overlay{
+  position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  animation:fadeIn 0.25s ease;
+}
+.card-modal-overlay.open{display:flex}
+.card-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  max-width:640px;width:100%;max-height:80vh;overflow-y:auto;
+  padding:32px 36px;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  animation:fadeUp 0.3s var(--transition);
+}
+body.light .card-modal{background:rgba(255,255,255,0.96);box-shadow:0 30px 80px rgba(0,0,0,0.18)}
+.card-modal h3{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.4rem;
+  text-transform:uppercase;letter-spacing:1px;line-height:1.25;margin-bottom:14px;
+  background:linear-gradient(90deg,#fff 0%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+body.light .card-modal h3{background:linear-gradient(90deg,#1a1a2e,var(--red));-webkit-background-clip:text;background-clip:text}
+.card-modal .meta{font-size:0.78rem;color:var(--text-dim);margin-bottom:16px;letter-spacing:0.5px}
+.card-modal p, .card-modal .summary{font-size:0.95rem;line-height:1.65;color:var(--text);margin-bottom:14px}
+.card-modal .quote{
+  font-style:italic;padding:14px 18px;border-left:3px solid var(--gold);
+  background:rgba(255,215,0,0.05);border-radius:0 8px 8px 0;margin:14px 0;
+}
+.card-modal .platforms{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.card-modal .read-more{
+  display:inline-block;margin-top:18px;padding:10px 20px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:1.5px;text-decoration:none;
+  background:linear-gradient(90deg,var(--red),#ff6644);color:#fff;
+  border-radius:6px;transition:filter 0.2s;
+}
+.card-modal .read-more:hover{filter:brightness(1.15)}
+.card-modal-close{
+  position:absolute;top:14px;right:18px;background:none;border:none;
+  color:var(--text-dim);font-size:1.8rem;cursor:pointer;line-height:1;
+  transition:color 0.2s;
+}
+.card-modal-close:hover{color:#fff}
+body.light .card-modal-close:hover{color:#000}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── BETA BADGE ── */
+.beta-badge{
+  display:inline-block;margin-left:8px;padding:2px 8px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.6rem;
+  letter-spacing:2px;text-transform:uppercase;color:#000;
+  background:linear-gradient(135deg,var(--gold),#ffae00);
+  border-radius:4px;vertical-align:middle;
+  box-shadow:0 0 12px rgba(255,215,0,0.4);
+  animation:beta-pulse 2.5s ease-in-out infinite;
+}
+@keyframes beta-pulse{
+  0%,100%{box-shadow:0 0 12px rgba(255,215,0,0.4)}
+  50%{box-shadow:0 0 20px rgba(255,215,0,0.7)}
+}
 .gemini-panel{
   position:fixed;top:0;right:0;bottom:0;z-index:201;
   width:420px;max-width:90vw;
@@ -984,7 +1052,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="brand">MFG World Cup Command</div>
+    <div class="brand">MFG World Cup Command<span class="beta-badge">Beta</span></div>
     <nav class="header-nav">
       <button class="tab-btn active" data-tab="live">Live</button>
       <button class="tab-btn" data-tab="calendar">Fixtures</button>
@@ -1102,6 +1170,13 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 </main>
 
 <!-- GEMINI -->
+<div class="card-modal-overlay" id="cardModalOverlay">
+  <div class="card-modal" id="cardModal" role="dialog" aria-modal="true">
+    <button class="card-modal-close" id="cardModalClose" aria-label="Close">×</button>
+    <div id="cardModalBody"></div>
+  </div>
+</div>
+
 <button class="gemini-toggle" id="geminiToggle" aria-label="Open Gemini Assistant">✨ Gemini</button>
 <div class="gemini-overlay" id="geminiOverlay"></div>
 <div class="gemini-panel" id="geminiPanel">
@@ -1327,6 +1402,7 @@ function init() {
   setupGemini();
   setupKeyboard();
   setupSearch();
+  setupCardExpand();
   handleHash();
 }
 
@@ -1495,14 +1571,12 @@ function renderNews() {
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
     const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    const linkOpen = n.url ? `<a href="${n.url}" target="_blank" rel="noopener" class="news-card-link">` : '<div class="news-card-link">';
-    const linkClose = n.url ? '</a>' : '</div>';
-    return `<div class="carousel-card">${linkOpen}<div class="news-card glass">
+    return `<div class="carousel-card"><div class="news-card glass" data-card-type="news" data-card-id="${n.id}">
       <span class="tag ${tagClass}">${tagLabel}</span>
       <h3>${n.headline}</h3>
       <p class="meta">${n.source} \u2022 ${timeStr}</p>
       <p class="summary">${n.summary}</p>
-    </div>${linkClose}</div>`;
+    </div></div>`;
   });
   newsCarousel.setCards(cards, filtered.length);
 }
@@ -1517,7 +1591,7 @@ function renderSocial() {
   const cards = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
-    return `<div class="carousel-card"><div class="social-card glass">
+    return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${s.id}">
       <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
       <h3 class="topic">${s.topic}</h3>
       <p class="volume">${s.volume}</p>
@@ -1658,6 +1732,50 @@ function handleHash() {
   if (['live', 'calendar', 'creative'].includes(hash)) switchTab(hash);
 }
 window.addEventListener('hashchange', handleHash);
+
+function setupCardExpand() {
+  const overlay = document.getElementById('cardModalOverlay');
+  const body = document.getElementById('cardModalBody');
+  const closeBtn = document.getElementById('cardModalClose');
+
+  function open(html) {
+    body.innerHTML = html;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', e => {
+    const card = e.target.closest('[data-card-type][data-card-id]');
+    if (!card) return;
+    e.preventDefault();
+    const type = card.dataset.cardType;
+    const id = card.dataset.cardId;
+    if (type === 'news') {
+      const n = DASHBOARD_DATA.news.find(x => x.id === id);
+      if (!n) return;
+      const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
+      const time = new Date(n.timestamp);
+      const timeStr = time.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' • ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      const link = n.url ? `<a href="${n.url}" target="_blank" rel="noopener" class="read-more">Read full article →</a>` : '';
+      open(`<span class="tag ${tagClass}">${n.tag || 'General'}</span><h3 style="margin-top:12px">${n.headline}</h3><p class="meta">${n.source} • ${timeStr}</p><p class="summary">${n.summary}</p>${link}`);
+    } else if (type === 'social') {
+      const s = DASHBOARD_DATA.social.find(x => x.id === id);
+      if (!s) return;
+      const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
+      const quote = s.sampleQuote ? `<div class="quote">${s.sampleQuote}</div>` : '';
+      const platforms = s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('');
+      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3><p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quote}<div class="platforms">${platforms}</div>`);
+    }
+  });
+
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+}
 
 function setupGemini() {
   const overlay = document.getElementById('geminiOverlay');
