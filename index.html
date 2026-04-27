@@ -3490,7 +3490,11 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
         system_instruction: { parts: [{ text: systemInstruction }] },
         contents: chatHistory,
         tools: [{ google_search: {} }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1536 }
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 4096,
+          thinkingConfig: { thinkingBudget: 0 }
+        }
       };
 
       const res = await fetch(
@@ -3499,8 +3503,18 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
       );
 
       const data = await res.json();
+      if (data?.error) {
+        throw new Error(data.error.message || JSON.stringify(data.error));
+      }
       const candidate = data?.candidates?.[0];
-      const reply = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || 'No response generated.';
+      let reply = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
+      if (!reply) {
+        const reason = candidate?.finishReason || 'No content';
+        const block = data?.promptFeedback?.blockReason;
+        reply = block ? `Response blocked (${block}). Try rephrasing.` : `No response generated (${reason}).`;
+      } else if (candidate?.finishReason === 'MAX_TOKENS') {
+        reply += '\n\n_⚠ Response truncated — token cap reached._';
+      }
 
       // Surface grounding citations if the model used web search
       let citationsHtml = '';
