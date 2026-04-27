@@ -7,8 +7,8 @@
 <meta name="description" content="Internal MFG console for World Cup HQ.">
 <meta name="theme-color" content="#0a0c14">
 <meta name="robots" content="noindex,nofollow">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/mfg-logo.png">
-<link rel="apple-touch-icon" href="/assets/mfg-logo.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%BD</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%BD</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -101,6 +101,73 @@ a:hover { opacity: 0.8; }
 #marketGate .market-instructions strong { color: var(--text); }
 #marketGate .market-instructions ol { margin: 8px 0 0 18px; padding: 0; }
 #marketGate .market-instructions li { margin-bottom: 4px; }
+
+#marketSelect {
+  text-align: left;
+  padding-right: 46px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path fill='none' stroke='%23ffd700' stroke-width='1.5' stroke-linecap='round' d='M1 1l5 5 5-5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.gate-link {
+  display: block;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  padding: 6px;
+  transition: color 0.2s;
+}
+.gate-link:hover { color: var(--gold); }
+
+#adminPanel {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  padding: 32px;
+  overflow: auto;
+}
+#adminPanel.shown { display: flex; }
+#adminPanel .admin-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
+}
+#adminPanel h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: 22px;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+#adminPanel .admin-meta { color: var(--text-muted); font-size: 13px; }
+#adminPanel table.admin-log {
+  width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden;
+}
+#adminPanel table.admin-log th {
+  text-align: left; padding: 12px 14px; font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-muted);
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--glass-border);
+}
+#adminPanel table.admin-log td {
+  padding: 12px 14px; font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+#adminPanel table.admin-log tr:last-child td { border-bottom: none; }
+#adminPanel table.admin-log tr:hover td { background: rgba(255,255,255,0.03); }
+#adminPanel .admin-empty { padding: 40px; text-align: center; color: var(--text-muted); }
 
 .gate-box {
   text-align: center;
@@ -693,7 +760,7 @@ a:hover { opacity: 0.8; }
       </ol>
     </div>
 
-    <select class="gate-input" id="marketSelect" style="appearance:auto">
+    <select class="gate-input" id="marketSelect">
       <option value="">— Select your market —</option>
       <option value="Canada">🇨🇦 Canada</option>
       <option value="Germany">🇩🇪 Germany</option>
@@ -703,8 +770,24 @@ a:hover { opacity: 0.8; }
     </select>
     <input type="text" class="gate-input" id="marketUser" placeholder="Your name (for audit log)" maxlength="40" style="margin-top:10px">
     <button class="gate-btn" id="marketContinue" style="margin-top:14px">Continue</button>
+    <button type="button" class="gate-link" id="adminModeLink">🛡 Admin mode →</button>
     <div class="gate-error" id="marketError">Please pick a market and enter your name.</div>
   </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <div>
+      <h1>🛡 Admin · Activity Log</h1>
+      <div class="admin-meta" id="adminMeta">Loading…</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="setting-btn" id="adminRefresh">Refresh</button>
+      <button class="setting-btn" id="adminExit">Exit Admin</button>
+    </div>
+  </div>
+  <div id="adminLogContainer"></div>
 </div>
 
 <!-- App -->
@@ -951,6 +1034,114 @@ a:hover { opacity: 0.8; }
     }
   }
 
+  // --- Admin Mode ---
+  const ADMIN_PASSWORD = 'claude';
+  const adminPanel = document.getElementById('adminPanel');
+  const adminModeLink = document.getElementById('adminModeLink');
+  const adminExit = document.getElementById('adminExit');
+  const adminRefresh = document.getElementById('adminRefresh');
+
+  function openAdmin() {
+    const pw = window.prompt('Admin password:');
+    if (pw !== ADMIN_PASSWORD) {
+      if (pw !== null) alert('Incorrect admin password.');
+      return;
+    }
+    marketGate.classList.remove('shown');
+    gate.style.display = 'none';
+    app.style.display = 'none';
+    adminPanel.classList.add('shown');
+    loadAdminLog();
+  }
+  function closeAdmin() {
+    adminPanel.classList.remove('shown');
+    if (currentMarket && currentUserLabel) {
+      app.style.display = 'block';
+      showMarketBadge();
+    } else {
+      showMarketGate();
+    }
+  }
+  adminModeLink.addEventListener('click', openAdmin);
+  adminExit.addEventListener('click', closeAdmin);
+  adminRefresh.addEventListener('click', loadAdminLog);
+
+  async function loadAdminLog() {
+    const container = document.getElementById('adminLogContainer');
+    const meta = document.getElementById('adminMeta');
+    container.innerHTML = '';
+    meta.textContent = 'Loading…';
+    if (!supabase) {
+      container.innerHTML = '<div class="admin-empty">Supabase not connected.</div>';
+      meta.textContent = '';
+      return;
+    }
+
+    // Try the audit table first; fall back to dashboard_content snapshot if missing.
+    let rows = null;
+    let source = 'audit';
+    try {
+      const { data, error } = await supabase
+        .from('dashboard_audit')
+        .select('created_at, market, kind, updated_by, item_count')
+        .order('created_at', { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      rows = data || [];
+    } catch (e) {
+      source = 'snapshot';
+      try {
+        const { data, error } = await supabase
+          .from('dashboard_content')
+          .select('updated_at, market, kind, updated_by, payload')
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        rows = (data || []).map(r => ({
+          created_at: r.updated_at,
+          market: r.market,
+          kind: r.kind,
+          updated_by: r.updated_by,
+          item_count: Array.isArray(r.payload) ? r.payload.length : null,
+        }));
+      } catch (e2) {
+        container.innerHTML = '<div class="admin-empty">Could not load logs: ' + (e2.message || 'Unknown error') + '</div>';
+        meta.textContent = '';
+        return;
+      }
+    }
+
+    if (!rows.length) {
+      container.innerHTML = '<div class="admin-empty">No publishes yet.</div>';
+      meta.textContent = source === 'snapshot' ? 'Showing current dashboard_content (audit table not found).' : '0 entries.';
+      return;
+    }
+
+    const fmt = ts => new Date(ts).toLocaleString();
+    const escAdm = s => String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+    const headerNote = source === 'snapshot'
+      ? `Showing latest snapshot per (market, kind) — for full history, create the <code>dashboard_audit</code> table.`
+      : `${rows.length} publish event${rows.length === 1 ? '' : 's'} logged.`;
+    meta.innerHTML = headerNote;
+
+    const body = rows.map(r => `
+      <tr>
+        <td>${fmt(r.created_at)}</td>
+        <td><strong>${escAdm(r.market)}</strong></td>
+        <td>${escAdm(r.kind)}</td>
+        <td>${escAdm(r.updated_by) || '<em style="color:var(--text-muted)">—</em>'}</td>
+        <td>${r.item_count == null ? '—' : r.item_count}</td>
+      </tr>
+    `).join('');
+
+    container.innerHTML = `<table class="admin-log">
+      <thead><tr><th>When</th><th>Market</th><th>Kind</th><th>Published by</th><th>Items</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table>`;
+  }
+
   marketContinue.addEventListener('click', () => {
     const m = marketSelect.value;
     const u = marketUser.value.trim();
@@ -1185,6 +1376,20 @@ a:hover { opacity: 0.8; }
           .from('dashboard_content')
           .upsert(upserts, { onConflict: 'market,kind' });
         if (error) throw error;
+
+        // Append to audit log (best-effort; ignore if table missing).
+        try {
+          const auditRows = upserts.map(u => ({
+            market: u.market,
+            kind: u.kind,
+            updated_by: u.updated_by || null,
+            item_count: Array.isArray(u.payload) ? u.payload.length : 0,
+          }));
+          await supabase.from('dashboard_audit').insert(auditRows);
+        } catch(auditErr) {
+          console.warn('audit insert skipped', auditErr);
+        }
+
         showToast(`Published ${upserts.length} update${upserts.length>1?'s':''} for ${market}!`, 'success');
         document.getElementById('newsInput').value = '';
         document.getElementById('socialInput').value = '';
