@@ -641,6 +641,105 @@ body.light .card-modal h3{background:linear-gradient(90deg,#1a1a2e,var(--red));-
 body.light .card-modal-close:hover{color:#000}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+/* ── FIXTURES CALENDAR ── */
+.week-strip{margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;backdrop-filter:blur(12px)}
+.week-strip-label{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:2.5px;color:var(--text-dim);margin-bottom:10px;
+}
+.week-strip-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.week-day{padding:10px 6px;text-align:center;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid transparent}
+.week-day-today{background:linear-gradient(135deg,rgba(204,0,0,0.18),rgba(255,215,0,0.10));border-color:rgba(255,215,0,0.3)}
+.week-day-name{font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase}
+.week-day-num{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.4rem;color:var(--text);margin:2px 0}
+.week-day-count{font-size:0.68rem;color:var(--text-dim);font-weight:500}
+body.light .week-day{background:rgba(0,0,0,0.03)}
+
+.cal-controls{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:14px}
+.cal-month{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:1.3rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text);margin:0;
+}
+.cal-nav{
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-dim);font-size:1.2rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s var(--transition);
+}
+.cal-nav:hover:not(:disabled){background:rgba(255,255,255,0.08);color:#fff;border-color:rgba(255,255,255,0.2)}
+.cal-nav:disabled{opacity:0.3;cursor:not-allowed}
+body.light .cal-nav:hover:not(:disabled){background:rgba(0,0,0,0.06);color:#000}
+
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:8px;backdrop-filter:blur(12px);
+}
+.cal-dow{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.68rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);
+  text-align:center;padding:6px 0;
+}
+.cal-cell{
+  min-height:96px;padding:6px;border-radius:8px;
+  background:rgba(255,255,255,0.02);border:1px solid transparent;
+  display:flex;flex-direction:column;gap:3px;
+  transition:background 0.2s;
+}
+.cal-cell.cal-empty{background:transparent}
+.cal-cell.cal-has-games{background:rgba(255,255,255,0.04)}
+.cal-cell.cal-has-games:hover{background:rgba(255,255,255,0.07)}
+.cal-cell.cal-today{
+  background:linear-gradient(135deg,rgba(204,0,0,0.15),rgba(255,215,0,0.08));
+  border-color:rgba(255,215,0,0.35);box-shadow:0 0 14px rgba(255,215,0,0.1);
+}
+body.light .cal-cell.cal-has-games{background:rgba(0,0,0,0.03)}
+body.light .cal-cell.cal-has-games:hover{background:rgba(0,0,0,0.06)}
+.cal-day-num{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
+  color:var(--text);text-align:right;padding:0 2px;
+}
+.cal-cell.cal-today .cal-day-num{color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.cal-chip{
+  font-size:0.62rem;font-weight:600;line-height:1.2;
+  padding:3px 5px;border-radius:4px;
+  display:flex;justify-content:space-between;align-items:center;gap:4px;
+  cursor:default;overflow:hidden;
+}
+.cal-chip-time{opacity:0.85;font-size:0.55rem;letter-spacing:0.3px;flex-shrink:0}
+.cal-chip-teams{font-weight:700;letter-spacing:0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-more{font-size:0.6rem;color:var(--text-dim);text-align:center;font-style:italic;margin-top:2px}
+.cal-group{background:rgba(33,150,243,0.18);color:#90caf9}
+.cal-r32{background:rgba(156,39,176,0.18);color:#ce93d8}
+.cal-r16{background:rgba(233,30,99,0.18);color:#f48fb1}
+.cal-qf{background:rgba(255,87,34,0.2);color:#ffab91}
+.cal-sf{background:rgba(255,193,7,0.22);color:#ffe082}
+.cal-3rd{background:rgba(0,200,83,0.18);color:#a5d6a7}
+.cal-final{background:linear-gradient(135deg,rgba(204,0,0,0.3),rgba(255,215,0,0.25));color:#fff;font-weight:800;box-shadow:0 0 8px rgba(255,215,0,0.3)}
+body.light .cal-group{color:#1976d2}
+body.light .cal-r32{color:#7b1fa2}
+body.light .cal-r16{color:#c2185b}
+body.light .cal-qf{color:#e64a19}
+body.light .cal-sf{color:#f57c00}
+body.light .cal-3rd{color:#2e7d32}
+
+.cal-legend{
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
+  margin-top:14px;font-size:0.7rem;color:var(--text-dim);
+}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.cal-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+@media (max-width:760px){
+  .cal-cell{min-height:64px;padding:3px}
+  .cal-chip-time{display:none}
+  .cal-chip{font-size:0.55rem;padding:2px 3px}
+  .week-day{padding:6px 2px}
+  .week-day-num{font-size:1.1rem}
+  .week-day-count{font-size:0.6rem}
+}
+
 /* ── BETA BADGE ── */
 .beta-badge{
   display:inline-block;margin-left:8px;padding:2px 8px;
@@ -1122,7 +1221,8 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   <div class="tab-panel" id="panel-calendar">
     <h2 class="section-title">Match Schedule — 104 Matches</h2>
     <div class="fixtures-controls">
-      <button class="view-btn active" data-view="date" onclick="setFixtureView('date')">📅 By Date</button>
+      <button class="view-btn active" data-view="calendar" onclick="setFixtureView('calendar')">🗓️ Calendar</button>
+      <button class="view-btn" data-view="date" onclick="setFixtureView('date')">📅 By Date</button>
       <button class="view-btn" data-view="group" onclick="setFixtureView('group')">🏟️ By Group</button>
       <select class="group-filter" id="groupFilter" onchange="renderMatches()">
         <option value="all">All Stages</option>
@@ -1229,7 +1329,17 @@ const DASHBOARD_DATA = {
     { id: "n12", headline: "🌍 CFR: 'The U.S. Is Co-Hosting the World Cup. But Much of the World Can't Attend'", source: "CNN / CFR", timestamp: "2026-04-21T14:00:00Z", summary: "Travel bans, $250 visa integrity fees, and bonds of $5K-$15K for some African nations are pricing out and barring fans from qualifying countries. Iran, Haiti, DRC, Côte d'Ivoire, Senegal among most affected 🛂", url: "https://www.cnn.com/2026/04/21/travel/world-cup-travelers-united-states", tag: null },
     { id: "n13", headline: "🇮🇷 Iran WILL Play — Infantino Confirms Despite Trump Suggestion", source: "Goal.com", timestamp: "2026-04-20T16:00:00Z", summary: "FIFA President Gianni Infantino confirmed Iran's team will play in the tournament, after Donald Trump previously suggested Iran's players should skip the World Cup 'for their own life and safety' ⚽", url: "https://www.goal.com/en/lists/six-major-concerns-ahead-2026-world-cup-donald-trump-travel-bans-sky-high-ticket-prices-war-iran/bltef4bd787ddbff285", tag: null },
     { id: "n14", headline: "👨‍⚖️ FIFA Names 52 Referees, 88 ARs, 30 VARs for Tournament", source: "FIFA.com", timestamp: "2026-04-09T14:00:00Z", summary: "FIFA published its full match-officials list for the 2026 World Cup: 52 referees, 88 assistant referees, and 30 video assistant referees confirmed for the 48-team, 104-match tournament 🟨", url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026", tag: null },
-    { id: "n15", headline: "🏟️ FIFA Fan Festivals Confirmed in 14 Cities Across All 3 Hosts", source: "FourFourTwo", timestamp: "2026-04-20T12:00:00Z", summary: "Official Fan Festivals locked in for Toronto, Vancouver, Mexico City, Guadalajara, Monterrey + Atlanta, Boston, Dallas, Houston, Kansas City, LA, Miami, NY/NJ and Philadelphia. Free entry, some w/ timed registration 🎉", url: "https://www.fourfourtwo.com/competition/world-cup-2026-fan-zones", tag: null }
+    { id: "n15", headline: "🏟️ FIFA Fan Festivals Confirmed in 14 Cities Across All 3 Hosts", source: "FourFourTwo", timestamp: "2026-04-20T12:00:00Z", summary: "Official Fan Festivals locked in for Toronto, Vancouver, Mexico City, Guadalajara, Monterrey + Atlanta, Boston, Dallas, Houston, Kansas City, LA, Miami, NY/NJ and Philadelphia. Free entry, some w/ timed registration 🎉", url: "https://www.fourfourtwo.com/competition/world-cup-2026-fan-zones", tag: null },
+    { id: "n16", headline: "🇺🇸 USMNT Goalkeeper Jonathan Klinsmann Suffers Broken Neck", source: "Sports Illustrated", timestamp: "2026-04-26T18:00:00Z", summary: "Jonathan Klinsmann broke his neck playing for Italian Serie B side Cesena and is out for the rest of the season — Pochettino's third April injury setback ahead of the May 26 final 26-man roster announcement 🤕", url: "https://www.si.com/soccer/usmnt-world-cup-hopeful-broken-neck-what-next-mauricio-pochettino", tag: "USA" },
+    { id: "n17", headline: "🇺🇸 Pochettino's 'No-Nonsense' April Squeeze — Former Locks in Danger", source: "Sportscasting", timestamp: "2026-04-25T14:00:00Z", summary: "Matt Freese's surge has Matt Turner's #1 spot in real jeopardy. Antonee Robinson's lock status has 'evaporated.' Diego Luna has emerged as Pochettino's right-hand man, pushing veterans down the depth chart ⚖️", url: "https://www.sportscasting.com/news/usmnt-2026-world-cup-roster-bubble-locks-pochettino/", tag: "USA" },
+    { id: "n18", headline: "🇺🇸 USMNT Final 26-Man Roster Announcement Set for May 26", source: "ESPN", timestamp: "2026-04-22T16:00:00Z", summary: "With only two friendlies left — Senegal (May 31) and Germany — bubble players have just 180 minutes to prove they belong before Pochettino names his final 26 on May 26. ESPN Big Board 6.0 dropped this week 📋", url: "https://www.espn.com/soccer/story/_/id/48359122/usmnt-2026-world-cup-big-board-6-march-international-losses-belgium-portugal-cemented-mauricio-pochettino-squad", tag: "USA" },
+    { id: "n19", headline: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Tuchel: 'Bellingham Will Try Everything' to Make WC", source: "Goal.com", timestamp: "2026-04-26T16:00:00Z", summary: "Thomas Tuchel reiterated three reasons Jude Bellingham must go to the World Cup despite his hamstring injury. Real Madrid in close contact with England staff supporting his recovery. 'No matter the cost' is the line 🦁", url: "https://www.goal.com/en-us/lists/jude-bellingham-world-cup-thomas-tuchel-three-reasons-injured-real-madrid-star-england-squad/blt47c064023b0c01b2", tag: "UK" },
+    { id: "n20", headline: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Bellingham Hamstring Race Against Time — Fox Sports Update", source: "Fox Sports", timestamp: "2026-04-23T14:00:00Z", summary: "Real Madrid superstar Bellingham still managing a hamstring strain picked up vs Rayo Vallecano in February. Did not feature in March camp. Tuchel managing return carefully — every La Liga and CL minute now critical ⏱️", url: "https://www.foxsports.com/stories/soccer/jude-bellingham-in-race-against-time-as-england-boss-thomas-tuchel-delivers-update-on-injured-real-madrid-superstar", tag: "UK" },
+    { id: "n21", headline: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 ESPN: 'Best England Team in Decades' — Kane, Bellingham, Rice Spine", source: "ESPN", timestamp: "2026-04-21T18:00:00Z", summary: "ESPN's England 2026 squad prediction calls this 'the best England team in decades.' Kane leading the line, Bellingham + Rice anchoring midfield. 26-man squad due June 1 from Tuchel's preliminary 55-player list 🌟", url: "https://www.espn.com/soccer/story/_/id/48346178/predicting-england-2026-world-cup-squad-thomas-tuchel-26-players-take-bubble", tag: "UK" },
+    { id: "n22", headline: "🇨🇦 Davies Returns From ACL — 3 Bayern Appearances, Goal + Assist", source: "ESPN", timestamp: "2026-04-26T20:00:00Z", summary: "Canada captain Alphonso Davies featured in Bayern's last 3 matches after his ACL recovery — scoring once and assisting once. Came on at 60' vs St. Pauli and 70' vs Real Madrid in the CL quarterfinal 🇨🇦💪", url: "https://www.espn.com/soccer/story/_/id/47524993/canada-jesse-marsch-alphonso-davies-ready-world-cup-excited-playing-again", tag: "Canada" },
+    { id: "n23", headline: "🇨🇦 Marsch's Tightrope: Davies in CL Final 13 Days Before WC Opener", source: "Sports Illustrated", timestamp: "2026-04-22T14:00:00Z", summary: "Bayern's CL semi vs PSG (Apr 28 / May 6). Potential CL Final May 30 in Budapest — same day Canada's WC camp closes. Tune-up vs Uzbekistan in Davies' hometown Edmonton just 13 days before WC opener vs Bosnia 🎯", url: "https://www.si.com/soccer/predicting-canada-2026-world-cup-roster-50-days-from-kickoff", tag: "Canada" },
+    { id: "n24", headline: "🇩🇪 Nagelsmann Locks 9 Guaranteed Starters for Germany WC XI", source: "Bavarian Football Works", timestamp: "2026-04-24T12:00:00Z", summary: "Nagelsmann's confirmed starters: Baumann (GK); Kimmich, Tah, Schlotterbeck, Raum (DEF); Pavlović (DM); Wirtz, Musiala (if fit), Havertz (ATT). Two open competition spots remain in midfield + striker ⚽", url: "https://www.bavarianfootballworks.com/germany-international-soccer/192680/julian-nagelsmann-confirms-desire-to-bring-jamal-musiala-to-world-cup", tag: "Germany" },
+    { id: "n25", headline: "🇩🇪 Wirtz Sparkles in 4-3 Friendly Win Over Switzerland", source: "Bundesliga", timestamp: "2026-04-21T16:00:00Z", summary: "Liverpool's Florian Wirtz set up Germany's first two goals and scored twice himself in last month's 4-3 friendly win in Switzerland. Nagelsmann's attacking blueprint with Wirtz + Musiala + Havertz is taking shape 🌟", url: "https://www.bundesliga.com/en/bundesliga/news/how-will-germany-line-up-havertz-musiala-wirtz-nagelsmann-world-cup-2026-28807", tag: "Germany" }
   ],
   matches: [
     // ── GROUP A ──
@@ -1370,7 +1480,17 @@ const DASHBOARD_DATA = {
     { id: "s12", topic: "🇲🇽 Group A 'Group of Death' Debate Reignites", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/soccer and r/WorldCup spending hours dissecting Group A — Mexico, South Africa, South Korea, Czechia. Most threads landing on 'no walkover, this is genuinely tough for Mexico' 🇲🇽🇿🇦🇰🇷🇨🇿", sampleQuote: "\"Mexico fans calling this 'easy.' Mexico fans have not watched South Korea or Czechia recently.\"", platforms: ["X", "Reddit"] },
     { id: "s13", topic: "📺 'VAR Monitor' Watch Party Setup Memes", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "The most viral format right now: fans posting videos of themselves setting up living rooms for watch parties, zooming in on a tiny TV in the corner labeled 'VAR monitor,' then cutting to someone screaming. Peak comedy 🛋️📺", sampleQuote: "\"Setting up the WC bunker. Yes, that 6-inch TV is the VAR monitor. Yes, it's necessary.\"", platforms: ["TikTok", "IG"] },
     { id: "s14", topic: "📈 r/WC2026Tix Surge — Reddit WC Activity Tripled YoY", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "Per Reddit's own data: 77M+ views to 'FIFA World Cup' mentions in the US over the past year, with conversation more than tripling year over year. r/soccer, r/WorldCup, r/USSoccer, r/WC2026Tix all surging 📊", sampleQuote: "\"r/WC2026Tix is the most chaotic, useful, and emotionally damaging subreddit on the entire site rn\"", platforms: ["Reddit", "X"] },
-    { id: "s15", topic: "🇮🇷 Iran Will Play — Infantino Statement Reaction", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Infantino confirming Iran will play despite Trump's earlier suggestion they should skip generated mixed reactions. Iranian football fans celebrating; debate continues over whether Iranian fans will be allowed entry 🇮🇷⚽", sampleQuote: "\"The team plays. The fans can't come watch. What kind of World Cup is this?\"", platforms: ["X", "Reddit", "IG"] }
+    { id: "s15", topic: "🇮🇷 Iran Will Play — Infantino Statement Reaction", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Infantino confirming Iran will play despite Trump's earlier suggestion they should skip generated mixed reactions. Iranian football fans celebrating; debate continues over whether Iranian fans will be allowed entry 🇮🇷⚽", sampleQuote: "\"The team plays. The fans can't come watch. What kind of World Cup is this?\"", platforms: ["X", "Reddit", "IG"] },
+    { id: "s16", topic: "🇺🇸 Diego Luna Hype TikTok Edits Going Viral", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Diego Luna becoming Pochettino's right-hand man has triggered a wave of USMNT TikTok edits — Real Salt Lake skill compilations and 'America's new #10' captions racking up millions of views 🇺🇸⚡", sampleQuote: "\"Diego Luna is what USMNT was missing. Pure street creativity. Pochettino unlocked him.\"", platforms: ["TikTok", "X", "IG"] },
+    { id: "s17", topic: "🇺🇸 Pochettino Roster Bubble Drama on r/USSoccer", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Reddit r/USSoccer hosting marathon threads dissecting Pochettino's bubble — Freese vs Turner, Robinson's slide, Diego Luna's rise. ESPN Big Board 6.0 dropped this week and triggered another 800-comment debate ⚖️", sampleQuote: "\"Robinson was supposed to be a lock. Now I'd genuinely take Dest over him. What a fall.\"", platforms: ["Reddit", "X"] },
+    { id: "s18", topic: "🇺🇸 Klinsmann Broken Neck — USMNT Fans Stunned", category: "game", volume: "🔥🔥", sentiment: "negative", summary: "Reaction to Jonathan Klinsmann's broken neck at Cesena — a freak injury that closes the door on a fairy-tale WC redemption arc. Send-well posts dominating r/USSoccer and X Spaces 🤕🇺🇸", sampleQuote: "\"A broken NECK. Just utterly cruel. Get well Klinsi.\"", platforms: ["X", "Reddit", "IG"] },
+    { id: "s19", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Bellingham Hamstring Anxiety Threads on X", category: "game", volume: "🔥🔥🔥", sentiment: "negative", summary: "Every Bellingham minute for Real Madrid is being live-tracked by England fans on X. Tuchel's 'no matter the cost' line is a meme — and a coping mechanism. Threads regularly hit 5K+ replies 🦁🩹", sampleQuote: "\"He limped on the bench and the entire UK held its breath. This is going to be a long 6 weeks.\"", platforms: ["X", "TikTok", "Reddit"] },
+    { id: "s20", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 'Best England Team in Decades' — Optimism vs Trauma", category: "fandom", volume: "🔥🔥", sentiment: "mixed", summary: "ESPN's call that this is England's strongest squad in decades has split fans on r/soccer and r/England. Kane + Bellingham + Rice spine has hype peaking — but 60 years of hurt has fans hedging 🏴󠁧󠁢󠁥󠁮󠁧󠁿😅", sampleQuote: "\"On paper this is the best England squad of my lifetime. Which is why I'm absolutely terrified.\"", platforms: ["Reddit", "X", "IG"] },
+    { id: "s21", topic: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Tuchel Decision-Making Memes Trending", category: "memes", volume: "🔥🔥", sentiment: "positive", summary: "Tuchel's chess-master vibe + scientific selection process has triggered a meme wave on TikTok and X. 'POV: Tuchel deciding between Grealish and Foden for 90 seconds straight' edits topping FYPs 😂♟️", sampleQuote: "\"Tuchel staring at his squad list like it's a quantum physics problem 🧠📋\"", platforms: ["TikTok", "X"] },
+    { id: "s22", topic: "🇨🇦 Davies Bayern Goal Reaction — Canada Fans Lose It", category: "game", volume: "🔥🔥🔥", sentiment: "positive", summary: "Davies coming off the bench and scoring for Bayern post-ACL had Canadian football X in literal tears. Clip of his celebration looped 8M+ times across TikTok and X. 'He's BACK' is the dominant emotion 🇨🇦💪", sampleQuote: "\"After everything? After the ACL? After the surgery? He scores. I'm crying. We're all crying.\"", platforms: ["TikTok", "X", "IG"] },
+    { id: "s23", topic: "🇨🇦 13 Days From CL Final to WC Opener Discourse", category: "game", volume: "🔥🔥", sentiment: "mixed", summary: "Canada fans on Reddit r/CanadaSoccer war-gaming Davies' May/June schedule. CL semi vs PSG, possible Final May 30, then WC opener vs Bosnia June 11. 'Marsch is a chess player playing Tetris' is the line 🇨🇦📅", sampleQuote: "\"Pray for Phonzie's hamstrings. Light a candle for his ACL. Sacrifice a goat for his calves.\"", platforms: ["Reddit", "X", "TikTok"] },
+    { id: "s24", topic: "🇩🇪 Wirtz vs Musiala Tactical Discourse Hits New Peak", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Wirtz's 2 goals + 2 assists vs Switzerland reignited Germany's golden generation discourse. Tactical creators on YouTube and TikTok comparing Nagelsmann's Wirtz/Musiala/Havertz front 4 to Germany 2014 in elite breakdowns 🇩🇪🧠", sampleQuote: "\"Wirtz is operating on a different frequency. Musiala fit + this guy = Germany are winning the World Cup.\"", platforms: ["YouTube", "X", "IG"] },
+    { id: "s25", topic: "🇩🇪 Nagelsmann '9 Guaranteed Starters' List Goes Viral", category: "game", volume: "🔥", sentiment: "positive", summary: "Bavarian Football Works' breakdown of Nagelsmann's 9 locked starters became one of the most-shared Germany pieces of April. Open competition for the last two spots is dominating r/Bundesliga discussion 🇩🇪⚽", sampleQuote: "\"9 starters locked, 2 spots open, 4 guys who think they should start. April is going to be brutal.\"", platforms: ["Reddit", "X"] }
   ],
   assets: [
     { id: "a1", headline: "\u{1f1e8}\u{1f1e6} Canada vs Mexico \u2014 Opener Hype Reel \u{1f3ac}", market: "Canada", status: "Live", deployDate: "2026-06-10", format: "Reel", driveFileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz", driveUrl: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view" },
@@ -1464,6 +1584,8 @@ const liveFilterDefs = [
   { id: 'all', label: '🌐 All' },
   { id: 'canada', label: '🇨🇦 Canada' },
   { id: 'germany', label: '🇩🇪 Germany' },
+  { id: 'usa', label: '🇺🇸 USA' },
+  { id: 'uk', label: '🇬🇧 UK' },
   { id: 'game', label: '⚽ Game' },
   { id: 'culture', label: '🎵 Culture' },
   { id: 'viral', label: '🔥 Trending' },
@@ -1491,7 +1613,17 @@ function matchesLiveFilter(item, type) {
   }
   if (liveFilter === 'germany') {
     if (type === 'news') return item.tag === 'Germany';
-    return item.topic?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('kit');
+    return item.topic?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('germany') || item.summary?.toLowerCase().includes('nagelsmann') || item.summary?.toLowerCase().includes('wirtz') || item.summary?.toLowerCase().includes('musiala');
+  }
+  if (liveFilter === 'usa') {
+    if (type === 'news') return item.tag === 'USA';
+    const t = (item.topic + ' ' + item.summary).toLowerCase();
+    return t.includes('usmnt') || t.includes(' usa ') || t.includes('🇺🇸') || t.includes('pochettino') || t.includes('diego luna') || t.includes('tolkin') || t.includes('america');
+  }
+  if (liveFilter === 'uk') {
+    if (type === 'news') return item.tag === 'UK';
+    const t = (item.topic + ' ' + item.summary).toLowerCase();
+    return t.includes('england') || t.includes('🏴') || t.includes('tuchel') || t.includes('bellingham') || t.includes('kane') || t.includes('three lions');
   }
   if (liveFilter === 'game') {
     if (type === 'news') return true; // all news is game-related
@@ -1556,8 +1688,8 @@ function createCarousel(containerId, dotsId, interval = 5000) {
   return { next, prev, goTo, setCards };
 }
 
-let newsCarousel = createCarousel('newsCards', 'newsDots', 5000);
-let socialCarousel = createCarousel('socialCards', 'socialDots', 6000);
+let newsCarousel = createCarousel('newsCards', 'newsDots', 2800);
+let socialCarousel = createCarousel('socialCards', 'socialDots', 3200);
 
 function renderNews() {
   const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news') && matchesSearch(n));
@@ -1608,7 +1740,7 @@ function switchSubTab(id) {
   document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === 'sub-' + id));
 }
 
-let fixtureView = 'date';
+let fixtureView = 'calendar';
 function setFixtureView(view) {
   fixtureView = view;
   document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
@@ -1641,12 +1773,138 @@ function renderMatchRow(m) {
   </div>`;
 }
 
+// ── Fixtures Calendar (month grid) ──
+let calendarMonth = null; // YYYY-MM string; defaults to first match month if null
+function shiftCalendar(delta) {
+  if (!calendarMonth) calendarMonth = '2026-06';
+  const [y,m] = calendarMonth.split('-').map(Number);
+  const d = new Date(y, m-1+delta, 1);
+  calendarMonth = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  renderMatches();
+}
+function renderCalendarView(matches) {
+  if (!calendarMonth) {
+    const first = matches.map(m => m.date).sort()[0] || '2026-06-11';
+    calendarMonth = first.slice(0,7);
+  }
+  const [y, mo] = calendarMonth.split('-').map(Number);
+  const firstDay = new Date(y, mo-1, 1);
+  const lastDay = new Date(y, mo, 0);
+  const daysInMonth = lastDay.getDate();
+  const startWeekday = firstDay.getDay(); // 0=Sun
+  const monthLabel = firstDay.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const today = new Date().toISOString().slice(0,10);
+
+  // Bucket matches by date
+  const byDate = {};
+  matches.forEach(m => {
+    if (m.date.startsWith(calendarMonth)) {
+      (byDate[m.date] = byDate[m.date] || []).push(m);
+    }
+  });
+
+  const stageColor = s => {
+    if (s.startsWith('Group')) return 'cal-group';
+    if (s.includes('Round of 32')) return 'cal-r32';
+    if (s.includes('Round of 16')) return 'cal-r16';
+    if (s.includes('Quarter')) return 'cal-qf';
+    if (s.includes('Semi')) return 'cal-sf';
+    if (s.includes('Third')) return 'cal-3rd';
+    if (s.includes('Final')) return 'cal-final';
+    return 'cal-group';
+  };
+
+  // Build cells
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) cells.push('<div class="cal-cell cal-empty"></div>');
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const games = byDate[dateStr] || [];
+    const isToday = dateStr === today;
+    const chips = games.slice(0,3).map(g =>
+      `<div class="cal-chip ${stageColor(g.stage)}" data-match-id="${g.id}" title="${g.kickoff} • ${g.home.name} vs ${g.away.name} • ${g.venue}">
+        <span class="cal-chip-time">${g.kickoff.replace(' ET','')}</span>
+        <span class="cal-chip-teams">${g.home.flag}${g.away.flag} ${g.home.code}-${g.away.code}</span>
+      </div>`
+    ).join('');
+    const more = games.length > 3 ? `<div class="cal-more">+${games.length-3} more</div>` : '';
+    cells.push(`<div class="cal-cell${isToday ? ' cal-today' : ''}${games.length ? ' cal-has-games' : ''}">
+      <div class="cal-day-num">${d}</div>${chips}${more}
+    </div>`);
+  }
+  // Pad trailing
+  while (cells.length % 7 !== 0) cells.push('<div class="cal-cell cal-empty"></div>');
+
+  // Has prev/next month relative to tournament window?
+  const earliest = '2026-06';
+  const latest = '2026-07';
+  const canPrev = calendarMonth > earliest;
+  const canNext = calendarMonth < latest;
+
+  // Compact "this week" strip
+  const weekStrip = renderWeekStrip(matches);
+
+  return `
+    ${weekStrip}
+    <div class="cal-controls">
+      <button class="cal-nav" ${canPrev?'':'disabled'} onclick="shiftCalendar(-1)">‹</button>
+      <h3 class="cal-month">${monthLabel}</h3>
+      <button class="cal-nav" ${canNext?'':'disabled'} onclick="shiftCalendar(1)">›</button>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+      <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div>
+      ${cells.join('')}
+    </div>
+    <div class="cal-legend">
+      <span><i class="cal-dot cal-group"></i>Group</span>
+      <span><i class="cal-dot cal-r32"></i>R32</span>
+      <span><i class="cal-dot cal-r16"></i>R16</span>
+      <span><i class="cal-dot cal-qf"></i>QF</span>
+      <span><i class="cal-dot cal-sf"></i>SF</span>
+      <span><i class="cal-dot cal-3rd"></i>3rd</span>
+      <span><i class="cal-dot cal-final"></i>Final</span>
+    </div>
+  `;
+}
+
+function renderWeekStrip(matches) {
+  const today = new Date();
+  const start = new Date(today);
+  start.setHours(0,0,0,0);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const ds = d.toISOString().slice(0,10);
+    const games = matches.filter(m => m.date === ds);
+    days.push({ d, ds, games });
+  }
+  const hasAny = days.some(x => x.games.length);
+  if (!hasAny) return '';
+  return `<div class="week-strip">
+    <div class="week-strip-label">This Week</div>
+    <div class="week-strip-grid">
+      ${days.map(({d, ds, games}) => `
+        <div class="week-day${ds === new Date().toISOString().slice(0,10) ? ' week-day-today' : ''}">
+          <div class="week-day-name">${d.toLocaleDateString('en-US',{weekday:'short'})}</div>
+          <div class="week-day-num">${d.getDate()}</div>
+          <div class="week-day-count">${games.length ? games.length + ' game' + (games.length>1?'s':'') : '—'}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function renderMatches() {
   const container = document.getElementById('matchList');
   const filterVal = document.getElementById('groupFilter').value;
   let matches = DASHBOARD_DATA.matches.filter(m => matchesSearch(m));
   if (filterVal !== 'all') {
     matches = matches.filter(m => m.stage === filterVal);
+  }
+
+  if (fixtureView === 'calendar') {
+    container.innerHTML = renderCalendarView(matches);
+    return;
   }
 
   if (fixtureView === 'date') {
@@ -1843,25 +2101,38 @@ function setupGemini() {
     chatHistory.push({ role: "user", parts: [{ text: text }] });
 
     try {
-      const systemInstruction = `You are a strategic analyst embedded in the MFG World Cup Command dashboard — an internal war room for a global strategy team running premade and reactive Instagram content during the 2026 FIFA World Cup.
+      const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'live';
+      const activeMarket = document.querySelector('.live-filter.active')?.textContent?.trim() || 'All';
+      const systemInstruction = `You are the embedded strategic analyst inside the **MFG World Cup Command** dashboard — an internal war room for a global strategy team running premade and reactive Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada/Mexico/USA).
 
-You have full access to the dashboard data below. Use it to answer questions about:
-- Match schedule, fixtures, venues, dates, kickoff times (104 matches total, Groups A-L)
-- Latest news headlines and sources
-- Social media trends, sentiment, volume, and platform distribution
-- Creative assets pipeline (status, market, format, deploy dates)
-- Campaign strategy recommendations
+# About this tool
+- **Purpose**: real-time intelligence + creative pipeline tracking for the team running MFG's IG content during the WC.
+- **Tabs the user can navigate**:
+  • **Live** — Breaking news ticker, News carousel, Social Trends carousel. Filter by market (All / Canada / Germany / USA / UK) or theme (Game / Culture / Trending). Cards auto-rotate; click any card to expand.
+  • **Fixtures** — All 104 matches across 12 groups + knockouts. Sort by date or group; filter by stage.
+  • **Creative** — Three sub-tabs: ⚽ WC Engine (active asset pipeline with market/status/format/deploy date), ▶️ YT x Genius, 📺 Fox S2 (planned).
+- **MFG Mode** (separate page, password-gated) is where the team manually pastes news + social conversations; that data flows into Supabase and surfaces on this dashboard.
+- **Source quality**: news carousel items each have a real \`source\` and \`url\` (Al Jazeera, ESPN, beIN, FIFA, Goal, Bundesliga, etc.) from real April 2026 reporting. Social items are sourced from observed TikTok/X/Reddit/IG trends — \`sampleQuote\` fields are illustrative reconstructions, not verbatim quotes.
+- **Other features**: 🌍 BETA tag in nav, persistent rainbow Gemini button (you), countdown to next match, today-highlight on fixtures, live search, theme toggle (light/dark), MFG password-gated upload mode at /mfg.html.
 
-Be concise, actionable, and strategic. Use data from the dashboard to back up your answers. When discussing matches, reference actual teams, dates, and venues. When discussing social trends, reference specific topics and their metrics.
+# Current user context
+- Active tab: **${activeTab}**
+- Active market filter: **${activeMarket}**
+- Today's date (per dashboard): **${new Date().toISOString().slice(0,10)}**
 
-Always format responses with clear structure:
-- Use **bold** for key terms and emphasis
-- Use bullet points for lists of items, recommendations, or data points
-- Use numbered lists for step-by-step actions or ranked items
-- Use short paragraphs — never write a wall of text
-- Use ### headers to separate sections when answering complex questions
+# What you should do
+Answer questions about matches, fixtures, news, social trends, creative assets, campaign strategy. Be concise, actionable, and strategic. Reference specific data points (team names, dates, venues, source names, sentiment, volume) from the dashboard data below.
 
-DASHBOARD DATA:
+If a user asks about something **outside** the dashboard data (e.g. a topic not represented in news/social/assets), say so plainly and suggest pasting it into MFG Mode to surface it here.
+
+# Format
+- **bold** for key terms
+- bullet lists for items / recommendations / data points
+- numbered lists for ranked items or step-by-step actions
+- short paragraphs — never walls of text
+- ### headers to separate sections in complex answers
+
+# DASHBOARD DATA (live snapshot)
 ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
 
       const payload = {
