@@ -169,6 +169,110 @@ a:hover { opacity: 0.8; }
 #adminPanel table.admin-log tr:hover td { background: rgba(255,255,255,0.03); }
 #adminPanel .admin-empty { padding: 40px; text-align: center; color: var(--text-muted); }
 
+#adminPanel .admin-section {
+  margin-bottom: 26px;
+}
+#adminPanel .admin-section-title {
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+#adminPanel .health-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+#adminPanel .health-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  font-size: 12px; letter-spacing: 0.3px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+}
+#adminPanel .health-pill .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+#adminPanel .health-ok .dot { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+#adminPanel .health-bad .dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+#adminPanel .health-warn .dot { background: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.6); }
+#adminPanel .health-info .dot { background: rgba(255,255,255,0.5); }
+
+#adminPanel .stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+#adminPanel .stat-card {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+  border-radius: 10px; padding: 14px 16px;
+}
+#adminPanel .stat-label {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+#adminPanel .stat-value {
+  font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+#adminPanel .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+#adminPanel .markets-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+#adminPanel .market-tile {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+  border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+#adminPanel .market-tile-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+#adminPanel .market-status {
+  font-size: 10px; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.5px;
+  text-transform: uppercase; font-weight: 600;
+}
+#adminPanel .ms-fresh { background: rgba(34,197,94,0.15); color: #4ade80; }
+#adminPanel .ms-stale { background: rgba(234,179,8,0.15); color: #fde047; }
+#adminPanel .ms-empty { background: rgba(239,68,68,0.15); color: #f87171; }
+#adminPanel .market-row {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-size: 12px; color: var(--text-muted);
+  padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.04);
+}
+#adminPanel .market-row:first-of-type { border-top: none; }
+#adminPanel .market-row strong { color: var(--text); font-weight: 500; }
+#adminPanel .market-actions { display: flex; gap: 6px; margin-top: 4px; }
+#adminPanel .market-actions button {
+  flex: 1; font-size: 11px; padding: 6px 8px; border-radius: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+  color: var(--text); cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase;
+  font-weight: 600; transition: background 0.15s, border-color 0.15s;
+}
+#adminPanel .market-actions button:hover { background: rgba(255,255,255,0.1); border-color: var(--gold); }
+#adminPanel .market-actions .danger:hover { border-color: #ef4444; color: #fca5a5; }
+
+#adminPanel .payload-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 1100;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+#adminPanel .payload-modal.shown { display: flex; }
+#adminPanel .payload-modal-inner {
+  background: var(--bg); border: 1px solid var(--glass-border); border-radius: 12px;
+  width: 100%; max-width: 800px; max-height: 80vh; display: flex; flex-direction: column;
+}
+#adminPanel .payload-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--glass-border);
+  font-family: var(--font-display); letter-spacing: 1.5px; text-transform: uppercase;
+}
+#adminPanel .payload-modal-body {
+  padding: 14px 18px; overflow: auto; font-family: monospace; font-size: 12px;
+  white-space: pre-wrap; word-break: break-word;
+}
+#adminPanel .payload-modal-close {
+  background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 22px;
+}
+
 .gate-box {
   text-align: center;
   padding: 48px 40px;
@@ -771,6 +875,7 @@ a:hover { opacity: 0.8; }
     <input type="text" class="gate-input" id="marketUser" placeholder="Your name (for audit log)" maxlength="40" style="margin-top:10px">
     <button class="gate-btn" id="marketContinue" style="margin-top:14px">Continue</button>
     <button type="button" class="gate-link" id="adminModeLink">🛡 Admin mode →</button>
+    <a href="index.html" class="gate-link" style="text-decoration:none">← Back to main dashboard</a>
     <div class="gate-error" id="marketError">Please pick a market and enter your name.</div>
   </div>
 </div>
@@ -779,7 +884,7 @@ a:hover { opacity: 0.8; }
 <div id="adminPanel">
   <div class="admin-header">
     <div>
-      <h1>🛡 Admin · Activity Log</h1>
+      <h1>🛡 Admin Console</h1>
       <div class="admin-meta" id="adminMeta">Loading…</div>
     </div>
     <div style="display:flex;gap:10px">
@@ -787,7 +892,36 @@ a:hover { opacity: 0.8; }
       <button class="setting-btn" id="adminExit">Exit Admin</button>
     </div>
   </div>
-  <div id="adminLogContainer"></div>
+
+  <div class="admin-section">
+    <div class="admin-section-title">System Health</div>
+    <div class="health-row" id="adminHealth"></div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-title">Tournament Stats</div>
+    <div class="stats-grid" id="adminStats"></div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-title">Market Status</div>
+    <div class="markets-grid" id="adminMarkets"></div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-title">Recent Publish Activity</div>
+    <div id="adminLogContainer"></div>
+  </div>
+
+  <div class="payload-modal" id="adminPayloadModal">
+    <div class="payload-modal-inner">
+      <div class="payload-modal-head">
+        <span id="payloadModalTitle">Payload</span>
+        <button class="payload-modal-close" id="payloadModalClose">×</button>
+      </div>
+      <pre class="payload-modal-body" id="payloadModalBody"></pre>
+    </div>
+  </div>
 </div>
 
 <!-- App -->
@@ -1066,20 +1200,78 @@ a:hover { opacity: 0.8; }
   adminExit.addEventListener('click', closeAdmin);
   adminRefresh.addEventListener('click', loadAdminLog);
 
+  const MARKETS = [
+    { code: 'Canada', flag: '🇨🇦' },
+    { code: 'Germany', flag: '🇩🇪' },
+    { code: 'UK', flag: '🇬🇧' },
+    { code: 'USA', flag: '🇺🇸' },
+    { code: 'Global', flag: '🌍' },
+  ];
+
+  const escAdm = s => String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+  function fmtRel(ts) {
+    if (!ts) return 'never';
+    const d = new Date(ts).getTime();
+    const diff = Math.floor((Date.now() - d) / 1000);
+    if (diff < 60) return diff + 's ago';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+  }
+  function fmtAbs(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleString();
+  }
+
+  let adminPayloadCache = {}; // (market, kind) -> payload
+
   async function loadAdminLog() {
-    const container = document.getElementById('adminLogContainer');
     const meta = document.getElementById('adminMeta');
-    container.innerHTML = '';
+    const healthEl = document.getElementById('adminHealth');
+    const statsEl = document.getElementById('adminStats');
+    const marketsEl = document.getElementById('adminMarkets');
+    const logEl = document.getElementById('adminLogContainer');
+
+    healthEl.innerHTML = '';
+    statsEl.innerHTML = '';
+    marketsEl.innerHTML = '';
+    logEl.innerHTML = '';
     meta.textContent = 'Loading…';
+
+    // Health pills
+    const health = [];
+    health.push({ state: supabase ? 'ok' : 'bad', label: supabase ? 'Supabase connected' : 'Supabase disconnected' });
+    health.push({ state: 'info', label: 'Project: ' + SUPABASE_URL.replace('https://','').split('.')[0] });
+    health.push({ state: 'info', label: 'Browser TZ: ' + (Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown') });
+    health.push({ state: 'info', label: 'Now: ' + new Date().toLocaleString() });
+
     if (!supabase) {
-      container.innerHTML = '<div class="admin-empty">Supabase not connected.</div>';
-      meta.textContent = '';
+      healthEl.innerHTML = health.map(h =>
+        `<span class="health-pill health-${h.state}"><span class="dot"></span>${escAdm(h.label)}</span>`
+      ).join('');
+      meta.textContent = 'Supabase unavailable — admin views require connection.';
       return;
     }
 
-    // Try the audit table first; fall back to dashboard_content snapshot if missing.
-    let rows = null;
-    let source = 'audit';
+    // Fetch content snapshot + audit (best-effort) in parallel
+    let contentRows = [];
+    let auditRows = null;
+    let auditAvailable = false;
+
+    try {
+      const { data, error } = await supabase
+        .from('dashboard_content')
+        .select('market, kind, updated_at, updated_by, payload')
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      contentRows = data || [];
+    } catch(e) {
+      console.warn('content load failed', e);
+    }
+
     try {
       const { data, error } = await supabase
         .from('dashboard_audit')
@@ -1087,60 +1279,161 @@ a:hover { opacity: 0.8; }
         .order('created_at', { ascending: false })
         .limit(500);
       if (error) throw error;
-      rows = data || [];
-    } catch (e) {
-      source = 'snapshot';
-      try {
-        const { data, error } = await supabase
-          .from('dashboard_content')
-          .select('updated_at, market, kind, updated_by, payload')
-          .order('updated_at', { ascending: false });
-        if (error) throw error;
-        rows = (data || []).map(r => ({
-          created_at: r.updated_at,
-          market: r.market,
-          kind: r.kind,
-          updated_by: r.updated_by,
-          item_count: Array.isArray(r.payload) ? r.payload.length : null,
-        }));
-      } catch (e2) {
-        container.innerHTML = '<div class="admin-empty">Could not load logs: ' + (e2.message || 'Unknown error') + '</div>';
-        meta.textContent = '';
-        return;
+      auditRows = data || [];
+      auditAvailable = true;
+    } catch(e) {
+      auditAvailable = false;
+    }
+
+    health.push({
+      state: auditAvailable ? 'ok' : 'warn',
+      label: auditAvailable ? 'Audit log enabled' : 'Audit log not configured (run dashboard_audit SQL)'
+    });
+    health.push({
+      state: contentRows.length ? 'ok' : 'warn',
+      label: contentRows.length ? `${contentRows.length} content row${contentRows.length===1?'':'s'} live` : 'No published content yet'
+    });
+
+    healthEl.innerHTML = health.map(h =>
+      `<span class="health-pill health-${h.state}"><span class="dot"></span>${escAdm(h.label)}</span>`
+    ).join('');
+
+    // Stats — derived from audit if available, else from content snapshot
+    const events = auditAvailable ? auditRows : contentRows.map(r => ({
+      created_at: r.updated_at, market: r.market, kind: r.kind, updated_by: r.updated_by,
+      item_count: Array.isArray(r.payload) ? r.payload.length : null,
+    }));
+    const now = Date.now();
+    const within = (ts, ms) => ts && (now - new Date(ts).getTime() <= ms);
+    const todayCount = events.filter(e => within(e.created_at, 24*3600*1000)).length;
+    const weekCount = events.filter(e => within(e.created_at, 7*24*3600*1000)).length;
+    const totalCount = events.length;
+    const publishers7d = new Set(events
+      .filter(e => within(e.created_at, 7*24*3600*1000) && e.updated_by)
+      .map(e => e.updated_by)).size;
+    const totalItemsLive = contentRows.reduce((sum, r) => sum + (Array.isArray(r.payload) ? r.payload.length : 0), 0);
+
+    const stats = [
+      { label: 'Publishes (24h)', value: todayCount },
+      { label: 'Publishes (7d)', value: weekCount },
+      { label: 'Publishes (all-time)', value: auditAvailable ? totalCount : '~' + totalCount, sub: auditAvailable ? '' : 'snapshot only' },
+      { label: 'Active publishers (7d)', value: publishers7d },
+      { label: 'Live items on dashboard', value: totalItemsLive, sub: 'news + social + assets' },
+      { label: 'Markets configured', value: MARKETS.length },
+    ];
+    statsEl.innerHTML = stats.map(s =>
+      `<div class="stat-card">
+        <div class="stat-label">${escAdm(s.label)}</div>
+        <div class="stat-value">${escAdm(s.value)}</div>
+        ${s.sub ? `<div class="stat-sub">${escAdm(s.sub)}</div>` : ''}
+      </div>`
+    ).join('');
+
+    // Market tiles
+    adminPayloadCache = {};
+    const byMarket = {};
+    contentRows.forEach(r => {
+      if (!byMarket[r.market]) byMarket[r.market] = {};
+      byMarket[r.market][r.kind] = r;
+      adminPayloadCache[r.market + '|' + r.kind] = r.payload;
+    });
+
+    marketsEl.innerHTML = MARKETS.map(({code, flag}) => {
+      const m = byMarket[code] || {};
+      const lastTs = [m.news?.updated_at, m.social?.updated_at, m.assets?.updated_at]
+        .filter(Boolean).sort().slice(-1)[0];
+      let statusClass = 'ms-empty', statusText = 'Never published';
+      if (lastTs) {
+        const ageH = (Date.now() - new Date(lastTs).getTime()) / 3600000;
+        if (ageH < 24) { statusClass = 'ms-fresh'; statusText = 'Fresh'; }
+        else { statusClass = 'ms-stale'; statusText = 'Stale (' + Math.floor(ageH/24) + 'd)'; }
       }
+      const kindRow = (kind) => {
+        const r = m[kind];
+        if (!r) return `<div class="market-row"><strong>${escAdm(kind)}</strong><span>not published</span></div>`;
+        const items = Array.isArray(r.payload) ? r.payload.length : 0;
+        return `<div class="market-row">
+          <strong>${escAdm(kind)}</strong>
+          <span>${items} item${items===1?'':'s'} · ${escAdm(fmtRel(r.updated_at))} · ${escAdm(r.updated_by || '—')}</span>
+        </div>`;
+      };
+      const hasAny = !!(m.news || m.social || m.assets);
+      return `<div class="market-tile">
+        <div class="market-tile-head">
+          <span>${flag} ${escAdm(code)}</span>
+          <span class="market-status ${statusClass}">${statusText}</span>
+        </div>
+        ${kindRow('news')}
+        ${kindRow('social')}
+        ${kindRow('assets')}
+        <div class="market-actions">
+          <button data-admin-view="${escAdm(code)}|news" ${m.news ? '' : 'disabled style="opacity:0.4;cursor:not-allowed"'}>View News</button>
+          <button data-admin-view="${escAdm(code)}|social" ${m.social ? '' : 'disabled style="opacity:0.4;cursor:not-allowed"'}>View Social</button>
+          <button class="danger" data-admin-clear="${escAdm(code)}" ${hasAny ? '' : 'disabled style="opacity:0.4;cursor:not-allowed"'}>Clear</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Wire market tile actions
+    marketsEl.querySelectorAll('[data-admin-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.adminView;
+        const payload = adminPayloadCache[key];
+        const title = document.getElementById('payloadModalTitle');
+        const body = document.getElementById('payloadModalBody');
+        title.textContent = key + ' payload';
+        body.textContent = JSON.stringify(payload, null, 2);
+        document.getElementById('adminPayloadModal').classList.add('shown');
+      });
+    });
+    marketsEl.querySelectorAll('[data-admin-clear]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const market = btn.dataset.adminClear;
+        if (!confirm(`Clear ALL content for ${market}? This deletes news, social, and assets rows from dashboard_content. Audit log is preserved.`)) return;
+        try {
+          const { error } = await supabase.from('dashboard_content').delete().eq('market', market);
+          if (error) throw error;
+          alert(`Cleared ${market}.`);
+          loadAdminLog();
+        } catch(e) {
+          alert('Clear failed: ' + (e.message || 'unknown'));
+        }
+      });
+    });
+
+    // Activity log
+    if (!events.length) {
+      logEl.innerHTML = '<div class="admin-empty">No publishes yet.</div>';
+      meta.textContent = auditAvailable ? '0 entries.' : 'Audit log not configured — showing snapshot only.';
+    } else {
+      const note = auditAvailable
+        ? `${events.length} publish event${events.length === 1 ? '' : 's'} logged.`
+        : `Showing latest snapshot per (market, kind) — for full history, create the <code>dashboard_audit</code> table.`;
+      meta.innerHTML = note;
+
+      const body = events.slice(0, 100).map(r => `
+        <tr>
+          <td>${escAdm(fmtAbs(r.created_at))}<br><span style="color:var(--text-muted);font-size:11px">${escAdm(fmtRel(r.created_at))}</span></td>
+          <td><strong>${escAdm(r.market)}</strong></td>
+          <td>${escAdm(r.kind)}</td>
+          <td>${escAdm(r.updated_by) || '<em style="color:var(--text-muted)">—</em>'}</td>
+          <td>${r.item_count == null ? '—' : r.item_count}</td>
+        </tr>
+      `).join('');
+
+      logEl.innerHTML = `<table class="admin-log">
+        <thead><tr><th>When</th><th>Market</th><th>Kind</th><th>Published by</th><th>Items</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>${events.length > 100 ? `<div class="admin-empty">Showing latest 100 of ${events.length}.</div>` : ''}`;
     }
-
-    if (!rows.length) {
-      container.innerHTML = '<div class="admin-empty">No publishes yet.</div>';
-      meta.textContent = source === 'snapshot' ? 'Showing current dashboard_content (audit table not found).' : '0 entries.';
-      return;
-    }
-
-    const fmt = ts => new Date(ts).toLocaleString();
-    const escAdm = s => String(s == null ? '' : s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-
-    const headerNote = source === 'snapshot'
-      ? `Showing latest snapshot per (market, kind) — for full history, create the <code>dashboard_audit</code> table.`
-      : `${rows.length} publish event${rows.length === 1 ? '' : 's'} logged.`;
-    meta.innerHTML = headerNote;
-
-    const body = rows.map(r => `
-      <tr>
-        <td>${fmt(r.created_at)}</td>
-        <td><strong>${escAdm(r.market)}</strong></td>
-        <td>${escAdm(r.kind)}</td>
-        <td>${escAdm(r.updated_by) || '<em style="color:var(--text-muted)">—</em>'}</td>
-        <td>${r.item_count == null ? '—' : r.item_count}</td>
-      </tr>
-    `).join('');
-
-    container.innerHTML = `<table class="admin-log">
-      <thead><tr><th>When</th><th>Market</th><th>Kind</th><th>Published by</th><th>Items</th></tr></thead>
-      <tbody>${body}</tbody>
-    </table>`;
   }
+
+  document.getElementById('payloadModalClose').addEventListener('click', () => {
+    document.getElementById('adminPayloadModal').classList.remove('shown');
+  });
+  document.getElementById('adminPayloadModal').addEventListener('click', (e) => {
+    if (e.target.id === 'adminPayloadModal') e.target.classList.remove('shown');
+  });
 
   marketContinue.addEventListener('click', () => {
     const m = marketSelect.value;
