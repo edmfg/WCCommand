@@ -1992,25 +1992,15 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
       <button class="sub-tab" data-subtab="yt-genius" onclick="switchSubTab('yt-genius')">▶️ YT x Genius</button>
       <button class="sub-tab" data-subtab="fox-s2" onclick="switchSubTab('fox-s2')">📺 Fox S2</button>
     </div>
-    <div class="sub-panel active" id="sub-wc-engine">
+    <div class="sub-panel active" id="sub-wc-engine" data-subtab="engine">
       <div class="filter-bar" id="filterBar"></div>
       <div class="assets-grid" id="assetsGrid"></div>
     </div>
-    <div class="sub-panel" id="sub-yt-genius">
-      <div class="empty-state glass">
-        <span class="empty-icon">▶️</span>
-        <h3>YT x Genius</h3>
-        <p>Content coming soon. This section will house YouTube x Genius campaign assets.</p>
-        <button class="creative-lock-btn creative-upload-btn" data-creative-upload="yt-genius" style="display:none;margin-top:14px">+ Upload Asset</button>
-      </div>
+    <div class="sub-panel" id="sub-yt-genius" data-subtab="genius">
+      <div class="assets-grid" id="ytGeniusGrid"></div>
     </div>
-    <div class="sub-panel" id="sub-fox-s2">
-      <div class="empty-state glass">
-        <span class="empty-icon">📺</span>
-        <h3>Fox S2</h3>
-        <p>Content coming soon. This section will house Fox Season 2 campaign assets.</p>
-        <button class="creative-lock-btn creative-upload-btn" data-creative-upload="fox-s2" style="display:none;margin-top:14px">+ Upload Asset</button>
-      </div>
+    <div class="sub-panel" id="sub-fox-s2" data-subtab="s2">
+      <div class="assets-grid" id="foxS2Grid"></div>
     </div>
   </div>
 </main>
@@ -2476,6 +2466,8 @@ function init() {
   renderSocial();
   renderMatches();
   renderAssets();
+  renderSubtabAssets('genius');
+  renderSubtabAssets('s2');
   setupTabs();
   setupGemini();
   setupKeyboard();
@@ -2978,6 +2970,8 @@ function renderSentimentHeatmap() {
 function switchSubTab(id) {
   document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.dataset.subtab === id));
   document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === 'sub-' + id));
+  const map = { 'wc-engine': 'engine', 'yt-genius': 'genius', 'fox-s2': 's2' };
+  CURRENT_SUBTAB = map[id] || 'engine';
 }
 
 let fixtureView = 'calendar';
@@ -3318,6 +3312,8 @@ function setCreativeUnlocked(on) {
   else localStorage.removeItem(CREATIVE_UNLOCK_KEY);
   refreshCreativeLockUI();
   renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
+  renderSubtabAssets('genius');
+  renderSubtabAssets('s2');
 }
 function refreshCreativeLockUI() {
   const status = document.getElementById('creativeLockStatus');
@@ -3330,6 +3326,9 @@ function refreshCreativeLockUI() {
   if (btn) btn.textContent = unlocked ? 'Lock' : 'Unlock Upload';
   document.querySelectorAll('.creative-upload-btn').forEach(b => {
     b.style.display = unlocked ? 'inline-block' : 'none';
+  });
+  document.querySelectorAll('.creative-upload-tile').forEach(t => {
+    t.style.display = unlocked ? '' : 'none';
   });
 }
 function setupCreativeLock() {
@@ -3347,7 +3346,7 @@ function setupCreativeLock() {
       alert('Incorrect password.');
     }
   });
-  document.querySelectorAll('.creative-upload-btn').forEach(b => {
+  document.querySelectorAll('.creative-upload-btn, .creative-upload-tile').forEach(b => {
     b.addEventListener('click', () => {
       if (!isCreativeUnlocked()) return;
       openAssetUploadModal();
@@ -3355,7 +3354,62 @@ function setupCreativeLock() {
   });
 }
 
-// \u2500\u2500 User-uploaded assets (localStorage) \u2500\u2500
+// \u2500\u2500 Shared creative assets (Supabase Storage + creative_assets table) \u2500\u2500
+const CREATIVE_BUCKET = 'creative-assets';
+const CREATIVE_UPLOADER_LS_KEY = 'creative_uploader';
+let SHARED_CREATIVE_ASSETS = [];
+let CURRENT_SUBTAB = 'engine';
+
+function getCreativeSb() {
+  if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
+    mfgSyncSb = window.supabase.createClient(MFG_SUPABASE_URL, MFG_SUPABASE_KEY);
+  }
+  return mfgSyncSb;
+}
+
+async function fetchSharedAssets(silent = false) {
+  const sb = getCreativeSb();
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from('creative_assets')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    SHARED_CREATIVE_ASSETS = (data || []).map(r => ({
+      id: 'sa_' + r.id,
+      sharedId: r.id,
+      headline: r.headline,
+      market: r.market,
+      format: r.format,
+      status: r.status,
+      deployDate: r.deploy_date,
+      subtab: r.subtab || 'engine',
+      kind: r.kind,
+      youtubeUrl: r.youtube_url,
+      imageUrl: r.image_url,
+      uploadedBy: r.uploaded_by,
+      sharedUpload: true,
+      createdAt: r.created_at,
+    }));
+    renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
+    renderSubtabAssets('genius');
+    renderSubtabAssets('s2');
+  } catch(e) {
+    if (!silent) console.warn('fetchSharedAssets failed', e);
+  }
+}
+
+function getUploaderName() {
+  let n = localStorage.getItem(CREATIVE_UPLOADER_LS_KEY) || '';
+  if (!n) {
+    n = (window.prompt('Your name (used as uploader label):') || '').trim();
+    if (n) localStorage.setItem(CREATIVE_UPLOADER_LS_KEY, n);
+  }
+  return n || 'anonymous';
+}
+
+// \u2500\u2500 User-uploaded assets (localStorage drafts \u2014 pre-Supabase fallback) \u2500\u2500
 const ASSETS_LS_KEY = 'wc_user_assets';
 function loadUserAssets() {
   try { return JSON.parse(localStorage.getItem(ASSETS_LS_KEY) || '[]'); }
@@ -3376,60 +3430,103 @@ function youtubeIdFrom(url) {
   return null;
 }
 
+function buildAssetCardHtml(a, unlocked) {
+  const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
+  const sc = statusMap[a.status] || 'astatus-concept';
+  const ytId = a.kind === 'youtube' ? youtubeIdFrom(a.youtubeUrl) : null;
+  const formatEsc = escapeHtml(a.format || 'Asset');
+  const localImg = (typeof a.imageData === 'string' && a.imageData.startsWith('data:image/')) ? a.imageData : '';
+  const remoteImg = safeUrl(a.imageUrl);
+  let thumb;
+  if (a.kind === 'image' && localImg) {
+    thumb = `<img src="${escapeHtml(localImg)}" alt="" />`;
+  } else if (a.kind === 'image' && remoteImg) {
+    thumb = `<img src="${remoteImg}" alt="" />`;
+  } else if (ytId) {
+    thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
+  } else if (a.driveFileId) {
+    thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${formatEsc}</div>`;
+  } else {
+    thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${formatEsc}</div>`;
+  }
+  const ytHref = safeUrl(a.youtubeUrl);
+  const driveHref = safeUrl(a.driveUrl);
+  const link = ytHref
+    ? `<a href="${ytHref}" target="_blank" rel="noopener" class="asset-link">Open on YouTube \u2192</a>`
+    : driveHref
+      ? `<a href="${driveHref}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>`
+      : remoteImg
+        ? `<a href="${remoteImg}" target="_blank" rel="noopener" class="asset-link">Open full size \u2192</a>`
+        : '';
+  const removable = unlocked && (a.userUploaded || a.sharedUpload);
+  const removeBtn = removable
+    ? `<button class="asset-remove" data-asset-id="${escapeHtml(a.id)}" data-shared-id="${escapeHtml(a.sharedId || '')}" title="Remove">\u00d7</button>`
+    : '';
+  const dateStr = a.deployDate ? `Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}` : '';
+  const uploaderLine = a.uploadedBy ? `<span class="asset-date" style="color:var(--text-dim);font-size:11px">By ${escapeHtml(a.uploadedBy)}</span>` : '';
+  return `<div class="asset-card glass">
+    ${removeBtn}
+    <div class="asset-thumb">${thumb}</div>
+    <div class="asset-body">
+      <h4>${escapeHtml(a.headline)}</h4>
+      <div class="asset-meta">
+        ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ''}
+        ${a.status ? `<span class="asset-status-pill ${sc}">${escapeHtml(a.status)}</span>` : ''}
+      </div>
+      ${dateStr ? `<span class="asset-date">${escapeHtml(dateStr)}</span>` : ''}
+      ${uploaderLine}
+      ${link}
+    </div>
+  </div>`;
+}
+
+function getAssetsForSubtab(subtab) {
+  const userAssets = loadUserAssets().map(a => ({ ...a, subtab: a.subtab || 'engine' }));
+  const baseAssets = subtab === 'engine' ? DASHBOARD_DATA.assets : [];
+  return [
+    ...SHARED_CREATIVE_ASSETS.filter(a => (a.subtab || 'engine') === subtab),
+    ...userAssets.filter(a => a.subtab === subtab),
+    ...baseAssets,
+  ];
+}
+
+async function handleAssetRemove(btn, redrawSubtab) {
+  const sharedId = btn.dataset.sharedId;
+  const localId = btn.dataset.assetId;
+  if (!confirm('Remove this asset?')) return;
+  if (sharedId) {
+    const sb = getCreativeSb();
+    if (sb) {
+      try {
+        await sb.from('creative_assets').delete().eq('id', sharedId);
+      } catch(e) { console.warn('remote delete failed', e); }
+    }
+    SHARED_CREATIVE_ASSETS = SHARED_CREATIVE_ASSETS.filter(a => a.sharedId !== sharedId);
+  } else {
+    saveUserAssets(loadUserAssets().filter(a => a.id !== localId));
+  }
+  if (redrawSubtab === 'engine') {
+    renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
+  } else {
+    renderSubtabAssets(redrawSubtab);
+  }
+}
+
 function renderAssets(filter = 'All') {
   const grid = document.getElementById('assetsGrid');
-  const userAssets = loadUserAssets();
-  const all = [...userAssets, ...DASHBOARD_DATA.assets];
+  if (!grid) return;
+  const all = getAssetsForSubtab('engine');
   const filtered = all.filter(a => (filter === 'All' || a.market === filter) && matchesSearch(a));
 
   const unlocked = isCreativeUnlocked();
   const uploadCard = unlocked ? `
-    <div class="asset-card asset-upload-card glass" id="assetUploadTrigger">
+    <div class="asset-card asset-upload-card glass creative-upload-tile" data-creative-upload="engine">
       <div class="upload-plus">+</div>
       <div class="upload-label">Upload Asset</div>
       <div class="upload-sub">Screenshot or YouTube link</div>
     </div>` : '';
 
-  const cards = filtered.map(a => {
-    const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
-    const sc = statusMap[a.status] || 'astatus-concept';
-    const ytId = a.kind === 'youtube' ? youtubeIdFrom(a.youtubeUrl) : null;
-    const formatEsc = escapeHtml(a.format || 'Asset');
-    const safeImageSrc = (typeof a.imageData === 'string' && a.imageData.startsWith('data:image/')) ? a.imageData : '';
-    let thumb;
-    if (a.kind === 'image' && safeImageSrc) {
-      thumb = `<img src="${escapeHtml(safeImageSrc)}" alt="" />`;
-    } else if (ytId) {
-      thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
-    } else if (a.driveFileId) {
-      thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${formatEsc}</div>`;
-    } else {
-      thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${formatEsc}</div>`;
-    }
-    const ytHref = safeUrl(a.youtubeUrl);
-    const driveHref = safeUrl(a.driveUrl);
-    const link = ytHref
-      ? `<a href="${ytHref}" target="_blank" rel="noopener" class="asset-link">Open on YouTube \u2192</a>`
-      : driveHref
-        ? `<a href="${driveHref}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>`
-        : '';
-    const removeBtn = (a.userUploaded && unlocked) ? `<button class="asset-remove" data-asset-id="${escapeHtml(a.id)}" title="Remove">\u00d7</button>` : '';
-    const dateStr = a.deployDate ? `Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}` : '';
-    return `<div class="asset-card glass">
-      ${removeBtn}
-      <div class="asset-thumb">${thumb}</div>
-      <div class="asset-body">
-        <h4>${escapeHtml(a.headline)}</h4>
-        <div class="asset-meta">
-          ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ''}
-          ${a.status ? `<span class="asset-status-pill ${sc}">${escapeHtml(a.status)}</span>` : ''}
-        </div>
-        ${dateStr ? `<span class="asset-date">${escapeHtml(dateStr)}</span>` : ''}
-        ${link}
-      </div>
-    </div>`;
-  }).join('');
-
+  const cards = filtered.map(a => buildAssetCardHtml(a, unlocked)).join('');
   grid.innerHTML = uploadCard + cards;
 
   const bar = document.getElementById('filterBar');
@@ -3438,15 +3535,44 @@ function renderAssets(filter = 'All') {
   bar.querySelectorAll('.filter-pill').forEach(btn => {
     btn.addEventListener('click', () => renderAssets(btn.dataset.market));
   });
-  document.getElementById('assetUploadTrigger')?.addEventListener('click', openAssetUploadModal);
+  grid.querySelector('[data-creative-upload="engine"]')?.addEventListener('click', () => {
+    if (!isCreativeUnlocked()) return;
+    CURRENT_SUBTAB = 'engine';
+    openAssetUploadModal();
+  });
   grid.querySelectorAll('.asset-remove').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const id = btn.dataset.assetId;
-      if (!confirm('Remove this asset?')) return;
-      saveUserAssets(loadUserAssets().filter(a => a.id !== id));
-      renderAssets(filter);
-    });
+    btn.addEventListener('click', e => { e.stopPropagation(); handleAssetRemove(btn, 'engine'); });
+  });
+}
+
+function renderSubtabAssets(subtab) {
+  const gridId = subtab === 'genius' ? 'ytGeniusGrid' : subtab === 's2' ? 'foxS2Grid' : null;
+  if (!gridId) return;
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const unlocked = isCreativeUnlocked();
+  const items = getAssetsForSubtab(subtab);
+  const uploadCard = unlocked ? `
+    <div class="asset-card asset-upload-card glass creative-upload-tile" data-creative-upload="${subtab}">
+      <div class="upload-plus">+</div>
+      <div class="upload-label">Upload Asset</div>
+      <div class="upload-sub">Screenshot or YouTube link</div>
+    </div>` : '';
+  const cards = items.map(a => buildAssetCardHtml(a, unlocked)).join('');
+  const empty = !items.length && !unlocked
+    ? `<div class="empty-state glass" style="grid-column:1/-1">
+        <span class="empty-icon">${subtab === 'genius' ? '\u25b6\ufe0f' : '\ud83d\udcfa'}</span>
+        <h3>${subtab === 'genius' ? 'YT x Genius' : 'Fox S2'}</h3>
+        <p>No assets yet. Unlock upload to add the first one.</p>
+      </div>` : '';
+  grid.innerHTML = uploadCard + cards + empty;
+  grid.querySelector(`[data-creative-upload="${subtab}"]`)?.addEventListener('click', () => {
+    if (!isCreativeUnlocked()) return;
+    CURRENT_SUBTAB = subtab;
+    openAssetUploadModal();
+  });
+  grid.querySelectorAll('.asset-remove').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); handleAssetRemove(btn, subtab); });
   });
 }
 
@@ -3469,13 +3595,15 @@ function setupAssetUpload() {
   const fileInput = document.getElementById('assetFile');
   const ytInput = document.getElementById('assetYoutube');
   const preview = document.getElementById('assetPreview');
+  let selectedFile = null;
 
-  closeBtn.addEventListener('click', closeAssetUploadModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeAssetUploadModal(); });
+  closeBtn.addEventListener('click', () => { selectedFile = null; closeAssetUploadModal(); });
+  overlay.addEventListener('click', e => { if (e.target === overlay) { selectedFile = null; closeAssetUploadModal(); } });
 
   fileInput.addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
+    selectedFile = f;
     const reader = new FileReader();
     reader.onload = ev => {
       preview.innerHTML = `<img src="${ev.target.result}" alt="preview" />`;
@@ -3491,12 +3619,13 @@ function setupAssetUpload() {
       preview.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="preview" />`;
       preview.dataset.imageData = '';
       fileInput.value = '';
+      selectedFile = null;
     } else if (!preview.dataset.imageData) {
       preview.innerHTML = '';
     }
   });
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const title = document.getElementById('assetTitle').value.trim();
     const market = document.getElementById('assetMarket').value;
@@ -3507,22 +3636,76 @@ function setupAssetUpload() {
     const imageData = preview.dataset.imageData || '';
 
     if (!title) return;
-    if (!imageData && !ytUrl) { alert('Please upload a screenshot or paste a YouTube URL.'); return; }
+    if (!selectedFile && !ytUrl) { alert('Please upload a screenshot or paste a YouTube URL.'); return; }
 
-    const asset = {
-      id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-      headline: title,
-      market, format, status, deployDate,
-      kind: ytUrl ? 'youtube' : 'image',
-      userUploaded: true,
-      ...(ytUrl ? { youtubeUrl: ytUrl } : { imageData }),
-      createdAt: new Date().toISOString(),
-    };
-    const existing = loadUserAssets();
-    existing.unshift(asset);
-    saveUserAssets(existing);
+    const subtab = CURRENT_SUBTAB || 'engine';
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Uploading…'; }
+
+    const sb = getCreativeSb();
+    let savedRemote = false;
+
+    if (sb) {
+      try {
+        const uploader = getUploaderName();
+        let imageUrl = null;
+        if (selectedFile) {
+          const ext = (selectedFile.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '');
+          const path = `${subtab}/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+          const { error: upErr } = await sb.storage.from(CREATIVE_BUCKET).upload(path, selectedFile, {
+            cacheControl: '3600', upsert: false, contentType: selectedFile.type || undefined,
+          });
+          if (upErr) throw upErr;
+          const { data: urlData } = sb.storage.from(CREATIVE_BUCKET).getPublicUrl(path);
+          imageUrl = urlData?.publicUrl || null;
+        }
+        const { error: insErr } = await sb.from('creative_assets').insert({
+          headline: title,
+          market: market || null,
+          format: format || null,
+          status: status || null,
+          deploy_date: deployDate || null,
+          subtab,
+          kind: ytUrl ? 'youtube' : 'image',
+          youtube_url: ytUrl || null,
+          image_url: imageUrl,
+          uploaded_by: uploader,
+        });
+        if (insErr) throw insErr;
+        savedRemote = true;
+      } catch (err) {
+        console.error('Supabase upload failed, falling back to local draft', err);
+        alert('Supabase upload failed: ' + (err.message || err) + '\n\nSaving as a local draft on this device only.');
+      }
+    } else {
+      alert('Supabase not connected — saving as a local draft on this device only.');
+    }
+
+    if (!savedRemote) {
+      const asset = {
+        id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        headline: title,
+        market, format, status, deployDate,
+        subtab,
+        kind: ytUrl ? 'youtube' : 'image',
+        userUploaded: true,
+        ...(ytUrl ? { youtubeUrl: ytUrl } : { imageData }),
+        createdAt: new Date().toISOString(),
+      };
+      const existing = loadUserAssets();
+      existing.unshift(asset);
+      saveUserAssets(existing);
+    }
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save Asset'; }
+    selectedFile = null;
     closeAssetUploadModal();
-    renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
+    if (savedRemote) await fetchSharedAssets(true);
+    if (subtab === 'engine') {
+      renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
+    } else {
+      renderSubtabAssets(subtab);
+    }
   });
 }
 
@@ -3614,11 +3797,12 @@ async function fetchMfgLatest(silent = false) {
 
 function setupMfgSync() {
   const btn = document.getElementById('mfgSyncRefresh');
-  if (btn) btn.addEventListener('click', () => { fetchMfgLatest(false); fetchMarketContent(true); });
+  if (btn) btn.addEventListener('click', () => { fetchMfgLatest(false); fetchMarketContent(true); fetchSharedAssets(true); });
   fetchMfgLatest(true);
   fetchMarketContent(true);
+  fetchSharedAssets(true);
   if (mfgPollTimer) clearInterval(mfgPollTimer);
-  mfgPollTimer = setInterval(() => { fetchMfgLatest(true); fetchMarketContent(true); }, 5 * 60 * 1000);
+  mfgPollTimer = setInterval(() => { fetchMfgLatest(true); fetchMarketContent(true); fetchSharedAssets(true); }, 5 * 60 * 1000);
   setInterval(updateMfgSyncTime, 30 * 1000);
 }
 
