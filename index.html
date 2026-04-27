@@ -43,12 +43,52 @@ body{
 /* ── HEADER ── */
 .header{
   position:sticky;top:0;z-index:100;
-  background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
-  backdrop-filter:blur(30px) saturate(200%);
-  -webkit-backdrop-filter:blur(30px) saturate(200%);
-  border-bottom:3px solid var(--red);
-  box-shadow:0 4px 30px rgba(0,0,0,0.5),0 0 20px rgba(204,0,0,0.12);
-  padding:0 24px;
+  background:rgba(248,250,253,0.65);
+  -webkit-backdrop-filter:blur(28px) saturate(200%);
+  backdrop-filter:blur(28px) saturate(200%);
+  border-bottom:1px solid rgba(255,255,255,0.6);
+  box-shadow:
+    0 8px 30px rgba(15,23,42,0.08),
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 -1px 0 rgba(0,0,0,0.04) inset;
+  padding:0 24px;overflow:hidden;
+}
+.header::before, .header::after{
+  content:'';position:absolute;border-radius:50%;pointer-events:none;
+  filter:blur(60px);opacity:0.55;mix-blend-mode:screen;z-index:0;
+}
+.header::before{
+  width:420px;height:420px;left:-80px;top:-160px;
+  background:radial-gradient(circle,#7dd3fc 0%,transparent 70%);
+  animation:nav-blob-a 14s ease-in-out infinite alternate;
+}
+.header::after{
+  width:380px;height:380px;right:-60px;top:-180px;
+  background:radial-gradient(circle,#fca5a5 0%,#fde68a 60%,transparent 80%);
+  animation:nav-blob-b 18s ease-in-out infinite alternate;
+}
+.header > *{position:relative;z-index:1}
+.header-inner::after{
+  content:'';position:absolute;left:30%;top:-40px;width:300px;height:160px;
+  background:radial-gradient(ellipse,rgba(196,181,253,0.55) 0%,transparent 70%);
+  filter:blur(50px);opacity:0.5;pointer-events:none;z-index:0;
+  animation:nav-blob-c 16s ease-in-out infinite alternate;
+}
+.header-inner > *{position:relative;z-index:1}
+@keyframes nav-blob-a{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(120px,30px) scale(1.15)}
+  100%{transform:translate(40px,-20px) scale(0.95)}
+}
+@keyframes nav-blob-b{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(-100px,40px) scale(1.1)}
+  100%{transform:translate(-30px,-30px) scale(0.9)}
+}
+@keyframes nav-blob-c{
+  0%{transform:translate(0,0) scale(1);opacity:0.5}
+  50%{transform:translate(-80px,20px) scale(1.2);opacity:0.7}
+  100%{transform:translate(60px,-10px) scale(0.95);opacity:0.4}
 }
 .header .brand{
   background:linear-gradient(135deg,#0a1628 0%,#1a3a6b 50%,#cc0000 100%);
@@ -61,7 +101,7 @@ body{
 .header .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12);color:#333}
 .header .theme-toggle:hover{background:rgba(0,0,0,0.1)}
 .header-inner{
-  max-width:1400px;margin:0 auto;
+  max-width:1400px;margin:0 auto;position:relative;
   display:flex;align-items:center;justify-content:space-between;
   height:72px;gap:16px;flex-wrap:wrap;
 }
@@ -198,7 +238,7 @@ body.light{
 body.light{background:var(--bg);color:var(--text)}
 body.light .bg-blobs{opacity:0.3}
 body.light .stadium-light{background:radial-gradient(ellipse at 50% 0%,rgba(204,0,0,0.04) 0%,transparent 60%)}
-body.light .header{background:linear-gradient(180deg,#fff 0%,#f5f5fa 100%);border-bottom-color:var(--red)}
+body.light .header{background:rgba(255,255,255,0.7);border-bottom-color:rgba(255,255,255,0.6)}
 body.light .brand{
   background:linear-gradient(135deg,#1a1a2e 0%,var(--red) 40%,var(--gold) 70%,var(--red) 100%);
   background-size:200% 200%;-webkit-background-clip:text;background-clip:text;
@@ -777,12 +817,15 @@ body.light .cal-3rd{color:#2e7d32}
 
 /* ── BETA BADGE ── */
 .beta-badge{
-  display:inline-block;margin-left:8px;padding:2px 8px;
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.6rem;
-  letter-spacing:2px;text-transform:uppercase;color:#000;
+  display:inline-block;margin-left:8px;padding:3px 9px;
+  font-family:'Oswald',sans-serif;font-weight:800;font-size:0.6rem;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:#1a1a2e;
   background:linear-gradient(135deg,var(--gold),#ffae00);
+  -webkit-background-clip:padding-box;background-clip:padding-box;
+  -webkit-text-fill-color:#1a1a2e;
   border-radius:4px;vertical-align:middle;
-  box-shadow:0 0 12px rgba(255,215,0,0.4);
+  box-shadow:0 0 12px rgba(255,215,0,0.45),0 1px 0 rgba(255,255,255,0.5) inset;
   animation:beta-pulse 2.5s ease-in-out infinite;
 }
 @keyframes beta-pulse{
@@ -1186,7 +1229,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="brand"><img src="assets/mfg-logo.png" alt="Media Futures Group" class="brand-logo"><span>World Cup HQ</span><span class="beta-badge">Beta</span></div>
+    <div class="brand"><img src="assets/mfg-logo.png" alt="Media Futures Group" class="brand-logo"><span>World Cup HQ</span><span class="beta-badge">BETA</span></div>
     <nav class="header-nav">
       <button class="tab-btn active" data-tab="live">Live</button>
       <button class="tab-btn" data-tab="calendar">Fixtures</button>
