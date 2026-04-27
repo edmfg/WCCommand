@@ -336,7 +336,7 @@ body.light .gemini-input{background:rgba(0,0,0,0.04);color:#333;border-color:rgb
   z-index:1;flex-shrink:0;
 }
 .ticker-track{
-  display:flex;animation:marquee 60s linear infinite;white-space:nowrap;
+  display:flex;animation:marquee 140s linear infinite;white-space:nowrap;
 }
 .ticker-bar:hover .ticker-track{animation-play-state:paused}
 .ticker-item{
@@ -410,19 +410,50 @@ body.light .live-filter.active{background:var(--red);color:#fff}
 .news-col,.social-col{}
 /* Card carousel — 3 visible, stacked absolutely for zero layout shift */
 .card-carousel{
-  position:relative;
+  position:relative;overflow:hidden;
   height:calc(180px * 3 + 10px * 2); /* 3 cards + 2 gaps */
 }
 .carousel-page{
   position:absolute;inset:0;
   display:flex;flex-direction:column;gap:10px;
-  opacity:0;transform:translateY(10px);
-  transition:opacity 0.4s ease,transform 0.4s ease;
-  pointer-events:none;
+  opacity:0;transform:translateX(60px);
+  transition:opacity 0.55s var(--transition), transform 0.55s var(--transition);
+  pointer-events:none;will-change:transform,opacity;
 }
 .carousel-page.active{
-  opacity:1;transform:translateY(0);pointer-events:auto;
+  opacity:1;transform:translateX(0);pointer-events:auto;
 }
+.carousel-page.exit-left{
+  opacity:0;transform:translateX(-60px);
+}
+.carousel-page.enter-left{
+  opacity:0;transform:translateX(-60px);
+}
+.carousel-page .carousel-card{position:relative}
+.card-pin{
+  position:absolute;top:8px;right:8px;z-index:6;
+  width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.7);font-size:0.85rem;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.2s, background 0.2s, transform 0.2s, color 0.2s;
+}
+.carousel-card:hover .card-pin{opacity:1}
+.card-pin:hover{background:rgba(0,0,0,0.7);color:#fff;transform:scale(1.1)}
+.card-pin.pinned{
+  opacity:1;background:linear-gradient(135deg,var(--gold),#ffae00);color:#1a1a2e;
+  box-shadow:0 0 12px rgba(255,215,0,0.5);
+}
+.carousel-pinned-banner{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--gold);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.carousel-pinned-banner button{
+  background:none;border:1px solid rgba(255,215,0,0.4);color:var(--gold);
+  padding:3px 10px;border-radius:12px;font-size:0.6rem;cursor:pointer;
+  font-family:'Oswald',sans-serif;letter-spacing:1px;
+}
+.carousel-pinned-banner button:hover{background:rgba(255,215,0,0.1)}
 .carousel-page .carousel-card{
   height:180px;
 }
@@ -754,6 +785,45 @@ body.light .card-modal h3{background:linear-gradient(90deg,#1a1a2e,var(--red));-
 body.light .card-modal-close:hover{color:#000}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+/* ── STANDINGS ── */
+.standings-banner{padding:12px 18px;margin-bottom:18px;font-size:0.82rem;color:var(--text-dim);border-radius:10px;border-left:3px solid var(--gold)}
+.standings-banner strong{color:var(--text);margin-right:6px}
+.standings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.standings-group{padding:14px 16px;border-radius:12px}
+.standings-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;
+  text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;
+  color:var(--gold);
+  border-bottom:1px solid var(--border);padding-bottom:8px;
+}
+body.light .standings-title{color:var(--red)}
+.standings-table{width:100%;border-collapse:collapse;font-size:0.78rem}
+.standings-table th{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);
+  text-align:center;padding:6px 4px;font-weight:600;
+}
+.standings-table th:nth-child(2){text-align:left}
+.standings-table td{padding:7px 4px;text-align:center;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.05)}
+body.light .standings-table td{border-bottom-color:rgba(0,0,0,0.05)}
+.standings-table td:nth-child(2){text-align:left;font-weight:500}
+.standings-rank{font-family:'Oswald',sans-serif;font-weight:700;color:var(--text-dim);width:24px}
+.standings-flag{margin-right:6px}
+.standings-pts{font-family:'Oswald',sans-serif;font-weight:800;color:var(--gold)}
+body.light .standings-pts{color:var(--red)}
+.standings-gd{font-weight:600}
+.gd-pos{color:#34c759}
+.gd-neg{color:#ff453a}
+.standings-qual{background:linear-gradient(90deg,rgba(34,197,94,0.08),transparent)}
+.standings-qual .standings-rank{color:#34c759}
+.standings-bubble{background:linear-gradient(90deg,rgba(255,193,7,0.08),transparent)}
+.standings-bubble .standings-rank{color:#ffc107}
+.standings-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:0.72rem;color:var(--text-dim);justify-content:center}
+.standings-legend span{display:flex;align-items:center;gap:6px}
+.standings-key{width:14px;height:14px;border-radius:3px;display:inline-block}
+.standings-key.standings-qual{background:rgba(34,197,94,0.4)}
+.standings-key.standings-bubble{background:rgba(255,193,7,0.4)}
+
 /* ── FIXTURES CALENDAR ── */
 .week-strip{margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;backdrop-filter:blur(12px)}
 .week-strip-label{
@@ -852,6 +922,72 @@ body.light .cal-3rd{color:#2e7d32}
   .week-day-num{font-size:1.1rem}
   .week-day-count{font-size:0.6rem}
 }
+
+/* ── MFG SYNC ── */
+.mfg-sync{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;margin-bottom:18px;border-radius:10px;font-size:0.78rem;
+}
+.mfg-sync-left,.mfg-sync-right{display:flex;align-items:center;gap:10px}
+.mfg-sync-dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);
+  box-shadow:0 0 0 0 rgba(255,255,255,0);transition:all 0.3s;
+}
+.mfg-sync-live{background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,0.6);animation:mfg-pulse 2.4s ease-in-out infinite}
+.mfg-sync-syncing{background:#3b82f6;animation:mfg-pulse 1s linear infinite}
+.mfg-sync-idle{background:#9ca3af}
+.mfg-sync-error{background:#ef4444;animation:mfg-pulse 1.4s ease-in-out infinite}
+@keyframes mfg-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}
+  50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}
+}
+.mfg-sync-label{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;font-size:0.7rem;color:var(--text)}
+.mfg-sync-status{color:var(--text-dim);font-size:0.75rem}
+.mfg-sync-time{color:var(--text-dim);font-size:0.72rem;font-style:italic}
+.mfg-sync-btn{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text-dim);width:28px;height:28px;border-radius:50%;cursor:pointer;
+  font-size:0.95rem;line-height:1;display:flex;align-items:center;justify-content:center;
+  transition:all 0.25s;
+}
+.mfg-sync-btn:hover{background:rgba(255,255,255,0.12);color:var(--text);transform:rotate(180deg)}
+body.light .mfg-sync-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
+
+/* ── SENTIMENT HEATMAP ── */
+.heatmap-wrap{padding:16px 20px;margin-bottom:22px;border-radius:12px}
+.heatmap-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.heatmap-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.9rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text);
+  background:linear-gradient(90deg,#fff,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+body.light .heatmap-title{background:linear-gradient(90deg,#1a1a2e,var(--red));-webkit-background-clip:text;background-clip:text}
+.heatmap-sub{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.5px}
+.heatmap-grid{
+  display:grid;grid-template-columns:90px repeat(3,1fr);gap:4px;
+}
+.heatmap-corner{background:transparent}
+.heatmap-col-label{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);
+  text-align:center;padding:4px;
+}
+.heatmap-row-label{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.78rem;
+  text-transform:uppercase;letter-spacing:1.2px;color:var(--text);
+  display:flex;align-items:center;padding-right:8px;
+}
+.heatmap-cell{
+  border-radius:6px;padding:14px 8px;text-align:center;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;color:#fff;
+  transition:transform 0.2s;cursor:default;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.heatmap-cell:hover{transform:scale(1.03)}
+.heatmap-val{text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+body.light .heatmap-cell{color:#1a1a2e;border-color:rgba(0,0,0,0.06)}
+body.light .heatmap-val{text-shadow:none}
 
 /* ── ASSET UPLOAD ── */
 .asset-upload-card{
@@ -1383,6 +1519,29 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   <!-- LIVE -->
   <div class="tab-panel active" id="panel-live">
     <div class="live-filters" id="liveFilters"></div>
+
+    <!-- MFG Sync indicator -->
+    <div class="mfg-sync glass" id="mfgSync">
+      <div class="mfg-sync-left">
+        <span class="mfg-sync-dot" id="mfgSyncDot"></span>
+        <span class="mfg-sync-label">MFG Mode</span>
+        <span class="mfg-sync-status" id="mfgSyncStatus">Connecting…</span>
+      </div>
+      <div class="mfg-sync-right">
+        <span class="mfg-sync-time" id="mfgSyncTime"></span>
+        <button class="mfg-sync-btn" id="mfgSyncRefresh" title="Refresh now">⟳</button>
+      </div>
+    </div>
+
+    <!-- Sentiment Heatmap -->
+    <div class="heatmap-wrap glass" id="heatmapWrap">
+      <div class="heatmap-header">
+        <h3 class="heatmap-title">Sentiment Heatmap</h3>
+        <span class="heatmap-sub">Volume by market × sentiment (current social signal)</span>
+      </div>
+      <div class="heatmap-grid" id="sentimentHeatmap"></div>
+    </div>
+
     <div class="live-grid">
       <div class="news-col">
         <div class="carousel-controls">
@@ -1420,6 +1579,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
       <button class="view-btn active" data-view="calendar" onclick="setFixtureView('calendar')">🗓️ Calendar</button>
       <button class="view-btn" data-view="date" onclick="setFixtureView('date')">📅 By Date</button>
       <button class="view-btn" data-view="group" onclick="setFixtureView('group')">🏟️ By Group</button>
+      <button class="view-btn" data-view="standings" onclick="setFixtureView('standings')">📊 Standings</button>
       <select class="group-filter" id="groupFilter" onchange="renderMatches()">
         <option value="all">All Stages</option>
         <option value="Group A">Group A</option><option value="Group B">Group B</option>
@@ -1745,6 +1905,7 @@ function init() {
   setupSearch();
   setupCardExpand();
   setupAssetUpload();
+  setupMfgSync();
   handleHash();
 }
 
@@ -1861,35 +2022,71 @@ function matchesLiveFilter(item, type) {
   return true;
 }
 
-// ── Card Carousel Engine (3 per page, absolute positioning, zero layout shift) ──
+// ── Card Carousel Engine (3 per page, slide motion, pin + hover-pause) ──
+const PINNED_LS_KEY = 'wc_pinned_cards';
+function loadPinned() {
+  try { return new Set(JSON.parse(localStorage.getItem(PINNED_LS_KEY) || '[]')); }
+  catch { return new Set(); }
+}
+function savePinned(set) {
+  try { localStorage.setItem(PINNED_LS_KEY, JSON.stringify([...set])); } catch {}
+}
+function togglePin(id) {
+  const pinned = loadPinned();
+  if (pinned.has(id)) pinned.delete(id); else pinned.add(id);
+  savePinned(pinned);
+  renderNews(); renderSocial();
+}
+
 function createCarousel(containerId, dotsId, interval = 5000) {
-  let page = 0, pageCount = 0, timer = null;
+  let page = 0, pageCount = 0, timer = null, hoverPaused = false;
   const perPage = 3;
   const container = document.getElementById(containerId);
   const dotsEl = document.getElementById(dotsId);
   const name = containerId === 'newsCards' ? 'newsCarousel' : 'socialCarousel';
 
-  function showPage(p) {
+  function showPage(p, dir = 1) {
     const pages = container.querySelectorAll('.carousel-page');
     if (!pages.length) return;
-    page = ((p % pageCount) + pageCount) % pageCount;
-    pages.forEach((pg, i) => pg.classList.toggle('active', i === page));
+    const next = ((p % pageCount) + pageCount) % pageCount;
+    if (next === page) return;
+
+    const current = pages[page];
+    const incoming = pages[next];
+
+    // Set incoming start position based on direction
+    incoming.classList.remove('active','exit-left','enter-left');
+    if (dir < 0) incoming.classList.add('enter-left');
+    // force reflow
+    void incoming.offsetWidth;
+
+    if (current) {
+      current.classList.remove('active');
+      if (dir < 0) current.classList.remove('exit-left');
+      else current.classList.add('exit-left');
+    }
+    incoming.classList.remove('enter-left');
+    incoming.classList.add('active');
+
+    page = next;
     dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === page));
   }
 
-  function next() { showPage(page + 1); resetTimer(); }
-  function prev() { showPage(page - 1); resetTimer(); }
-  function goTo(i) { showPage(i); resetTimer(); }
+  function next() { showPage(page + 1, 1); resetTimer(); }
+  function prev() { showPage(page - 1, -1); resetTimer(); }
+  function goTo(i) {
+    const dir = i > page ? 1 : -1;
+    showPage(i, dir); resetTimer();
+  }
 
   function resetTimer() {
     if (timer) clearInterval(timer);
-    if (pageCount > 1) timer = setInterval(() => showPage(page + 1), interval);
+    if (pageCount > 1 && !hoverPaused) timer = setInterval(() => showPage(page + 1, 1), interval);
   }
 
   function setCards(cardHtmlArray, count) {
     pageCount = Math.ceil(count / perPage);
     page = 0;
-    // Group cards into pages of 3
     let pagesHtml = '';
     for (let p = 0; p < pageCount; p++) {
       const start = p * perPage;
@@ -1903,8 +2100,8 @@ function createCarousel(containerId, dotsId, interval = 5000) {
     resetTimer();
   }
 
-  container.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
-  container.addEventListener('mouseleave', resetTimer);
+  container.addEventListener('mouseenter', () => { hoverPaused = true; if (timer) clearInterval(timer); });
+  container.addEventListener('mouseleave', () => { hoverPaused = false; resetTimer(); });
 
   return { next, prev, goTo, setCards };
 }
@@ -1913,7 +2110,9 @@ let newsCarousel = createCarousel('newsCards', 'newsDots', 2800);
 let socialCarousel = createCarousel('socialCards', 'socialDots', 3200);
 
 function renderNews() {
-  const filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news') && matchesSearch(n));
+  let filtered = DASHBOARD_DATA.news.filter(n => matchesLiveFilter(n, 'news') && matchesSearch(n));
+  const pinned = loadPinned();
+  filtered = [...filtered].sort((a,b) => (pinned.has(b.id)?1:0) - (pinned.has(a.id)?1:0));
   if (!filtered.length) {
     document.getElementById('newsCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
     document.getElementById('newsDots').innerHTML = '';
@@ -1924,7 +2123,9 @@ function renderNews() {
     const tagLabel = n.tag || 'General';
     const time = new Date(n.timestamp);
     const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    const isPinned = pinned.has(n.id);
     return `<div class="carousel-card"><div class="news-card glass" data-card-type="news" data-card-id="${n.id}">
+      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${n.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '\u2605' : '\u2606'}</button>
       <span class="tag ${tagClass}">${tagLabel}</span>
       <h3>${n.headline}</h3>
       <p class="meta">${n.source} \u2022 ${timeStr}</p>
@@ -1935,7 +2136,10 @@ function renderNews() {
 }
 
 function renderSocial() {
-  const filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social') && matchesSearch(s));
+  let filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social') && matchesSearch(s));
+  const pinned = loadPinned();
+  filtered = [...filtered].sort((a,b) => (pinned.has(b.id)?1:0) - (pinned.has(a.id)?1:0));
+  renderSentimentHeatmap();
   if (!filtered.length) {
     document.getElementById('socialCards').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No social trends match this filter.</p>';
     document.getElementById('socialDots').innerHTML = '';
@@ -1944,7 +2148,9 @@ function renderSocial() {
   const cards = filtered.map(s => {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
     const quoteHtml = s.sampleQuote ? `<p class="quote">${s.sampleQuote}</p>` : '';
+    const isPinned = pinned.has(s.id);
     return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${s.id}">
+      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${s.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '★' : '☆'}</button>
       <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
       <h3 class="topic">${s.topic}</h3>
       <p class="volume">${s.volume}</p>
@@ -1954,6 +2160,67 @@ function renderSocial() {
     </div></div>`;
   });
   socialCarousel.setCards(cards, filtered.length);
+}
+
+// ── Pin click delegation ──
+document.addEventListener('click', e => {
+  const pinBtn = e.target.closest('.card-pin');
+  if (!pinBtn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  togglePin(pinBtn.dataset.pinId);
+});
+
+// ── #6: Sentiment heatmap (market × sentiment density) ──
+function classifySocialMarket(s) {
+  const t = ((s.topic || '') + ' ' + (s.summary || '')).toLowerCase();
+  if (t.includes('canada') || t.includes('🇨🇦') || t.includes('davies') || t.includes('marsch')) return 'Canada';
+  if (t.includes('germany') || t.includes('🇩🇪') || t.includes('nagelsmann') || t.includes('wirtz') || t.includes('musiala')) return 'Germany';
+  if (t.includes('🏴') || t.includes('england') || t.includes('tuchel') || t.includes('bellingham') || t.includes('kane')) return 'UK';
+  if (t.includes('🇺🇸') || t.includes('usmnt') || t.includes('pochettino') || t.includes('diego luna') || t.includes('tolkin') || t.includes('klinsmann')) return 'USA';
+  return 'Global';
+}
+function volumeWeight(v) {
+  if (!v) return 1;
+  return Math.max(1, (v.match(/🔥/g) || []).length);
+}
+function renderSentimentHeatmap() {
+  const el = document.getElementById('sentimentHeatmap');
+  if (!el) return;
+  const markets = ['Canada','Germany','UK','USA','Global'];
+  const sentiments = ['positive','mixed','negative'];
+  const grid = {};
+  markets.forEach(m => grid[m] = { positive: 0, mixed: 0, negative: 0, items: { positive:[], mixed:[], negative:[] } });
+
+  DASHBOARD_DATA.social.forEach(s => {
+    const m = classifySocialMarket(s);
+    const sent = s.sentiment || 'mixed';
+    const w = volumeWeight(s.volume);
+    grid[m][sent] += w;
+    grid[m].items[sent].push(s.topic);
+  });
+
+  let max = 0;
+  markets.forEach(m => sentiments.forEach(s => { max = Math.max(max, grid[m][s]); }));
+  if (max === 0) max = 1;
+
+  const sentColor = { positive: '34,197,94', mixed: '234,179,8', negative: '239,68,68' };
+  const sentEmoji = { positive: '🟢', mixed: '🟡', negative: '🔴' };
+
+  let html = '<div class="heatmap-corner"></div>';
+  sentiments.forEach(s => html += `<div class="heatmap-col-label">${sentEmoji[s]} ${s}</div>`);
+  markets.forEach(m => {
+    html += `<div class="heatmap-row-label">${m}</div>`;
+    sentiments.forEach(s => {
+      const v = grid[m][s];
+      const intensity = v / max;
+      const tooltip = v ? `${v} pts • ${grid[m].items[s].slice(0,3).join(' / ')}${grid[m].items[s].length>3?' …':''}` : 'No signal';
+      html += `<div class="heatmap-cell" style="background:rgba(${sentColor[s]},${0.08 + intensity * 0.55})" title="${tooltip.replace(/"/g,'&quot;')}">
+        <span class="heatmap-val">${v || ''}</span>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
 }
 
 function switchSubTab(id) {
@@ -2115,6 +2382,67 @@ function renderWeekStrip(matches) {
   </div>`;
 }
 
+// ── #9: Group Standings ──
+function computeGroupStandings(matches) {
+  const groups = {};
+  matches.filter(m => m.stage && m.stage.startsWith('Group ')).forEach(m => {
+    const g = m.stage;
+    if (!groups[g]) groups[g] = {};
+    [m.home, m.away].forEach(t => {
+      if (!groups[g][t.code]) {
+        groups[g][t.code] = { name: t.name, code: t.code, flag: t.flag, P:0, W:0, D:0, L:0, GF:0, GA:0, GD:0, Pts:0 };
+      }
+    });
+    if (m.score && m.score.home != null && m.score.away != null) {
+      const h = groups[g][m.home.code], a = groups[g][m.away.code];
+      h.P++; a.P++;
+      h.GF += m.score.home; h.GA += m.score.away; h.GD = h.GF - h.GA;
+      a.GF += m.score.away; a.GA += m.score.home; a.GD = a.GF - a.GA;
+      if (m.score.home > m.score.away) { h.W++; h.Pts+=3; a.L++; }
+      else if (m.score.home < m.score.away) { a.W++; a.Pts+=3; h.L++; }
+      else { h.D++; a.D++; h.Pts++; a.Pts++; }
+    }
+  });
+  return groups;
+}
+function renderStandingsView(matches) {
+  const groups = computeGroupStandings(matches);
+  const groupKeys = Object.keys(groups).sort();
+  if (!groupKeys.length) return '<p style="color:var(--text-dim);font-size:0.85rem;padding:40px;text-align:center">No group matches available.</p>';
+
+  const totalPlayed = matches.filter(m => m.score).length;
+  const banner = totalPlayed === 0
+    ? `<div class="standings-banner glass"><strong>No matches played yet.</strong> Tables will populate automatically as group-stage results arrive (kickoff June 11, 2026). Live preview shows team list per group.</div>`
+    : `<div class="standings-banner glass"><strong>${totalPlayed} match${totalPlayed===1?'':'es'} played.</strong> Standings auto-compute from match scores in fixture data.</div>`;
+
+  const tables = groupKeys.map(g => {
+    const teams = Object.values(groups[g]).sort((a,b) => b.Pts - a.Pts || b.GD - a.GD || b.GF - a.GF || a.name.localeCompare(b.name));
+    return `<div class="standings-group glass">
+      <h3 class="standings-title">${g}</h3>
+      <table class="standings-table">
+        <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+        <tbody>${teams.map((t,i) => {
+          const qualClass = i < 2 ? 'standings-qual' : (i === 2 ? 'standings-bubble' : '');
+          return `<tr class="${qualClass}">
+            <td class="standings-rank">${i+1}</td>
+            <td class="standings-team"><span class="standings-flag">${t.flag}</span>${t.name}</td>
+            <td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td>
+            <td>${t.GF}</td><td>${t.GA}</td>
+            <td class="standings-gd ${t.GD>0?'gd-pos':t.GD<0?'gd-neg':''}">${t.GD>0?'+':''}${t.GD}</td>
+            <td class="standings-pts">${t.Pts}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  return `${banner}<div class="standings-grid">${tables}</div>
+    <div class="standings-legend">
+      <span><i class="standings-key standings-qual"></i>Top 2: advance</span>
+      <span><i class="standings-key standings-bubble"></i>3rd: best 3rds bracket</span>
+    </div>`;
+}
+
 function renderMatches() {
   const container = document.getElementById('matchList');
   const filterVal = document.getElementById('groupFilter').value;
@@ -2125,6 +2453,11 @@ function renderMatches() {
 
   if (fixtureView === 'calendar') {
     container.innerHTML = renderCalendarView(matches);
+    return;
+  }
+
+  if (fixtureView === 'standings') {
+    container.innerHTML = renderStandingsView(matches);
     return;
   }
 
@@ -2346,6 +2679,78 @@ function handleHash() {
   if (['live', 'calendar', 'creative'].includes(hash)) switchTab(hash);
 }
 window.addEventListener('hashchange', handleHash);
+
+// ── #7: MFG Mode auto-refresh ──
+const MFG_SUPABASE_URL = 'https://ypisjfefbccgtxesteja.supabase.co';
+const MFG_SUPABASE_KEY = 'sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d';
+const MFG_LS_KEY = 'mfg_dashboard_updates';
+let mfgSyncSb = null;
+let mfgLastSyncedAt = null;
+let mfgPollTimer = null;
+
+function setMfgSyncStatus(state, label) {
+  const dot = document.getElementById('mfgSyncDot');
+  const status = document.getElementById('mfgSyncStatus');
+  if (!dot) return;
+  dot.className = 'mfg-sync-dot mfg-sync-' + state;
+  if (label) status.textContent = label;
+}
+function updateMfgSyncTime() {
+  const el = document.getElementById('mfgSyncTime');
+  if (!el || !mfgLastSyncedAt) return;
+  const diff = Math.floor((Date.now() - mfgLastSyncedAt) / 1000);
+  let txt;
+  if (diff < 5) txt = 'just now';
+  else if (diff < 60) txt = `${diff}s ago`;
+  else if (diff < 3600) txt = `${Math.floor(diff/60)}m ago`;
+  else txt = `${Math.floor(diff/3600)}h ago`;
+  el.textContent = `Synced ${txt}`;
+}
+
+async function fetchMfgLatest(silent = false) {
+  if (!silent) setMfgSyncStatus('syncing', 'Syncing…');
+  try {
+    if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
+      mfgSyncSb = window.supabase.createClient(MFG_SUPABASE_URL, MFG_SUPABASE_KEY);
+    }
+    let latest = null;
+    if (mfgSyncSb) {
+      const { data, error } = await mfgSyncSb
+        .from('dashboard_updates')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (!error && data && data.length) latest = data[0];
+    }
+    if (!latest) {
+      const ls = JSON.parse(localStorage.getItem(MFG_LS_KEY) || '[]');
+      if (ls.length) latest = ls[0];
+    }
+
+    mfgLastSyncedAt = Date.now();
+    if (latest) {
+      setMfgSyncStatus('live', 'Live');
+      const ageMin = Math.floor((Date.now() - new Date(latest.created_at).getTime()) / 60000);
+      const ageLabel = ageMin < 60 ? `${ageMin}m` : `${Math.floor(ageMin/60)}h`;
+      document.getElementById('mfgSyncStatus').textContent = `Latest upload ${ageLabel} ago`;
+    } else {
+      setMfgSyncStatus('idle', 'No uploads yet');
+    }
+    updateMfgSyncTime();
+  } catch(e) {
+    console.warn('MFG sync failed', e);
+    setMfgSyncStatus('error', 'Connection error');
+  }
+}
+
+function setupMfgSync() {
+  const btn = document.getElementById('mfgSyncRefresh');
+  if (btn) btn.addEventListener('click', () => fetchMfgLatest(false));
+  fetchMfgLatest(true);
+  if (mfgPollTimer) clearInterval(mfgPollTimer);
+  mfgPollTimer = setInterval(() => fetchMfgLatest(true), 5 * 60 * 1000); // 5 min
+  setInterval(updateMfgSyncTime, 30 * 1000); // tick the "Xm ago" label
+}
 
 function setupCardExpand() {
   const overlay = document.getElementById('cardModalOverlay');
