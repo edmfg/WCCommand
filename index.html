@@ -188,6 +188,14 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
   transition:all 0.3s var(--transition);
 }
 .mfg-link:hover{background:rgba(125,211,252,0.15);box-shadow:0 0 16px rgba(125,211,252,0.2)}
+.help-link{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.78rem;
+  text-transform:uppercase;letter-spacing:1.2px;
+  padding:7px 16px;cursor:pointer;color:#a78bfa;
+  background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);
+  border-radius:999px;transition:all 0.25s var(--transition);
+}
+.help-link:hover{background:rgba(167,139,250,0.2);box-shadow:0 0 16px rgba(167,139,250,0.3);transform:translateY(-1px)}
 .gemini-toggle{
   position:fixed;bottom:62px;right:24px;z-index:9000;
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
@@ -1074,6 +1082,74 @@ body.light .heatmap-val{text-shadow:none}
 .heatmap-clear:hover{background:rgba(255,215,0,0.15);border-color:var(--gold);color:var(--gold)}
 body.light .heatmap-clear{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
 
+/* ── HELP MODAL ── */
+.help-overlay{
+  position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,0.65);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  animation:fadeIn 0.2s ease;
+}
+.help-overlay.open{display:flex}
+.help-modal{
+  background:rgba(20,22,30,0.96);border:1px solid rgba(255,255,255,0.1);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border-radius:14px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:32px 36px;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,0.55);
+  animation:fadeUp 0.3s var(--transition);
+}
+body.light .help-modal{background:rgba(255,255,255,0.98);box-shadow:0 30px 80px rgba(0,0,0,0.18);border-color:rgba(0,0,0,0.08)}
+.help-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.4rem;
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;
+  background:linear-gradient(90deg,#a78bfa,#c084fc);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.help-sub{font-size:0.85rem;color:var(--text-dim);margin-bottom:18px;line-height:1.5}
+.help-form{display:flex;flex-direction:column;gap:14px}
+.help-form label{
+  display:flex;flex-direction:column;gap:6px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+}
+.help-form input,.help-form select,.help-form textarea{
+  padding:10px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;
+  letter-spacing:0;text-transform:none;font-weight:400;resize:vertical;
+}
+body.light .help-form input,body.light .help-form select,body.light .help-form textarea{
+  background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.12);
+}
+.help-form input:focus,.help-form select:focus,.help-form textarea:focus{outline:2px solid #a78bfa;outline-offset:1px}
+.help-submit{
+  margin-top:6px;padding:12px 18px;border:none;cursor:pointer;border-radius:8px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
+  letter-spacing:2px;text-transform:uppercase;color:#fff;
+  background:linear-gradient(135deg,#a78bfa,#7c3aed);
+  box-shadow:0 6px 16px rgba(167,139,250,0.35);
+  transition:filter 0.2s,transform 0.2s;
+}
+.help-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.help-submit:disabled{opacity:0.7;cursor:not-allowed;transform:none}
+.help-status{font-size:0.82rem;text-align:center;min-height:1.2em;margin-top:2px}
+.help-status-error{color:#f87171;font-weight:600}
+.help-thanks{text-align:center;padding:8px 0}
+.help-check{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#34d399,#10b981);
+  color:#fff;font-size:2.6rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  box-shadow:0 12px 32px rgba(16,185,129,0.4);
+  animation:helpCheckIn 0.5s var(--transition);
+}
+@keyframes helpCheckIn{
+  0%{transform:scale(0) rotate(-180deg);opacity:0}
+  60%{transform:scale(1.15) rotate(0);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+
 /* ── ASSET UPLOAD ── */
 .asset-upload-card{
   cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1605,6 +1681,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
       <button class="tab-btn" data-tab="creative">Creative</button>
     </nav>
     <div class="header-actions">
+      <button class="help-link" id="helpBtn" type="button">❔ Help</button>
       <a href="mfg.html" class="mfg-link">MFG Mode</a>
       <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">☀️</button>
     </div>
@@ -1735,6 +1812,40 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 </main>
 
 <!-- GEMINI -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal" role="dialog" aria-modal="true">
+    <button class="card-modal-close" id="helpClose" aria-label="Close">×</button>
+    <div class="help-stage" id="helpStageForm">
+      <h3 class="help-title">Need a hand?</h3>
+      <p class="help-sub">Drop us a message and we'll get back to you.</p>
+      <form id="helpForm" class="help-form" action="https://formspree.io/f/mkoklnge" method="POST">
+        <label>Your name<input type="text" name="name" id="helpName" required></label>
+        <label>Your email<input type="email" name="email" id="helpEmail" required></label>
+        <label>Topic
+          <select name="topic" id="helpTopic">
+            <option>Bug / something broken</option>
+            <option>Feature request</option>
+            <option>Question about the dashboard</option>
+            <option>Content / data correction</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Message<textarea name="message" id="helpMessage" rows="6" required placeholder="What's going on?"></textarea></label>
+        <input type="hidden" name="_subject" id="helpSubject" value="[World Cup HQ] Help request">
+        <input type="hidden" name="page" id="helpPage" value="">
+        <button type="submit" class="help-submit" id="helpSubmit">Send</button>
+        <p class="help-status" id="helpStatus"></p>
+      </form>
+    </div>
+    <div class="help-stage help-thanks" id="helpStageThanks" style="display:none">
+      <div class="help-check">✓</div>
+      <h3 class="help-title">Thank you!</h3>
+      <p class="help-sub">Your message is on its way. We'll get back to you as soon as we can.</p>
+      <button type="button" class="help-submit" id="helpThanksClose">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="asset-upload-overlay" id="assetUploadOverlay">
   <div class="asset-upload-modal" role="dialog" aria-modal="true">
     <button class="card-modal-close" id="assetUploadClose" aria-label="Close">×</button>
@@ -2146,6 +2257,7 @@ function init() {
   setupCardExpand();
   setupAssetUpload();
   setupHeatmapToggle();
+  setupHelp();
   handleHash();
 }
 
@@ -3118,6 +3230,70 @@ function setupMfgSync() {
   if (mfgPollTimer) clearInterval(mfgPollTimer);
   mfgPollTimer = setInterval(() => fetchMfgLatest(true), 5 * 60 * 1000); // 5 min
   setInterval(updateMfgSyncTime, 30 * 1000); // tick the "Xm ago" label
+}
+
+// ── Help modal (Formspree) ──
+function setupHelp() {
+  const overlay = document.getElementById('helpOverlay');
+  const btn = document.getElementById('helpBtn');
+  const closeBtn = document.getElementById('helpClose');
+  const thanksClose = document.getElementById('helpThanksClose');
+  const form = document.getElementById('helpForm');
+  const submit = document.getElementById('helpSubmit');
+  const status = document.getElementById('helpStatus');
+  const stageForm = document.getElementById('helpStageForm');
+  const stageThanks = document.getElementById('helpStageThanks');
+  const pageInput = document.getElementById('helpPage');
+  if (!overlay || !btn) return;
+
+  function open() {
+    stageForm.style.display = '';
+    stageThanks.style.display = 'none';
+    overlay.classList.add('open');
+    submit.disabled = false;
+    submit.textContent = 'Send';
+    status.textContent = '';
+    status.className = 'help-status';
+    if (pageInput) pageInput.value = location.href;
+    document.getElementById('helpName').focus();
+  }
+  function close() {
+    overlay.classList.remove('open');
+  }
+
+  btn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  thanksClose.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+    status.textContent = '';
+    try {
+      const data = new FormData(form);
+      const r = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data,
+      });
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j?.errors?.[0]?.message || `Server returned ${r.status}`);
+      }
+      // Success → swap to thank-you stage
+      stageForm.style.display = 'none';
+      stageThanks.style.display = '';
+      form.reset();
+    } catch (err) {
+      status.className = 'help-status help-status-error';
+      status.textContent = '⚠ ' + (err.message || 'Something went wrong. Please try again.');
+      submit.disabled = false;
+      submit.textContent = 'Send';
+    }
+  });
 }
 
 function setupCardExpand() {
