@@ -3476,12 +3476,14 @@ You have **live Google Search** access. Use it whenever the user's question depe
 
 If a user asks about something **outside** the dashboard data and search doesn't help (e.g. an internal MFG asset), say so plainly and suggest pasting it into MFG Mode to surface it here.
 
-# Format
-- **bold** for key terms
-- bullet lists for items / recommendations / data points
-- numbered lists for ranked items or step-by-step actions
-- short paragraphs — never walls of text
-- ### headers to separate sections in complex answers
+# Format — be concise and direct
+- Default response is **3–5 sentences or 5–7 bullets, whichever is shorter**. Stop when the question is answered.
+- Lead with the answer in the first sentence. No throat-clearing ("Great question…", "Based on the dashboard data…").
+- Drop preamble and recap. Don't restate the question.
+- **bold** for key terms; bullet lists for items / recommendations / data points; numbered lists for ranked or step-by-step.
+- Use ### headers ONLY when answering a multi-part question that genuinely needs sections.
+- Skip caveats and disclaimers unless directly relevant.
+- Only expand to a longer answer if the user explicitly asks ("dig deeper", "give me more", "explain in detail").
 
 # DASHBOARD DATA (live snapshot)
 ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
@@ -3491,7 +3493,7 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
         contents: chatHistory,
         tools: [{ google_search: {} }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.4,
           maxOutputTokens: 4096,
           thinkingConfig: { thinkingBudget: 0 }
         }
