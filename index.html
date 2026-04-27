@@ -1279,7 +1279,7 @@ body.light .fact-bar{background:linear-gradient(90deg,#1a3a6b,#0a1628,#1a3a6b)}
   50%{box-shadow:0 0 20px rgba(255,215,0,0.7)}
 }
 .gemini-panel{
-  position:fixed;top:0;right:0;bottom:0;z-index:201;
+  position:fixed;top:0;right:0;bottom:0;z-index:9500;
   width:420px;max-width:90vw;
   background:rgba(14,16,24,0.92);backdrop-filter:blur(24px);
   border-left:1px solid var(--border);
@@ -1315,6 +1315,13 @@ body.light .fact-bar{background:linear-gradient(90deg,#1a3a6b,#0a1628,#1a3a6b)}
 }
 .gemini-msg.assistant ul,.gemini-msg.assistant ol{margin:6px 0 6px 18px}
 .gemini-msg.assistant li{margin-bottom:3px}
+.gemini-citations{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:4px}
+body.light .gemini-citations{border-top-color:rgba(0,0,0,0.08)}
+.gemini-citations-label{font-family:'Oswald',sans-serif;font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:2px}
+.gemini-citation{font-size:0.75rem;color:#7dd3fc;text-decoration:none;line-height:1.4;word-break:break-word}
+.gemini-citation:hover{color:#bae6fd;text-decoration:underline}
+body.light .gemini-citation{color:#0284c7}
+body.light .gemini-citation:hover{color:#0369a1}
 .gemini-msg.assistant p{margin-bottom:6px}
 .gemini-msg.assistant p:last-child{margin-bottom:0}
 .gemini-msg.assistant strong{color:#fff}
@@ -1434,15 +1441,50 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   .team{min-width:90px}
 }
 @media(max-width:600px){
-  .header-nav{order:3;width:100%;justify-content:center}
-  .brand{font-size:1.3rem;letter-spacing:1px}
-  .tab-btn{padding:6px 14px;font-size:0.75rem}
+  .header-nav{order:3;width:100%;justify-content:center;gap:6px}
+  .header-actions{order:2;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  .header-actions .help-link,.header-actions .mfg-link{padding:6px 12px;font-size:0.7rem;letter-spacing:1px}
+  .header-actions .theme-toggle{width:32px;height:32px}
+  .brand{font-size:1.2rem;letter-spacing:1px;gap:8px}
+  .brand-logo{height:26px}
+  .beta-badge{font-size:0.55rem;padding:2px 7px;letter-spacing:1.5px;margin-left:4px}
+  .tab-btn{padding:6px 14px;font-size:0.72rem;letter-spacing:1px}
   .assets-grid{grid-template-columns:1fr}
   .gemini-panel{width:100%;max-width:100%}
   .section-title{font-size:1.1rem}
   .match-teams{flex-direction:column;gap:4px}
   .team{justify-content:center !important;text-align:center !important;min-width:auto}
   .vs-divider{padding:2px 0}
+  .main{padding:16px 12px}
+  .live-filters{gap:5px}
+  .live-filter{padding:5px 11px;font-size:0.62rem;letter-spacing:1px}
+  .filter-pill{padding:5px 12px;font-size:0.65rem;letter-spacing:1px}
+  .ticker-bar{height:32px}
+  .ticker-label{padding:0 12px;font-size:0.65rem}
+  .ticker-item{font-size:0.72rem;padding:0 22px}
+  .fact-bar{height:32px}
+  .fact-label{padding:0 12px;font-size:0.6rem}
+  .fact-item{font-size:0.7rem;padding:0 18px}
+  body{padding-bottom:32px}
+  .heatmap-grid{grid-template-columns:70px repeat(3,1fr);gap:3px}
+  .heatmap-row-label{font-size:0.66rem;padding-right:4px}
+  .heatmap-col-label{font-size:0.6rem;letter-spacing:1px}
+  .heatmap-cell{padding:10px 4px;font-size:0.85rem}
+  .standings-grid{grid-template-columns:1fr}
+  .standings-table th,.standings-table td{padding:6px 2px;font-size:0.7rem}
+  .standings-table th:nth-child(7),.standings-table td:nth-child(7),
+  .standings-table th:nth-child(8),.standings-table td:nth-child(8){display:none}
+  .card-modal{padding:24px 22px}
+  .help-modal,.asset-upload-modal,.support-modal{padding:24px 22px}
+  .modal-quote{padding:8px 10px;gap:8px;font-size:0.85rem}
+  .modal-quote-plat{font-size:0.55rem;min-width:46px;padding:2px 6px}
+  .countdown-bar{font-size:0.85rem;padding:12px 16px}
+}
+@media(max-width:420px){
+  .header-actions .help-link span,.header-actions .mfg-link{display:none}
+  .help-link{padding:7px 10px}
+  .help-cross{margin-right:0}
+  .heatmap-grid{grid-template-columns:60px repeat(3,1fr)}
 }
 /* ── BROADCAST INTRO ── */
 /* ── STADIUM FLYOVER INTRO ── */
@@ -3304,6 +3346,7 @@ function setupCardExpand() {
   }
 
   document.addEventListener('click', e => {
+    if (e.target.closest('.card-pin')) return;
     const card = e.target.closest('[data-card-type][data-card-id]');
     if (!card) return;
     e.preventDefault();
@@ -3428,7 +3471,10 @@ function setupGemini() {
 # What you should do
 Answer questions about matches, fixtures, news, social trends, creative assets, campaign strategy. Be concise, actionable, and strategic. Reference specific data points (team names, dates, venues, source names, sentiment, volume) from the dashboard data below.
 
-If a user asks about something **outside** the dashboard data (e.g. a topic not represented in news/social/assets), say so plainly and suggest pasting it into MFG Mode to surface it here.
+# Web search (Google grounding)
+You have **live Google Search** access. Use it whenever the user's question depends on current information — late-breaking news, scores, transfers, injuries, social trends, fan reactions, statements made today, etc. — or when the dashboard data may be stale. Prefer fresh web sources over the JSON snapshot when the topic is recent. When you use search, the harness will append a Sources list automatically; cite specific outlets inline (e.g. "per ESPN…", "Al Jazeera reported…").
+
+If a user asks about something **outside** the dashboard data and search doesn't help (e.g. an internal MFG asset), say so plainly and suggest pasting it into MFG Mode to surface it here.
 
 # Format
 - **bold** for key terms
@@ -3443,7 +3489,8 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
       const payload = {
         system_instruction: { parts: [{ text: systemInstruction }] },
         contents: chatHistory,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+        tools: [{ google_search: {} }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1536 }
       };
 
       const res = await fetch(
@@ -3452,12 +3499,28 @@ ${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
       );
 
       const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+      const candidate = data?.candidates?.[0];
+      const reply = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || 'No response generated.';
+
+      // Surface grounding citations if the model used web search
+      let citationsHtml = '';
+      const gm = candidate?.groundingMetadata;
+      if (gm?.groundingChunks?.length) {
+        const cites = gm.groundingChunks
+          .map(c => c.web && c.web.uri ? { uri: c.web.uri, title: c.web.title || c.web.uri } : null)
+          .filter(Boolean);
+        if (cites.length) {
+          citationsHtml = `<div class="gemini-citations"><div class="gemini-citations-label">🌐 Sources from web search</div>` +
+            cites.slice(0, 6).map((c, i) =>
+              `<a href="${c.uri}" target="_blank" rel="noopener" class="gemini-citation">[${i+1}] ${escapeHtml(c.title)}</a>`
+            ).join('') + `</div>`;
+        }
+      }
 
       chatHistory.push({ role: "model", parts: [{ text: reply }] });
 
       typingEl.remove();
-      messages.innerHTML += `<div class="gemini-msg assistant">${renderMarkdown(reply)}</div>`;
+      messages.innerHTML += `<div class="gemini-msg assistant">${renderMarkdown(reply)}${citationsHtml}</div>`;
     } catch (e) {
       typingEl.remove();
       messages.innerHTML += `<div class="gemini-msg assistant" style="color:#ff4444">Error: ${escapeHtml(e.message)}</div>`;
