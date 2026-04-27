@@ -1611,14 +1611,23 @@ a:hover { opacity: 0.8; }
 
     function parseItems(raw, kind) {
       // Split on blank lines = item boundaries; first line of block = headline/topic, rest = summary.
+      // Any http(s):// URL inside a block is pulled out as sourceUrl (and youtubeUrl if it's YouTube).
+      const URL_RE = /\bhttps?:\/\/[^\s<>"']+/i;
+      const YT_RE = /(?:youtube\.com|youtu\.be)/i;
       const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
       const market = window.__mfgMarket();
       const ts = new Date().toISOString();
       return blocks.map((block, i) => {
-        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        const urlMatch = block.match(URL_RE);
+        const url = urlMatch ? urlMatch[0].replace(/[).,;]+$/, '') : '';
+        const cleaned = url ? block.replace(URL_RE, '').replace(/\s{2,}/g, ' ').trim() : block;
+        const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
         const head = lines[0] || '';
         const rest = lines.slice(1).join(' ') || lines[0] || '';
         const id = `${market.toLowerCase()}-${kind}-${Date.now()}-${i}`;
+        const linkFields = url
+          ? (YT_RE.test(url) ? { youtubeUrl: url, sourceUrl: url } : { sourceUrl: url })
+          : {};
         if (kind === 'news') {
           return {
             id,
@@ -1627,6 +1636,7 @@ a:hover { opacity: 0.8; }
             source: 'Market Update',
             tag: market,
             timestamp: ts,
+            ...linkFields,
           };
         } else {
           return {
@@ -1638,6 +1648,7 @@ a:hover { opacity: 0.8; }
             category: market,
             platforms: [],
             tag: market,
+            ...linkFields,
           };
         }
       });
