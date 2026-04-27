@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MFG World Cup Command</title>
+<title>World Cup HQ</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,7 +64,15 @@ body{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   background-clip:text;white-space:nowrap;
   filter:drop-shadow(0 0 12px rgba(255,215,0,0.15));
+  display:inline-flex;align-items:center;gap:14px;
 }
+.brand-logo{
+  height:42px;width:auto;flex-shrink:0;
+  -webkit-background-clip:initial;-webkit-text-fill-color:initial;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
+@media (max-width:760px){.brand-logo{height:32px}}
 @keyframes brandShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .header-nav{display:flex;align-items:center;gap:6px}
 .tab-btn{
@@ -1137,7 +1145,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
     <div class="pitch-sweep"></div>
     <div class="pitch-pulse"></div>
   </div>
-  <div class="intro-title" id="introTitle">MFG World Cup Command</div>
+  <div class="intro-title" id="introTitle">World Cup HQ</div>
 </div>
 
 <!-- BG -->
@@ -1151,7 +1159,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="brand">MFG World Cup Command<span class="beta-badge">Beta</span></div>
+    <div class="brand"><img src="assets/mfg-logo.png" alt="Media Futures Group" class="brand-logo"><span>World Cup HQ</span><span class="beta-badge">Beta</span></div>
     <nav class="header-nav">
       <button class="tab-btn active" data-tab="live">Live</button>
       <button class="tab-btn" data-tab="calendar">Fixtures</button>
@@ -2103,7 +2111,7 @@ function setupGemini() {
     try {
       const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'live';
       const activeMarket = document.querySelector('.live-filter.active')?.textContent?.trim() || 'All';
-      const systemInstruction = `You are the embedded strategic analyst inside the **MFG World Cup Command** dashboard — an internal war room for a global strategy team running premade and reactive Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada/Mexico/USA).
+      const systemInstruction = `You are the embedded strategic analyst inside the **World Cup HQ** dashboard — an internal war room for a global strategy team running premade and reactive Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada/Mexico/USA).
 
 # About this tool
 - **Purpose**: real-time intelligence + creative pipeline tracking for the team running MFG's IG content during the WC.
