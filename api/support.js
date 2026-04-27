@@ -64,7 +64,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         from: process.env.SUPPORT_FROM || 'World Cup HQ <onboarding@resend.dev>',
-        to: [process.env.SUPPORT_TO || 'ed.tsue@mediafuturesgroup.com'],
+        to: [process.env.SUPPORT_TO || 'edtsue@gmail.com'],
         reply_to: sEmail,
         subject,
         text,
