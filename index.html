@@ -1172,7 +1172,7 @@ body.light .asset-upload-form input,body.light .asset-upload-form select{
   z-index:2;box-shadow:2px 0 12px rgba(255,215,0,0.3);
 }
 .fact-track{
-  display:flex;animation:fact-marquee 240s linear infinite;
+  display:flex;animation:fact-marquee var(--fact-duration,460s) linear infinite;
   white-space:nowrap;flex:1;
 }
 .fact-bar:hover .fact-track{animation-play-state:paused}
@@ -2215,6 +2215,19 @@ function renderFactTicker() {
   const shuffled = [...WC_FUN_FACTS].sort(() => Math.random() - 0.5);
   const items = shuffled.map(f => `<span class="fact-item">${f}</span>`).join('');
   track.innerHTML = items + items; // double for seamless loop
+  // Match the breaking-news ticker's scroll speed (px/sec)
+  requestAnimationFrame(() => {
+    const breakingTrack = document.getElementById('tickerTrack');
+    if (!breakingTrack) return;
+    // Breaking ticker animation: 140s for translateX(-50%) of doubled content
+    const breakingHalfWidth = breakingTrack.scrollWidth / 2;
+    const breakingPxPerSec = breakingHalfWidth / 140;
+    const factHalfWidth = track.scrollWidth / 2;
+    if (breakingPxPerSec > 0 && factHalfWidth > 0) {
+      const factDuration = factHalfWidth / breakingPxPerSec;
+      track.style.setProperty('--fact-duration', factDuration.toFixed(1) + 's');
+    }
+  });
 }
 
 function renderTimestamp() {
