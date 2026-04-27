@@ -954,16 +954,44 @@ body.light .cal-3rd{color:#2e7d32}
 body.light .mfg-sync-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
 
 /* ── SENTIMENT HEATMAP ── */
-.heatmap-wrap{padding:16px 20px;margin-bottom:22px;border-radius:12px}
-.heatmap-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.heatmap-wrap{padding:0;margin-bottom:22px;border-radius:12px;overflow:hidden}
+.heatmap-header{
+  width:100%;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:14px 18px;background:transparent;border:none;cursor:pointer;
+  font-family:inherit;color:inherit;text-align:left;
+  transition:background 0.2s;
+}
+.heatmap-header:hover{background:rgba(255,255,255,0.03)}
+body.light .heatmap-header:hover{background:rgba(0,0,0,0.03)}
+.heatmap-chevron{
+  font-size:0.9rem;color:var(--gold);
+  transition:transform 0.3s var(--transition);display:inline-block;
+}
+.heatmap-wrap:not(.collapsed) .heatmap-chevron{transform:rotate(90deg)}
 .heatmap-title{
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.9rem;
   text-transform:uppercase;letter-spacing:2px;color:var(--text);
   background:linear-gradient(90deg,#fff,var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin:0;
 }
 body.light .heatmap-title{background:linear-gradient(90deg,#1a1a2e,var(--red));-webkit-background-clip:text;background-clip:text}
-.heatmap-sub{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.5px}
+.heatmap-sub{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.5px;flex:1}
+.heatmap-active-filter{
+  display:none;align-items:center;gap:4px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:1.5px;color:#1a1a2e;
+  background:linear-gradient(135deg,var(--gold),#ffae00);
+  padding:4px 10px;border-radius:12px;
+  box-shadow:0 0 12px rgba(255,215,0,0.4);
+}
+.heatmap-body{
+  max-height:600px;opacity:1;
+  padding:0 18px 16px;
+  transition:max-height 0.4s var(--transition), opacity 0.3s, padding 0.3s;
+  overflow:hidden;
+}
+.heatmap-wrap.collapsed .heatmap-body{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
 .heatmap-grid{
   display:grid;grid-template-columns:90px repeat(3,1fr);gap:4px;
 }
@@ -981,13 +1009,28 @@ body.light .heatmap-title{background:linear-gradient(90deg,#1a1a2e,var(--red));-
 .heatmap-cell{
   border-radius:6px;padding:14px 8px;text-align:center;
   font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;color:#fff;
-  transition:transform 0.2s;cursor:default;
+  transition:transform 0.2s, box-shadow 0.2s;cursor:pointer;
   border:1px solid rgba(255,255,255,0.06);
 }
-.heatmap-cell:hover{transform:scale(1.03)}
+.heatmap-cell:hover{transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,0.25)}
+.heatmap-cell.active{
+  outline:2px solid var(--gold);outline-offset:1px;
+  box-shadow:0 0 0 4px rgba(255,215,0,0.25),0 6px 18px rgba(0,0,0,0.3);
+  transform:scale(1.05);
+}
 .heatmap-val{text-shadow:0 1px 2px rgba(0,0,0,0.5)}
 body.light .heatmap-cell{color:#1a1a2e;border-color:rgba(0,0,0,0.06)}
 body.light .heatmap-val{text-shadow:none}
+.heatmap-clear-row{margin-top:10px;text-align:center}
+.heatmap-clear{
+  font-family:'Oswald',sans-serif;font-size:0.7rem;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);padding:6px 14px;border-radius:18px;
+  transition:all 0.2s;
+}
+.heatmap-clear:hover{background:rgba(255,215,0,0.15);border-color:var(--gold);color:var(--gold)}
+body.light .heatmap-clear{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
 
 /* ── ASSET UPLOAD ── */
 .asset-upload-card{
@@ -1520,26 +1563,20 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   <div class="tab-panel active" id="panel-live">
     <div class="live-filters" id="liveFilters"></div>
 
-    <!-- MFG Sync indicator -->
-    <div class="mfg-sync glass" id="mfgSync">
-      <div class="mfg-sync-left">
-        <span class="mfg-sync-dot" id="mfgSyncDot"></span>
-        <span class="mfg-sync-label">MFG Mode</span>
-        <span class="mfg-sync-status" id="mfgSyncStatus">Connecting…</span>
-      </div>
-      <div class="mfg-sync-right">
-        <span class="mfg-sync-time" id="mfgSyncTime"></span>
-        <button class="mfg-sync-btn" id="mfgSyncRefresh" title="Refresh now">⟳</button>
-      </div>
-    </div>
-
     <!-- Sentiment Heatmap -->
-    <div class="heatmap-wrap glass" id="heatmapWrap">
-      <div class="heatmap-header">
+    <div class="heatmap-wrap glass collapsed" id="heatmapWrap">
+      <button class="heatmap-header" id="heatmapToggle" aria-expanded="false">
+        <span class="heatmap-chevron">▸</span>
         <h3 class="heatmap-title">Sentiment Heatmap</h3>
-        <span class="heatmap-sub">Volume by market × sentiment (current social signal)</span>
+        <span class="heatmap-sub">Volume by market × sentiment — click any cell to filter</span>
+        <span class="heatmap-active-filter" id="heatmapActiveFilter"></span>
+      </button>
+      <div class="heatmap-body">
+        <div class="heatmap-grid" id="sentimentHeatmap"></div>
+        <div class="heatmap-clear-row">
+          <button class="heatmap-clear" id="heatmapClear" style="display:none">✕ Clear heatmap filter</button>
+        </div>
       </div>
-      <div class="heatmap-grid" id="sentimentHeatmap"></div>
     </div>
 
     <div class="live-grid">
@@ -1905,7 +1942,7 @@ function init() {
   setupSearch();
   setupCardExpand();
   setupAssetUpload();
-  setupMfgSync();
+  setupHeatmapToggle();
   handleHash();
 }
 
@@ -2137,6 +2174,12 @@ function renderNews() {
 
 function renderSocial() {
   let filtered = DASHBOARD_DATA.social.filter(s => matchesLiveFilter(s, 'social') && matchesSearch(s));
+  if (heatmapFilter.market) {
+    filtered = filtered.filter(s =>
+      classifySocialMarket(s) === heatmapFilter.market &&
+      (s.sentiment || 'mixed') === heatmapFilter.sentiment
+    );
+  }
   const pinned = loadPinned();
   filtered = [...filtered].sort((a,b) => (pinned.has(b.id)?1:0) - (pinned.has(a.id)?1:0));
   renderSentimentHeatmap();
@@ -2172,6 +2215,30 @@ document.addEventListener('click', e => {
 });
 
 // ── #6: Sentiment heatmap (market × sentiment density) ──
+let heatmapFilter = { market: null, sentiment: null };
+
+function setHeatmapFilter(market, sentiment) {
+  if (heatmapFilter.market === market && heatmapFilter.sentiment === sentiment) {
+    heatmapFilter = { market: null, sentiment: null };
+  } else {
+    heatmapFilter = { market, sentiment };
+  }
+  renderSocial();
+}
+function clearHeatmapFilter() {
+  heatmapFilter = { market: null, sentiment: null };
+  renderSocial();
+}
+function setupHeatmapToggle() {
+  const wrap = document.getElementById('heatmapWrap');
+  const btn = document.getElementById('heatmapToggle');
+  btn?.addEventListener('click', () => {
+    const open = wrap.classList.toggle('collapsed');
+    btn.setAttribute('aria-expanded', String(!open));
+  });
+  document.getElementById('heatmapClear')?.addEventListener('click', clearHeatmapFilter);
+}
+
 function classifySocialMarket(s) {
   const t = ((s.topic || '') + ' ' + (s.summary || '')).toLowerCase();
   if (t.includes('canada') || t.includes('🇨🇦') || t.includes('davies') || t.includes('marsch')) return 'Canada';
@@ -2214,13 +2281,32 @@ function renderSentimentHeatmap() {
     sentiments.forEach(s => {
       const v = grid[m][s];
       const intensity = v / max;
-      const tooltip = v ? `${v} pts • ${grid[m].items[s].slice(0,3).join(' / ')}${grid[m].items[s].length>3?' …':''}` : 'No signal';
-      html += `<div class="heatmap-cell" style="background:rgba(${sentColor[s]},${0.08 + intensity * 0.55})" title="${tooltip.replace(/"/g,'&quot;')}">
+      const tooltip = v ? `${v} pts • ${grid[m].items[s].slice(0,3).join(' / ')}${grid[m].items[s].length>3?' …':''}` : 'No signal — click to filter anyway';
+      const isActive = heatmapFilter.market === m && heatmapFilter.sentiment === s;
+      html += `<button class="heatmap-cell${isActive ? ' active' : ''}" data-market="${m}" data-sentiment="${s}" style="background:rgba(${sentColor[s]},${0.08 + intensity * 0.55})" title="${tooltip.replace(/"/g,'&quot;')}">
         <span class="heatmap-val">${v || ''}</span>
-      </div>`;
+      </button>`;
     });
   });
   el.innerHTML = html;
+  el.querySelectorAll('.heatmap-cell').forEach(c => {
+    c.addEventListener('click', () => setHeatmapFilter(c.dataset.market, c.dataset.sentiment));
+  });
+
+  // Update active filter chip + clear button
+  const chip = document.getElementById('heatmapActiveFilter');
+  const clearBtn = document.getElementById('heatmapClear');
+  if (heatmapFilter.market) {
+    if (chip) chip.textContent = `${heatmapFilter.market} • ${heatmapFilter.sentiment}`;
+    if (chip) chip.style.display = 'inline-flex';
+    if (clearBtn) clearBtn.style.display = 'inline-block';
+    // Auto-expand when filter active
+    document.getElementById('heatmapWrap')?.classList.remove('collapsed');
+    document.getElementById('heatmapToggle')?.setAttribute('aria-expanded','true');
+  } else {
+    if (chip) { chip.textContent = ''; chip.style.display = 'none'; }
+    if (clearBtn) clearBtn.style.display = 'none';
+  }
 }
 
 function switchSubTab(id) {
