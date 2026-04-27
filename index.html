@@ -815,6 +815,86 @@ body.light .cal-3rd{color:#2e7d32}
   .week-day-count{font-size:0.6rem}
 }
 
+/* ── ASSET UPLOAD ── */
+.asset-upload-card{
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:300px;text-align:center;border:2px dashed rgba(255,255,255,0.18);
+  background:linear-gradient(135deg,rgba(255,215,0,0.04),rgba(204,0,0,0.03));
+  transition:all 0.25s var(--transition);
+}
+.asset-upload-card:hover{
+  border-color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(204,0,0,0.06));
+  box-shadow:0 0 24px rgba(255,215,0,0.18);transform:translateY(-2px);
+}
+.upload-plus{
+  font-family:'Oswald',sans-serif;font-weight:300;font-size:3.5rem;line-height:1;
+  color:var(--gold);margin-bottom:8px;text-shadow:0 0 20px rgba(255,215,0,0.3);
+}
+.upload-label{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text);
+}
+.upload-sub{font-size:0.78rem;color:var(--text-dim);margin-top:6px}
+.asset-remove{
+  position:absolute;top:8px;right:8px;z-index:5;
+  width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.2s,background 0.2s;
+}
+.asset-card:hover .asset-remove{opacity:1}
+.asset-remove:hover{background:var(--red)}
+.yt-play-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:54px;height:54px;border-radius:50%;
+  background:rgba(0,0,0,0.6);color:#fff;font-size:1.4rem;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.asset-upload-overlay{
+  position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.asset-upload-overlay.open{display:flex}
+.asset-upload-modal{
+  background:var(--surface);border:1px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:14px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:32px 36px;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  background-color:rgba(20,22,30,0.96);
+}
+body.light .asset-upload-modal{background-color:rgba(255,255,255,0.98);box-shadow:0 30px 80px rgba(0,0,0,0.18)}
+.asset-upload-form{display:flex;flex-direction:column;gap:14px}
+.asset-upload-form label{
+  display:flex;flex-direction:column;gap:6px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+}
+.asset-upload-form input,.asset-upload-form select{
+  padding:10px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;
+  letter-spacing:0;text-transform:none;font-weight:400;
+}
+body.light .asset-upload-form input,body.light .asset-upload-form select{
+  background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.12);
+}
+.asset-upload-form input:focus,.asset-upload-form select:focus{outline:2px solid var(--gold);outline-offset:1px}
+.asset-upload-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.asset-preview{margin-top:6px}
+.asset-preview img{width:100%;max-height:240px;object-fit:contain;border-radius:8px;border:1px solid var(--border)}
+.asset-submit{
+  margin-top:6px;padding:12px 18px;border:none;cursor:pointer;border-radius:8px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
+  letter-spacing:2px;text-transform:uppercase;color:#fff;
+  background:linear-gradient(135deg,var(--red),#ff3333);
+  box-shadow:0 6px 16px rgba(204,0,0,0.35);
+  transition:filter 0.2s,transform 0.2s;
+}
+.asset-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
 /* ── BETA BADGE ── */
 .beta-badge{
   display:inline-block;margin-left:8px;padding:3px 9px;
@@ -1348,6 +1428,40 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 </main>
 
 <!-- GEMINI -->
+<div class="asset-upload-overlay" id="assetUploadOverlay">
+  <div class="asset-upload-modal" role="dialog" aria-modal="true">
+    <button class="card-modal-close" id="assetUploadClose" aria-label="Close">×</button>
+    <h3 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px">Upload Asset</h3>
+    <form id="assetUploadForm" class="asset-upload-form">
+      <label>Title<input type="text" id="assetTitle" placeholder="e.g. 🇨🇦 Davies CL Goal — Reactive Reel" required></label>
+      <div class="asset-upload-row">
+        <label>Market
+          <select id="assetMarket">
+            <option>Canada</option><option>Germany</option><option>UK</option><option>USA</option><option>Global</option>
+          </select>
+        </label>
+        <label>Format
+          <select id="assetFormat">
+            <option>Reel</option><option>Story</option><option>Carousel</option><option>Static</option><option>Video</option>
+          </select>
+        </label>
+      </div>
+      <div class="asset-upload-row">
+        <label>Status
+          <select id="assetStatus">
+            <option>Concept</option><option>In Review</option><option>Scheduled</option><option>Live</option>
+          </select>
+        </label>
+        <label>Deploy date<input type="date" id="assetDeploy"></label>
+      </div>
+      <label>Screenshot<input type="file" id="assetFile" accept="image/*"></label>
+      <label>or YouTube URL<input type="url" id="assetYoutube" placeholder="https://youtu.be/... or https://youtube.com/watch?v=..."></label>
+      <div class="asset-preview" id="assetPreview"></div>
+      <button type="submit" class="asset-submit">Save Asset</button>
+    </form>
+  </div>
+</div>
+
 <div class="card-modal-overlay" id="cardModalOverlay">
   <div class="card-modal" id="cardModal" role="dialog" aria-modal="true">
     <button class="card-modal-close" id="cardModalClose" aria-label="Close">×</button>
@@ -1570,16 +1684,7 @@ const DASHBOARD_DATA = {
     { id: "s24", topic: "🇩🇪 Wirtz vs Musiala Tactical Discourse Hits New Peak", category: "game", volume: "🔥🔥", sentiment: "positive", summary: "Wirtz's 2 goals + 2 assists vs Switzerland reignited Germany's golden generation discourse. Tactical creators on YouTube and TikTok comparing Nagelsmann's Wirtz/Musiala/Havertz front 4 to Germany 2014 in elite breakdowns 🇩🇪🧠", sampleQuote: "\"Wirtz is operating on a different frequency. Musiala fit + this guy = Germany are winning the World Cup.\"", platforms: ["YouTube", "X", "IG"] },
     { id: "s25", topic: "🇩🇪 Nagelsmann '9 Guaranteed Starters' List Goes Viral", category: "game", volume: "🔥", sentiment: "positive", summary: "Bavarian Football Works' breakdown of Nagelsmann's 9 locked starters became one of the most-shared Germany pieces of April. Open competition for the last two spots is dominating r/Bundesliga discussion 🇩🇪⚽", sampleQuote: "\"9 starters locked, 2 spots open, 4 guys who think they should start. April is going to be brutal.\"", platforms: ["Reddit", "X"] }
   ],
-  assets: [
-    { id: "a1", headline: "\u{1f1e8}\u{1f1e6} Canada vs Mexico \u2014 Opener Hype Reel \u{1f3ac}", market: "Canada", status: "Live", deployDate: "2026-06-10", format: "Reel", driveFileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz", driveUrl: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view" },
-    { id: "a2", headline: "\u{1f1e8}\u{1f1e6} Alphonso Davies \u2014 Captain Announcement Post \u{1fae1}", market: "Canada", status: "Live", deployDate: "2026-04-08", format: "Carousel", driveFileId: "2BcDeFgHiJkLmNoPqRsTuVwXyZ", driveUrl: "https://drive.google.com/file/d/2BcDeFgHiJkLmNoPqRsTuVwXyZ/view" },
-    { id: "a3", headline: "\u{1f1e9}\u{1f1ea} Germany Kit Reveal \u2014 Reaction Template \u{1f455}", market: "Germany", status: "Scheduled", deployDate: "2026-04-12", format: "Story", driveFileId: "3CdEfGhIjKlMnOpQrStUvWxYz1", driveUrl: "https://drive.google.com/file/d/3CdEfGhIjKlMnOpQrStUvWxYz1/view" },
-    { id: "a4", headline: "\u{1f30d} Global \u2014 Countdown to Kickoff (30 Days) \u23f3", market: "Global", status: "In Review", deployDate: "2026-05-12", format: "Static", driveFileId: "4DeFgHiJkLmNoPqRsTuVwXyZ12", driveUrl: "https://drive.google.com/file/d/4DeFgHiJkLmNoPqRsTuVwXyZ12/view" },
-    { id: "a5", headline: "\u{1f1e8}\u{1f1e6} Canada \u2014 Group Stage Match Day Graphics Pack \u26bd", market: "Canada", status: "In Review", deployDate: "2026-06-11", format: "Static", driveFileId: "5EfGhIjKlMnOpQrStUvWxYz123", driveUrl: "https://drive.google.com/file/d/5EfGhIjKlMnOpQrStUvWxYz123/view" },
-    { id: "a6", headline: "\u{1f1e9}\u{1f1ea} Germany \u2014 Musiala Spotlight Reel \u{1f31f}", market: "Germany", status: "Concept", deployDate: "2026-06-12", format: "Reel", driveFileId: "6FgHiJkLmNoPqRsTuVwXyZ1234", driveUrl: "https://drive.google.com/file/d/6FgHiJkLmNoPqRsTuVwXyZ1234/view" },
-    { id: "a7", headline: "\u{1f30d} Global \u2014 World Cup Fan Culture Carousel \u{1faf6}", market: "Global", status: "Scheduled", deployDate: "2026-05-20", format: "Carousel", driveFileId: "7GhIjKlMnOpQrStUvWxYz12345", driveUrl: "https://drive.google.com/file/d/7GhIjKlMnOpQrStUvWxYz12345/view" },
-    { id: "a8", headline: "\u{1f1e8}\u{1f1e6} Canada \u2014 Jonathan David Goal Reactive Template \u{1f3af}", market: "Canada", status: "Concept", deployDate: "2026-06-11", format: "Static", driveFileId: "8HiJkLmNoPqRsTuVwXyZ123456", driveUrl: "https://drive.google.com/file/d/8HiJkLmNoPqRsTuVwXyZ123456/view" }
-  ]
+  assets: []
 };
 
 function driveThumbnail(fileId, size = 800) {
@@ -1601,6 +1706,7 @@ function init() {
   setupKeyboard();
   setupSearch();
   setupCardExpand();
+  setupAssetUpload();
   handleHash();
 }
 
@@ -2014,34 +2120,169 @@ function renderMatches() {
   }
 }
 
+// \u2500\u2500 User-uploaded assets (localStorage) \u2500\u2500
+const ASSETS_LS_KEY = 'wc_user_assets';
+function loadUserAssets() {
+  try { return JSON.parse(localStorage.getItem(ASSETS_LS_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveUserAssets(items) {
+  try { localStorage.setItem(ASSETS_LS_KEY, JSON.stringify(items)); } catch(e) { console.warn('asset save failed', e); }
+}
+function youtubeIdFrom(url) {
+  if (!url) return null;
+  const patterns = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
 function renderAssets(filter = 'All') {
   const grid = document.getElementById('assetsGrid');
-  const filtered = DASHBOARD_DATA.assets.filter(a => (filter === 'All' || a.market === filter) && matchesSearch(a));
-  grid.innerHTML = filtered.map(a => {
+  const userAssets = loadUserAssets();
+  const all = [...userAssets, ...DASHBOARD_DATA.assets];
+  const filtered = all.filter(a => (filter === 'All' || a.market === filter) && matchesSearch(a));
+
+  const uploadCard = `
+    <div class="asset-card asset-upload-card glass" id="assetUploadTrigger">
+      <div class="upload-plus">+</div>
+      <div class="upload-label">Upload Asset</div>
+      <div class="upload-sub">Screenshot or YouTube link</div>
+    </div>`;
+
+  const cards = filtered.map(a => {
     const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
     const sc = statusMap[a.status] || 'astatus-concept';
+    const ytId = a.kind === 'youtube' ? youtubeIdFrom(a.youtubeUrl) : null;
+    let thumb;
+    if (a.kind === 'image' && a.imageData) {
+      thumb = `<img src="${a.imageData}" alt="" />`;
+    } else if (ytId) {
+      thumb = `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
+    } else if (a.driveFileId) {
+      thumb = `<img src="${driveThumbnail(a.driveFileId, 400)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${a.format || 'Asset'}</div>`;
+    } else {
+      thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${a.format || 'Asset'}</div>`;
+    }
+    const link = a.youtubeUrl
+      ? `<a href="${a.youtubeUrl}" target="_blank" rel="noopener" class="asset-link">Open on YouTube \u2192</a>`
+      : a.driveUrl
+        ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>`
+        : '';
+    const removeBtn = a.userUploaded ? `<button class="asset-remove" data-asset-id="${a.id}" title="Remove">\u00d7</button>` : '';
+    const dateStr = a.deployDate ? `Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}` : '';
     return `<div class="asset-card glass">
-      <div class="asset-thumb">
-        <img src="${driveThumbnail(a.driveFileId, 400)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-        <div class="fallback" style="display:none;position:absolute;inset:0">${a.format}</div>
-      </div>
+      ${removeBtn}
+      <div class="asset-thumb">${thumb}</div>
       <div class="asset-body">
         <h4>${a.headline}</h4>
         <div class="asset-meta">
-          <span class="asset-format">${a.format}</span>
-          <span class="asset-status-pill ${sc}">${a.status}</span>
+          ${a.format ? `<span class="asset-format">${a.format}</span>` : ''}
+          ${a.status ? `<span class="asset-status-pill ${sc}">${a.status}</span>` : ''}
         </div>
-        <span class="asset-date">Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
-        <a href="${a.driveUrl}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>
+        ${dateStr ? `<span class="asset-date">${dateStr}</span>` : ''}
+        ${link}
       </div>
     </div>`;
   }).join('');
 
+  grid.innerHTML = uploadCard + cards;
+
   const bar = document.getElementById('filterBar');
-  const markets = ['All', 'Canada', 'Germany', 'Global'];
+  const markets = ['All', 'Canada', 'Germany', 'UK', 'USA', 'Global'];
   bar.innerHTML = markets.map(m => `<button class="filter-pill${m === filter ? ' active' : ''}" data-market="${m}">${m}</button>`).join('');
   bar.querySelectorAll('.filter-pill').forEach(btn => {
     btn.addEventListener('click', () => renderAssets(btn.dataset.market));
+  });
+  document.getElementById('assetUploadTrigger')?.addEventListener('click', openAssetUploadModal);
+  grid.querySelectorAll('.asset-remove').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.assetId;
+      if (!confirm('Remove this asset?')) return;
+      saveUserAssets(loadUserAssets().filter(a => a.id !== id));
+      renderAssets(filter);
+    });
+  });
+}
+
+function openAssetUploadModal() {
+  const overlay = document.getElementById('assetUploadOverlay');
+  overlay.classList.add('open');
+  document.getElementById('assetTitle').focus();
+}
+function closeAssetUploadModal() {
+  document.getElementById('assetUploadOverlay').classList.remove('open');
+  document.getElementById('assetUploadForm').reset();
+  document.getElementById('assetPreview').innerHTML = '';
+  document.getElementById('assetPreview').dataset.imageData = '';
+}
+
+function setupAssetUpload() {
+  const overlay = document.getElementById('assetUploadOverlay');
+  const form = document.getElementById('assetUploadForm');
+  const closeBtn = document.getElementById('assetUploadClose');
+  const fileInput = document.getElementById('assetFile');
+  const ytInput = document.getElementById('assetYoutube');
+  const preview = document.getElementById('assetPreview');
+
+  closeBtn.addEventListener('click', closeAssetUploadModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeAssetUploadModal(); });
+
+  fileInput.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      preview.innerHTML = `<img src="${ev.target.result}" alt="preview" />`;
+      preview.dataset.imageData = ev.target.result;
+      ytInput.value = '';
+    };
+    reader.readAsDataURL(f);
+  });
+
+  ytInput.addEventListener('input', () => {
+    const id = youtubeIdFrom(ytInput.value);
+    if (id) {
+      preview.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="preview" />`;
+      preview.dataset.imageData = '';
+      fileInput.value = '';
+    } else if (!preview.dataset.imageData) {
+      preview.innerHTML = '';
+    }
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const title = document.getElementById('assetTitle').value.trim();
+    const market = document.getElementById('assetMarket').value;
+    const format = document.getElementById('assetFormat').value;
+    const status = document.getElementById('assetStatus').value;
+    const deployDate = document.getElementById('assetDeploy').value;
+    const ytUrl = ytInput.value.trim();
+    const imageData = preview.dataset.imageData || '';
+
+    if (!title) return;
+    if (!imageData && !ytUrl) { alert('Please upload a screenshot or paste a YouTube URL.'); return; }
+
+    const asset = {
+      id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      headline: title,
+      market, format, status, deployDate,
+      kind: ytUrl ? 'youtube' : 'image',
+      userUploaded: true,
+      ...(ytUrl ? { youtubeUrl: ytUrl } : { imageData }),
+      createdAt: new Date().toISOString(),
+    };
+    const existing = loadUserAssets();
+    existing.unshift(asset);
+    saveUserAssets(existing);
+    closeAssetUploadModal();
+    renderAssets(document.querySelector('#filterBar .filter-pill.active')?.dataset.market || 'All');
   });
 }
 
