@@ -187,6 +187,14 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
   transition:all 0.3s var(--transition);
 }
 .mfg-link:hover{background:rgba(125,211,252,0.15);box-shadow:0 0 16px rgba(125,211,252,0.2)}
+.support-link{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.78rem;
+  text-transform:uppercase;letter-spacing:1.2px;
+  padding:7px 16px;cursor:pointer;color:#10b981;
+  background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);
+  border-radius:999px;transition:all 0.25s var(--transition);
+}
+.support-link:hover{background:rgba(16,185,129,0.18);box-shadow:0 0 16px rgba(16,185,129,0.25);transform:translateY(-1px)}
 .gemini-toggle{
   position:fixed;bottom:24px;right:24px;z-index:9000;
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
@@ -1032,6 +1040,66 @@ body.light .heatmap-val{text-shadow:none}
 .heatmap-clear:hover{background:rgba(255,215,0,0.15);border-color:var(--gold);color:var(--gold)}
 body.light .heatmap-clear{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
 
+/* ── SUPPORT MODAL ── */
+.support-overlay{
+  position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,0.65);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  animation:fadeIn 0.2s ease;
+}
+.support-overlay.open{display:flex}
+.support-modal{
+  background:rgba(20,22,30,0.96);border:1px solid rgba(255,255,255,0.1);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border-radius:14px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:32px 36px;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,0.55);
+  animation:fadeUp 0.3s var(--transition);
+}
+body.light .support-modal{background:rgba(255,255,255,0.98);box-shadow:0 30px 80px rgba(0,0,0,0.18);border-color:rgba(0,0,0,0.08)}
+.support-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.4rem;
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;
+  background:linear-gradient(90deg,#10b981,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.support-sub{font-size:0.82rem;color:var(--text-dim);margin-bottom:18px;line-height:1.5}
+.support-form{display:flex;flex-direction:column;gap:14px}
+.support-form label{
+  display:flex;flex-direction:column;gap:6px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+}
+.support-form input,.support-form select,.support-form textarea{
+  padding:10px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;
+  letter-spacing:0;text-transform:none;font-weight:400;resize:vertical;
+}
+body.light .support-form input,body.light .support-form select,body.light .support-form textarea{
+  background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.12);
+}
+.support-form input:focus,.support-form select:focus,.support-form textarea:focus{outline:2px solid #10b981;outline-offset:1px}
+.support-submit{
+  margin-top:6px;padding:12px 18px;border:none;cursor:pointer;border-radius:8px;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
+  letter-spacing:2px;text-transform:uppercase;color:#fff;
+  background:linear-gradient(135deg,#10b981,#059669);
+  box-shadow:0 6px 16px rgba(16,185,129,0.35);
+  transition:filter 0.2s,transform 0.2s;
+}
+.support-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.support-gmail{
+  margin-top:2px;padding:10px 16px;border-radius:8px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.78rem;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text);
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);
+  transition:all 0.2s;
+}
+.support-gmail:hover{background:rgba(234,67,53,0.12);border-color:rgba(234,67,53,0.5);color:#ea4335}
+body.light .support-gmail{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.12)}
+.support-hint{font-size:0.7rem;color:var(--text-dim);text-align:center;margin-top:4px}
+
 /* ── ASSET UPLOAD ── */
 .asset-upload-card{
   cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1533,6 +1601,7 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
       <button class="tab-btn" data-tab="creative">Creative</button>
     </nav>
     <div class="header-actions">
+      <button class="support-link" id="supportBtn" type="button">💬 Support</button>
       <a href="mfg.html" class="mfg-link">MFG Mode</a>
       <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">☀️</button>
     </div>
@@ -1663,6 +1732,31 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 </main>
 
 <!-- GEMINI -->
+<div class="support-overlay" id="supportOverlay">
+  <div class="support-modal" role="dialog" aria-modal="true">
+    <button class="card-modal-close" id="supportClose" aria-label="Close">×</button>
+    <h3 class="support-title">Contact Support</h3>
+    <p class="support-sub">Send a message and we'll get back to you. Your default email client will open with the message pre-filled.</p>
+    <form id="supportForm" class="support-form">
+      <label>Your name<input type="text" id="supportName" required></label>
+      <label>Your email (so we can reply)<input type="email" id="supportEmail" required></label>
+      <label>Topic
+        <select id="supportTopic">
+          <option>Bug / something broken</option>
+          <option>Feature request</option>
+          <option>Question about the dashboard</option>
+          <option>Content / data correction</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Message<textarea id="supportMessage" rows="6" required placeholder="What's going on?"></textarea></label>
+      <button type="submit" class="support-submit">Send via default mail app</button>
+      <button type="button" class="support-gmail" id="supportGmailBtn">Send via Gmail (web)</button>
+      <p class="support-hint">Goes to the World Cup HQ team.</p>
+    </form>
+  </div>
+</div>
+
 <div class="asset-upload-overlay" id="assetUploadOverlay">
   <div class="asset-upload-modal" role="dialog" aria-modal="true">
     <button class="card-modal-close" id="assetUploadClose" aria-label="Close">×</button>
@@ -1943,6 +2037,7 @@ function init() {
   setupCardExpand();
   setupAssetUpload();
   setupHeatmapToggle();
+  setupSupport();
   handleHash();
 }
 
@@ -2836,6 +2931,63 @@ function setupMfgSync() {
   if (mfgPollTimer) clearInterval(mfgPollTimer);
   mfgPollTimer = setInterval(() => fetchMfgLatest(true), 5 * 60 * 1000); // 5 min
   setInterval(updateMfgSyncTime, 30 * 1000); // tick the "Xm ago" label
+}
+
+// ── Support modal ──
+// Recipient masked from UI; lightly obfuscated in source to avoid casual scraping.
+const SUPPORT_EMAIL = ['ed.tsue', 'mediafuturesgroup.com'].join('@');
+function setupSupport() {
+  const overlay = document.getElementById('supportOverlay');
+  const btn = document.getElementById('supportBtn');
+  const closeBtn = document.getElementById('supportClose');
+  const form = document.getElementById('supportForm');
+  const gmailBtn = document.getElementById('supportGmailBtn');
+  if (!overlay || !btn) return;
+
+  function open() { overlay.classList.add('open'); document.getElementById('supportName').focus(); }
+  function close() { overlay.classList.remove('open'); }
+
+  btn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+
+  function buildMessage() {
+    const name = document.getElementById('supportName').value.trim();
+    const email = document.getElementById('supportEmail').value.trim();
+    const topic = document.getElementById('supportTopic').value;
+    const message = document.getElementById('supportMessage').value.trim();
+    if (!name || !email || !message) return null;
+
+    const subject = `[World Cup HQ Support] ${topic} — from ${name}`;
+    const body = [
+      `From: ${name} <${email}>`,
+      `Topic: ${topic}`,
+      `Page: ${location.href}`,
+      `Browser: ${navigator.userAgent}`,
+      ``,
+      `---`,
+      ``,
+      message,
+    ].join('\n');
+    return { subject, body };
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const m = buildMessage(); if (!m) return;
+    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+    window.location.href = mailto;
+    setTimeout(close, 300);
+  });
+
+  gmailBtn?.addEventListener('click', () => {
+    if (!form.reportValidity()) return;
+    const m = buildMessage(); if (!m) return;
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(SUPPORT_EMAIL)}&su=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+    window.open(url, '_blank', 'noopener');
+    setTimeout(close, 300);
+  });
 }
 
 function setupCardExpand() {
