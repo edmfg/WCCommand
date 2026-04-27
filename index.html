@@ -3,11 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>World Cup HQ</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<title>World Cup HQ — Fixtures, News & Social Pulse</title>
+<meta name="description" content="World Cup HQ: live fixtures, standings, news, and the social pulse of the tournament — in one command center.">
+<meta name="theme-color" content="#0a0c14">
+<link rel="canonical" href="https://wccommand.vercel.app/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="World Cup HQ">
+<meta property="og:title" content="World Cup HQ — Fixtures, News & Social Pulse">
+<meta property="og:description" content="Live fixtures, standings, news, and the social pulse of the tournament — in one command center.">
+<meta property="og:url" content="https://wccommand.vercel.app/">
+<meta property="og:image" content="https://wccommand.vercel.app/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="World Cup HQ — Fixtures, News & Social Pulse">
+<meta name="twitter:description" content="Live fixtures, standings, news, and the social pulse of the tournament — in one command center.">
+<meta name="twitter:image" content="https://wccommand.vercel.app/assets/og.png">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/mfg-logo.png">
+<link rel="apple-touch-icon" href="/assets/mfg-logo.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -219,16 +240,7 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
   display:inline-flex;align-items:center;gap:8px;
   isolation:isolate;
 }
-.gemini-toggle::before{
-  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:conic-gradient(from 0deg at 50% 50%,
-    rgba(255,59,48,0.55),rgba(255,149,0,0.55),rgba(255,204,0,0.55),
-    rgba(52,199,89,0.55),rgba(0,199,190,0.55),rgba(0,122,255,0.55),
-    rgba(175,82,222,0.55),rgba(255,45,85,0.55),rgba(255,59,48,0.55));
-  mix-blend-mode:overlay;opacity:0.85;
-  animation:gemini-spin 12s linear infinite;
-  z-index:0;
-}
+.gemini-toggle::before{display:none}
 .gemini-toggle::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:linear-gradient(140deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.1) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,0.25) 100%);
@@ -606,6 +618,84 @@ body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
   border-bottom:1px solid rgba(255,215,0,0.15);
 }
 .matches-list{display:flex;flex-direction:column;gap:6px}
+
+/* ── Group Cards View ── */
+.groups-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
+  gap:18px;margin-top:8px;
+}
+.group-card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.015) 100%);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:16px 16px 14px;backdrop-filter:blur(14px);
+  box-shadow:0 4px 24px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.04);
+  transition:transform 0.25s var(--transition),border-color 0.25s var(--transition),box-shadow 0.25s var(--transition);
+}
+.group-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,215,0,0.22);
+  box-shadow:0 10px 36px rgba(0,0,0,0.4),0 0 0 1px rgba(255,215,0,0.08),inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.group-card-header{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding-bottom:10px;margin-bottom:12px;
+  border-bottom:1px solid rgba(255,215,0,0.18);
+}
+.group-card-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.1rem;
+  text-transform:uppercase;letter-spacing:2.5px;
+  background:linear-gradient(135deg,#ffd700 0%,#ffae00 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.group-card-count{font-size:11px;color:var(--text-dim);letter-spacing:0.5px}
+.group-standings{
+  width:100%;border-collapse:collapse;font-size:0.78rem;margin-bottom:12px;
+}
+.group-standings th{
+  font-family:'Inter',sans-serif;font-weight:500;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);
+  text-align:right;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.group-standings th.team-col{text-align:left}
+.group-standings td{
+  padding:7px 4px;border-bottom:1px solid rgba(255,255,255,0.04);
+  text-align:right;color:var(--text);font-variant-numeric:tabular-nums;
+}
+.group-standings td.team-col{
+  text-align:left;display:flex;align-items:center;gap:8px;
+  font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:0.5px;
+}
+.group-standings tr:last-child td{border-bottom:none}
+.group-standings tr.qual td{background:linear-gradient(90deg,rgba(34,197,94,0.06),transparent)}
+.group-standings tr.qual td.team-col{box-shadow:inset 3px 0 0 rgba(34,197,94,0.55)}
+.group-standings .gd-pos{color:#22c55e}
+.group-standings .gd-neg{color:#ef4444}
+.group-standings .pts-cell{color:var(--gold);font-weight:600}
+.group-card-fixtures{display:flex;flex-direction:column;gap:4px}
+.group-fixture{
+  display:grid;grid-template-columns:54px 1fr auto 1fr;
+  align-items:center;gap:8px;
+  padding:6px 8px;border-radius:8px;font-size:0.78rem;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.04);
+  transition:background 0.18s var(--transition);
+}
+.group-fixture:hover{background:rgba(255,255,255,0.05)}
+.group-fixture.is-today{border-color:rgba(255,215,0,0.35);background:rgba(255,215,0,0.05)}
+.gf-date{font-size:0.65rem;color:var(--text-dim);letter-spacing:0.5px;text-transform:uppercase}
+.gf-home{display:flex;align-items:center;gap:6px;justify-content:flex-end;text-align:right}
+.gf-away{display:flex;align-items:center;gap:6px}
+.gf-team{font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:0.5px;font-size:0.8rem}
+.gf-flag{font-size:1.05rem}
+.gf-mid{
+  font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:0.5px;
+  font-size:0.78rem;color:var(--text);min-width:46px;text-align:center;
+}
+.gf-mid.gf-time{color:var(--text-dim);font-weight:500;font-size:0.7rem}
+@media(max-width:520px){
+  .groups-grid{grid-template-columns:1fr}
+  .group-fixture{grid-template-columns:48px 1fr auto 1fr;gap:6px}
+}
 
 /* ESPN-style match row */
 .match-row{
@@ -1951,6 +2041,23 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
 </div>
 
 <script>
+// ── XSS HELPERS ──
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function safeUrl(u) {
+  if (!u) return '';
+  const s = String(u).trim();
+  if (/^(https?:|mailto:|\/|#)/i.test(s)) return escapeHtml(s);
+  return '';
+}
+
 // ── DATA ──
 const DASHBOARD_DATA = {
   lastUpdated: "2026-04-27T18:00:00Z",
@@ -2360,6 +2467,32 @@ const WC_FUN_FACTS = [
   "🦁 England has only won the World Cup ONCE — in 1966, on home soil.",
   "🌟 Lionel Messi finally won the WC in Qatar 2022 at age 35 — his 5th attempt.",
   "🇸🇦 Saudi Arabia stunned eventual champions Argentina 2-1 in their opening 2022 group game — biggest upset of the modern era.",
+  // ── CULTURAL TRIVIA ──
+  "📯 Vuvuzelas turned South Africa 2010 into the loudest WC ever — FIFA briefly considered banning them.",
+  "🎶 Shakira's 'Waka Waka' (2010) is the best-selling World Cup song of all time — over 10M copies sold.",
+  "🎤 Ricky Martin's 'La Copa de la Vida' (1998 France) launched Latin pop globally and is still the gold-standard WC anthem.",
+  "🐙 Paul the Octopus correctly predicted 7 of 7 matches at South Africa 2010 — including Spain lifting the trophy.",
+  "📚 Panini sticker albums have been a WC ritual since Mexico 1970 — Qatar 2022's album had 670 stickers and broke resale records.",
+  "🧹 Japanese fans famously stay behind to clean their stadium section after every WC match — a tradition since France 1998.",
+  "💃 Bebeto's baby-cradle goal celebration (USA 1994) is the most copied celebration in football history.",
+  "🦁 Mascots have evolved from World Cup Willie (1966) to Naranjito the orange (Spain 1982) to La'eeb the headscarf (Qatar 2022).",
+  "🎵 Argentina's fan anthem 'Muchachos' became a global phenomenon during their 2022 title run — written by a Racing Club fan.",
+  "🇫🇷 France 1998's 'Black-Blanc-Beur' squad is still cited as a turning point in how Europe talks about national identity.",
+  "🌹 Iran vs USA at France 1998 — Iranian players gave white roses to American players before kickoff. One of sport's most loaded handshakes.",
+  "🥁 Brazil's torcida brings full samba bands into the stands — the only national fan group that travels with live percussion.",
+  "🏛️ The Maracanã in Rio is called the 'Cathedral of Football' — every visiting national team trains there at least once.",
+  "🇸🇳 Senegal's 2002 squad celebrated every goal with a coordinated dance — sparked a wave of choreographed celebrations across Africa.",
+  "🇭🇷 Croatia's red-and-white checkered šahovnica kit is one of the most recognizable in world sport — rooted in 9th-century Croatian heraldry.",
+  "🎙️ 'Goooooooool' — the elongated Spanish-language goal call was popularized by Argentine commentator Andrés Cantor at USA 1994.",
+  "🥖 Host nations traditionally serve tournament-themed cuisine — Qatar 2022 introduced 6M visitors to machboos, harees, and karak chai.",
+  "🎺 The Iceland Viking Thunderclap, born at Euro 2016, has since spread to WC qualifiers across Europe.",
+  "🇰🇷 South Korea's 'Be the Reds!' chant from 2002 became the country's unofficial second national anthem.",
+  "👕 Diego Maradona's #10 has been retired by Argentina's youth teams and Napoli — but FIFA refuses to retire it from the senior squad.",
+  "🦅 Mexico's iconic green home shirt is the longest unchanged primary kit color in WC history — green since 1930.",
+  "📺 BBC's 1970 WC theme by Barry Stoller is still used at every England match — the longest-running sports theme on British TV.",
+  "🎨 The official WC poster is commissioned from a different artist every cycle — Mexico 70's poster by Lance Wyman is in MoMA's permanent collection.",
+  "🇩🇪 Germany's 'Sommermärchen' (summer fairy tale) of 2006 is credited with rehabilitating post-war German flag-waving as joyful, not nationalistic.",
+  "🎭 Nigeria's 1994 and 2018 kits are the most-copied jerseys in WC merch history — the 2018 design sold out in 3 minutes online.",
 ];
 
 function renderFactTicker() {
@@ -2593,12 +2726,12 @@ function renderNews() {
     const time = new Date(n.timestamp);
     const timeStr = time.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2022 ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     const isPinned = pinned.has(n.id);
-    return `<div class="carousel-card"><div class="news-card glass" data-card-type="news" data-card-id="${n.id}">
-      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${n.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '\u2605' : '\u2606'}</button>
-      <span class="tag ${tagClass}">${tagLabel}</span>
-      <h3>${n.headline}</h3>
-      <p class="meta">${n.source} \u2022 ${timeStr}</p>
-      <p class="summary">${n.summary}</p>
+    return `<div class="carousel-card"><div class="news-card glass" data-card-type="news" data-card-id="${escapeHtml(n.id)}">
+      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${escapeHtml(n.id)}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '\u2605' : '\u2606'}</button>
+      <span class="tag ${tagClass}">${escapeHtml(tagLabel)}</span>
+      <h3>${escapeHtml(n.headline)}</h3>
+      <p class="meta">${escapeHtml(n.source)} \u2022 ${timeStr}</p>
+      <p class="summary">${escapeHtml(n.summary)}</p>
     </div></div>`;
   });
   newsCarousel.setCards(cards, filtered.length);
@@ -2641,18 +2774,18 @@ function renderSocial() {
     const sentClass = s.sentiment === 'positive' ? 'sentiment-positive' : s.sentiment === 'negative' ? 'sentiment-negative' : 'sentiment-mixed';
     const quoteCount = (s.quotes && s.quotes.length) || (s.sampleQuote ? 1 : 0);
     const firstQuote = (s.quotes && s.quotes[0]) ? s.quotes[0] : (s.sampleQuote ? { text: s.sampleQuote.replace(/^"|"$/g,''), platform: (s.platforms && s.platforms[0]) || '' } : null);
-    const quoteHtml = firstQuote ? `<p class="quote">${firstQuote.platform ? `<span class="quote-plat">${firstQuote.platform}</span>` : ''}"${firstQuote.text}"</p>` : '';
+    const quoteHtml = firstQuote ? `<p class="quote">${firstQuote.platform ? `<span class="quote-plat">${escapeHtml(firstQuote.platform)}</span>` : ''}"${escapeHtml(firstQuote.text)}"</p>` : '';
     const moreHtml = quoteCount > 1 ? `<span class="quote-more-pill">💬 +${quoteCount - 1} more reactions</span>` : '';
     const isPinned = pinned.has(s.id);
-    return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${s.id}">
-      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${s.id}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '★' : '☆'}</button>
-      <span class="sentiment-badge ${sentClass}">${s.sentiment}</span>
-      <h3 class="topic">${s.topic}</h3>
-      <p class="volume">${s.volume}${trendDateShort(s.id) ? `<span class="trend-date">📅 trending ${trendDateShort(s.id)}</span>` : ''}</p>
-      <p class="summary">${s.summary}</p>
+    return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${escapeHtml(s.id)}">
+      <button class="card-pin${isPinned ? ' pinned' : ''}" data-pin-id="${escapeHtml(s.id)}" title="${isPinned ? 'Unpin' : 'Pin'} card">${isPinned ? '★' : '☆'}</button>
+      <span class="sentiment-badge ${sentClass}">${escapeHtml(s.sentiment)}</span>
+      <h3 class="topic">${escapeHtml(s.topic)}</h3>
+      <p class="volume">${escapeHtml(s.volume)}${trendDateShort(s.id) ? `<span class="trend-date">📅 trending ${trendDateShort(s.id)}</span>` : ''}</p>
+      <p class="summary">${escapeHtml(s.summary)}</p>
       ${quoteHtml}
       ${moreHtml}
-      <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('')}</div>
+      <div class="platforms">${s.platforms.map(p => `<span class="platform-pill">${escapeHtml(p)}</span>`).join('')}</div>
     </div></div>`;
   });
   socialCarousel.setCards(cards, filtered.length);
@@ -3010,10 +3143,12 @@ function renderMatches() {
     container.innerHTML = Object.entries(byDate).map(([date, games]) => {
       const dateStr = new Date(date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
       return `<div class="date-group">
-        <div class="date-header">${dateStr} <span class="match-count">${games.length} match${games.length > 1 ? 'es' : ''}</span></div>
+        <div class="date-header">${escapeHtml(dateStr)} <span class="match-count">${games.length} match${games.length > 1 ? 'es' : ''}</span></div>
         <div class="matches-list">${games.map(renderMatchRow).join('')}</div>
       </div>`;
     }).join('');
+  } else if (fixtureView === 'group') {
+    container.innerHTML = renderGroupCardsView(matches);
   } else {
     // Group by stage
     const byStage = {};
@@ -3023,11 +3158,73 @@ function renderMatches() {
     });
     container.innerHTML = Object.entries(byStage).map(([stage, games]) => {
       return `<div class="stage-group">
-        <h3>${stage} <span style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:rgba(255,255,255,0.4);letter-spacing:0;text-transform:none">${games.length} matches</span></h3>
+        <h3>${escapeHtml(stage)} <span style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:rgba(255,255,255,0.4);letter-spacing:0;text-transform:none">${games.length} matches</span></h3>
         <div class="matches-list">${games.map(renderMatchRow).join('')}</div>
       </div>`;
     }).join('');
   }
+}
+
+function renderGroupCardsView(matches) {
+  const groupMatches = matches.filter(m => m.stage && m.stage.startsWith('Group '));
+  if (!groupMatches.length) {
+    return '<p style="color:var(--text-dim);font-size:0.85rem;padding:40px;text-align:center">No group matches match this filter.</p>';
+  }
+  const standings = computeGroupStandings(groupMatches);
+  const byGroup = {};
+  groupMatches.forEach(m => {
+    if (!byGroup[m.stage]) byGroup[m.stage] = [];
+    byGroup[m.stage].push(m);
+  });
+  const today = new Date().toISOString().slice(0,10);
+  const groupKeys = Object.keys(byGroup).sort();
+
+  const cards = groupKeys.map(g => {
+    const games = byGroup[g].slice().sort((a,b) => (a.date + a.kickoff).localeCompare(b.date + b.kickoff));
+    const teams = standings[g] ? Object.values(standings[g]) : [];
+    teams.sort((a,b) => b.Pts - a.Pts || b.GD - a.GD || b.GF - a.GF || a.name.localeCompare(b.name));
+
+    const standingsRows = teams.map((t,i) => {
+      const gdClass = t.GD > 0 ? 'gd-pos' : t.GD < 0 ? 'gd-neg' : '';
+      const gdStr = (t.GD > 0 ? '+' : '') + t.GD;
+      return `<tr class="${i < 2 ? 'qual' : ''}">
+        <td class="team-col"><span>${escapeHtml(t.flag || '')}</span><span>${escapeHtml(t.code)}</span></td>
+        <td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td>
+        <td class="${gdClass}">${gdStr}</td>
+        <td class="pts-cell">${t.Pts}</td>
+      </tr>`;
+    }).join('');
+
+    const fixtureRows = games.map(m => {
+      const isToday = m.date === today;
+      const dateStr = new Date(m.date + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const mid = m.score
+        ? `<span class="gf-mid">${m.score.home}–${m.score.away}</span>`
+        : `<span class="gf-mid gf-time">${escapeHtml((m.kickoff || '').replace(' ET',''))}</span>`;
+      return `<div class="group-fixture${isToday ? ' is-today' : ''}">
+        <span class="gf-date">${escapeHtml(dateStr)}</span>
+        <span class="gf-home"><span class="gf-team">${escapeHtml(m.home.code)}</span><span class="gf-flag">${escapeHtml(m.home.flag)}</span></span>
+        ${mid}
+        <span class="gf-away"><span class="gf-flag">${escapeHtml(m.away.flag)}</span><span class="gf-team">${escapeHtml(m.away.code)}</span></span>
+      </div>`;
+    }).join('');
+
+    return `<div class="group-card glass">
+      <div class="group-card-header">
+        <span class="group-card-title">${escapeHtml(g)}</span>
+        <span class="group-card-count">${games.length} match${games.length === 1 ? '' : 'es'}</span>
+      </div>
+      ${teams.length ? `<table class="group-standings">
+        <thead><tr>
+          <th class="team-col">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th>
+        </tr></thead>
+        <tbody>${standingsRows}</tbody>
+      </table>` : ''}
+      <div class="group-card-fixtures">${fixtureRows}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="groups-grid">${cards}</div>`;
 }
 
 // \u2500\u2500 User-uploaded assets (localStorage) \u2500\u2500
@@ -3068,33 +3265,37 @@ function renderAssets(filter = 'All') {
     const statusMap = { 'Live': 'astatus-live', 'Scheduled': 'astatus-scheduled', 'In Review': 'astatus-review', 'Concept': 'astatus-concept' };
     const sc = statusMap[a.status] || 'astatus-concept';
     const ytId = a.kind === 'youtube' ? youtubeIdFrom(a.youtubeUrl) : null;
+    const formatEsc = escapeHtml(a.format || 'Asset');
+    const safeImageSrc = (typeof a.imageData === 'string' && a.imageData.startsWith('data:image/')) ? a.imageData : '';
     let thumb;
-    if (a.kind === 'image' && a.imageData) {
-      thumb = `<img src="${a.imageData}" alt="" />`;
+    if (a.kind === 'image' && safeImageSrc) {
+      thumb = `<img src="${escapeHtml(safeImageSrc)}" alt="" />`;
     } else if (ytId) {
-      thumb = `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
+      thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
     } else if (a.driveFileId) {
-      thumb = `<img src="${driveThumbnail(a.driveFileId, 400)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${a.format || 'Asset'}</div>`;
+      thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${formatEsc}</div>`;
     } else {
-      thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${a.format || 'Asset'}</div>`;
+      thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${formatEsc}</div>`;
     }
-    const link = a.youtubeUrl
-      ? `<a href="${a.youtubeUrl}" target="_blank" rel="noopener" class="asset-link">Open on YouTube \u2192</a>`
-      : a.driveUrl
-        ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>`
+    const ytHref = safeUrl(a.youtubeUrl);
+    const driveHref = safeUrl(a.driveUrl);
+    const link = ytHref
+      ? `<a href="${ytHref}" target="_blank" rel="noopener" class="asset-link">Open on YouTube \u2192</a>`
+      : driveHref
+        ? `<a href="${driveHref}" target="_blank" rel="noopener" class="asset-link">Open in Drive \u2192</a>`
         : '';
-    const removeBtn = a.userUploaded ? `<button class="asset-remove" data-asset-id="${a.id}" title="Remove">\u00d7</button>` : '';
+    const removeBtn = a.userUploaded ? `<button class="asset-remove" data-asset-id="${escapeHtml(a.id)}" title="Remove">\u00d7</button>` : '';
     const dateStr = a.deployDate ? `Deploy: ${new Date(a.deployDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}` : '';
     return `<div class="asset-card glass">
       ${removeBtn}
       <div class="asset-thumb">${thumb}</div>
       <div class="asset-body">
-        <h4>${a.headline}</h4>
+        <h4>${escapeHtml(a.headline)}</h4>
         <div class="asset-meta">
-          ${a.format ? `<span class="asset-format">${a.format}</span>` : ''}
-          ${a.status ? `<span class="asset-status-pill ${sc}">${a.status}</span>` : ''}
+          ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ''}
+          ${a.status ? `<span class="asset-status-pill ${sc}">${escapeHtml(a.status)}</span>` : ''}
         </div>
-        ${dateStr ? `<span class="asset-date">${dateStr}</span>` : ''}
+        ${dateStr ? `<span class="asset-date">${escapeHtml(dateStr)}</span>` : ''}
         ${link}
       </div>
     </div>`;
@@ -3284,11 +3485,55 @@ async function fetchMfgLatest(silent = false) {
 
 function setupMfgSync() {
   const btn = document.getElementById('mfgSyncRefresh');
-  if (btn) btn.addEventListener('click', () => fetchMfgLatest(false));
+  if (btn) btn.addEventListener('click', () => { fetchMfgLatest(false); fetchMarketContent(true); });
   fetchMfgLatest(true);
+  fetchMarketContent(true);
   if (mfgPollTimer) clearInterval(mfgPollTimer);
-  mfgPollTimer = setInterval(() => fetchMfgLatest(true), 5 * 60 * 1000); // 5 min
-  setInterval(updateMfgSyncTime, 30 * 1000); // tick the "Xm ago" label
+  mfgPollTimer = setInterval(() => { fetchMfgLatest(true); fetchMarketContent(true); }, 5 * 60 * 1000);
+  setInterval(updateMfgSyncTime, 30 * 1000);
+}
+
+// ── Market-scoped content merge (per-market upserts in Supabase) ──
+// Hardcoded DASHBOARD_DATA.news/social act as base. Supabase rows in `dashboard_content`
+// (keyed on market+kind) overlay/replace per market. Items already tagged with their market
+// so the existing market filters + heatmap continue to work.
+const DASHBOARD_BASE = {
+  news: DASHBOARD_DATA.news.slice(),
+  social: DASHBOARD_DATA.social.slice(),
+};
+async function fetchMarketContent(silent = false) {
+  try {
+    if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
+      mfgSyncSb = window.supabase.createClient(MFG_SUPABASE_URL, MFG_SUPABASE_KEY);
+    }
+    if (!mfgSyncSb) return;
+    const { data, error } = await mfgSyncSb
+      .from('dashboard_content')
+      .select('market, kind, payload, updated_at')
+      .order('updated_at', { ascending: false });
+    if (error) { if (!silent) console.warn('market content fetch error', error); return; }
+    if (!data) return;
+
+    const overrides = { news: {}, social: {} };
+    data.forEach(row => {
+      if (!overrides[row.kind]) return;
+      overrides[row.kind][row.market] = Array.isArray(row.payload) ? row.payload : [];
+    });
+
+    const mergeKind = (kind) => {
+      const baseKept = DASHBOARD_BASE[kind].filter(item => !overrides[kind][item.tag]);
+      const supabaseItems = Object.values(overrides[kind]).flat();
+      return [...supabaseItems, ...baseKept];
+    };
+
+    DASHBOARD_DATA.news = mergeKind('news');
+    DASHBOARD_DATA.social = mergeKind('social');
+
+    if (typeof renderNews === 'function') renderNews();
+    if (typeof renderSocial === 'function') renderSocial();
+  } catch(e) {
+    if (!silent) console.warn('market content fetch failed', e);
+  }
 }
 
 // ── Help modal (Formspree) ──
@@ -3383,8 +3628,9 @@ function setupCardExpand() {
       const tagClass = n.tag === 'Canada' ? 'tag-canada' : n.tag === 'Germany' ? 'tag-germany' : 'tag-general';
       const time = new Date(n.timestamp);
       const timeStr = time.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' • ' + time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-      const link = n.url ? `<a href="${n.url}" target="_blank" rel="noopener" class="read-more">Read full article →</a>` : '';
-      open(`<span class="tag ${tagClass}">${n.tag || 'General'}</span><h3 style="margin-top:12px">${n.headline}</h3><p class="meta">${n.source} • ${timeStr}</p><p class="summary">${n.summary}</p>${link}`);
+      const safeNewsHref = safeUrl(n.url);
+      const link = safeNewsHref ? `<a href="${safeNewsHref}" target="_blank" rel="noopener" class="read-more">Read full article →</a>` : '';
+      open(`<span class="tag ${tagClass}">${escapeHtml(n.tag || 'General')}</span><h3 style="margin-top:12px">${escapeHtml(n.headline)}</h3><p class="meta">${escapeHtml(n.source)} • ${escapeHtml(timeStr)}</p><p class="summary">${escapeHtml(n.summary)}</p>${link}`);
     } else if (type === 'social') {
       const s = DASHBOARD_DATA.social.find(x => x.id === id);
       if (!s) return;
@@ -3394,14 +3640,14 @@ function setupCardExpand() {
         ? `<div class="modal-quotes-header">💬 ${quotesArr.length} reaction${quotesArr.length === 1 ? '' : 's'} across platforms</div>
            <div class="modal-quotes">${quotesArr.map(q =>
              `<div class="modal-quote">
-                ${q.platform ? `<span class="modal-quote-plat plat-${q.platform.toLowerCase().replace(/[^a-z]/g,'')}">${q.platform}</span>` : ''}
-                <span class="modal-quote-text">"${q.text}"</span>
+                ${q.platform ? `<span class="modal-quote-plat plat-${q.platform.toLowerCase().replace(/[^a-z]/g,'')}">${escapeHtml(q.platform)}</span>` : ''}
+                <span class="modal-quote-text">"${escapeHtml(q.text)}"</span>
               </div>`).join('')}</div>`
         : '';
-      const platforms = s.platforms.map(p => `<span class="platform-pill">${p}</span>`).join('');
+      const platforms = s.platforms.map(p => `<span class="platform-pill">${escapeHtml(p)}</span>`).join('');
       const dateLong = trendDateLong(s.id);
-      const dateLine = dateLong ? `<p class="meta">📅 Trend started ${dateLong}</p>` : '';
-      open(`<span class="sentiment-badge ${sentClass}">${s.sentiment}</span><h3 style="margin-top:12px">${s.topic}</h3>${dateLine}<p class="meta">Volume ${s.volume} • ${s.category}</p><p class="summary">${s.summary}</p>${quotesBlock}<div class="platforms">${platforms}</div>`);
+      const dateLine = dateLong ? `<p class="meta">📅 Trend started ${escapeHtml(dateLong)}</p>` : '';
+      open(`<span class="sentiment-badge ${sentClass}">${escapeHtml(s.sentiment)}</span><h3 style="margin-top:12px">${escapeHtml(s.topic)}</h3>${dateLine}<p class="meta">Volume ${escapeHtml(s.volume)} • ${escapeHtml(s.category)}</p><p class="summary">${escapeHtml(s.summary)}</p>${quotesBlock}<div class="platforms">${platforms}</div>`);
     }
   });
 
@@ -3714,6 +3960,7 @@ function runIntro() {
 runIntro();
 setupTheme();
 init();
+setupMfgSync();
 </script>
 </body>
 </html>

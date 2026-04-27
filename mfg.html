@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>World Cup HQ</title>
+<title>World Cup HQ — MFG Console</title>
+<meta name="description" content="Internal MFG console for World Cup HQ.">
+<meta name="theme-color" content="#0a0c14">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/mfg-logo.png">
+<link rel="apple-touch-icon" href="/assets/mfg-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -654,6 +659,25 @@ a:hover { opacity: 0.8; }
   </div>
 </div>
 
+<!-- Market Identification Gate -->
+<div id="marketGate" style="display:none">
+  <div class="gate-box glass">
+    <h1>Identify Yourself</h1>
+    <p>Pick the market you're updating. You'll only edit your market's content — other markets stay untouched.</p>
+    <select class="gate-input" id="marketSelect" style="appearance:auto">
+      <option value="">— Select your market —</option>
+      <option value="Canada">🇨🇦 Canada</option>
+      <option value="Germany">🇩🇪 Germany</option>
+      <option value="UK">🇬🇧 UK</option>
+      <option value="USA">🇺🇸 USA</option>
+      <option value="Global">🌍 Global</option>
+    </select>
+    <input type="text" class="gate-input" id="marketUser" placeholder="Your name (for audit log)" maxlength="40" style="margin-top:10px">
+    <button class="gate-btn" id="marketContinue" style="margin-top:14px">Continue</button>
+    <div class="gate-error" id="marketError">Please pick a market and enter your name.</div>
+  </div>
+</div>
+
 <!-- App -->
 <div id="app">
 
@@ -661,14 +685,14 @@ a:hover { opacity: 0.8; }
     <div class="header-brand">
       &#127942; World Cup HQ
       <span class="mfg-badge">MFG</span>
+      <span class="mfg-badge" id="marketBadge" style="background:rgba(255,215,0,0.15);color:var(--gold);border-color:rgba(255,215,0,0.4);margin-left:6px"></span>
+      <button class="setting-btn" id="switchMarketBtn" style="margin-left:10px;padding:4px 10px;font-size:11px">Switch Market</button>
     </div>
     <a href="index.html" class="header-back">&larr; Dashboard</a>
   </header>
 
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="update" onclick="switchTab('update')">&#128229; Daily Update</button>
-    <button class="tab-btn" data-tab="production" onclick="switchTab('production')">&#127959; Production Tracker</button>
-    <button class="tab-btn" data-tab="prompts" onclick="switchTab('prompts')">&#128172; Prompts Tracker</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️ Settings</button>
   </nav>
 
@@ -730,14 +754,25 @@ a:hover { opacity: 0.8; }
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-primary" id="generateBtn">Generate JSON</button>
+          <button class="btn-primary" id="publishBtn">📤 Publish to Dashboard</button>
+          <button class="btn-secondary" id="generateBtn">Preview JSON</button>
           <button class="btn-secondary" id="copyBtn" style="display:none">Copy to Clipboard</button>
           <button class="btn-secondary" id="saveBtn" style="display:none">Save to History</button>
           <span class="toast" id="toast"></span>
         </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px">
+          Each line of the boxes above becomes one card. Use a blank line between items to add a multi-line summary
+          (first line becomes the headline, the rest is the summary).
+        </p>
         <div class="output-area" id="outputArea">
           <pre id="outputCode"></pre>
         </div>
+      </div>
+
+      <!-- Market activity -->
+      <div class="form-card glass" style="margin-top:18px">
+        <div class="section-title" style="font-size:14px;margin-bottom:12px">📡 Last Published per Market</div>
+        <div id="marketActivity" style="font-size:13px;color:var(--text-muted)">Loading…</div>
       </div>
 
       <!-- History -->
@@ -751,119 +786,7 @@ a:hover { opacity: 0.8; }
 
     </div>
 
-    <!-- Tab 2: Production Tracker -->
-    <div class="tab-panel" id="panel-production">
-      <div class="section-title">&#127959; Production Tracker</div>
-      <div class="table-card glass" style="overflow-x:auto">
-        <table class="data-table">
-          <thead>
-            <tr><th>Asset</th><th>Status</th><th>Owner</th><th>Deadline</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Pre-Tournament Hype Reel</td>
-              <td><span class="status-pill complete">Complete</span></td>
-              <td>Sarah K.</td>
-              <td>Jun 1, 2026</td>
-              <td>Final cut approved. Delivered to social team.</td>
-            </tr>
-            <tr>
-              <td>Daily Match Recap Template</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>Marcus T.</td>
-              <td>Jun 5, 2026</td>
-              <td>Motion graphics 80% done. Audio pending.</td>
-            </tr>
-            <tr>
-              <td>Fan Zone Interview Kit</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>Lisa R.</td>
-              <td>Jun 8, 2026</td>
-              <td>Shooting schedule confirmed. Gear packed.</td>
-            </tr>
-            <tr>
-              <td>Sponsor Integration Package</td>
-              <td><span class="status-pill blocked">Blocked</span></td>
-              <td>James W.</td>
-              <td>Jun 3, 2026</td>
-              <td>Waiting on brand guidelines from sponsor.</td>
-            </tr>
-            <tr>
-              <td>Player Profile Cards (Series)</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>Amy D.</td>
-              <td>Jun 10, 2026</td>
-              <td>12 of 24 cards designed. Batch 2 in review.</td>
-            </tr>
-            <tr>
-              <td>Post-Match Social Templates</td>
-              <td><span class="status-pill complete">Complete</span></td>
-              <td>Chris P.</td>
-              <td>May 28, 2026</td>
-              <td>All platforms covered. Templates in Figma.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Tab 3: Prompts Tracker -->
-    <div class="tab-panel" id="panel-prompts">
-      <div class="section-title">&#128172; Prompts Tracker</div>
-      <div class="table-card glass" style="overflow-x:auto">
-        <table class="data-table">
-          <thead>
-            <tr><th>Prompt</th><th>Status</th><th>Owner</th><th>Due Date</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Opening Day Hype Thread Generator</td>
-              <td><span class="status-pill complete">Complete</span></td>
-              <td>Sarah K.</td>
-              <td>Jun 1, 2026</td>
-              <td>Tested across 3 tone variations.</td>
-            </tr>
-            <tr>
-              <td>Match Recap Auto-Summary</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>Marcus T.</td>
-              <td>Jun 6, 2026</td>
-              <td>Prompt v2 in testing. Output quality at 85%.</td>
-            </tr>
-            <tr>
-              <td>Fan Sentiment Analyzer</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>Lisa R.</td>
-              <td>Jun 7, 2026</td>
-              <td>Needs more training examples for sarcasm detection.</td>
-            </tr>
-            <tr>
-              <td>Viral Moment Caption Writer</td>
-              <td><span class="status-pill blocked">Blocked</span></td>
-              <td>Amy D.</td>
-              <td>Jun 4, 2026</td>
-              <td>Dependent on brand voice doc (still in review).</td>
-            </tr>
-            <tr>
-              <td>Daily Dashboard News Formatter</td>
-              <td><span class="status-pill complete">Complete</span></td>
-              <td>Chris P.</td>
-              <td>May 30, 2026</td>
-              <td>Integrated into this page. Working well.</td>
-            </tr>
-            <tr>
-              <td>Player Quote Highlight Generator</td>
-              <td><span class="status-pill in-progress">In Progress</span></td>
-              <td>James W.</td>
-              <td>Jun 9, 2026</td>
-              <td>Draft prompt done. Needs multilingual support.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Tab 4: Settings -->
+    <!-- Tab 2: Settings -->
     <div class="tab-panel" id="panel-settings">
       <div class="settings-section glass">
         <h3 class="settings-title">⚙️ Dashboard Settings</h3>
@@ -949,22 +872,75 @@ a:hover { opacity: 0.8; }
 
   // --- Password Gate ---
   const gate = document.getElementById('gate');
+  const marketGate = document.getElementById('marketGate');
   const app = document.getElementById('app');
   const gateInput = document.getElementById('gateInput');
   const gateBtn = document.getElementById('gateBtn');
   const gateError = document.getElementById('gateError');
+  const marketSelect = document.getElementById('marketSelect');
+  const marketUser = document.getElementById('marketUser');
+  const marketContinue = document.getElementById('marketContinue');
+  const marketError = document.getElementById('marketError');
+
+  const MARKET_LS_KEY = 'mfg_market';
+  const MARKET_USER_LS_KEY = 'mfg_user_label';
+  let currentMarket = localStorage.getItem(MARKET_LS_KEY) || '';
+  let currentUserLabel = localStorage.getItem(MARKET_USER_LS_KEY) || '';
+
+  function showMarketBadge() {
+    const b = document.getElementById('marketBadge');
+    if (!b) return;
+    const flag = ({Canada:'🇨🇦',Germany:'🇩🇪',UK:'🇬🇧',USA:'🇺🇸',Global:'🌍'})[currentMarket] || '';
+    b.textContent = `${flag} ${currentMarket}${currentUserLabel ? ' · ' + currentUserLabel : ''}`;
+  }
+
+  function showApp() {
+    gate.style.display = 'none';
+    marketGate.style.display = 'none';
+    app.style.display = 'block';
+    showMarketBadge();
+    initApp();
+  }
+
+  function showMarketGate() {
+    gate.style.display = 'none';
+    app.style.display = 'none';
+    marketGate.style.display = 'flex';
+    if (currentMarket) marketSelect.value = currentMarket;
+    if (currentUserLabel) marketUser.value = currentUserLabel;
+    marketSelect.focus();
+  }
 
   function tryAuth() {
     if (gateInput.value === PASSWORD) {
-      gate.style.display = 'none';
-      app.style.display = 'block';
-      initApp();
+      if (currentMarket && currentUserLabel) showApp();
+      else showMarketGate();
     } else {
       gateError.style.display = 'block';
       gateInput.value = '';
       gateInput.focus();
     }
   }
+
+  marketContinue.addEventListener('click', () => {
+    const m = marketSelect.value;
+    const u = marketUser.value.trim();
+    if (!m || !u) { marketError.style.display = 'block'; return; }
+    currentMarket = m;
+    currentUserLabel = u;
+    localStorage.setItem(MARKET_LS_KEY, m);
+    localStorage.setItem(MARKET_USER_LS_KEY, u);
+    marketError.style.display = 'none';
+    showApp();
+  });
+  marketUser.addEventListener('keydown', e => { if (e.key === 'Enter') marketContinue.click(); });
+
+  // Expose getters for initApp
+  window.__mfgMarket = () => currentMarket;
+  window.__mfgUser = () => currentUserLabel;
+  window.__mfgSwitchMarket = () => {
+    showMarketGate();
+  };
 
   gateBtn.addEventListener('click', tryAuth);
   gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
@@ -980,15 +956,13 @@ a:hover { opacity: 0.8; }
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === '1') switchTab('update');
-    if (e.key === '2') switchTab('production');
-    if (e.key === '3') switchTab('prompts');
-    if (e.key === '4') switchTab('settings');
+    if (e.key === '2') switchTab('settings');
   });
 
   // Hash routing
   function applyHash() {
     const hash = location.hash.replace('#', '');
-    if (['update', 'production', 'prompts', 'settings'].includes(hash)) {
+    if (['update', 'settings'].includes(hash)) {
       switchTab(hash);
     }
   }
@@ -1107,15 +1081,128 @@ a:hover { opacity: 0.8; }
     applyHash();
 
     const generateBtn = document.getElementById('generateBtn');
+    const publishBtn = document.getElementById('publishBtn');
     const copyBtn = document.getElementById('copyBtn');
     const saveBtn = document.getElementById('saveBtn');
     const outputArea = document.getElementById('outputArea');
     const outputCode = document.getElementById('outputCode');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const switchMarketBtn = document.getElementById('switchMarketBtn');
+    const marketActivity = document.getElementById('marketActivity');
 
     let currentJson = '';
     let currentNewsRaw = '';
     let currentSocialRaw = '';
+
+    if (switchMarketBtn) switchMarketBtn.addEventListener('click', () => window.__mfgSwitchMarket());
+
+    function parseItems(raw, kind) {
+      // Split on blank lines = item boundaries; first line of block = headline/topic, rest = summary.
+      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      const market = window.__mfgMarket();
+      const ts = new Date().toISOString();
+      return blocks.map((block, i) => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        const head = lines[0] || '';
+        const rest = lines.slice(1).join(' ') || lines[0] || '';
+        const id = `${market.toLowerCase()}-${kind}-${Date.now()}-${i}`;
+        if (kind === 'news') {
+          return {
+            id,
+            headline: head,
+            summary: rest,
+            source: 'Market Update',
+            tag: market,
+            timestamp: ts,
+          };
+        } else {
+          return {
+            id,
+            topic: head,
+            summary: rest,
+            sentiment: 'mixed',
+            volume: '🔥',
+            category: market,
+            platforms: [],
+            tag: market,
+          };
+        }
+      });
+    }
+
+    async function publishMarketContent() {
+      const market = window.__mfgMarket();
+      const userLabel = window.__mfgUser();
+      if (!market) { showToast('Pick a market first.', 'error'); return; }
+
+      const newsRaw = document.getElementById('newsInput').value.trim();
+      const socialRaw = document.getElementById('socialInput').value.trim();
+      if (!newsRaw && !socialRaw) { showToast('Enter content in at least one field.', 'error'); return; }
+      if (!supabase) { showToast('Supabase not connected. Cannot publish.', 'error'); return; }
+
+      publishBtn.disabled = true;
+      publishBtn.textContent = 'Publishing…';
+
+      const upserts = [];
+      if (newsRaw) {
+        upserts.push({ market, kind: 'news', payload: parseItems(newsRaw, 'news'), updated_at: new Date().toISOString(), updated_by: userLabel });
+      }
+      if (socialRaw) {
+        upserts.push({ market, kind: 'social', payload: parseItems(socialRaw, 'social'), updated_at: new Date().toISOString(), updated_by: userLabel });
+      }
+
+      try {
+        const { error } = await supabase
+          .from('dashboard_content')
+          .upsert(upserts, { onConflict: 'market,kind' });
+        if (error) throw error;
+        showToast(`Published ${upserts.length} update${upserts.length>1?'s':''} for ${market}!`, 'success');
+        document.getElementById('newsInput').value = '';
+        document.getElementById('socialInput').value = '';
+        await loadMarketActivity();
+      } catch(e) {
+        console.error('Publish failed', e);
+        showToast('Publish failed: ' + (e.message || 'Unknown error'), 'error');
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.textContent = '📤 Publish to Dashboard';
+      }
+    }
+
+    async function loadMarketActivity() {
+      if (!supabase || !marketActivity) return;
+      try {
+        const { data, error } = await supabase
+          .from('dashboard_content')
+          .select('market, kind, updated_at, updated_by')
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        if (!data || !data.length) {
+          marketActivity.innerHTML = '<em>No content published yet.</em>';
+          return;
+        }
+        const fmt = ts => {
+          const d = new Date(ts);
+          const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+          if (diff < 60) return `${diff}s ago`;
+          if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+          if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+          return d.toLocaleString();
+        };
+        marketActivity.innerHTML = data.map(r =>
+          `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <strong style="color:var(--text)">${r.market}</strong> · ${r.kind} · ${fmt(r.updated_at)}${r.updated_by ? ' · by ' + r.updated_by : ''}
+          </div>`
+        ).join('');
+      } catch(e) {
+        console.warn('activity load failed', e);
+        marketActivity.innerHTML = '<em>Could not load activity.</em>';
+      }
+    }
+
+    if (publishBtn) publishBtn.addEventListener('click', publishMarketContent);
+    loadMarketActivity();
+    setInterval(loadMarketActivity, 60 * 1000);
 
     generateBtn.addEventListener('click', () => {
       const newsRaw = document.getElementById('newsInput').value.trim();
