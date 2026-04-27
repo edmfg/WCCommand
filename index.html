@@ -3074,15 +3074,17 @@ function setupTheme() {
   });
 }
 
-// ── Stadium Flyover Intro ──
+// ── Stadium Flyover Intro (plays every 3rd visit) ──
 function runIntro() {
-  const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('wc-intro-v7') === today) {
+  const VISIT_KEY = 'wc-visit-count';
+  const count = (parseInt(localStorage.getItem(VISIT_KEY) || '0', 10) || 0) + 1;
+  localStorage.setItem(VISIT_KEY, String(count));
+  // Play on visits 1, 4, 7, 10, … (every 3rd)
+  if (count % 3 !== 1) {
     document.body.classList.remove('dashboard-hidden');
     document.getElementById('introOverlay').remove();
     return;
   }
-  localStorage.setItem('wc-intro-v7', today);
 
   const overlay = document.getElementById('introOverlay');
   const pitch = document.getElementById('introPitch');
