@@ -74,7 +74,7 @@ a:hover { opacity: 0.8; }
 }
 
 /* Password Gate */
-#gate {
+#gate, #marketGate {
   position: fixed;
   inset: 0;
   background: var(--bg);
@@ -82,7 +82,25 @@ a:hover { opacity: 0.8; }
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 24px;
 }
+#marketGate { display: none; }
+#marketGate.shown { display: flex; }
+#marketGate .gate-box { max-width: 460px; }
+#marketGate .market-instructions {
+  text-align: left;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+#marketGate .market-instructions strong { color: var(--text); }
+#marketGate .market-instructions ol { margin: 8px 0 0 18px; padding: 0; }
+#marketGate .market-instructions li { margin-bottom: 4px; }
 
 .gate-box {
   text-align: center;
@@ -660,10 +678,21 @@ a:hover { opacity: 0.8; }
 </div>
 
 <!-- Market Identification Gate -->
-<div id="marketGate" style="display:none">
+<div id="marketGate">
   <div class="gate-box glass">
     <h1>Identify Yourself</h1>
-    <p>Pick the market you're updating. You'll only edit your market's content — other markets stay untouched.</p>
+    <p>Tell us who's updating — you'll only edit your own market.</p>
+
+    <div class="market-instructions">
+      <strong>How this works</strong>
+      <ol>
+        <li>Pick the market you're responsible for (Canada, Germany, UK, USA, or Global).</li>
+        <li>Enter your name — it shows up in the audit log so the team knows who published what.</li>
+        <li>Anything you publish only updates <strong>your</strong> market's content. Other markets are never overwritten.</li>
+        <li>You can switch market later using the "Switch Market" button in the header.</li>
+      </ol>
+    </div>
+
     <select class="gate-input" id="marketSelect" style="appearance:auto">
       <option value="">— Select your market —</option>
       <option value="Canada">🇨🇦 Canada</option>
@@ -896,7 +925,7 @@ a:hover { opacity: 0.8; }
 
   function showApp() {
     gate.style.display = 'none';
-    marketGate.style.display = 'none';
+    marketGate.classList.remove('shown');
     app.style.display = 'block';
     showMarketBadge();
     initApp();
@@ -905,7 +934,7 @@ a:hover { opacity: 0.8; }
   function showMarketGate() {
     gate.style.display = 'none';
     app.style.display = 'none';
-    marketGate.style.display = 'flex';
+    marketGate.classList.add('shown');
     if (currentMarket) marketSelect.value = currentMarket;
     if (currentUserLabel) marketUser.value = currentUserLabel;
     marketSelect.focus();
