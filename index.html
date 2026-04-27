@@ -43,32 +43,31 @@ body{
 /* ── HEADER ── */
 .header{
   position:sticky;top:0;z-index:100;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,0.55),rgba(255,255,255,0.35)),
-    linear-gradient(120deg,
-      #cfeaff 0%,
-      #e0d4ff 18%,
-      #ffd5ec 36%,
-      #fff0c2 54%,
-      #d4f5e1 72%,
-      #cfeaff 100%);
-  background-size:auto, 360% 360%;
-  animation:nav-wave 22s ease-in-out infinite;
-  -webkit-backdrop-filter:blur(28px) saturate(200%);
-  backdrop-filter:blur(28px) saturate(200%);
-  border-bottom:1px solid rgba(255,255,255,0.6);
+  background:linear-gradient(115deg,
+    #b3e0ff 0%,
+    #c7b8ff 14%,
+    #ffb8e0 28%,
+    #ffd9a8 42%,
+    #b8f0c8 56%,
+    #a8e6ff 70%,
+    #d6b8ff 84%,
+    #b3e0ff 100%);
+  background-size:500% 500%;
+  animation:nav-wave 30s linear infinite;
+  border-bottom:1px solid rgba(255,255,255,0.7);
   box-shadow:
-    0 8px 30px rgba(15,23,42,0.08),
-    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 8px 30px rgba(15,23,42,0.1),
+    0 1px 0 rgba(255,255,255,0.85) inset,
     0 -1px 0 rgba(0,0,0,0.04) inset;
   padding:0 24px;overflow:hidden;
 }
+.header::before{display:none}
+.header::after{display:none}
+.header-inner::after{display:none}
 @keyframes nav-wave{
-  0%   {background-position:center, 0% 50%}
-  25%  {background-position:center, 50% 25%}
-  50%  {background-position:center, 100% 50%}
-  75%  {background-position:center, 50% 75%}
-  100% {background-position:center, 0% 50%}
+  0%   {background-position:0% 50%}
+  50%  {background-position:100% 50%}
+  100% {background-position:0% 50%}
 }
 .header::before, .header::after{
   content:'';position:absolute;border-radius:50%;pointer-events:none;
