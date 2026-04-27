@@ -400,11 +400,11 @@ body.light .glass:hover{
 .live-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
 .live-filter{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
-  text-transform:uppercase;letter-spacing:1.5px;padding:6px 16px;
+  text-transform:uppercase;letter-spacing:1.5px;padding:7px 18px;
   background:rgba(255,255,255,0.06);color:var(--text-dim);
-  border:1px solid rgba(255,255,255,0.08);cursor:pointer;
-  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
-  transition:all 0.2s;
+  border:1px solid rgba(255,255,255,0.1);cursor:pointer;
+  border-radius:999px;
+  transition:all 0.2s var(--transition);
 }
 .live-filter:hover{color:#fff;background:rgba(255,255,255,0.1)}
 .live-filter.active{
@@ -567,10 +567,11 @@ body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
 .fixtures-controls{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
 .view-btn{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.7rem;
-  text-transform:uppercase;letter-spacing:1.5px;padding:6px 16px;
-  background:transparent;color:var(--text-dim);border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
-  transition:all 0.2s;
+  text-transform:uppercase;letter-spacing:1.5px;padding:7px 18px;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  border:1px solid rgba(255,255,255,0.1);cursor:pointer;
+  border-radius:999px;
+  transition:all 0.2s var(--transition);
 }
 .view-btn:hover{color:#fff;border-color:rgba(255,255,255,0.2)}
 .view-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
@@ -654,21 +655,21 @@ body.light .carousel-nav button:hover{background:rgba(0,0,0,0.08);color:#333}
 /* ── CREATIVE TAB ── */
 .sub-tabs{display:flex;gap:4px;margin-bottom:20px}
 .sub-tab{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.8rem;
-  text-transform:uppercase;letter-spacing:1px;padding:8px 22px;
-  background:rgba(255,255,255,0.04);color:var(--text-dim);
-  border:1px solid rgba(255,255,255,0.06);border-radius:8px 8px 0 0;
-  cursor:pointer;transition:all 0.25s var(--transition);border-bottom:none;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:0.78rem;
+  text-transform:uppercase;letter-spacing:1.5px;padding:7px 18px;
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  border:1px solid rgba(255,255,255,0.1);border-radius:999px;
+  cursor:pointer;transition:all 0.25s var(--transition);
 }
-.sub-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.sub-tab:hover{color:#fff;background:rgba(255,255,255,0.1)}
 .sub-tab.active{
-  background:rgba(255,255,255,0.06);color:#fff;
-  border-color:rgba(255,255,255,0.1);
-  box-shadow:inset 0 2px 0 var(--gold);
+  background:linear-gradient(135deg,var(--red),#ff3333);color:#fff;
+  border-color:rgba(255,255,255,0.2);
+  box-shadow:0 4px 14px rgba(204,0,0,0.35);
 }
 body.light .sub-tab{background:rgba(0,0,0,0.03);color:#666;border-color:rgba(0,0,0,0.06)}
 body.light .sub-tab:hover{color:#333;background:rgba(0,0,0,0.06)}
-body.light .sub-tab.active{background:rgba(255,255,255,0.8);color:#1a1a2e;box-shadow:inset 0 2px 0 var(--red)}
+body.light .sub-tab.active{background:linear-gradient(135deg,var(--red),#ff3333);color:#fff;box-shadow:0 4px 14px rgba(204,0,0,0.3)}
 .sub-panel{display:none}
 .sub-panel.active{display:block;animation:fadeUp 0.3s var(--transition)}
 .empty-state{
@@ -690,10 +691,9 @@ body.light .empty-state h3{
 .filter-pill{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.75rem;
   text-transform:uppercase;letter-spacing:1.5px;
-  padding:7px 20px;border:1px solid var(--border);
-  background:var(--surface);color:var(--text-dim);
-  cursor:pointer;
-  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  padding:7px 18px;border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.06);color:var(--text-dim);
+  cursor:pointer;border-radius:999px;
   transition:all 0.3s var(--transition);
 }
 .filter-pill:hover{border-color:rgba(255,255,255,0.2);color:#fff}
@@ -1089,6 +1089,10 @@ body.light .support-form input,body.light .support-form select,body.light .suppo
   transition:filter 0.2s,transform 0.2s;
 }
 .support-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.support-submit:disabled{opacity:0.7;cursor:not-allowed;transform:none}
+.support-status{font-size:0.82rem;text-align:center;min-height:1.2em;margin-top:2px}
+.support-status-success{color:#34d399;font-weight:600}
+.support-status-error{color:#f87171;font-weight:600}
 .support-gmail{
   margin-top:2px;padding:10px 16px;border-radius:8px;cursor:pointer;
   font-family:'Oswald',sans-serif;font-weight:600;font-size:0.78rem;
@@ -1750,9 +1754,9 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
         </select>
       </label>
       <label>Message<textarea id="supportMessage" rows="6" required placeholder="What's going on?"></textarea></label>
-      <button type="submit" class="support-submit">Send via default mail app</button>
-      <button type="button" class="support-gmail" id="supportGmailBtn">Send via Gmail (web)</button>
-      <p class="support-hint">Goes to the World Cup HQ team.</p>
+      <button type="submit" class="support-submit" id="supportSubmit">Send</button>
+      <p class="support-status" id="supportStatus"></p>
+      <p class="support-hint">Sends directly from the site to the World Cup HQ team.</p>
     </form>
   </div>
 </div>
@@ -2933,18 +2937,24 @@ function setupMfgSync() {
   setInterval(updateMfgSyncTime, 30 * 1000); // tick the "Xm ago" label
 }
 
-// ── Support modal ──
-// Recipient masked from UI; lightly obfuscated in source to avoid casual scraping.
-const SUPPORT_EMAIL = ['ed.tsue', 'mediafuturesgroup.com'].join('@');
+// ── Support modal: POSTs to /api/support which sends via Resend ──
 function setupSupport() {
   const overlay = document.getElementById('supportOverlay');
   const btn = document.getElementById('supportBtn');
   const closeBtn = document.getElementById('supportClose');
   const form = document.getElementById('supportForm');
-  const gmailBtn = document.getElementById('supportGmailBtn');
+  const submitBtn = document.getElementById('supportSubmit');
+  const status = document.getElementById('supportStatus');
   if (!overlay || !btn) return;
 
-  function open() { overlay.classList.add('open'); document.getElementById('supportName').focus(); }
+  function open() {
+    overlay.classList.add('open');
+    status.textContent = '';
+    status.className = 'support-status';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send';
+    document.getElementById('supportName').focus();
+  }
   function close() { overlay.classList.remove('open'); }
 
   btn.addEventListener('click', open);
@@ -2952,41 +2962,42 @@ function setupSupport() {
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
 
-  function buildMessage() {
-    const name = document.getElementById('supportName').value.trim();
-    const email = document.getElementById('supportEmail').value.trim();
-    const topic = document.getElementById('supportTopic').value;
-    const message = document.getElementById('supportMessage').value.trim();
-    if (!name || !email || !message) return null;
-
-    const subject = `[World Cup HQ Support] ${topic} — from ${name}`;
-    const body = [
-      `From: ${name} <${email}>`,
-      `Topic: ${topic}`,
-      `Page: ${location.href}`,
-      `Browser: ${navigator.userAgent}`,
-      ``,
-      `---`,
-      ``,
-      message,
-    ].join('\n');
-    return { subject, body };
-  }
-
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const m = buildMessage(); if (!m) return;
-    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
-    window.location.href = mailto;
-    setTimeout(close, 300);
-  });
+    const payload = {
+      name: document.getElementById('supportName').value.trim(),
+      email: document.getElementById('supportEmail').value.trim(),
+      topic: document.getElementById('supportTopic').value,
+      message: document.getElementById('supportMessage').value.trim(),
+      page: location.href,
+      ua: navigator.userAgent,
+    };
+    if (!payload.name || !payload.email || !payload.message) return;
 
-  gmailBtn?.addEventListener('click', () => {
-    if (!form.reportValidity()) return;
-    const m = buildMessage(); if (!m) return;
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(SUPPORT_EMAIL)}&su=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
-    window.open(url, '_blank', 'noopener');
-    setTimeout(close, 300);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    status.className = 'support-status';
+    status.textContent = '';
+
+    try {
+      const r = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || `Server returned ${r.status}`);
+      status.className = 'support-status support-status-success';
+      status.textContent = '✓ Sent. Thanks — we\'ll get back to you.';
+      submitBtn.textContent = 'Sent';
+      form.reset();
+      setTimeout(close, 1800);
+    } catch (err) {
+      status.className = 'support-status support-status-error';
+      status.textContent = '⚠ ' + (err.message || 'Something went wrong. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send';
+    }
   });
 }
 
