@@ -192,48 +192,70 @@ body.light .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.85rem;
   text-transform:uppercase;letter-spacing:1.5px;color:#fff;
   padding:14px 22px;border-radius:999px;cursor:pointer;
-  border:1px solid rgba(255,255,255,0.25);
-  background:
-    linear-gradient(rgba(255,255,255,0.08),rgba(255,255,255,0.02)),
-    conic-gradient(from 180deg at 50% 50%,
-      #ff3b30 0deg,#ff9500 45deg,#ffcc00 90deg,
-      #34c759 145deg,#00c7be 195deg,#007aff 245deg,
-      #af52de 295deg,#ff2d55 350deg,#ff3b30 360deg);
-  background-size:auto, 220% 220%;
-  background-position:center, 0% 50%;
+  border:1px solid rgba(255,255,255,0.3);
+  background:linear-gradient(115deg,
+    #ff3b30 0%,#ff9500 14%,#ffcc00 28%,#34c759 42%,
+    #00c7be 56%,#007aff 70%,#af52de 84%,#ff2d55 100%);
+  background-size:400% 400%;
   background-clip:padding-box;
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  backdrop-filter:blur(20px) saturate(180%);
   box-shadow:
     0 10px 30px rgba(0,0,0,0.35),
-    0 4px 10px rgba(255,45,85,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.45),
+    0 4px 18px rgba(175,82,222,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.55),
     inset 0 -1px 0 rgba(0,0,0,0.2);
-  text-shadow:0 1px 2px rgba(0,0,0,0.4);
+  text-shadow:0 1px 2px rgba(0,0,0,0.45);
   transition:transform 0.25s var(--transition), box-shadow 0.25s var(--transition);
-  animation:gemini-shine 6s linear infinite;
+  animation:gemini-flow 8s ease-in-out infinite;
   display:inline-flex;align-items:center;gap:8px;
+  isolation:isolate;
 }
 .gemini-toggle::before{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:linear-gradient(135deg,rgba(255,255,255,0.5),rgba(255,255,255,0.05) 35%,rgba(255,255,255,0) 60%);
-  mix-blend-mode:overlay;opacity:0.7;
+  background:conic-gradient(from 0deg at 50% 50%,
+    rgba(255,59,48,0.55),rgba(255,149,0,0.55),rgba(255,204,0,0.55),
+    rgba(52,199,89,0.55),rgba(0,199,190,0.55),rgba(0,122,255,0.55),
+    rgba(175,82,222,0.55),rgba(255,45,85,0.55),rgba(255,59,48,0.55));
+  mix-blend-mode:overlay;opacity:0.85;
+  animation:gemini-spin 12s linear infinite;
+  z-index:0;
 }
+.gemini-toggle::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(140deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.1) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,0.25) 100%);
+  background-size:250% 250%;
+  mix-blend-mode:screen;opacity:0.65;
+  animation:gemini-sheen 6s ease-in-out infinite;
+  z-index:1;
+}
+.gemini-toggle > *{position:relative;z-index:2}
 .gemini-toggle:hover{
-  transform:translateY(-2px) scale(1.04);
+  transform:translateY(-2px) scale(1.05);
+  animation-duration:5s,7s,4s;
   box-shadow:
-    0 14px 36px rgba(0,0,0,0.4),
-    0 6px 16px rgba(175,82,222,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 16px 42px rgba(0,0,0,0.45),
+    0 8px 24px rgba(175,82,222,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.7),
     inset 0 -1px 0 rgba(0,0,0,0.2);
 }
 .gemini-toggle:active{transform:translateY(0) scale(0.98)}
 body:has(.gemini-panel.open) .gemini-toggle{
   opacity:0;pointer-events:none;transform:translateY(8px) scale(0.95);
 }
-@keyframes gemini-shine{
-  0%{background-position:center, 0% 50%}
-  100%{background-position:center, 200% 50%}
+@keyframes gemini-flow{
+  0%   {background-position:0% 50%}
+  25%  {background-position:50% 100%}
+  50%  {background-position:100% 50%}
+  75%  {background-position:50% 0%}
+  100% {background-position:0% 50%}
+}
+@keyframes gemini-spin{
+  0%   {transform:rotate(0deg)}
+  100% {transform:rotate(360deg)}
+}
+@keyframes gemini-sheen{
+  0%   {background-position:0% 0%;opacity:0.5}
+  50%  {background-position:100% 100%;opacity:0.8}
+  100% {background-position:0% 0%;opacity:0.5}
 }
 @media (max-width:600px){
   .gemini-toggle{bottom:16px;right:16px;padding:12px 18px;font-size:0.78rem}
