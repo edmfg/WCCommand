@@ -27,7 +27,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -352,7 +352,7 @@ body.light .gemini-input{background:rgba(0,0,0,0.04);color:#333;border-color:rgb
 .ticker-label{
   font-family:'Oswald',sans-serif;font-weight:700;font-size:0.75rem;
   text-transform:uppercase;letter-spacing:2px;color:#fff;
-  background:#0a0c14;padding:0 20px 0 14px;height:100%;
+  background:rgba(0,0,0,0.4);padding:0 20px 0 14px;height:100%;
   display:flex;align-items:center;white-space:nowrap;
   clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);
   z-index:1;flex-shrink:0;
@@ -1783,163 +1783,8 @@ body.light .global-search input{background:rgba(0,0,0,0.03);border-color:rgba(0,
   0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}
 }
 </style>
-
-<!--
-  ╔═══════════════════════════════════════════════════════════════════╗
-  ║ PREMIUM V2 OVERLAY — fully reversible.                            ║
-  ║                                                                   ║
-  ║ All rules below are scoped under body.premium-v2 so removing the  ║
-  ║ class on <body> reverts the site instantly to the original look.  ║
-  ║                                                                   ║
-  ║ Toggle at runtime: append ?premium=0 to the URL,                  ║
-  ║   or run window.togglePremium() in DevTools.                      ║
-  ║                                                                   ║
-  ║ To remove permanently: delete this <style> block + the inline     ║
-  ║ premium-v2 toggle script + the Newsreader font + the              ║
-  ║ class="premium-v2" attribute on <body>. Nothing else changes.     ║
-  ╚═══════════════════════════════════════════════════════════════════╝
--->
-<style id="premium-v2-overlay">
-/* ── Color discipline ── */
-body.premium-v2 {
-  --gold: #d4af37;
-  --red: #b71c1c;
-  --red-dark: #7f1010;
-}
-
-/* ── Kill loud chrome animations ── */
-body.premium-v2 .bg-blobs,
-body.premium-v2 .stadium-light { display: none !important; }
-
-body.premium-v2 .header {
-  background: rgba(10,12,20,0.78) !important;
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-  border-bottom: 1px solid rgba(212,175,55,0.28) !important;
-  box-shadow:
-    0 8px 24px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.04) !important;
-  animation: none !important;
-  background-size: auto !important;
-}
-body.premium-v2 .header::before,
-body.premium-v2 .header::after,
-body.premium-v2 .header-inner::after { display: none !important; }
-
-/* Static noise overlay for paper-print feel */
-body.premium-v2::after {
-  content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 1;
-  opacity: 0.03; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-}
-
-/* ── Type system ── */
-body.premium-v2 .section-title,
-body.premium-v2 h1,
-body.premium-v2 h2,
-body.premium-v2 .news-card h3,
-body.premium-v2 .social-card h3,
-body.premium-v2 .modal-card h3,
-body.premium-v2 .group-card-title,
-body.premium-v2 .countdown-label,
-body.premium-v2 .stat-value {
-  font-family: 'Newsreader', Georgia, serif !important;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-}
-body.premium-v2 .section-title {
-  font-size: 1.9rem;
-  letter-spacing: -0.01em;
-}
-body.premium-v2 .news-card h3,
-body.premium-v2 .social-card h3 { font-size: 1.05rem; line-height: 1.3; }
-
-/* Demote Oswald shouting */
-body.premium-v2 .stage-group h3,
-body.premium-v2 .ticker-label,
-body.premium-v2 .tag,
-body.premium-v2 .sentiment-badge,
-body.premium-v2 .platform-pill,
-body.premium-v2 .filter-pill,
-body.premium-v2 .status-badge,
-body.premium-v2 .group-tag,
-body.premium-v2 .gf-team,
-body.premium-v2 .team-name {
-  letter-spacing: 0.6px !important;
-}
-
-/* Tabular numerals everywhere they matter */
-body.premium-v2 .score,
-body.premium-v2 .kickoff,
-body.premium-v2 .gf-mid,
-body.premium-v2 .group-standings td,
-body.premium-v2 .stat-value,
-body.premium-v2 .countdown-num,
-body.premium-v2 .cal-day-num,
-body.premium-v2 .week-day-num,
-body.premium-v2 .heatmap-val {
-  font-variant-numeric: tabular-nums !important;
-  font-feature-settings: 'tnum' 1;
-}
-
-/* ── Slow, confident motion ── */
-body.premium-v2 *,
-body.premium-v2 *::before,
-body.premium-v2 *::after {
-  --transition: cubic-bezier(0.22, 1, 0.36, 1);
-}
-body.premium-v2 .blob { animation: none !important; }
-body.premium-v2 .gemini-toggle::after { animation: none !important; }
-/* Keep the breaking-news ticker scroll — it's editorial. Everything else infinite stays off. */
-
-/* Slightly warmer, less plastic surfaces */
-body.premium-v2 .glass {
-  background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.012) 100%) !important;
-  border-color: rgba(255,255,255,0.075) !important;
-  box-shadow: 0 24px 48px -24px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05) !important;
-}
-body.premium-v2 .glass:hover {
-  border-color: rgba(212,175,55,0.22) !important;
-}
-
-/* Body bg: very slightly warmer black */
-body.premium-v2 { background: #0c0e15 !important; }
-
-/* Section breathing room */
-body.premium-v2 .section-title { margin-bottom: 22px; }
-body.premium-v2 .tab-panel > * + * { margin-top: 8px; }
-</style>
-
-<script>
-// Premium v2 toggle — reversible.
-//   URL ?premium=0 disables (and remembers); ?premium=1 re-enables.
-//   localStorage 'premium' persists choice.
-//   window.togglePremium() flips it from DevTools.
-// Default: ON.
-(function(){
-  let off = false;
-  try {
-    const qs = new URLSearchParams(location.search);
-    if (qs.get('premium') === '0') { localStorage.setItem('premium', 'off'); off = true; }
-    else if (qs.get('premium') === '1') { localStorage.setItem('premium', 'on'); off = false; }
-    else { off = localStorage.getItem('premium') === 'off'; }
-  } catch(e) {}
-  document.addEventListener('DOMContentLoaded', () => {
-    if (off) document.body.classList.remove('premium-v2');
-  });
-  // Belt-and-suspenders: also strip immediately if body is already parsed
-  if (off && document.body) document.body.classList.remove('premium-v2');
-  window.togglePremium = function(){
-    const on = document.body.classList.toggle('premium-v2');
-    try { localStorage.setItem('premium', on ? 'on' : 'off'); } catch(e) {}
-    return on ? 'Premium v2 enabled' : 'Premium v2 disabled';
-  };
-})();
-</script>
 </head>
-<body class="dashboard-hidden premium-v2">
+<body class="dashboard-hidden">
 
 <!-- STADIUM FLYOVER INTRO -->
 <div class="intro-overlay" id="introOverlay" style="display:none">
