@@ -503,6 +503,86 @@ a:hover { opacity: 0.8; }
   color: var(--gold);
 }
 
+/* New step-by-step cards */
+.step-card { position: relative; }
+.step-card .step-header {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding-bottom: 16px; margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.step-card .step-header strong {
+  display: block; font-family: var(--font-display);
+  font-weight: 700; font-size: 16px; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--text);
+}
+.step-card .step-desc {
+  font-size: 13px; color: var(--text-muted); margin-top: 4px; line-height: 1.55;
+}
+.step-card.complete .step-num {
+  background: rgba(46,204,113,0.2); color: var(--green);
+}
+
+.preview-summary {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
+  padding: 10px 14px; background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.2); border-radius: 8px;
+}
+.preview-summary strong { color: var(--gold); }
+
+.preview-section {
+  margin-bottom: 22px;
+}
+.preview-section-title {
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.preview-section-title .count { color: var(--text-muted); font-weight: 500; }
+
+.preview-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+}
+.preview-table th {
+  font-family: var(--font-display); font-weight: 700; font-size: 10px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+  text-align: left; padding: 10px 12px; background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.preview-table td {
+  padding: 10px 12px; vertical-align: top; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 13px;
+}
+.preview-table tbody tr:last-child td { border-bottom: none; }
+.preview-table tr.disabled { opacity: 0.4; }
+.preview-table input[type="text"], .preview-table textarea, .preview-table select {
+  width: 100%; padding: 6px 8px; border-radius: 6px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text); font-size: 12px; font-family: inherit;
+  resize: vertical;
+}
+.preview-table textarea { min-height: 50px; }
+.preview-table input[type="text"]:focus, .preview-table textarea:focus, .preview-table select:focus {
+  outline: none; border-color: var(--gold);
+}
+.preview-table .row-include { width: 32px; text-align: center; }
+.preview-table .row-delete {
+  background: none; border: none; color: var(--red); cursor: pointer;
+  font-size: 16px; padding: 4px 8px;
+}
+.preview-table .row-delete:hover { color: #ff6b6b; }
+
+.ai-loading { color: var(--text-muted); font-size: 13px; padding: 20px 0; }
+.ai-loading::before {
+  content: ''; display: inline-block; width: 12px; height: 12px;
+  border: 2px solid rgba(255,215,0,0.2); border-top-color: var(--gold);
+  border-radius: 50%; animation: ai-spin 0.7s linear infinite;
+  vertical-align: middle; margin-right: 10px;
+}
+@keyframes ai-spin { to { transform: rotate(360deg); } }
+
 /* Form area */
 .form-card {
   padding: 28px;
@@ -929,6 +1009,67 @@ a:hover { opacity: 0.8; }
     <div id="adminLogContainer"></div>
   </div>
 
+  <div class="admin-section">
+    <div class="admin-section-title">⚙️ Settings</div>
+    <div class="settings-section glass">
+      <div class="setting-group">
+        <label class="setting-label">🎨 Theme</label>
+        <p class="setting-desc">Switch between dark and light mode across the dashboard.</p>
+        <div class="setting-row">
+          <button class="setting-btn" id="themeDark" onclick="setTheme('dark')">🌙 Dark Mode</button>
+          <button class="setting-btn" id="themeLight" onclick="setTheme('light')">☀️ Light Mode</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">🔑 MFG Password</label>
+        <p class="setting-desc">Change the password required to access MFG mode.</p>
+        <div class="setting-row">
+          <input type="text" class="setting-input" id="newPassword" placeholder="Enter new password" />
+          <button class="setting-btn" onclick="updatePassword()">Update Password</button>
+        </div>
+        <span class="setting-toast" id="passwordToast"></span>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">🔗 Supabase Connection</label>
+        <p class="setting-desc">Current Supabase project for storing update history.</p>
+        <div class="setting-row">
+          <input type="text" class="setting-input" id="supabaseUrl" placeholder="Supabase URL" />
+          <input type="text" class="setting-input" id="supabaseKey" placeholder="Supabase Anon Key" />
+          <button class="setting-btn" onclick="updateSupabase()">Save</button>
+        </div>
+        <span class="setting-toast" id="supabaseToast"></span>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">📰 Ticker Speed</label>
+        <p class="setting-desc">Adjust how fast the news ticker scrolls on the main dashboard.</p>
+        <div class="setting-row">
+          <select class="setting-select" id="tickerSpeed" onchange="saveTickerSpeed()">
+            <option value="slow">Slow (90s)</option>
+            <option value="normal" selected>Normal (60s)</option>
+            <option value="fast">Fast (30s)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">🗑️ Data Management</label>
+        <p class="setting-desc">Clear cached data and reset settings.</p>
+        <div class="setting-row">
+          <button class="setting-btn setting-btn-danger" onclick="clearAllData()">Clear All Local Data</button>
+          <button class="setting-btn setting-btn-danger" onclick="clearUpdateHistory()">Clear Update History</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">ℹ️ About</label>
+        <p class="setting-desc">World Cup HQ — Internal war room dashboard for the 2026 FIFA World Cup social media campaign.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="payload-modal" id="adminPayloadModal">
     <div class="payload-modal-inner">
       <div class="payload-modal-head">
@@ -955,7 +1096,6 @@ a:hover { opacity: 0.8; }
 
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="update" onclick="switchTab('update')">&#128229; Daily Update</button>
-    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️ Settings</button>
   </nav>
 
   <main class="main">
@@ -965,71 +1105,74 @@ a:hover { opacity: 0.8; }
 
       <div class="section-title">&#128229; Daily Dashboard Update</div>
 
-      <div class="steps-box glass">
-        <div class="step">
+      <!-- STEP 1 -->
+      <div class="form-card glass step-card" id="stepCard1">
+        <div class="step-header">
           <span class="step-num">1</span>
-          <div class="step-text">
-            <strong>Paste your raw content</strong>
-            Drop today's news headlines, match scores, and social trends into the two boxes below.
+          <div>
+            <strong>Paste your raw content for this market</strong>
+            <p class="step-desc">Dump anything — news headlines, match scores, viral tweets, Slack threads. The AI will tidy it up next. Include URLs inline; they'll be auto-linked.</p>
           </div>
         </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <div class="step-text">
-            <strong>Click "Generate JSON"</strong>
-            Converts your raw text into a structured update package.
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num">3</span>
-          <div class="step-text">
-            <strong>Click "Copy to Clipboard"</strong>
-            Copies the generated JSON so you can hand it to Claude Code.
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num">4</span>
-          <div class="step-text">
-            <strong>Open Claude Code and paste</strong>
-            Run <code>claude</code> in the WCCommand repo and paste the JSON with:<br>
-            <code>"Update DASHBOARD_DATA in index.html with this content"</code>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num">5</span>
-          <div class="step-text">
-            <strong>Review, commit, and push</strong>
-            Claude will edit <code>index.html</code>. Review, then: <code>"commit and push"</code>. Dashboard updates in ~30 seconds.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-card glass">
         <div class="form-grid">
           <div class="form-group">
             <label>News &amp; Match Outcomes</label>
-            <textarea id="newsInput" placeholder="Paste headlines, scores, news items...&#10;&#10;Example:&#10;Canada 2-1 Mexico (Davies 23', David 67')&#10;Germany announces starting XI for Japan match&#10;Messi ruled out of group stage opener with calf strain"></textarea>
+            <textarea id="newsInput" placeholder="Paste headlines, scores, news items…&#10;&#10;Example:&#10;Canada 2-1 Mexico (Davies 23', David 67')&#10;Germany announces starting XI for Japan match&#10;Messi ruled out of group stage opener — https://example.com/article"></textarea>
           </div>
           <div class="form-group">
             <label>Social Conversations &amp; Trends</label>
-            <textarea id="socialInput" placeholder="Paste trending topics, viral moments, fan reactions...&#10;&#10;Example:&#10;Davies goal celebration going viral on TikTok (2M views)&#10;Fans debating best food at Toronto fan zone&#10;Drake spotted at Canada match wearing custom jersey"></textarea>
+            <textarea id="socialInput" placeholder="Paste trending topics, viral moments, fan reactions…&#10;&#10;Example:&#10;Davies goal celebration going viral on TikTok (2M views)&#10;Drake spotted at Canada match — https://youtu.be/xyz"></textarea>
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-primary" id="publishBtn">📤 Publish to Dashboard</button>
-          <button class="btn-secondary" id="generateBtn">Preview JSON</button>
-          <button class="btn-secondary" id="copyBtn" style="display:none">Copy to Clipboard</button>
-          <button class="btn-secondary" id="saveBtn" style="display:none">Save to History</button>
+          <button class="btn-primary" id="structureBtn">🤖 Structure with AI →</button>
+          <button class="btn-secondary" id="publishBtn">Skip AI · Publish raw</button>
           <span class="toast" id="toast"></span>
         </div>
         <p style="font-size:12px;color:var(--text-muted);margin-top:8px">
-          Each line of the boxes above becomes one card. Use a blank line between items to add a multi-line summary
-          (first line becomes the headline, the rest is the summary).
+          Recommended: use <strong>Structure with AI</strong>. It splits your text into clean cards, picks sentiment, and pulls out source links. You'll review everything before publishing.
         </p>
-        <div class="output-area" id="outputArea">
-          <pre id="outputCode"></pre>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="form-card glass step-card" id="stepCard2" style="display:none">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Review &amp; edit the AI's draft</strong>
+            <p class="step-desc">Each row is one card. Click any field to edit. Untick rows you don't want. Adjust sentiment on social rows. Nothing publishes until you hit the next button.</p>
+          </div>
+        </div>
+        <div id="previewSummary" class="preview-summary"></div>
+        <div id="previewNews"></div>
+        <div id="previewSocial"></div>
+        <div class="form-actions" style="margin-top:14px">
+          <button class="btn-secondary" id="restructureBtn">↺ Re-run AI</button>
+          <button class="btn-secondary" id="cancelPreviewBtn">← Back to edit raw</button>
+          <button class="btn-primary" id="publishPreviewBtn">📤 Publish reviewed items →</button>
         </div>
       </div>
+
+      <!-- STEP 3 -->
+      <div class="form-card glass step-card" id="stepCard3" style="display:none">
+        <div class="step-header">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Done — your market is live</strong>
+            <p class="step-desc" id="successDesc">Your update is now visible on the main dashboard. Other markets are untouched.</p>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a href="index.html" target="_blank" class="btn-secondary" style="text-decoration:none">View on dashboard →</a>
+          <button class="btn-primary" id="anotherUpdateBtn">+ Publish another update</button>
+        </div>
+      </div>
+
+      <!-- Hidden artifacts kept for compatibility with existing JS handlers -->
+      <button id="generateBtn" style="display:none"></button>
+      <button id="copyBtn" style="display:none"></button>
+      <button id="saveBtn" style="display:none"></button>
+      <div id="outputArea" style="display:none"><pre id="outputCode"></pre></div>
 
       <!-- Market activity -->
       <div class="form-card glass" style="margin-top:18px">
@@ -1046,69 +1189,6 @@ a:hover { opacity: 0.8; }
         <div id="historyList"></div>
       </div>
 
-    </div>
-
-    <!-- Tab 2: Settings -->
-    <div class="tab-panel" id="panel-settings">
-      <div class="settings-section glass">
-        <h3 class="settings-title">⚙️ Dashboard Settings</h3>
-
-        <div class="setting-group">
-          <label class="setting-label">🎨 Theme</label>
-          <p class="setting-desc">Switch between dark and light mode across the dashboard.</p>
-          <div class="setting-row">
-            <button class="setting-btn" id="themeDark" onclick="setTheme('dark')">🌙 Dark Mode</button>
-            <button class="setting-btn" id="themeLight" onclick="setTheme('light')">☀️ Light Mode</button>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <label class="setting-label">🔑 MFG Password</label>
-          <p class="setting-desc">Change the password required to access MFG mode.</p>
-          <div class="setting-row">
-            <input type="text" class="setting-input" id="newPassword" placeholder="Enter new password" />
-            <button class="setting-btn" onclick="updatePassword()">Update Password</button>
-          </div>
-          <span class="setting-toast" id="passwordToast"></span>
-        </div>
-
-        <div class="setting-group">
-          <label class="setting-label">🔗 Supabase Connection</label>
-          <p class="setting-desc">Current Supabase project for storing update history.</p>
-          <div class="setting-row">
-            <input type="text" class="setting-input" id="supabaseUrl" placeholder="Supabase URL" />
-            <input type="text" class="setting-input" id="supabaseKey" placeholder="Supabase Anon Key" />
-            <button class="setting-btn" onclick="updateSupabase()">Save</button>
-          </div>
-          <span class="setting-toast" id="supabaseToast"></span>
-        </div>
-
-        <div class="setting-group">
-          <label class="setting-label">📰 Ticker Speed</label>
-          <p class="setting-desc">Adjust how fast the news ticker scrolls on the main dashboard.</p>
-          <div class="setting-row">
-            <select class="setting-select" id="tickerSpeed" onchange="saveTickerSpeed()">
-              <option value="slow">Slow (90s)</option>
-              <option value="normal" selected>Normal (60s)</option>
-              <option value="fast">Fast (30s)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <label class="setting-label">🗑️ Data Management</label>
-          <p class="setting-desc">Clear cached data and reset settings.</p>
-          <div class="setting-row">
-            <button class="setting-btn setting-btn-danger" onclick="clearAllData()">Clear All Local Data</button>
-            <button class="setting-btn setting-btn-danger" onclick="clearUpdateHistory()">Clear Update History</button>
-          </div>
-        </div>
-
-        <div class="setting-group">
-          <label class="setting-label">ℹ️ About</label>
-          <p class="setting-desc">World Cup HQ — Internal war room dashboard for the 2026 FIFA World Cup social media campaign. Built with Claude Code.</p>
-        </div>
-      </div>
     </div>
 
   </main>
@@ -1508,13 +1588,12 @@ a:hover { opacity: 0.8; }
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === '1') switchTab('update');
-    if (e.key === '2') switchTab('settings');
   });
 
   // Hash routing
   function applyHash() {
     const hash = location.hash.replace('#', '');
-    if (['update', 'settings'].includes(hash)) {
+    if (['update'].includes(hash)) {
       switchTab(hash);
     }
   }
@@ -1734,8 +1813,13 @@ a:hover { opacity: 0.8; }
         }
 
         showToast(`Published ${upserts.length} update${upserts.length>1?'s':''} for ${market}!`, 'success');
+        const newsCount = upserts.find(u => u.kind === 'news')?.payload?.length || 0;
+        const socialCount = upserts.find(u => u.kind === 'social')?.payload?.length || 0;
+        const desc = document.getElementById('successDesc');
+        if (desc) desc.innerHTML = `Published <strong>${newsCount}</strong> news + <strong>${socialCount}</strong> social for <strong>${market}</strong>. Live for every visitor now.`;
         document.getElementById('newsInput').value = '';
         document.getElementById('socialInput').value = '';
+        if (typeof showStep === 'function') showStep(3);
         await loadMarketActivity();
       } catch(e) {
         console.error('Publish failed', e);
@@ -1780,6 +1864,232 @@ a:hover { opacity: 0.8; }
     if (publishBtn) publishBtn.addEventListener('click', publishMarketContent);
     loadMarketActivity();
     setInterval(loadMarketActivity, 60 * 1000);
+
+    // ── AI structure flow ──
+    let aiPreview = { news: [], social: [] };
+    const escAi = s => String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    function showStep(n) {
+      ['stepCard1','stepCard2','stepCard3'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = (i + 1 === n) ? '' : 'none';
+        el.classList.toggle('complete', (i + 1) < n);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function callGeminiStructure(market, newsRaw, socialRaw) {
+      const prompt = `You are organizing raw notes from a World Cup market manager into structured cards for a public dashboard.
+
+Market: ${market}. Tag every item with this market.
+
+Split the raw text into individual items, one per real headline/topic. Clean them up.
+
+Return STRICT JSON with this EXACT shape (no preamble, no code fences, no markdown):
+{
+  "news": [{ "headline": "string", "summary": "string", "sourceUrl": "string-or-empty" }],
+  "social": [{ "topic": "string", "summary": "string", "sentiment": "positive|mixed|negative", "sourceUrl": "string-or-empty" }]
+}
+
+Rules:
+- Headlines 6–12 words, factual, no clickbait.
+- Summaries 1–3 sentences.
+- For social: pick sentiment based on overall fan tone.
+- If a URL appears anywhere in the raw text for an item, attach it as that item's sourceUrl. Strip the URL from summary text.
+- If a section is empty in the raw, return an empty array for that section.
+- Skip internal chatter that isn't dashboard-worthy (e.g. "let me know what you think", "draft v2").
+- Do not invent facts. If you're unsure, drop the item.
+
+NEWS RAW:
+${newsRaw || '(none)'}
+
+SOCIAL RAW:
+${socialRaw || '(none)'}`;
+
+      const r = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+        })
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `AI request failed (${r.status})`);
+      }
+      const data = await r.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      let parsed;
+      try { parsed = JSON.parse(text); }
+      catch (e) {
+        const m = text.match(/\{[\s\S]*\}/);
+        if (m) parsed = JSON.parse(m[0]);
+        else throw new Error('AI response could not be parsed as JSON.');
+      }
+      return {
+        news: Array.isArray(parsed.news) ? parsed.news : [],
+        social: Array.isArray(parsed.social) ? parsed.social : [],
+      };
+    }
+
+    function renderPreview() {
+      const market = window.__mfgMarket();
+      const summary = document.getElementById('previewSummary');
+      summary.innerHTML = `Market: <strong>${escAi(market)}</strong> · <strong>${aiPreview.news.length}</strong> news + <strong>${aiPreview.social.length}</strong> social. Edit any field, untick to skip an item, then publish.`;
+
+      const newsHtml = aiPreview.news.length ? `<div class="preview-section">
+        <div class="preview-section-title">📰 News <span class="count">${aiPreview.news.length} items</span></div>
+        <table class="preview-table"><thead><tr>
+          <th class="row-include">✓</th><th>Headline</th><th>Summary</th><th>Source URL</th><th></th>
+        </tr></thead><tbody>
+        ${aiPreview.news.map((n, i) => `<tr data-kind="news" data-idx="${i}" class="${n._include === false ? 'disabled' : ''}">
+          <td class="row-include"><input type="checkbox" data-field="_include" ${n._include === false ? '' : 'checked'}/></td>
+          <td><input type="text" data-field="headline" value="${escAi(n.headline)}"/></td>
+          <td><textarea data-field="summary">${escAi(n.summary)}</textarea></td>
+          <td><input type="text" data-field="sourceUrl" value="${escAi(n.sourceUrl)}" placeholder="https://…"/></td>
+          <td><button class="row-delete" data-action="delete" title="Delete row">×</button></td>
+        </tr>`).join('')}
+        </tbody></table></div>` : '';
+      document.getElementById('previewNews').innerHTML = newsHtml;
+
+      const socialHtml = aiPreview.social.length ? `<div class="preview-section">
+        <div class="preview-section-title">💬 Social <span class="count">${aiPreview.social.length} items</span></div>
+        <table class="preview-table"><thead><tr>
+          <th class="row-include">✓</th><th>Topic</th><th>Summary</th><th>Sentiment</th><th>Source URL</th><th></th>
+        </tr></thead><tbody>
+        ${aiPreview.social.map((s, i) => `<tr data-kind="social" data-idx="${i}" class="${s._include === false ? 'disabled' : ''}">
+          <td class="row-include"><input type="checkbox" data-field="_include" ${s._include === false ? '' : 'checked'}/></td>
+          <td><input type="text" data-field="topic" value="${escAi(s.topic)}"/></td>
+          <td><textarea data-field="summary">${escAi(s.summary)}</textarea></td>
+          <td><select data-field="sentiment">
+            <option value="positive" ${s.sentiment==='positive'?'selected':''}>positive</option>
+            <option value="mixed" ${s.sentiment==='mixed'?'selected':''}>mixed</option>
+            <option value="negative" ${s.sentiment==='negative'?'selected':''}>negative</option>
+          </select></td>
+          <td><input type="text" data-field="sourceUrl" value="${escAi(s.sourceUrl)}" placeholder="https://…"/></td>
+          <td><button class="row-delete" data-action="delete" title="Delete row">×</button></td>
+        </tr>`).join('')}
+        </tbody></table></div>` : '';
+      document.getElementById('previewSocial').innerHTML = socialHtml;
+
+      document.querySelectorAll('#previewNews tr, #previewSocial tr').forEach(row => {
+        row.querySelectorAll('input, textarea, select').forEach(el => {
+          el.addEventListener('input', () => {
+            const kind = row.dataset.kind;
+            const idx = +row.dataset.idx;
+            const field = el.dataset.field;
+            const val = el.type === 'checkbox' ? el.checked : el.value;
+            aiPreview[kind][idx][field] = val;
+            if (field === '_include') row.classList.toggle('disabled', !val);
+          });
+        });
+        row.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+          const kind = row.dataset.kind;
+          const idx = +row.dataset.idx;
+          aiPreview[kind].splice(idx, 1);
+          renderPreview();
+        });
+      });
+    }
+
+    async function handleStructure() {
+      const market = window.__mfgMarket();
+      if (!market) { showToast('Pick a market first.', 'error'); return; }
+      const newsRaw = document.getElementById('newsInput').value.trim();
+      const socialRaw = document.getElementById('socialInput').value.trim();
+      if (!newsRaw && !socialRaw) { showToast('Paste content first.', 'error'); return; }
+
+      const btn = document.getElementById('structureBtn');
+      btn.disabled = true; btn.textContent = '🤖 Asking AI…';
+      showStep(2);
+      document.getElementById('previewSummary').innerHTML = '<div class="ai-loading">AI is structuring your content (5-15 sec)…</div>';
+      document.getElementById('previewNews').innerHTML = '';
+      document.getElementById('previewSocial').innerHTML = '';
+      try {
+        aiPreview = await callGeminiStructure(market, newsRaw, socialRaw);
+        if (!aiPreview.news.length && !aiPreview.social.length) {
+          document.getElementById('previewSummary').innerHTML = '<em>The AI returned 0 items. Try adding more context, or use "Skip AI · Publish raw".</em>';
+          return;
+        }
+        renderPreview();
+      } catch (e) {
+        console.error(e);
+        document.getElementById('previewSummary').innerHTML = `<em style="color:#ff8a8a">AI failed: ${escAi(e.message || 'Unknown error')}. Retry below or use "Skip AI · Publish raw".</em>`;
+      } finally {
+        btn.disabled = false; btn.textContent = '🤖 Structure with AI →';
+      }
+    }
+
+    async function publishPreview() {
+      const market = window.__mfgMarket();
+      const userLabel = window.__mfgUser();
+      if (!supabase) { showToast('Supabase not connected. Cannot publish.', 'error'); return; }
+      const ts = new Date().toISOString();
+      const ytRe = /(?:youtube\.com|youtu\.be)/i;
+      const linkFields = u => u ? (ytRe.test(u) ? { sourceUrl: u, youtubeUrl: u } : { sourceUrl: u }) : {};
+      const newsItems = aiPreview.news.filter(n => n._include !== false).map((n, i) => ({
+        id: `${market.toLowerCase()}-news-${Date.now()}-${i}`,
+        headline: (n.headline || '').trim(),
+        summary: (n.summary || '').trim(),
+        source: 'Market Update',
+        tag: market,
+        timestamp: ts,
+        ...linkFields((n.sourceUrl || '').trim()),
+      }));
+      const socialItems = aiPreview.social.filter(s => s._include !== false).map((s, i) => ({
+        id: `${market.toLowerCase()}-social-${Date.now()}-${i}`,
+        topic: (s.topic || '').trim(),
+        summary: (s.summary || '').trim(),
+        sentiment: s.sentiment || 'mixed',
+        volume: '🔥',
+        category: market,
+        platforms: [],
+        tag: market,
+        ...linkFields((s.sourceUrl || '').trim()),
+      }));
+
+      if (!newsItems.length && !socialItems.length) {
+        showToast('Nothing to publish — every item is unchecked.', 'error');
+        return;
+      }
+
+      const upserts = [];
+      if (newsItems.length) upserts.push({ market, kind: 'news', payload: newsItems, updated_at: ts, updated_by: userLabel });
+      if (socialItems.length) upserts.push({ market, kind: 'social', payload: socialItems, updated_at: ts, updated_by: userLabel });
+
+      const btn = document.getElementById('publishPreviewBtn');
+      btn.disabled = true; btn.textContent = 'Publishing…';
+      try {
+        const { error } = await supabase.from('dashboard_content').upsert(upserts, { onConflict: 'market,kind' });
+        if (error) throw error;
+        try {
+          await supabase.from('dashboard_audit').insert(upserts.map(u => ({
+            market: u.market, kind: u.kind, updated_by: u.updated_by || null, item_count: u.payload.length
+          })));
+        } catch(e) { console.warn('audit insert skipped', e); }
+
+        document.getElementById('successDesc').innerHTML = `Published <strong>${newsItems.length}</strong> news + <strong>${socialItems.length}</strong> social for <strong>${escAi(market)}</strong>. Live for every visitor now.`;
+        document.getElementById('newsInput').value = '';
+        document.getElementById('socialInput').value = '';
+        aiPreview = { news: [], social: [] };
+        showStep(3);
+        await loadMarketActivity();
+      } catch(e) {
+        console.error(e);
+        showToast('Publish failed: ' + (e.message || 'Unknown'), 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = '📤 Publish reviewed items →';
+      }
+    }
+
+    document.getElementById('structureBtn')?.addEventListener('click', handleStructure);
+    document.getElementById('restructureBtn')?.addEventListener('click', handleStructure);
+    document.getElementById('cancelPreviewBtn')?.addEventListener('click', () => showStep(1));
+    document.getElementById('publishPreviewBtn')?.addEventListener('click', publishPreview);
+    document.getElementById('anotherUpdateBtn')?.addEventListener('click', () => showStep(1));
 
     generateBtn.addEventListener('click', () => {
       const newsRaw = document.getElementById('newsInput').value.trim();
