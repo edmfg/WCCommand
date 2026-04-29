@@ -358,7 +358,7 @@ body.light .gemini-input{background:rgba(0,0,0,0.04);color:#333;border-color:rgb
   z-index:1;flex-shrink:0;
 }
 .ticker-track{
-  display:flex;animation:marquee 140s linear infinite;white-space:nowrap;
+  display:flex;animation:marquee 182s linear infinite;white-space:nowrap;
 }
 .ticker-bar:hover .ticker-track{animation-play-state:paused}
 .ticker-item{
@@ -2694,9 +2694,9 @@ function renderFactTicker() {
   requestAnimationFrame(() => {
     const breakingTrack = document.getElementById('tickerTrack');
     if (!breakingTrack) return;
-    // Breaking ticker animation: 140s for translateX(-50%) of doubled content
+    // Breaking ticker animation: 182s for translateX(-50%) of doubled content
     const breakingHalfWidth = breakingTrack.scrollWidth / 2;
-    const breakingPxPerSec = breakingHalfWidth / 140;
+    const breakingPxPerSec = breakingHalfWidth / 182;
     const factHalfWidth = track.scrollWidth / 2;
     if (breakingPxPerSec > 0 && factHalfWidth > 0) {
       const factDuration = factHalfWidth / breakingPxPerSec;
