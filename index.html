@@ -4123,6 +4123,44 @@ function setupCardExpand() {
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
 }
 
+// Build a slim snapshot of dashboard data for Gemini context (avoids 32KB+ payloads)
+function buildDashboardSnapshot() {
+  const D = (typeof DASHBOARD_DATA !== 'undefined') ? DASHBOARD_DATA : {};
+  const today = new Date().toISOString().slice(0, 10);
+  const slimNews = (D.news || []).slice(0, 25).map(n => ({
+    id: n.id, headline: n.headline, source: n.source, tag: n.tag,
+    timestamp: n.timestamp, summary: n.summary, url: n.url,
+  }));
+  const slimSocial = (D.social || []).slice(0, 25).map(s => ({
+    id: s.id, topic: s.topic, category: s.category, volume: s.volume,
+    sentiment: s.sentiment, summary: s.summary,
+    quotesCount: (s.quotes && s.quotes.length) || 0,
+    sampleQuote: s.sampleQuote || (s.quotes && s.quotes[0] && s.quotes[0].text),
+    platforms: s.platforms,
+  }));
+  const upcoming = (D.matches || [])
+    .filter(m => m.date >= today)
+    .slice(0, 12)
+    .map(m => ({
+      date: m.date, kickoff: m.kickoff, stage: m.stage,
+      home: m.home && m.home.name, away: m.away && m.away.name,
+      venue: m.venue,
+    }));
+  const slimAssets = (D.assets || []).slice(0, 10).map(a => ({
+    headline: a.headline, market: a.market, status: a.status,
+    format: a.format, deployDate: a.deployDate,
+  }));
+  return {
+    lastUpdated: D.lastUpdated,
+    today,
+    ticker: (D.ticker || []).slice(0, 15),
+    news: slimNews,
+    social: slimSocial,
+    upcomingMatches: upcoming,
+    assets: slimAssets,
+  };
+}
+
 function setupGemini() {
   const overlay = document.getElementById('geminiOverlay');
   const panel = document.getElementById('geminiPanel');
@@ -4225,8 +4263,8 @@ If a user asks about something **outside** the dashboard data and search doesn't
 - Skip caveats and disclaimers unless directly relevant.
 - Only expand to a longer answer if the user explicitly asks ("dig deeper", "give me more", "explain in detail").
 
-# DASHBOARD DATA (live snapshot)
-${JSON.stringify(DASHBOARD_DATA, null, 2)}`;
+# DASHBOARD DATA (live snapshot — trimmed for context budget)
+${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
 
       const payload = {
         system_instruction: { parts: [{ text: systemInstruction }] },
