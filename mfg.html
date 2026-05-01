@@ -675,6 +675,9 @@ a:hover { opacity: 0.8; }
 .triage-snap-diff .removed { color: #fca5a5; }
 .triage-snap-diff .changed { color: #fcd34d; }
 /* New tag colors */
+.triage-item.tag-activation   { border-left-color: #fb923c; background: rgba(251, 146, 60, 0.10); }
+.triage-item.tag-activation   .triage-item-tag { background: rgba(251, 146, 60, 0.20); color: #fdba74; }
+.triage-group-header.tag-activation { color: #fdba74; border-color: rgba(251,146,60,0.30); }
 .triage-item.tag-media        { border-left-color: #a3e635; background: rgba(163, 230, 53, 0.10); }
 .triage-item.tag-talent       { border-left-color: #fb7185; background: rgba(251, 113, 133, 0.10); }
 .triage-item.tag-partnerships { border-left-color: #2dd4bf; background: rgba(45, 212, 191, 0.10); }
@@ -1658,8 +1661,9 @@ a:hover { opacity: 0.8; }
             <option value="">All tags</option>
             <option value="creative">Creative</option>
             <option value="strategy">Strategy</option>
-            <option value="production">Production</option>
+            <option value="activation">Activation</option>
             <option value="media">Media</option>
+            <option value="production">Production</option>
             <option value="talent">Talent</option>
             <option value="partnerships">Partnerships</option>
             <option value="legal">Legal</option>
@@ -2354,8 +2358,9 @@ a:hover { opacity: 0.8; }
     const s = String(text || '').toLowerCase();
     if (/\bcreative\b/.test(s)) return 'creative';
     if (/\bstrategy\b/.test(s) || /\bstrategic\b/.test(s)) return 'strategy';
-    if (/\bproduction\b/.test(s) || /\bprod\b/.test(s)) return 'production';
+    if (/\bactivation(s)?\b/.test(s) || /\bevent(s)?\b/.test(s) || /\bexperiential\b/.test(s)) return 'activation';
     if (/\bmedia\b/.test(s) || /\bpaid\b/.test(s)) return 'media';
+    if (/\bproduction\b/.test(s) || /\bprod\b/.test(s)) return 'production';
     if (/\btalent\b/.test(s) || /\bcasting\b/.test(s)) return 'talent';
     if (/\bpartner(ship)?s?\b/.test(s) || /\bsponsor(ship)?s?\b/.test(s)) return 'partnerships';
     if (/\blegal\b/.test(s) || /\bcompliance\b/.test(s)) return 'legal';
@@ -2445,7 +2450,7 @@ a:hover { opacity: 0.8; }
         '<button class="triage-add-item" data-col="' + ci + '">+ Add item</button>';
       board.appendChild(colEl);
       const itemsEl = colEl.querySelector('.triage-items');
-      const TAG_ORDER = ['creative', 'strategy', 'production', 'media', 'talent', 'partnerships', 'legal', 'else', null];
+      const TAG_ORDER = ['creative', 'strategy', 'activation', 'media', 'production', 'talent', 'partnerships', 'legal', 'else', null];
       const indexed = col.items.map(function(it, idx){
         return { it: it, idx: idx, tag: detectTriageTag(it.text) };
       });
@@ -2833,7 +2838,7 @@ a:hover { opacity: 0.8; }
           const itemEl = t.closest('.triage-item');
           if (itemEl) {
             const newTag = detectTriageTag(plain);
-            ['tag-creative','tag-strategy','tag-production','tag-media','tag-talent','tag-partnerships','tag-legal','tag-else'].forEach(function(c){ itemEl.classList.remove(c); });
+            ['tag-creative','tag-strategy','tag-activation','tag-media','tag-production','tag-talent','tag-partnerships','tag-legal','tag-else'].forEach(function(c){ itemEl.classList.remove(c); });
             const oldTagEl = itemEl.querySelector('.triage-item-tag');
             if (oldTagEl) oldTagEl.remove();
             if (newTag) {
