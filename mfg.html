@@ -2531,8 +2531,14 @@ a:hover { opacity: 0.8; }
   refreshFromCloud(true);
 
   // --- Supabase helpers ---
+  let dashboardUpdatesUnavailable = false;
+  function isMissingTableError(e) {
+    const msg = (e && (e.message || e.toString())) || '';
+    const code = e && e.code;
+    return code === 'PGRST205' || /schema cache|does not exist|relation .* does not exist|42P01/i.test(msg);
+  }
   async function sbFetch() {
-    if (!supabase) return null;
+    if (!supabase || dashboardUpdatesUnavailable) return null;
     try {
       const { data, error } = await supabase
         .from('dashboard_updates')
@@ -2541,13 +2547,18 @@ a:hover { opacity: 0.8; }
       if (error) throw error;
       return data;
     } catch(e) {
-      console.warn('Supabase fetch failed:', e);
+      if (isMissingTableError(e)) {
+        dashboardUpdatesUnavailable = true;
+        console.info('dashboard_updates table missing — using localStorage only. Run supabase-dashboard-updates.sql to enable cloud sync.');
+      } else {
+        console.warn('Supabase fetch failed:', e);
+      }
       return null;
     }
   }
 
   async function sbInsert(record) {
-    if (!supabase) return false;
+    if (!supabase || dashboardUpdatesUnavailable) return false;
     try {
       const { error } = await supabase
         .from('dashboard_updates')
@@ -2555,13 +2566,17 @@ a:hover { opacity: 0.8; }
       if (error) throw error;
       return true;
     } catch(e) {
-      console.warn('Supabase insert failed:', e);
+      if (isMissingTableError(e)) {
+        dashboardUpdatesUnavailable = true;
+      } else {
+        console.warn('Supabase insert failed:', e);
+      }
       return false;
     }
   }
 
   async function sbDeleteAll() {
-    if (!supabase) return false;
+    if (!supabase || dashboardUpdatesUnavailable) return false;
     try {
       const { error } = await supabase
         .from('dashboard_updates')
@@ -2570,7 +2585,11 @@ a:hover { opacity: 0.8; }
       if (error) throw error;
       return true;
     } catch(e) {
-      console.warn('Supabase delete failed:', e);
+      if (isMissingTableError(e)) {
+        dashboardUpdatesUnavailable = true;
+      } else {
+        console.warn('Supabase delete failed:', e);
+      }
       return false;
     }
   }
