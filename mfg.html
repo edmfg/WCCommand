@@ -490,6 +490,8 @@ a:hover { opacity: 0.8; }
   padding-bottom: 12px;
   align-items: stretch;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .triage-col {
   flex: 1 1 0;
@@ -523,9 +525,42 @@ a:hover { opacity: 0.8; }
 .triage-col-resizer.dragging::after {
   background: var(--accent, #4ade80);
 }
-@media (max-width: 700px) {
-  .triage-board { flex-wrap: wrap; }
-  .triage-col { flex: 1 1 calc(50% - 7px); min-width: 0; }
+@media (max-width: 900px) {
+  .triage-board { flex-wrap: wrap; overflow-x: visible; }
+  .triage-col { flex: 1 1 100%; min-width: 0; }
+  .triage-col-resizer { display: none; }
+}
+@media (max-width: 600px) {
+  .triage-toolbar-row { flex-direction: column; align-items: stretch !important; gap: 8px !important; }
+  .triage-search-wrap, .triage-select { width: 100% !important; max-width: none !important; min-width: 0 !important; flex: 1 1 100% !important; }
+  .triage-field, .triage-field-actions { width: 100%; }
+  .triage-field-actions { flex-direction: column; gap: 6px; }
+  .triage-btn { width: 100%; min-height: 44px; }
+  .triage-item {
+    flex-wrap: wrap;
+    padding: 14px 12px !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+  }
+  .triage-item-grip {
+    order: 0;
+    width: 28px; min-width: 28px; height: 28px;
+    margin-top: 0;
+    opacity: 1;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    align-self: center;
+  }
+  .triage-item-done { order: 1; align-self: center !important; }
+  .triage-item-editor { flex: 1 1 100%; order: 4; min-height: 36px; padding: 4px 0; font-size: 14px; }
+  .triage-item-meta { order: 5; flex: 1 1 100%; margin-left: 0; justify-content: flex-end; }
+  .triage-item-delete { order: 2; align-self: center !important; margin-left: auto; }
+  .triage-item-done, .triage-item-delete {
+    width: 32px !important; height: 32px !important; min-width: 32px !important;
+    margin-top: 0 !important; align-self: center !important;
+  }
+  .triage-snap-row-actions { flex-wrap: wrap; }
+  .section-title { font-size: 18px; }
 }
 .triage-col-head { display: flex; align-items: center; gap: 8px; }
 .triage-col-title {
@@ -2653,6 +2688,96 @@ a:hover { opacity: 0.8; }
         renderTriage();
       });
     });
+    // Touch-based drag for mobile devices (HTML5 drag doesn't fire on touch)
+    document.querySelectorAll('#triageBoard .triage-item-grip').forEach(function(grip) {
+      let touchActive = false;
+      let touchSrc = null;
+      let ghost = null;
+      grip.addEventListener('touchstart', function(e) {
+        const itemEl = grip.closest('.triage-item');
+        if (!itemEl) return;
+        touchSrc = {
+          col: parseInt(itemEl.dataset.col, 10),
+          item: parseInt(itemEl.dataset.item, 10),
+          el: itemEl
+        };
+        touchActive = true;
+        itemEl.classList.add('dragging');
+        // Create a floating ghost so the user can see what they're moving
+        ghost = itemEl.cloneNode(true);
+        ghost.style.cssText = 'position:fixed;pointer-events:none;opacity:0.85;z-index:9999;width:' + itemEl.offsetWidth + 'px;left:0;top:0;transform:translate(-9999px,-9999px)';
+        document.body.appendChild(ghost);
+        e.preventDefault();
+      }, { passive: false });
+      grip.addEventListener('touchmove', function(e) {
+        if (!touchActive || !touchSrc) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        if (ghost) ghost.style.transform = 'translate(' + (t.clientX - 30) + 'px,' + (t.clientY - 20) + 'px)';
+        // Find the item under the touch
+        document.querySelectorAll('#triageBoard .triage-item.drop-above, #triageBoard .triage-item.drop-below').forEach(function(n){
+          n.classList.remove('drop-above','drop-below');
+        });
+        const elUnder = document.elementFromPoint(t.clientX, t.clientY);
+        const target = elUnder && elUnder.closest && elUnder.closest('.triage-item');
+        if (target && target !== touchSrc.el) {
+          const rect = target.getBoundingClientRect();
+          const before = (t.clientY - rect.top) < rect.height / 2;
+          target.classList.toggle('drop-above', before);
+          target.classList.toggle('drop-below', !before);
+        }
+      }, { passive: false });
+      grip.addEventListener('touchend', function(e) {
+        if (!touchActive || !touchSrc) return;
+        touchActive = false;
+        const t = (e.changedTouches && e.changedTouches[0]) || null;
+        const cleanup = function() {
+          if (ghost) { ghost.remove(); ghost = null; }
+          document.querySelectorAll('#triageBoard .triage-item.dragging, #triageBoard .triage-item.drop-above, #triageBoard .triage-item.drop-below').forEach(function(n){
+            n.classList.remove('dragging','drop-above','drop-below');
+          });
+        };
+        if (!t) { cleanup(); touchSrc = null; return; }
+        const elUnder = document.elementFromPoint(t.clientX, t.clientY);
+        const target = elUnder && elUnder.closest && elUnder.closest('.triage-item');
+        const colTarget = elUnder && elUnder.closest && elUnder.closest('.triage-col');
+        if (target && target !== touchSrc.el) {
+          const dstCol = parseInt(target.dataset.col, 10);
+          const dstItem = parseInt(target.dataset.item, 10);
+          const rect = target.getBoundingClientRect();
+          const before = (t.clientY - rect.top) < rect.height / 2;
+          const fromArr = triage.columns[touchSrc.col].items;
+          const [moved] = fromArr.splice(touchSrc.item, 1);
+          const toArr = triage.columns[dstCol].items;
+          let insertAt = dstItem;
+          if (touchSrc.col === dstCol && touchSrc.item < dstItem) insertAt -= 1;
+          if (!before) insertAt += 1;
+          insertAt = Math.max(0, Math.min(insertAt, toArr.length));
+          toArr.splice(insertAt, 0, moved);
+          saveTriage(triage);
+          cleanup();
+          touchSrc = null;
+          renderTriage();
+          return;
+        }
+        if (colTarget && !target) {
+          // Drop into empty column
+          const dstCol = parseInt(colTarget.dataset.colIdx, 10);
+          if (!isNaN(dstCol) && dstCol !== touchSrc.col) {
+            const fromArr = triage.columns[touchSrc.col].items;
+            const [moved] = fromArr.splice(touchSrc.item, 1);
+            triage.columns[dstCol].items.push(moved);
+            saveTriage(triage);
+            cleanup();
+            touchSrc = null;
+            renderTriage();
+            return;
+          }
+        }
+        cleanup();
+        touchSrc = null;
+      });
+    });
     // Empty triage-items containers should also accept drops (drop into empty column)
     document.querySelectorAll('#triageBoard .triage-items').forEach(function(container) {
       container.addEventListener('dragover', function(e) {
@@ -2876,16 +3001,24 @@ a:hover { opacity: 0.8; }
           dateInput.addEventListener('blur', restore);
           dateInput.addEventListener('change', restore);
         }
-      } else if (t.classList && t.classList.contains('triage-item') && !t.closest('.triage-item-editor')) {
-        // Click anywhere on the card body focuses the editor
-        const ed = t.querySelector(':scope > .triage-item-editor');
-        if (ed) {
-          ed.focus();
-          const sel = window.getSelection();
-          const range = document.createRange();
-          range.selectNodeContents(ed);
-          range.collapse(false);
-          sel.removeAllRanges(); sel.addRange(range);
+      } else {
+        // Click on empty card space focuses the editor (but not when interacting with the editor itself or any button)
+        const itemEl = t.closest && t.closest('.triage-item');
+        if (itemEl &&
+            !t.closest('.triage-item-editor') &&
+            !t.closest('button') &&
+            !t.closest('input') &&
+            !t.classList.contains('triage-item-grip') &&
+            !t.classList.contains('triage-item-tag')) {
+          const ed = itemEl.querySelector('.triage-item-editor');
+          if (ed) {
+            ed.focus();
+            const sel = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(ed);
+            range.collapse(false);
+            sel.removeAllRanges(); sel.addRange(range);
+          }
         }
       }
     });
