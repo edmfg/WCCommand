@@ -2119,9 +2119,13 @@ a:hover { opacity: 0.8; }
     }
   };
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (skip when typing in any editable surface, or when modifier keys are held)
   document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (!t) return;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT') return;
+    if (t.isContentEditable || (t.closest && t.closest('[contenteditable="true"]'))) return;
     if (e.key === '1') switchTab('update');
     else if (e.key === '2') switchTab('triage');
   });
