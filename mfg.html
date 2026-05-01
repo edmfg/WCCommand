@@ -1874,6 +1874,12 @@ a:hover { opacity: 0.8; }
           ta.style.height = Math.max(ta.scrollHeight + 2, 40) + 'px';
         });
       });
+      // Auto-load snapshot history when triage tab is opened
+      if (typeof window.__triageLoadHistory === 'function') {
+        const hp = document.getElementById('triageHistoryPanel');
+        if (hp) hp.style.display = 'block';
+        window.__triageLoadHistory();
+      }
     }
   };
 
@@ -2343,22 +2349,27 @@ a:hover { opacity: 0.8; }
     saveSnapBtn.disabled = true;
     saveSnapBtn.textContent = 'Saving…';
     try {
-      const { error } = await supabase.from(TRIAGE_SNAPSHOTS_TABLE).insert({
-        snapshot_date: date,
-        data: triage,
-        note: note || null
-      });
+      const { data: inserted, error } = await supabase
+        .from(TRIAGE_SNAPSHOTS_TABLE)
+        .insert({ snapshot_date: date, data: triage, note: note || null })
+        .select();
       if (error) {
-        console.error('snapshot save failed:', error);
-        triageToast('Snapshot save failed');
+        console.error('[triage] snapshot save failed:', error);
+        const msg = error.message || error.hint || JSON.stringify(error);
+        triageToast('Save failed: ' + msg.slice(0, 80));
       } else {
-        triageToast('Snapshot saved · ' + date);
+        console.log('[triage] snapshot inserted:', inserted);
+        triageToast('Snapshot saved · ' + date + ' · id ' + (inserted && inserted[0] && inserted[0].id ? inserted[0].id.slice(0,8) : '?'));
         const noteEl = document.getElementById('triageSnapshotNote');
         if (noteEl) noteEl.value = '';
+        // Open and reload the history panel so the user actually sees it
+        const hp = document.getElementById('triageHistoryPanel');
+        if (hp) hp.style.display = 'block';
+        if (typeof loadHistory === 'function') loadHistory();
       }
     } catch (e) {
-      console.error(e);
-      triageToast('Snapshot save failed');
+      console.error('[triage] snapshot save threw:', e);
+      triageToast('Save threw: ' + (e && e.message ? e.message : String(e)).slice(0, 80));
     } finally {
       saveSnapBtn.disabled = false;
       saveSnapBtn.innerHTML = '&#128190; Save snapshot';
@@ -2399,6 +2410,7 @@ a:hover { opacity: 0.8; }
     if (b) b.textContent = 'Confirm restore';
   }
 
+  window.__triageLoadHistory = function() { loadHistory(); };
   async function loadHistory() {
     console.log('[triage] loadHistory called');
     if (!historyList) { console.warn('[triage] historyList element missing'); return; }
