@@ -429,12 +429,52 @@ a:hover { opacity: 0.8; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
+/* Global Triage toolbar — uniform 40px control heights, baseline-aligned */
+.triage-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+.triage-field { margin: 0 !important; }
+.triage-field label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.triage-field input {
+  height: 40px;
+  box-sizing: border-box;
+  margin: 0;
+}
+.triage-field-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.triage-btn {
+  height: 40px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  margin: 0;
+}
+
 /* Global Triage board */
 .triage-board {
   display: flex;
   gap: 14px;
   padding-bottom: 12px;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
 }
 .triage-col {
@@ -1322,26 +1362,29 @@ a:hover { opacity: 0.8; }
         Free-form board for tracking what's happened and what's next across markets. Add columns, add checklist items, share or export when done. Saved per browser.
       </p>
 
-      <div class="form-card glass" style="margin-bottom:16px">
-        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px">
-          <div class="form-group" style="margin:0;min-width:160px">
-            <label style="font-size:11px">Week of</label>
-            <input type="date" id="triageDateInput" style="font-size:14px" />
+      <div class="form-card glass triage-toolbar" style="margin-bottom:16px">
+        <div class="triage-toolbar-row">
+          <div class="form-group triage-field" style="flex:0 0 180px">
+            <label>Week of</label>
+            <input type="date" id="triageDateInput" />
           </div>
-          <div class="form-group" style="margin:0;flex:1;min-width:200px">
-            <label style="font-size:11px">Snapshot note (optional)</label>
+          <div class="form-group triage-field" style="flex:1 1 220px;min-width:180px">
+            <label>Snapshot note (optional)</label>
             <input type="text" id="triageSnapshotNote" placeholder="e.g. Pre-launch checkpoint" />
           </div>
-          <button class="btn-primary" id="triageSaveSnapshotBtn" style="height:38px">&#128190; Save snapshot</button>
-          <button class="btn-secondary" id="triageHistoryBtn" style="height:38px">&#128338; History</button>
+          <div class="triage-field-actions">
+            <button class="btn-primary triage-btn" id="triageSaveSnapshotBtn">&#128190; Save snapshot</button>
+            <button class="btn-secondary triage-btn" id="triageHistoryBtn">&#128338; History</button>
+          </div>
         </div>
-        <div class="form-actions" style="flex-wrap:wrap;gap:8px">
-          <button class="btn-secondary" id="triageAddColumnBtn">+ Add column</button>
-          <button class="btn-secondary" id="triageRefreshBtn" title="Pull latest from cloud">&#x21bb; Refresh</button>
-          <button class="btn-secondary" id="triageExportMdBtn">&#128203; Copy as Markdown</button>
-          <button class="btn-secondary" id="triageExportCsvBtn">&#11015; Download CSV</button>
-          <button class="btn-secondary" id="triageExportImgBtn">&#128247; Copy as image</button>
-          <button class="btn-danger" id="triageResetBtn" style="margin-left:auto">Reset</button>
+        <div class="triage-toolbar-row" style="margin-top:8px">
+          <button class="btn-secondary triage-btn" id="triageAddColumnBtn">+ Add column</button>
+          <button class="btn-secondary triage-btn" id="triageRefreshBtn" title="Pull latest from cloud">&#x21bb; Refresh</button>
+          <button class="btn-secondary triage-btn" id="triageExportMdBtn">&#128203; Copy as Markdown</button>
+          <button class="btn-secondary triage-btn" id="triageExportCsvBtn">&#11015; Download CSV</button>
+          <button class="btn-secondary triage-btn" id="triageExportImgBtn">&#128247; Copy as image</button>
+          <span style="flex:1"></span>
+          <button class="btn-danger triage-btn" id="triageResetBtn">Reset</button>
           <span class="toast" id="triageToast"></span>
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:8px">
