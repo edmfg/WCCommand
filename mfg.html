@@ -2072,6 +2072,8 @@ a:hover { opacity: 0.8; }
   });
 
   renderTriage();
+  // Pull cloud state on first paint
+  refreshFromCloud(true);
 
   // --- Supabase helpers ---
   async function sbFetch() {
