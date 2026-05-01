@@ -1286,11 +1286,16 @@ a:hover { opacity: 0.8; }
       <div class="form-card glass" style="margin-bottom:16px">
         <div class="form-actions" style="flex-wrap:wrap;gap:8px">
           <button class="btn-secondary" id="triageAddColumnBtn">+ Add column</button>
+          <button class="btn-secondary" id="triageRefreshBtn" title="Pull latest from cloud">&#x21bb; Refresh</button>
           <button class="btn-secondary" id="triageExportMdBtn">&#128203; Copy as Markdown</button>
           <button class="btn-secondary" id="triageExportCsvBtn">&#11015; Download CSV</button>
           <button class="btn-secondary" id="triageExportImgBtn">&#128247; Copy as image</button>
           <button class="btn-danger" id="triageResetBtn" style="margin-left:auto">Reset</button>
           <span class="toast" id="triageToast"></span>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:8px">
+          <span id="triageSyncDot" style="width:8px;height:8px;border-radius:50%;background:#888"></span>
+          <span id="triageSyncStatus">Loading…</span>
         </div>
       </div>
 
@@ -1706,8 +1711,10 @@ a:hover { opacity: 0.8; }
   }
   window.addEventListener('hashchange', applyHash);
 
-  // --- Global Triage ---
+  // --- Global Triage (Supabase synced, MFG-shared) ---
   const TRIAGE_KEY = 'mfg_global_triage_v1';
+  const TRIAGE_ROW_ID = 'global';
+  const TRIAGE_TABLE = 'mfg_triage';
   function defaultTriage() {
     return {
       columns: [
@@ -1716,7 +1723,7 @@ a:hover { opacity: 0.8; }
       ]
     };
   }
-  function loadTriage() {
+  function loadTriageLocal() {
     try {
       const raw = localStorage.getItem(TRIAGE_KEY);
       if (raw) {
@@ -1728,8 +1735,97 @@ a:hover { opacity: 0.8; }
   }
   function saveTriage(state) {
     try { localStorage.setItem(TRIAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    cloudSaveDebounced();
   }
-  let triage = loadTriage();
+  let triage = loadTriageLocal();
+  let lastCloudHash = null;
+
+  function setSyncDot(color) {
+    const el = document.getElementById('triageSyncDot');
+    if (el) el.style.background = color;
+  }
+  function setSyncStatus(text, color) {
+    const el = document.getElementById('triageSyncStatus');
+    if (el) el.textContent = text;
+    if (color) setSyncDot(color);
+  }
+  function hashState(s) { try { return JSON.stringify(s); } catch (e) { return ''; } }
+
+  async function cloudLoad() {
+    if (!supabase) return null;
+    try {
+      const { data, error } = await supabase
+        .from(TRIAGE_TABLE)
+        .select('data')
+        .eq('id', TRIAGE_ROW_ID)
+        .maybeSingle();
+      if (error) {
+        console.warn('triage cloudLoad error:', error.message);
+        return null;
+      }
+      return data && data.data ? data.data : null;
+    } catch (e) {
+      console.warn('triage cloudLoad threw:', e);
+      return null;
+    }
+  }
+
+  let cloudSaveTimer = null;
+  function cloudSaveDebounced() {
+    if (!supabase) {
+      setSyncStatus('Local only — no cloud connection', '#a3a300');
+      return;
+    }
+    setSyncStatus('Saving…', '#3b82f6');
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(async function() {
+      try {
+        const payload = {
+          id: TRIAGE_ROW_ID,
+          data: triage,
+          updated_at: new Date().toISOString()
+        };
+        const { error } = await supabase
+          .from(TRIAGE_TABLE)
+          .upsert(payload, { onConflict: 'id' });
+        if (error) {
+          console.error('triage cloudSave error:', error);
+          setSyncStatus('Cloud sync failed — saved locally only', '#ef4444');
+        } else {
+          lastCloudHash = hashState(triage);
+          setSyncStatus('Synced ✓ — visible to all MFG users', '#22c55e');
+        }
+      } catch (e) {
+        console.error('triage cloudSave threw:', e);
+        setSyncStatus('Cloud sync failed — saved locally only', '#ef4444');
+      }
+    }, 600);
+  }
+
+  async function refreshFromCloud(silent) {
+    if (!supabase) {
+      if (!silent) setSyncStatus('Local only — no cloud connection', '#a3a300');
+      return;
+    }
+    if (!silent) setSyncStatus('Loading…', '#3b82f6');
+    const remote = await cloudLoad();
+    if (remote && Array.isArray(remote.columns)) {
+      const remoteHash = hashState(remote);
+      const localHash = hashState(triage);
+      if (remoteHash !== localHash) {
+        triage = remote;
+        try { localStorage.setItem(TRIAGE_KEY, JSON.stringify(triage)); } catch (e) {}
+        renderTriage();
+      }
+      lastCloudHash = remoteHash;
+      setSyncStatus('Synced ✓ — visible to all MFG users', '#22c55e');
+    } else {
+      // No row yet — push local default to seed the cloud
+      lastCloudHash = null;
+      setSyncStatus('Seeding cloud with starter board…', '#3b82f6');
+      cloudSaveDebounced();
+    }
+  }
   function uid() { return Math.random().toString(36).slice(2, 10); }
   function escTriage(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
@@ -1923,6 +2019,14 @@ a:hover { opacity: 0.8; }
     downloadFile('global-triage.csv', csv, 'text/csv;charset=utf-8');
     triageToast('Downloaded global-triage.csv');
   });
+  const refreshBtn = document.getElementById('triageRefreshBtn');
+  if (refreshBtn) refreshBtn.addEventListener('click', function() { refreshFromCloud(false); });
+
+  // Refresh when user returns to the tab — picks up other MFG users' edits
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') refreshFromCloud(true);
+  });
+
   const expImgBtn = document.getElementById('triageExportImgBtn');
   if (expImgBtn) expImgBtn.addEventListener('click', async function() {
     const node = document.getElementById('triageBoard');
