@@ -466,8 +466,24 @@ a:hover { opacity: 0.8; }
   width: 22px; height: 22px;
   cursor: pointer; font-size: 12px;
   line-height: 1; padding: 0;
+  white-space: nowrap;
+  transition: all 0.15s;
 }
 .triage-col-delete:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.triage-col-delete.armed {
+  width: auto; padding: 0 10px;
+  border-radius: 11px; height: 22px;
+  background: #ff6b6b; color: white; border-color: #ff6b6b;
+  font-size: 11px; font-weight: 600;
+}
+.triage-confirm-row {
+  display: flex; gap: 8px; align-items: center;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
 .triage-items { display: flex; flex-direction: column; gap: 6px; }
 .triage-item {
   display: flex;
@@ -1311,7 +1327,7 @@ a:hover { opacity: 0.8; }
         </div>
       </div>
 
-      <div id="triageViewingBanner" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(255,200,40,0.1);border:1px solid rgba(255,200,40,0.4);border-radius:8px;font-size:13px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div id="triageViewingBanner" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(255,200,40,0.1);border:1px solid rgba(255,200,40,0.4);border-radius:8px;font-size:13px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <span id="triageViewingLabel"></span>
         <span style="display:flex;gap:8px">
           <button class="btn-secondary" id="triageRestoreBtn">Restore this version</button>
@@ -1319,17 +1335,16 @@ a:hover { opacity: 0.8; }
         </span>
       </div>
 
-      <div id="triageBoard" class="triage-board"></div>
-
-      <div id="triageHistoryModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px">
-        <div class="form-card glass" style="max-width:640px;width:100%;max-height:80vh;overflow-y:auto">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
-            <strong>Snapshot history</strong>
-            <button class="btn-secondary" id="triageHistoryCloseBtn">Close</button>
-          </div>
-          <div id="triageHistoryList" style="font-size:13px;color:var(--text-muted)">Loading…</div>
+      <!-- Inline history panel (no modal) -->
+      <div id="triageHistoryPanel" class="form-card glass" style="display:none;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+          <strong>Snapshot history</strong>
+          <button class="btn-secondary" id="triageHistoryHideBtn">Hide</button>
         </div>
+        <div id="triageHistoryList" style="font-size:13px;color:var(--text-muted)">Loading…</div>
       </div>
+
+      <div id="triageBoard" class="triage-board"></div>
     </div>
 
   </main>
@@ -1876,11 +1891,53 @@ a:hover { opacity: 0.8; }
     ta.style.height = 'auto';
     ta.style.height = (ta.scrollHeight + 2) + 'px';
   }
+  // Track which destructive control is "armed" — clicking it once sets this,
+  // clicking again confirms, anything else clears it. Replaces all confirm() popups.
+  let triageArmed = null; // string identifier
+  let triageArmedTimer = null;
+  function arm(id, ms) {
+    triageArmed = id;
+    clearTimeout(triageArmedTimer);
+    triageArmedTimer = setTimeout(function() {
+      if (triageArmed === id) { triageArmed = null; renderTriage(); }
+    }, ms || 4000);
+    renderTriage();
+  }
+  function disarm() {
+    if (triageArmed != null) {
+      triageArmed = null;
+      clearTimeout(triageArmedTimer);
+    }
+  }
+  // Clicks outside the board's destructive controls disarm
+  document.addEventListener('click', function(e) {
+    if (!triageArmed) return;
+    const t = e.target;
+    if (t.classList && (
+      t.classList.contains('triage-col-delete') ||
+      t.classList.contains('triage-item-delete') ||
+      t.classList.contains('triage-snap-delete') ||
+      t.classList.contains('triage-snap-restore') ||
+      t.id === 'triageResetBtn'
+    )) return;
+    disarm(); renderTriage();
+  });
+
   function renderTriage() {
     const board = document.getElementById('triageBoard');
     const dateInput = document.getElementById('triageDateInput');
     if (dateInput && document.activeElement !== dateInput) {
       dateInput.value = triage.date || todayIso();
+    }
+    const resetBtn = document.getElementById('triageResetBtn');
+    if (resetBtn) {
+      if (triageArmed === 'reset') {
+        resetBtn.textContent = 'Confirm reset';
+        resetBtn.classList.add('armed');
+      } else {
+        resetBtn.textContent = 'Reset';
+        resetBtn.classList.remove('armed');
+      }
     }
     if (!board) return;
     board.innerHTML = '';
@@ -1888,11 +1945,14 @@ a:hover { opacity: 0.8; }
       const colEl = document.createElement('div');
       colEl.className = 'triage-col';
       const doneCount = col.items.filter(function(i){return i.done;}).length;
+      const colArmed = triageArmed === 'col-' + ci;
       colEl.innerHTML =
         '<div class="triage-col-head">' +
-          '<input class="triage-col-title" value="' + escTriage(col.title) + '" data-col="' + ci + '" />' +
+          '<input class="triage-col-title" value="' + escTriage(col.title) + '" data-col="' + ci + '" placeholder="Column title" />' +
           '<span class="triage-col-count">' + doneCount + '/' + col.items.length + '</span>' +
-          '<button class="triage-col-delete" data-col="' + ci + '" title="Delete column">&times;</button>' +
+          '<button class="triage-col-delete' + (colArmed ? ' armed' : '') + '" data-col="' + ci + '" title="Delete column">' +
+            (colArmed ? 'Delete?' : '&times;') +
+          '</button>' +
         '</div>' +
         '<div class="triage-items"></div>' +
         '<button class="triage-add-item" data-col="' + ci + '">+ Add item</button>';
@@ -1901,10 +1961,13 @@ a:hover { opacity: 0.8; }
       col.items.forEach(function(it, ii) {
         const itEl = document.createElement('div');
         itEl.className = 'triage-item' + (it.done ? ' done' : '');
+        const itArmed = triageArmed === 'item-' + ci + '-' + ii;
         itEl.innerHTML =
           '<input type="checkbox" ' + (it.done ? 'checked' : '') + ' data-col="' + ci + '" data-item="' + ii + '" />' +
           '<textarea data-col="' + ci + '" data-item="' + ii + '" rows="1" placeholder="Type then press Enter for next…">' + escTriage(it.text) + '</textarea>' +
-          '<button class="triage-item-delete" data-col="' + ci + '" data-item="' + ii + '" title="Delete">&times;</button>';
+          '<button class="triage-item-delete" data-col="' + ci + '" data-item="' + ii + '" title="Delete">' +
+            (itArmed ? '✓' : '&times;') +
+          '</button>';
         itemsEl.appendChild(itEl);
         autoSize(itEl.querySelector('textarea'));
       });
@@ -1969,9 +2032,13 @@ a:hover { opacity: 0.8; }
       const t = e.target;
       if (t.classList && t.classList.contains('triage-col-delete')) {
         const ci = parseInt(t.dataset.col, 10);
-        if (confirm('Delete this column and all its items?')) {
+        const id = 'col-' + ci;
+        if (triageArmed === id) {
+          disarm();
           triage.columns.splice(ci, 1);
           saveTriage(triage); renderTriage();
+        } else {
+          arm(id);
         }
       } else if (t.classList && t.classList.contains('triage-add-item')) {
         const ci = parseInt(t.dataset.col, 10);
@@ -1983,8 +2050,14 @@ a:hover { opacity: 0.8; }
       } else if (t.classList && t.classList.contains('triage-item-delete')) {
         const ci = parseInt(t.dataset.col, 10);
         const ii = parseInt(t.dataset.item, 10);
-        triage.columns[ci].items.splice(ii, 1);
-        saveTriage(triage); renderTriage();
+        const id = 'item-' + ci + '-' + ii;
+        if (triageArmed === id) {
+          disarm();
+          triage.columns[ci].items.splice(ii, 1);
+          saveTriage(triage); renderTriage();
+        } else {
+          arm(id);
+        }
       }
     });
     board.addEventListener('change', function(e) {
@@ -2031,16 +2104,23 @@ a:hover { opacity: 0.8; }
 
   const addColBtn = document.getElementById('triageAddColumnBtn');
   if (addColBtn) addColBtn.addEventListener('click', function() {
-    const title = (prompt('New column title:') || '').trim();
-    if (!title) return;
-    triage.columns.push({ id: uid(), title: title, items: [] });
+    triage.columns.push({ id: uid(), title: 'New column', items: [] });
     saveTriage(triage); renderTriage();
+    // Focus & select the new column's title so user can rename inline
+    setTimeout(function() {
+      const titles = document.querySelectorAll('.triage-col-title');
+      const last = titles[titles.length - 1];
+      if (last) { last.focus(); last.select(); }
+    }, 0);
   });
   const resetBtn = document.getElementById('triageResetBtn');
   if (resetBtn) resetBtn.addEventListener('click', function() {
-    if (confirm('Reset the triage board to defaults? This clears all items.')) {
+    if (triageArmed === 'reset') {
+      disarm();
       triage = defaultTriage();
       saveTriage(triage); renderTriage();
+    } else {
+      arm('reset');
     }
   });
   const expMdBtn = document.getElementById('triageExportMdBtn');
@@ -2107,16 +2187,39 @@ a:hover { opacity: 0.8; }
     }
   });
 
-  // History modal
+  // History panel (inline, not modal)
   const historyBtn = document.getElementById('triageHistoryBtn');
-  const historyModal = document.getElementById('triageHistoryModal');
+  const historyPanel = document.getElementById('triageHistoryPanel');
   const historyList = document.getElementById('triageHistoryList');
-  const historyCloseBtn = document.getElementById('triageHistoryCloseBtn');
-  function closeHistory() { if (historyModal) historyModal.style.display = 'none'; }
-  if (historyCloseBtn) historyCloseBtn.addEventListener('click', closeHistory);
-  if (historyModal) historyModal.addEventListener('click', function(e) {
-    if (e.target === historyModal) closeHistory();
-  });
+  const historyHideBtn = document.getElementById('triageHistoryHideBtn');
+  function closeHistory() { if (historyPanel) historyPanel.style.display = 'none'; }
+  if (historyHideBtn) historyHideBtn.addEventListener('click', closeHistory);
+
+  // Track armed state for snapshot delete buttons
+  let snapArmed = null;
+  let snapArmedTimer = null;
+  function armSnap(id) {
+    snapArmed = id;
+    clearTimeout(snapArmedTimer);
+    snapArmedTimer = setTimeout(function() {
+      if (snapArmed === id) { snapArmed = null; loadHistory(); }
+    }, 4000);
+    loadHistory(); // re-render to show armed state
+  }
+  // Track armed state for restore
+  let restoreArmed = false;
+  let restoreArmedTimer = null;
+  function armRestore() {
+    restoreArmed = true;
+    clearTimeout(restoreArmedTimer);
+    restoreArmedTimer = setTimeout(function() {
+      restoreArmed = false;
+      const b = document.getElementById('triageRestoreBtn');
+      if (b) b.textContent = 'Restore this version';
+    }, 4000);
+    const b = document.getElementById('triageRestoreBtn');
+    if (b) b.textContent = 'Confirm restore';
+  }
 
   async function loadHistory() {
     if (!historyList) return;
@@ -2172,10 +2275,20 @@ a:hover { opacity: 0.8; }
           closeHistory();
         });
         const delBtn = document.createElement('button');
-        delBtn.className = 'btn-danger';
-        delBtn.textContent = 'Delete';
-        delBtn.addEventListener('click', async function() {
-          if (!confirm('Delete this snapshot permanently?')) return;
+        delBtn.className = 'btn-danger triage-snap-delete';
+        if (snapArmed === snap.id) {
+          delBtn.textContent = 'Confirm';
+        } else {
+          delBtn.textContent = 'Delete';
+        }
+        delBtn.addEventListener('click', async function(ev) {
+          ev.stopPropagation();
+          if (snapArmed !== snap.id) {
+            armSnap(snap.id);
+            return;
+          }
+          snapArmed = null;
+          clearTimeout(snapArmedTimer);
           try {
             const { error: e2 } = await supabase
               .from(TRIAGE_SNAPSHOTS_TABLE)
@@ -2196,15 +2309,20 @@ a:hover { opacity: 0.8; }
     }
   }
   if (historyBtn) historyBtn.addEventListener('click', function() {
-    if (historyModal) historyModal.style.display = 'flex';
-    loadHistory();
+    if (!historyPanel) return;
+    const visible = historyPanel.style.display !== 'none';
+    historyPanel.style.display = visible ? 'none' : 'block';
+    if (!visible) loadHistory();
   });
 
-  // Restore / back-to-live
+  // Restore / back-to-live (inline armed pattern, no popup)
   const restoreBtn = document.getElementById('triageRestoreBtn');
-  if (restoreBtn) restoreBtn.addEventListener('click', function() {
+  if (restoreBtn) restoreBtn.addEventListener('click', function(ev) {
+    ev.stopPropagation();
     if (!triageViewing) return;
-    if (!confirm('Restore this snapshot as the live triage? Other MFG users will see it too.')) return;
+    if (!restoreArmed) { armRestore(); return; }
+    restoreArmed = false;
+    clearTimeout(restoreArmedTimer);
     triageViewing = null;
     document.getElementById('triageViewingBanner').style.display = 'none';
     saveTriage(triage); // triggers cloud sync
