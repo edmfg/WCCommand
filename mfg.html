@@ -529,6 +529,34 @@ a:hover { opacity: 0.8; }
   font-size: 12px;
 }
 .triage-items { display: flex; flex-direction: column; gap: 10px; }
+.triage-group-header {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  color: var(--text-muted); padding: 4px 4px 2px;
+  margin-top: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.triage-group-header.tag-creative   { color: #f9a8d4; border-color: rgba(236,72,153,0.30); }
+.triage-group-header.tag-strategy   { color: #7dd3fc; border-color: rgba(56,189,248,0.30); }
+.triage-group-header.tag-production { color: #fcd34d; border-color: rgba(245,158,11,0.30); }
+.triage-group-header.tag-else       { color: #c4b5fd; border-color: rgba(167,139,250,0.30); }
+.triage-item-grip {
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 18px; line-height: 1;
+  width: 18px; min-width: 18px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  align-self: flex-start;
+  margin-top: 6px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.triage-item:hover .triage-item-grip { opacity: 1; }
+.triage-item-grip:active { cursor: grabbing; }
+.triage-item.dragging { opacity: 0.4; }
+.triage-item.drop-above { box-shadow: 0 -2px 0 0 var(--accent, #4ade80); }
+.triage-item.drop-below { box-shadow: 0 2px 0 0 var(--accent, #4ade80); }
 .triage-item {
   display: flex;
   align-items: center;
@@ -594,6 +622,24 @@ a:hover { opacity: 0.8; }
   box-sizing: border-box;
   overflow: hidden;
 }
+.triage-item-editor {
+  flex: 1; min-width: 0;
+  color: var(--text);
+  font: inherit; font-size: 15px;
+  min-height: 40px; line-height: 1.55;
+  padding: 6px 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  outline: none;
+}
+.triage-item-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.triage-item-editor b, .triage-item-editor strong { font-weight: 700; color: #fff; }
+.triage-item.done .triage-item-editor { text-decoration: line-through; color: var(--text-muted); }
 .triage-item textarea:focus { outline: none; }
 .triage-item.done textarea { text-decoration: line-through; color: var(--text-muted); }
 .triage-item-delete {
@@ -2117,20 +2163,104 @@ a:hover { opacity: 0.8; }
         '<button class="triage-add-item" data-col="' + ci + '">+ Add item</button>';
       board.appendChild(colEl);
       const itemsEl = colEl.querySelector('.triage-items');
-      col.items.forEach(function(it, ii) {
+      // Auto-group: order tagged items by tag (creative > strategy > production > else > untagged)
+      // while preserving relative order within each group.
+      const TAG_ORDER = ['creative', 'strategy', 'production', 'else', null];
+      const indexed = col.items.map(function(it, idx){
+        return { it: it, idx: idx, tag: detectTriageTag(it.text) };
+      });
+      indexed.sort(function(a, b) {
+        const ai = TAG_ORDER.indexOf(a.tag);
+        const bi = TAG_ORDER.indexOf(b.tag);
+        if (ai !== bi) return ai - bi;
+        return a.idx - b.idx;
+      });
+      let lastGroupHeader = '__init__';
+      indexed.forEach(function(entry) {
+        const it = entry.it;
+        const ii = entry.idx;
+        const tag = entry.tag;
+        const groupKey = tag || 'untagged';
+        if (groupKey !== lastGroupHeader && indexed.some(function(e){ return e !== entry && (e.tag || 'untagged') !== groupKey; })) {
+          const hdr = document.createElement('div');
+          hdr.className = 'triage-group-header tag-' + (tag || 'untagged');
+          hdr.textContent = tag ? tag.toUpperCase() : 'UNTAGGED';
+          itemsEl.appendChild(hdr);
+          lastGroupHeader = groupKey;
+        }
         const itEl = document.createElement('div');
-        const tag = detectTriageTag(it.text);
         itEl.className = 'triage-item' + (it.done ? ' done' : '') + (tag ? ' tag-' + tag : '');
+        itEl.draggable = true;
+        itEl.dataset.col = String(ci);
+        itEl.dataset.item = String(ii);
         const itArmed = triageArmed === 'item-' + ci + '-' + ii;
+        const itemHtml = it.html != null ? it.html : escTriage(it.text || '');
         itEl.innerHTML =
+          '<span class="triage-item-grip" title="Drag to reorder">&#8801;</span>' +
           '<button class="triage-item-done" data-col="' + ci + '" data-item="' + ii + '" title="Mark done">&check;</button>' +
-          '<textarea data-col="' + ci + '" data-item="' + ii + '" rows="1" placeholder="Type then press Enter for next…">' + escTriage(it.text) + '</textarea>' +
+          '<div class="triage-item-editor" contenteditable="true" data-col="' + ci + '" data-item="' + ii + '" data-placeholder="Type then press Enter for next… (Cmd+B for bold)">' + itemHtml + '</div>' +
           (tag ? '<span class="triage-item-tag">' + tag + '</span>' : '') +
           '<button class="triage-item-delete' + (itArmed ? ' armed' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="Delete">' +
             (itArmed ? '✓' : '&times;') +
           '</button>';
+        // Stop drag from starting when interacting with the editor — otherwise selecting text triggers row drag
+        const ed = itEl.querySelector('.triage-item-editor');
+        if (ed) {
+          ed.addEventListener('mousedown', function(){ itEl.draggable = false; });
+          ed.addEventListener('blur', function(){ itEl.draggable = true; });
+        }
         itemsEl.appendChild(itEl);
-        autoSize(itEl.querySelector('textarea'));
+      });
+    });
+    wireTriageDnD();
+  }
+  // Drag-and-drop reordering of triage items
+  let dragSrc = null;
+  function wireTriageDnD() {
+    document.querySelectorAll('#triageBoard .triage-item').forEach(function(el) {
+      el.addEventListener('dragstart', function(e) {
+        dragSrc = { col: parseInt(el.dataset.col, 10), item: parseInt(el.dataset.item, 10), el: el };
+        el.classList.add('dragging');
+        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'triage'); } catch(_) {}
+      });
+      el.addEventListener('dragend', function() {
+        if (dragSrc && dragSrc.el) dragSrc.el.classList.remove('dragging');
+        document.querySelectorAll('#triageBoard .triage-item.drop-above, #triageBoard .triage-item.drop-below').forEach(function(n){
+          n.classList.remove('drop-above','drop-below');
+        });
+        dragSrc = null;
+      });
+      el.addEventListener('dragover', function(e) {
+        if (!dragSrc) return;
+        e.preventDefault();
+        const rect = el.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        el.classList.toggle('drop-above', before);
+        el.classList.toggle('drop-below', !before);
+      });
+      el.addEventListener('dragleave', function() {
+        el.classList.remove('drop-above','drop-below');
+      });
+      el.addEventListener('drop', function(e) {
+        e.preventDefault();
+        if (!dragSrc) return;
+        const dstCol = parseInt(el.dataset.col, 10);
+        const dstItem = parseInt(el.dataset.item, 10);
+        const rect = el.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        const srcCol = dragSrc.col;
+        const srcItem = dragSrc.item;
+        if (srcCol === dstCol && srcItem === dstItem) return;
+        const fromArr = triage.columns[srcCol].items;
+        const [moved] = fromArr.splice(srcItem, 1);
+        const toArr = triage.columns[dstCol].items;
+        let insertAt = dstItem;
+        if (srcCol === dstCol && srcItem < dstItem) insertAt -= 1;
+        if (!before) insertAt += 1;
+        insertAt = Math.max(0, Math.min(insertAt, toArr.length));
+        toArr.splice(insertAt, 0, moved);
+        saveTriage(triage);
+        renderTriage();
       });
     });
   }
@@ -2203,11 +2333,11 @@ a:hover { opacity: 0.8; }
         }
       } else if (t.classList && t.classList.contains('triage-add-item')) {
         const ci = parseInt(t.dataset.col, 10);
-        triage.columns[ci].items.push({ id: uid(), text: '', done: false });
+        triage.columns[ci].items.push({ id: uid(), text: '', html: '', done: false });
         saveTriage(triage); renderTriage();
         const cols = document.querySelectorAll('.triage-col');
-        const tas = cols[ci].querySelectorAll('textarea');
-        if (tas.length) tas[tas.length - 1].focus();
+        const eds = cols[ci].querySelectorAll('.triage-item-editor');
+        if (eds.length) eds[eds.length - 1].focus();
       } else if (t.classList && t.classList.contains('triage-item-done')) {
         const ci = parseInt(t.dataset.col, 10);
         const ii = parseInt(t.dataset.item, 10);
@@ -2246,17 +2376,18 @@ a:hover { opacity: 0.8; }
           saveTriage(triage);
           // Don't re-render — would lose cursor. Just update count badge by sibling.
         }
-      } else if (t.tagName === 'TEXTAREA' && t.dataset.col != null && t.dataset.item != null) {
+      } else if (t.classList && t.classList.contains('triage-item-editor') && t.dataset.col != null && t.dataset.item != null) {
         const ci = parseInt(t.dataset.col, 10);
         const ii = parseInt(t.dataset.item, 10);
         if (triage.columns[ci] && triage.columns[ci].items[ii]) {
-          triage.columns[ci].items[ii].text = t.value;
+          const plain = t.textContent || '';
+          triage.columns[ci].items[ii].text = plain;
+          triage.columns[ci].items[ii].html = t.innerHTML;
           saveTriage(triage);
-          autoSize(t);
           // Live-update color tag without re-rendering (preserves cursor)
           const itemEl = t.closest('.triage-item');
           if (itemEl) {
-            const newTag = detectTriageTag(t.value);
+            const newTag = detectTriageTag(plain);
             ['tag-creative','tag-strategy','tag-production','tag-else'].forEach(function(c){ itemEl.classList.remove(c); });
             const oldTagEl = itemEl.querySelector('.triage-item-tag');
             if (oldTagEl) oldTagEl.remove();
@@ -2274,15 +2405,41 @@ a:hover { opacity: 0.8; }
     });
     board.addEventListener('keydown', function(e) {
       const t = e.target;
-      if (t.tagName === 'TEXTAREA' && e.key === 'Enter' && !e.shiftKey) {
+      const isEditor = t.classList && t.classList.contains('triage-item-editor');
+      if (isEditor && (e.metaKey || e.ctrlKey) && (e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        document.execCommand('bold');
+        // Re-fire input handler so we save the new HTML
+        t.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+      }
+      if (isEditor && e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         const ci = parseInt(t.dataset.col, 10);
-        triage.columns[ci].items.push({ id: uid(), text: '', done: false });
+        triage.columns[ci].items.push({ id: uid(), text: '', html: '', done: false });
         saveTriage(triage); renderTriage();
         const cols = document.querySelectorAll('.triage-col');
-        const tas = cols[ci].querySelectorAll('textarea');
-        if (tas.length) tas[tas.length - 1].focus();
+        const eds = cols[ci].querySelectorAll('.triage-item-editor');
+        if (eds.length) {
+          const last = eds[eds.length - 1];
+          last.focus();
+          // Place cursor at end
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(last);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
       }
+    });
+    // Strip pasted formatting to plain text (avoids junk inline styles from paste)
+    board.addEventListener('paste', function(e) {
+      const t = e.target;
+      if (!(t.classList && t.classList.contains('triage-item-editor'))) return;
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      document.execCommand('insertText', false, text);
     });
   }
 
