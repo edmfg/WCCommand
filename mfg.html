@@ -558,15 +558,17 @@ a:hover { opacity: 0.8; }
 .triage-item.tag-production .triage-item-tag { background: rgba(245, 158, 11, 0.20); color: #fcd34d; }
 .triage-item.tag-else       .triage-item-tag { background: rgba(167, 139, 250, 0.20); color: #c4b5fd; }
 .triage-item-done {
-  background: rgba(74, 222, 128, 0.10);
-  border: 1px solid rgba(74, 222, 128, 0.40);
-  color: #4ade80;
+  background: rgba(74, 222, 128, 0.06);
+  border: 1.5px solid rgba(74, 222, 128, 0.45);
+  color: rgba(74, 222, 128, 0.55);
   cursor: pointer; padding: 0;
-  width: 32px; height: 32px; min-width: 32px;
+  width: 36px; height: 36px; min-width: 36px;
   border-radius: 8px;
-  font-size: 16px; font-weight: 700; line-height: 1;
+  font-size: 20px; font-weight: 700; line-height: 1;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
   transition: all 0.15s;
 }
 .triage-item-done:hover {
@@ -585,19 +587,27 @@ a:hover { opacity: 0.8; }
   min-height: 40px; line-height: 1.55;
   padding: 6px 0;
   font-size: 15px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .triage-item textarea:focus { outline: none; }
 .triage-item.done textarea { text-decoration: line-through; color: var(--text-muted); }
 .triage-item-delete {
-  background: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.30);
-  color: rgba(255, 107, 107, 0.85);
+  background: rgba(255, 107, 107, 0.06);
+  border: 1.5px solid rgba(255, 107, 107, 0.35);
+  color: rgba(255, 107, 107, 0.75);
   cursor: pointer; padding: 0;
-  width: 32px; height: 32px; min-width: 32px;
+  width: 36px; height: 36px; min-width: 36px;
   border-radius: 8px;
-  font-size: 18px; font-weight: 700; line-height: 1;
+  font-size: 22px; font-weight: 700; line-height: 1;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
   transition: all 0.15s;
 }
 .triage-item-delete:hover {
@@ -1459,7 +1469,7 @@ a:hover { opacity: 0.8; }
           <strong>Snapshot history</strong>
           <button class="btn-secondary" id="triageHistoryHideBtn">Hide</button>
         </div>
-        <div id="triageHistoryList" style="font-size:13px;color:var(--text-muted)">Loading…</div>
+        <div id="triageHistoryList" style="font-size:13px;color:var(--text-muted)">Click <strong>History</strong> again to refresh, or save a snapshot to start your archive.</div>
       </div>
 
       <div id="triageBoard" class="triage-board"></div>
@@ -1856,6 +1866,15 @@ a:hover { opacity: 0.8; }
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tabId));
     history.replaceState(null, '', '#' + tabId);
+    if (tabId === 'triage') {
+      // Textareas inside hidden tabs report scrollHeight 0; resize once visible.
+      requestAnimationFrame(function() {
+        document.querySelectorAll('#panel-triage .triage-item textarea').forEach(function(ta) {
+          ta.style.height = 'auto';
+          ta.style.height = Math.max(ta.scrollHeight + 2, 40) + 'px';
+        });
+      });
+    }
   };
 
   // Keyboard shortcuts
@@ -2006,9 +2025,17 @@ a:hover { opacity: 0.8; }
     });
   }
   function autoSize(ta) {
+    if (!ta) return;
     ta.style.height = 'auto';
-    ta.style.height = (ta.scrollHeight + 2) + 'px';
+    const h = Math.max(ta.scrollHeight + 2, 40);
+    ta.style.height = h + 'px';
   }
+  // Re-run autoSize on all triage textareas after the tab actually becomes visible
+  // (scrollHeight is unreliable while the parent is display:none)
+  function autoSizeAllTriage() {
+    document.querySelectorAll('#panel-triage .triage-item textarea').forEach(autoSize);
+  }
+  window.addEventListener('resize', autoSizeAllTriage);
   // Track which destructive control is "armed" — clicking it once sets this,
   // clicking again confirms, anything else clears it. Replaces all confirm() popups.
   let triageArmed = null; // string identifier
@@ -2090,9 +2117,7 @@ a:hover { opacity: 0.8; }
         itEl.className = 'triage-item' + (it.done ? ' done' : '') + (tag ? ' tag-' + tag : '');
         const itArmed = triageArmed === 'item-' + ci + '-' + ii;
         itEl.innerHTML =
-          '<button class="triage-item-done" data-col="' + ci + '" data-item="' + ii + '" title="Mark done">' +
-            (it.done ? '&check;' : '') +
-          '</button>' +
+          '<button class="triage-item-done" data-col="' + ci + '" data-item="' + ii + '" title="Mark done">&check;</button>' +
           '<textarea data-col="' + ci + '" data-item="' + ii + '" rows="1" placeholder="Type then press Enter for next…">' + escTriage(it.text) + '</textarea>' +
           (tag ? '<span class="triage-item-tag">' + tag + '</span>' : '') +
           '<button class="triage-item-delete' + (itArmed ? ' armed' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="Delete">' +
@@ -2377,16 +2402,28 @@ a:hover { opacity: 0.8; }
   async function loadHistory() {
     console.log('[triage] loadHistory called');
     if (!historyList) { console.warn('[triage] historyList element missing'); return; }
-    historyList.textContent = 'Loading… (querying ' + TRIAGE_SNAPSHOTS_TABLE + ')';
+    const startedAt = Date.now();
+    historyList.innerHTML = '<span style="color:#fbbf24">Loading… querying ' + TRIAGE_SNAPSHOTS_TABLE + ' at ' + new Date().toLocaleTimeString() + '</span>';
     if (!supabase) { historyList.textContent = 'Supabase client not initialized — check console.'; return; }
+    // Race the query against a timeout so we never get stuck on Loading…
+    const timeout = new Promise(function(resolve) {
+      setTimeout(function() { resolve({ __timeout: true }); }, 8000);
+    });
     try {
       console.log('[triage] querying', TRIAGE_SNAPSHOTS_TABLE);
-      const { data, error } = await supabase
+      const queryPromise = supabase
         .from(TRIAGE_SNAPSHOTS_TABLE)
         .select('id, snapshot_date, note, saved_at, data')
         .order('saved_at', { ascending: false })
         .limit(100);
-      console.log('[triage] query returned', { dataLen: data && data.length, error });
+      const result = await Promise.race([queryPromise, timeout]);
+      if (result && result.__timeout) {
+        console.error('[triage] query timed out after 8s');
+        historyList.innerHTML = '<span style="color:#ff6b6b">Query timed out after 8s. Check console + Network tab for the failed request to ' + TRIAGE_SNAPSHOTS_TABLE + '. Most likely cause: the table doesn\'t exist yet — run supabase-mfg-triage.sql in your Supabase SQL editor.</span>';
+        return;
+      }
+      const { data, error } = result;
+      console.log('[triage] query returned in', Date.now() - startedAt, 'ms', { dataLen: data && data.length, error });
       if (error) {
         console.error('triage loadHistory error:', error);
         const msg = error.message || error.hint || JSON.stringify(error);
