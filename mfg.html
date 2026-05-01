@@ -2290,7 +2290,7 @@ a:hover { opacity: 0.8; }
   async function loadHistory() {
     if (!historyList) return;
     historyList.textContent = 'Loading…';
-    if (!supabase) { historyList.textContent = 'Supabase not connected'; return; }
+    if (!supabase) { historyList.textContent = 'Supabase client not initialized — check console.'; return; }
     try {
       const { data, error } = await supabase
         .from(TRIAGE_SNAPSHOTS_TABLE)
@@ -2298,11 +2298,16 @@ a:hover { opacity: 0.8; }
         .order('saved_at', { ascending: false })
         .limit(100);
       if (error) {
-        historyList.textContent = 'Failed to load history';
+        console.error('triage loadHistory error:', error);
+        const msg = error.message || 'Unknown error';
+        const hint = /schema cache|does not exist|relation .* does not exist|42P01/i.test(msg)
+          ? ' — looks like the mfg_triage_snapshots table is missing. Run the SQL in supabase-mfg-triage.sql in your Supabase SQL editor.'
+          : '';
+        historyList.textContent = 'Failed to load history: ' + msg + hint;
         return;
       }
       if (!data || data.length === 0) {
-        historyList.textContent = 'No snapshots yet. Click "Save snapshot" to record one.';
+        historyList.textContent = 'No snapshots yet. Click "Save snapshot" above to record one.';
         return;
       }
       historyList.innerHTML = '';
@@ -2371,7 +2376,8 @@ a:hover { opacity: 0.8; }
         historyList.appendChild(row);
       });
     } catch (e) {
-      historyList.textContent = 'Failed to load history';
+      console.error('triage loadHistory threw:', e);
+      historyList.textContent = 'Failed to load history: ' + (e && e.message ? e.message : String(e));
     }
   }
   if (historyBtn) historyBtn.addEventListener('click', function() {
