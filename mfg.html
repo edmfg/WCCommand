@@ -549,7 +549,144 @@ a:hover { opacity: 0.8; }
   padding: 8px 12px;
   font-size: 12px;
 }
+.triage-search-wrap {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+  max-width: 360px;
+  display: flex; align-items: center;
+}
+.triage-search-icon {
+  position: absolute; left: 10px;
+  font-size: 12px; opacity: 0.5;
+  pointer-events: none;
+}
+.triage-search-input {
+  width: 100%;
+  padding: 8px 60px 8px 30px;
+  height: 36px; box-sizing: border-box;
+  background: rgba(0,0,0,0.30);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.triage-search-input:focus {
+  outline: none;
+  border-color: var(--accent, #4ade80);
+  background: rgba(0,0,0,0.45);
+}
+.triage-search-count {
+  position: absolute; right: 10px;
+  font-size: 11px; color: var(--text-muted);
+  pointer-events: none;
+}
+.triage-select {
+  height: 36px; padding: 0 28px 0 10px;
+  background: rgba(0,0,0,0.30);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23999' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
 .triage-items { display: flex; flex-direction: column; gap: 10px; }
+/* Density control */
+[data-density="compact"] .triage-item { min-height: 48px; padding: 10px 12px; }
+[data-density="compact"] .triage-item-editor { min-height: 28px; font-size: 14px; padding: 4px 0; }
+[data-density="compact"] .triage-items { gap: 6px; }
+[data-density="spacious"] .triage-item { min-height: 110px; padding: 24px 18px; }
+[data-density="spacious"] .triage-item-editor { min-height: 60px; font-size: 16px; padding: 10px 0; }
+[data-density="spacious"] .triage-items { gap: 14px; }
+.triage-item.filtered-out { display: none; }
+.triage-empty-prompt {
+  font-size: 12px; color: var(--text-muted);
+  padding: 20px 14px; text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+}
+.triage-item-meta {
+  display: flex; align-items: center; gap: 6px;
+  flex-wrap: wrap;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.triage-owner-pill, .triage-due-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px;
+  font-size: 10px; font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.triage-owner-pill:hover, .triage-due-pill:hover { border-color: var(--accent, #4ade80); color: var(--accent, #4ade80); }
+.triage-owner-pill.assigned { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.40); color: #86efac; }
+.triage-due-pill.has-date { background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.35); color: #7dd3fc; }
+.triage-due-pill.overdue { background: rgba(255,107,107,0.18); border-color: rgba(255,107,107,0.50); color: #fca5a5; animation: triage-pulse 2s ease-in-out infinite; }
+@keyframes triage-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.65; } }
+.triage-due-input { display: none; }
+.triage-col-autogroup {
+  font-size: 10px; color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+  background: rgba(0,0,0,0.20);
+  letter-spacing: 0.5px;
+}
+.triage-col-autogroup.on { background: rgba(74,222,128,0.18); border-color: rgba(74,222,128,0.45); color: #86efac; }
+.triage-col-grip {
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 14px; line-height: 1;
+  padding: 0 4px;
+  user-select: none;
+  letter-spacing: -2px;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+.triage-col-head:hover .triage-col-grip { opacity: 1; }
+.triage-col-grip:active { cursor: grabbing; }
+.triage-col.col-dragging { opacity: 0.5; }
+.triage-col.col-drop-left  { box-shadow: -3px 0 0 0 var(--accent, #4ade80); }
+.triage-col.col-drop-right { box-shadow: 3px 0 0 0 var(--accent, #4ade80); }
+.triage-realtime-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+  margin-right: 4px;
+  animation: triage-pulse 1.5s ease-in-out infinite;
+}
+.triage-snap-diff {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.triage-snap-diff .added   { color: #86efac; }
+.triage-snap-diff .removed { color: #fca5a5; }
+.triage-snap-diff .changed { color: #fcd34d; }
+/* New tag colors */
+.triage-item.tag-media        { border-left-color: #a3e635; background: rgba(163, 230, 53, 0.10); }
+.triage-item.tag-talent       { border-left-color: #fb7185; background: rgba(251, 113, 133, 0.10); }
+.triage-item.tag-partnerships { border-left-color: #2dd4bf; background: rgba(45, 212, 191, 0.10); }
+.triage-item.tag-legal        { border-left-color: #94a3b8; background: rgba(148, 163, 184, 0.10); }
+.triage-item.tag-media        .triage-item-tag { background: rgba(163, 230, 53, 0.20); color: #d9f99d; }
+.triage-item.tag-talent       .triage-item-tag { background: rgba(251, 113, 133, 0.20); color: #fda4af; }
+.triage-item.tag-partnerships .triage-item-tag { background: rgba(45, 212, 191, 0.20); color: #99f6e4; }
+.triage-item.tag-legal        .triage-item-tag { background: rgba(148, 163, 184, 0.20); color: #cbd5e1; }
+.triage-group-header.tag-media        { color: #d9f99d; border-color: rgba(163,230,53,0.30); }
+.triage-group-header.tag-talent       { color: #fda4af; border-color: rgba(251,113,133,0.30); }
+.triage-group-header.tag-partnerships { color: #99f6e4; border-color: rgba(45,212,191,0.30); }
+.triage-group-header.tag-legal        { color: #cbd5e1; border-color: rgba(148,163,184,0.30); }
 .triage-group-header {
   font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
   color: var(--text-muted); padding: 4px 4px 2px;
@@ -1496,7 +1633,7 @@ a:hover { opacity: 0.8; }
         Free-form board for tracking what's happened and what's next across markets. Add columns, add checklist items, share or export when done. Saved per browser.
       </p>
 
-      <div class="form-card glass triage-toolbar" style="margin-bottom:16px">
+      <div class="form-card glass triage-toolbar" style="margin-bottom:16px;position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
         <div class="triage-toolbar-row">
           <div class="form-group triage-field" style="flex:0 0 180px">
             <label>Week of</label>
@@ -1512,12 +1649,39 @@ a:hover { opacity: 0.8; }
           </div>
         </div>
         <div class="triage-toolbar-row" style="margin-top:8px">
+          <div class="triage-search-wrap">
+            <span class="triage-search-icon">&#128269;</span>
+            <input type="text" id="triageSearchInput" class="triage-search-input" placeholder="Filter items…  (Cmd/Ctrl+K)" />
+            <span id="triageSearchCount" class="triage-search-count"></span>
+          </div>
+          <select id="triageTagFilter" class="triage-select" title="Filter by tag">
+            <option value="">All tags</option>
+            <option value="creative">Creative</option>
+            <option value="strategy">Strategy</option>
+            <option value="production">Production</option>
+            <option value="media">Media</option>
+            <option value="talent">Talent</option>
+            <option value="partnerships">Partnerships</option>
+            <option value="legal">Legal</option>
+            <option value="else">Else</option>
+            <option value="untagged">Untagged</option>
+          </select>
+          <select id="triageDoneFilter" class="triage-select" title="Filter by status">
+            <option value="all">All status</option>
+            <option value="open">Open only</option>
+            <option value="done">Done only</option>
+          </select>
+          <select id="triageDensitySelect" class="triage-select" title="Item density">
+            <option value="comfy">Comfy</option>
+            <option value="compact">Compact</option>
+            <option value="spacious">Spacious</option>
+          </select>
+          <span style="flex:1"></span>
           <button class="btn-secondary triage-btn" id="triageAddColumnBtn">+ Add column</button>
           <button class="btn-secondary triage-btn" id="triageRefreshBtn" title="Pull latest from cloud">&#x21bb; Refresh</button>
           <button class="btn-secondary triage-btn" id="triageExportMdBtn">&#128203; Copy as Markdown</button>
           <button class="btn-secondary triage-btn" id="triageExportCsvBtn">&#11015; Download CSV</button>
           <button class="btn-secondary triage-btn" id="triageExportImgBtn">&#128247; Copy as image</button>
-          <span style="flex:1"></span>
           <button class="btn-danger triage-btn" id="triageResetBtn">Reset</button>
           <span class="toast" id="triageToast"></span>
         </div>
@@ -2072,6 +2236,42 @@ a:hover { opacity: 0.8; }
     }, 600);
   }
 
+  // --- Realtime sync via Supabase channels ---
+  let realtimeChannel = null;
+  function subscribeRealtime() {
+    if (!supabase || !supabase.channel) return;
+    if (realtimeChannel) return;
+    try {
+      realtimeChannel = supabase
+        .channel('mfg-triage-' + TRIAGE_ROW_ID)
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: TRIAGE_TABLE, filter: 'id=eq.' + TRIAGE_ROW_ID },
+          function(payload) {
+            const newData = payload && payload.new && payload.new.data;
+            if (!newData || !Array.isArray(newData.columns)) return;
+            const remoteHash = hashState(newData);
+            if (remoteHash === lastCloudHash) return;
+            // Don't clobber the editor while user is typing
+            if (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('triage-item-editor')) {
+              return;
+            }
+            triage = newData;
+            try { localStorage.setItem(TRIAGE_KEY, JSON.stringify(triage)); } catch (e) {}
+            lastCloudHash = remoteHash;
+            if (!triageViewing) renderTriage();
+            setSyncStatus('Synced ✓ — live update from another user', '#22c55e');
+          })
+        .subscribe(function(status) {
+          if (status === 'SUBSCRIBED') {
+            const dot = document.getElementById('triageSyncDot');
+            if (dot) dot.classList.add('triage-realtime-dot');
+          }
+        });
+    } catch (e) {
+      console.warn('triage realtime subscribe failed:', e);
+    }
+  }
+
   async function refreshFromCloud(silent) {
     if (!supabase) {
       if (!silent) setSyncStatus('Local only — no cloud connection', '#a3a300');
@@ -2151,8 +2351,53 @@ a:hover { opacity: 0.8; }
     if (/\bcreative\b/.test(s)) return 'creative';
     if (/\bstrategy\b/.test(s) || /\bstrategic\b/.test(s)) return 'strategy';
     if (/\bproduction\b/.test(s) || /\bprod\b/.test(s)) return 'production';
+    if (/\bmedia\b/.test(s) || /\bpaid\b/.test(s)) return 'media';
+    if (/\btalent\b/.test(s) || /\bcasting\b/.test(s)) return 'talent';
+    if (/\bpartner(ship)?s?\b/.test(s) || /\bsponsor(ship)?s?\b/.test(s)) return 'partnerships';
+    if (/\blegal\b/.test(s) || /\bcompliance\b/.test(s)) return 'legal';
     if (/\belse\b/.test(s)) return 'else';
     return null;
+  }
+  // --- Filter / search state ---
+  const triageFilter = { q: '', tag: '', status: 'all' };
+  function passesFilter(item, tag) {
+    if (triageFilter.status === 'open' && item.done) return false;
+    if (triageFilter.status === 'done' && !item.done) return false;
+    if (triageFilter.tag) {
+      const itemTag = tag || 'untagged';
+      if (itemTag !== triageFilter.tag) return false;
+    }
+    if (triageFilter.q) {
+      const q = triageFilter.q.toLowerCase();
+      const hay = ((item.text || '') + ' ' + (item.owner || '') + ' ' + (item.due || '')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+  function ownerInitials(s) {
+    if (!s) return '+';
+    const parts = String(s).trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '+';
+    if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  }
+  function isOverdue(due, done) {
+    if (!due || done) return false;
+    const t = new Date(due + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    return t < today;
+  }
+  function fmtDue(due) {
+    if (!due) return '';
+    const t = new Date(due + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diffDays = Math.round((t - today) / 86400000);
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays === -1) return 'Yesterday';
+    if (diffDays > 0 && diffDays < 7) return 'In ' + diffDays + 'd';
+    if (diffDays < 0 && diffDays > -14) return Math.abs(diffDays) + 'd late';
+    return t.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
   function renderTriage() {
     const board = document.getElementById('triageBoard');
@@ -2172,17 +2417,22 @@ a:hover { opacity: 0.8; }
     }
     if (!board) return;
     board.innerHTML = '';
+    let totalShown = 0, totalAll = 0;
     triage.columns.forEach(function(col, ci) {
       const colEl = document.createElement('div');
       colEl.className = 'triage-col';
+      colEl.dataset.colIdx = String(ci);
       const savedWidth = triage.colWidths && triage.colWidths[col.id];
       if (savedWidth) colEl.style.flex = '0 0 ' + savedWidth + 'px';
       const doneCount = col.items.filter(function(i){return i.done;}).length;
       const colArmed = triageArmed === 'col-' + ci;
+      const autoGroup = col.autoGroup !== false;
       colEl.innerHTML =
-        '<div class="triage-col-head">' +
+        '<div class="triage-col-head" data-col="' + ci + '">' +
+          '<span class="triage-col-grip" draggable="true" data-col-idx="' + ci + '" title="Drag column to reorder">&#8942;&#8942;</span>' +
           '<input class="triage-col-title" value="' + escTriage(col.title) + '" data-col="' + ci + '" placeholder="Column title" />' +
           '<span class="triage-col-count">' + doneCount + '/' + col.items.length + '</span>' +
+          '<button class="triage-col-autogroup' + (autoGroup ? ' on' : '') + '" data-col="' + ci + '" title="Toggle auto-grouping by tag">GROUP</button>' +
           '<button class="triage-col-delete' + (colArmed ? ' armed' : '') + '" data-col="' + ci + '" title="Delete column">' +
             (colArmed ? 'Delete?' : '&times;') +
           '</button>' +
@@ -2191,55 +2441,76 @@ a:hover { opacity: 0.8; }
         '<button class="triage-add-item" data-col="' + ci + '">+ Add item</button>';
       board.appendChild(colEl);
       const itemsEl = colEl.querySelector('.triage-items');
-      // Auto-group: order tagged items by tag (creative > strategy > production > else > untagged)
-      // while preserving relative order within each group.
-      const TAG_ORDER = ['creative', 'strategy', 'production', 'else', null];
+      const TAG_ORDER = ['creative', 'strategy', 'production', 'media', 'talent', 'partnerships', 'legal', 'else', null];
       const indexed = col.items.map(function(it, idx){
         return { it: it, idx: idx, tag: detectTriageTag(it.text) };
       });
-      indexed.sort(function(a, b) {
-        const ai = TAG_ORDER.indexOf(a.tag);
-        const bi = TAG_ORDER.indexOf(b.tag);
-        if (ai !== bi) return ai - bi;
-        return a.idx - b.idx;
-      });
+      if (autoGroup) {
+        indexed.sort(function(a, b) {
+          const ai = TAG_ORDER.indexOf(a.tag);
+          const bi = TAG_ORDER.indexOf(b.tag);
+          if (ai !== bi) return ai - bi;
+          return a.idx - b.idx;
+        });
+      }
       let lastGroupHeader = '__init__';
+      let visibleInCol = 0;
       indexed.forEach(function(entry) {
+        totalAll += 1;
         const it = entry.it;
         const ii = entry.idx;
         const tag = entry.tag;
-        const groupKey = tag || 'untagged';
-        if (groupKey !== lastGroupHeader && indexed.some(function(e){ return e !== entry && (e.tag || 'untagged') !== groupKey; })) {
-          const hdr = document.createElement('div');
-          hdr.className = 'triage-group-header tag-' + (tag || 'untagged');
-          hdr.textContent = tag ? tag.toUpperCase() : 'UNTAGGED';
-          itemsEl.appendChild(hdr);
-          lastGroupHeader = groupKey;
+        const visible = passesFilter(it, tag);
+        if (autoGroup && visible) {
+          const groupKey = tag || 'untagged';
+          if (groupKey !== lastGroupHeader && indexed.some(function(e){ return e !== entry && passesFilter(e.it, e.tag) && (e.tag || 'untagged') !== groupKey; })) {
+            const hdr = document.createElement('div');
+            hdr.className = 'triage-group-header tag-' + (tag || 'untagged');
+            hdr.textContent = tag ? tag.toUpperCase() : 'UNTAGGED';
+            itemsEl.appendChild(hdr);
+            lastGroupHeader = groupKey;
+          }
         }
         const itEl = document.createElement('div');
-        itEl.className = 'triage-item' + (it.done ? ' done' : '') + (tag ? ' tag-' + tag : '');
+        itEl.className = 'triage-item' + (it.done ? ' done' : '') + (tag ? ' tag-' + tag : '') + (visible ? '' : ' filtered-out');
         itEl.draggable = true;
         itEl.dataset.col = String(ci);
         itEl.dataset.item = String(ii);
         const itArmed = triageArmed === 'item-' + ci + '-' + ii;
         const itemHtml = it.html != null ? it.html : escTriage(it.text || '');
+        const overdue = isOverdue(it.due, it.done);
+        const ownerLabel = it.owner ? ownerInitials(it.owner) : '+';
+        const dueLabel = it.due ? fmtDue(it.due) : '+ due';
         itEl.innerHTML =
           '<span class="triage-item-grip" title="Drag to reorder">&#8801;</span>' +
           '<button class="triage-item-done" data-col="' + ci + '" data-item="' + ii + '" title="Mark done">&check;</button>' +
           '<div class="triage-item-editor" contenteditable="true" data-col="' + ci + '" data-item="' + ii + '" data-placeholder="Type then press Enter for next… (Cmd+B for bold)">' + itemHtml + '</div>' +
-          (tag ? '<span class="triage-item-tag">' + tag + '</span>' : '') +
+          '<div class="triage-item-meta">' +
+            (tag ? '<span class="triage-item-tag">' + tag + '</span>' : '') +
+            '<button class="triage-owner-pill' + (it.owner ? ' assigned' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="' + (it.owner ? 'Owner: ' + escTriage(it.owner) + ' — click to clear' : 'Click to assign') + '">' + ownerLabel + '</button>' +
+            '<button class="triage-due-pill' + (it.due ? ' has-date' : '') + (overdue ? ' overdue' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="Set due date">' + dueLabel + '</button>' +
+            '<input type="date" class="triage-due-input" data-col="' + ci + '" data-item="' + ii + '" value="' + (it.due || '') + '" />' +
+          '</div>' +
           '<button class="triage-item-delete' + (itArmed ? ' armed' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="Delete">' +
             (itArmed ? '✓' : '&times;') +
           '</button>';
-        // Stop drag from starting when interacting with the editor — otherwise selecting text triggers row drag
         const ed = itEl.querySelector('.triage-item-editor');
         if (ed) {
           ed.addEventListener('mousedown', function(){ itEl.draggable = false; });
           ed.addEventListener('blur', function(){ itEl.draggable = true; });
         }
         itemsEl.appendChild(itEl);
+        if (visible) { visibleInCol += 1; totalShown += 1; }
       });
-      // Resizer handle on the right edge (skip on last column)
+      // Empty state when no items pass the filter
+      if (visibleInCol === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'triage-empty-prompt';
+        empty.textContent = col.items.length === 0
+          ? 'No items yet. Click + Add item or drop one here.'
+          : 'No items match the current filter.';
+        itemsEl.appendChild(empty);
+      }
       if (ci < triage.columns.length - 1) {
         const resizer = document.createElement('div');
         resizer.className = 'triage-col-resizer';
@@ -2247,8 +2518,14 @@ a:hover { opacity: 0.8; }
         colEl.appendChild(resizer);
       }
     });
+    const countEl = document.getElementById('triageSearchCount');
+    if (countEl) {
+      const filtering = triageFilter.q || triageFilter.tag || triageFilter.status !== 'all';
+      countEl.textContent = filtering ? totalShown + '/' + totalAll : '';
+    }
     wireTriageDnD();
     wireTriageColResize();
+    wireTriageColDnD();
   }
   function wireTriageColResize() {
     document.querySelectorAll('#triageBoard .triage-col-resizer').forEach(function(handle) {
@@ -2326,6 +2603,54 @@ a:hover { opacity: 0.8; }
         if (!before) insertAt += 1;
         insertAt = Math.max(0, Math.min(insertAt, toArr.length));
         toArr.splice(insertAt, 0, moved);
+        saveTriage(triage);
+        renderTriage();
+      });
+    });
+  }
+  // Column drag-to-reorder via the grip in column head
+  let colDragSrc = null;
+  function wireTriageColDnD() {
+    document.querySelectorAll('#triageBoard .triage-col-grip').forEach(function(grip) {
+      grip.addEventListener('dragstart', function(e) {
+        e.stopPropagation();
+        colDragSrc = parseInt(grip.dataset.colIdx, 10);
+        const colEl = grip.closest('.triage-col');
+        if (colEl) colEl.classList.add('col-dragging');
+        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'triage-col'); } catch(_) {}
+      });
+      grip.addEventListener('dragend', function() {
+        document.querySelectorAll('#triageBoard .triage-col').forEach(function(c) {
+          c.classList.remove('col-dragging','col-drop-left','col-drop-right');
+        });
+        colDragSrc = null;
+      });
+    });
+    document.querySelectorAll('#triageBoard .triage-col').forEach(function(colEl) {
+      colEl.addEventListener('dragover', function(e) {
+        if (colDragSrc == null) return;
+        e.preventDefault();
+        const rect = colEl.getBoundingClientRect();
+        const before = (e.clientX - rect.left) < rect.width / 2;
+        colEl.classList.toggle('col-drop-left', before);
+        colEl.classList.toggle('col-drop-right', !before);
+      });
+      colEl.addEventListener('dragleave', function() {
+        colEl.classList.remove('col-drop-left','col-drop-right');
+      });
+      colEl.addEventListener('drop', function(e) {
+        if (colDragSrc == null) return;
+        e.preventDefault();
+        const dst = parseInt(colEl.dataset.colIdx, 10);
+        const rect = colEl.getBoundingClientRect();
+        const before = (e.clientX - rect.left) < rect.width / 2;
+        if (dst === colDragSrc) return;
+        const moved = triage.columns.splice(colDragSrc, 1)[0];
+        let insertAt = dst;
+        if (colDragSrc < dst) insertAt -= 1;
+        if (!before) insertAt += 1;
+        insertAt = Math.max(0, Math.min(insertAt, triage.columns.length));
+        triage.columns.splice(insertAt, 0, moved);
         saveTriage(triage);
         renderTriage();
       });
@@ -2423,6 +2748,48 @@ a:hover { opacity: 0.8; }
         } else {
           arm(id);
         }
+      } else if (t.classList && t.classList.contains('triage-col-autogroup')) {
+        const ci = parseInt(t.dataset.col, 10);
+        if (triage.columns[ci]) {
+          triage.columns[ci].autoGroup = triage.columns[ci].autoGroup === false;
+          saveTriage(triage); renderTriage();
+        }
+      } else if (t.classList && t.classList.contains('triage-owner-pill')) {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        const it = triage.columns[ci] && triage.columns[ci].items[ii];
+        if (!it) return;
+        const me = (typeof window.__mfgUser === 'function' && window.__mfgUser()) || 'Me';
+        if (it.owner === me) {
+          it.owner = null;
+        } else {
+          const next = prompt('Assign to (leave blank to clear, default = you):', it.owner || me);
+          if (next === null) return;
+          it.owner = next.trim() || null;
+        }
+        saveTriage(triage); renderTriage();
+      } else if (t.classList && t.classList.contains('triage-due-pill')) {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        const itemEl = t.closest('.triage-item');
+        const dateInput = itemEl && itemEl.querySelector('.triage-due-input');
+        if (dateInput) {
+          dateInput.style.display = 'block';
+          dateInput.style.position = 'absolute';
+          dateInput.focus();
+          if (dateInput.showPicker) try { dateInput.showPicker(); } catch(_) {}
+        }
+      } else if (t.classList && t.classList.contains('triage-item') && !t.closest('.triage-item-editor')) {
+        // Click anywhere on the card body focuses the editor
+        const ed = t.querySelector(':scope > .triage-item-editor');
+        if (ed) {
+          ed.focus();
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(ed);
+          range.collapse(false);
+          sel.removeAllRanges(); sel.addRange(range);
+        }
       }
     });
     board.addEventListener('change', function(e) {
@@ -2432,6 +2799,13 @@ a:hover { opacity: 0.8; }
         const ii = parseInt(t.dataset.item, 10);
         triage.columns[ci].items[ii].done = t.checked;
         saveTriage(triage); renderTriage();
+      } else if (t.classList && t.classList.contains('triage-due-input')) {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        if (triage.columns[ci] && triage.columns[ci].items[ii]) {
+          triage.columns[ci].items[ii].due = t.value || null;
+          saveTriage(triage); renderTriage();
+        }
       }
     });
     board.addEventListener('input', function(e) {
@@ -2455,7 +2829,7 @@ a:hover { opacity: 0.8; }
           const itemEl = t.closest('.triage-item');
           if (itemEl) {
             const newTag = detectTriageTag(plain);
-            ['tag-creative','tag-strategy','tag-production','tag-else'].forEach(function(c){ itemEl.classList.remove(c); });
+            ['tag-creative','tag-strategy','tag-production','tag-media','tag-talent','tag-partnerships','tag-legal','tag-else'].forEach(function(c){ itemEl.classList.remove(c); });
             const oldTagEl = itemEl.querySelector('.triage-item-tag');
             if (oldTagEl) oldTagEl.remove();
             if (newTag) {
@@ -2554,6 +2928,54 @@ a:hover { opacity: 0.8; }
   const refreshBtn = document.getElementById('triageRefreshBtn');
   if (refreshBtn) refreshBtn.addEventListener('click', function() { refreshFromCloud(false); });
 
+  // --- Search / filter / density / sort wiring ---
+  const searchInput  = document.getElementById('triageSearchInput');
+  const tagFilter    = document.getElementById('triageTagFilter');
+  const doneFilter   = document.getElementById('triageDoneFilter');
+  const densitySel   = document.getElementById('triageDensitySelect');
+
+  // Restore density from localStorage
+  const savedDensity = localStorage.getItem('mfg_triage_density') || 'comfy';
+  const triagePanel = document.getElementById('panel-triage');
+  if (triagePanel) triagePanel.dataset.density = savedDensity;
+  if (densitySel) {
+    densitySel.value = savedDensity;
+    densitySel.addEventListener('change', function() {
+      const v = densitySel.value;
+      if (triagePanel) triagePanel.dataset.density = v;
+      localStorage.setItem('mfg_triage_density', v);
+    });
+  }
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      triageFilter.q = searchInput.value;
+      renderTriage();
+    });
+  }
+  if (tagFilter) {
+    tagFilter.addEventListener('change', function() {
+      triageFilter.tag = tagFilter.value;
+      renderTriage();
+    });
+  }
+  if (doneFilter) {
+    doneFilter.addEventListener('change', function() {
+      triageFilter.status = doneFilter.value;
+      renderTriage();
+    });
+  }
+  // Cmd/Ctrl+K to focus search
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+      const triageVisible = document.getElementById('panel-triage') && document.getElementById('panel-triage').classList.contains('active');
+      if (triageVisible && searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+  });
+
   // Date input — part of the live state, persists with everything else
   const dateInput = document.getElementById('triageDateInput');
   if (dateInput) {
@@ -2634,6 +3056,27 @@ a:hover { opacity: 0.8; }
     if (b) b.textContent = 'Confirm restore';
   }
 
+  // Compute a tiny diff between two triage states. Returns counts of added/removed/changed/completed.
+  function computeTriageDiff(snapData, liveData) {
+    if (!snapData || !liveData || !Array.isArray(snapData.columns) || !Array.isArray(liveData.columns)) return null;
+    const snapMap = {};
+    snapData.columns.forEach(function(c){ (c.items||[]).forEach(function(i){ if (i.id) snapMap[i.id] = i; }); });
+    const liveMap = {};
+    liveData.columns.forEach(function(c){ (c.items||[]).forEach(function(i){ if (i.id) liveMap[i.id] = i; }); });
+    let added = 0, removed = 0, changed = 0, completed = 0;
+    Object.keys(liveMap).forEach(function(id) {
+      if (!snapMap[id]) added += 1;
+      else {
+        const a = snapMap[id], b = liveMap[id];
+        if ((a.text||'') !== (b.text||'')) changed += 1;
+        if (!a.done && b.done) completed += 1;
+      }
+    });
+    Object.keys(snapMap).forEach(function(id) {
+      if (!liveMap[id]) removed += 1;
+    });
+    return { added: added, removed: removed, changed: changed, completed: completed };
+  }
   window.__triageLoadHistory = function() { loadTriageHistory(); };
   async function loadTriageHistory() {
     console.log('[triage] loadTriageHistory called');
@@ -2687,6 +3130,22 @@ a:hover { opacity: 0.8; }
         meta.textContent = 'Saved ' + new Date(snap.saved_at).toLocaleString();
         left.appendChild(dateLine);
         left.appendChild(meta);
+        // Diff vs current live state
+        try {
+          const diff = computeTriageDiff(snap.data, triage);
+          if (diff) {
+            const diffEl = document.createElement('div');
+            diffEl.className = 'triage-snap-diff';
+            const parts = [];
+            if (diff.added)   parts.push('<span class="added">+' + diff.added + ' added</span>');
+            if (diff.removed) parts.push('<span class="removed">−' + diff.removed + ' removed</span>');
+            if (diff.changed) parts.push('<span class="changed">~' + diff.changed + ' edited</span>');
+            if (diff.completed) parts.push('<span class="added">✓' + diff.completed + ' completed</span>');
+            if (parts.length === 0) parts.push('<span style="color:var(--text-muted)">no changes vs. live</span>');
+            diffEl.innerHTML = 'Δ vs live: ' + parts.join(' · ');
+            left.appendChild(diffEl);
+          }
+        } catch(_) {}
         const actions = document.createElement('div');
         actions.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
         const viewBtn = document.createElement('button');
@@ -2826,8 +3285,8 @@ a:hover { opacity: 0.8; }
   });
 
   renderTriage();
-  // Pull cloud state on first paint
-  refreshFromCloud(true);
+  // Pull cloud state on first paint, then subscribe to live updates
+  refreshFromCloud(true).then(subscribeRealtime).catch(function(){ subscribeRealtime(); });
 
   // --- Supabase helpers ---
   let dashboardUpdatesUnavailable = false;
