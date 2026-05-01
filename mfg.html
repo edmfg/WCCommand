@@ -1284,6 +1284,18 @@ a:hover { opacity: 0.8; }
       </p>
 
       <div class="form-card glass" style="margin-bottom:16px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px">
+          <div class="form-group" style="margin:0;min-width:160px">
+            <label style="font-size:11px">Week of</label>
+            <input type="date" id="triageDateInput" style="font-size:14px" />
+          </div>
+          <div class="form-group" style="margin:0;flex:1;min-width:200px">
+            <label style="font-size:11px">Snapshot note (optional)</label>
+            <input type="text" id="triageSnapshotNote" placeholder="e.g. Pre-launch checkpoint" />
+          </div>
+          <button class="btn-primary" id="triageSaveSnapshotBtn" style="height:38px">&#128190; Save snapshot</button>
+          <button class="btn-secondary" id="triageHistoryBtn" style="height:38px">&#128338; History</button>
+        </div>
         <div class="form-actions" style="flex-wrap:wrap;gap:8px">
           <button class="btn-secondary" id="triageAddColumnBtn">+ Add column</button>
           <button class="btn-secondary" id="triageRefreshBtn" title="Pull latest from cloud">&#x21bb; Refresh</button>
@@ -1299,7 +1311,25 @@ a:hover { opacity: 0.8; }
         </div>
       </div>
 
+      <div id="triageViewingBanner" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(255,200,40,0.1);border:1px solid rgba(255,200,40,0.4);border-radius:8px;font-size:13px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <span id="triageViewingLabel"></span>
+        <span style="display:flex;gap:8px">
+          <button class="btn-secondary" id="triageRestoreBtn">Restore this version</button>
+          <button class="btn-secondary" id="triageBackToLiveBtn">Back to live</button>
+        </span>
+      </div>
+
       <div id="triageBoard" class="triage-board"></div>
+
+      <div id="triageHistoryModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px">
+        <div class="form-card glass" style="max-width:640px;width:100%;max-height:80vh;overflow-y:auto">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
+            <strong>Snapshot history</strong>
+            <button class="btn-secondary" id="triageHistoryCloseBtn">Close</button>
+          </div>
+          <div id="triageHistoryList" style="font-size:13px;color:var(--text-muted)">Loading…</div>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -1715,27 +1745,37 @@ a:hover { opacity: 0.8; }
   const TRIAGE_KEY = 'mfg_global_triage_v1';
   const TRIAGE_ROW_ID = 'global';
   const TRIAGE_TABLE = 'mfg_triage';
+  const TRIAGE_SNAPSHOTS_TABLE = 'mfg_triage_snapshots';
+  function todayIso() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
   function defaultTriage() {
     return {
+      date: todayIso(),
       columns: [
         { id: 't1', title: 'Updates', items: [] },
         { id: 't2', title: "What's Next", items: [] }
       ]
     };
   }
+  let triageViewing = null; // { snapshot } when viewing a frozen version, else null
   function loadTriageLocal() {
     try {
       const raw = localStorage.getItem(TRIAGE_KEY);
       if (raw) {
         const data = JSON.parse(raw);
-        if (data && Array.isArray(data.columns)) return data;
+        if (data && Array.isArray(data.columns)) {
+          if (!data.date) data.date = todayIso();
+          return data;
+        }
       }
     } catch (e) {}
     return defaultTriage();
   }
   function saveTriage(state) {
     try { localStorage.setItem(TRIAGE_KEY, JSON.stringify(state)); } catch (e) {}
-    cloudSaveDebounced();
+    if (!triageViewing) cloudSaveDebounced();
   }
   let triage = loadTriageLocal();
   let lastCloudHash = null;
@@ -1838,6 +1878,10 @@ a:hover { opacity: 0.8; }
   }
   function renderTriage() {
     const board = document.getElementById('triageBoard');
+    const dateInput = document.getElementById('triageDateInput');
+    if (dateInput && document.activeElement !== dateInput) {
+      dateInput.value = triage.date || todayIso();
+    }
     if (!board) return;
     board.innerHTML = '';
     triage.columns.forEach(function(col, ci) {
@@ -2021,6 +2065,158 @@ a:hover { opacity: 0.8; }
   });
   const refreshBtn = document.getElementById('triageRefreshBtn');
   if (refreshBtn) refreshBtn.addEventListener('click', function() { refreshFromCloud(false); });
+
+  // Date input — part of the live state, persists with everything else
+  const dateInput = document.getElementById('triageDateInput');
+  if (dateInput) {
+    dateInput.value = triage.date || todayIso();
+    dateInput.addEventListener('input', function() {
+      triage.date = dateInput.value;
+      saveTriage(triage);
+    });
+  }
+
+  // Snapshot save button
+  const saveSnapBtn = document.getElementById('triageSaveSnapshotBtn');
+  if (saveSnapBtn) saveSnapBtn.addEventListener('click', async function() {
+    if (!supabase) { triageToast('Supabase not connected'); return; }
+    const note = (document.getElementById('triageSnapshotNote') || {}).value || '';
+    const date = triage.date || todayIso();
+    saveSnapBtn.disabled = true;
+    saveSnapBtn.textContent = 'Saving…';
+    try {
+      const { error } = await supabase.from(TRIAGE_SNAPSHOTS_TABLE).insert({
+        snapshot_date: date,
+        data: triage,
+        note: note || null
+      });
+      if (error) {
+        console.error('snapshot save failed:', error);
+        triageToast('Snapshot save failed');
+      } else {
+        triageToast('Snapshot saved · ' + date);
+        const noteEl = document.getElementById('triageSnapshotNote');
+        if (noteEl) noteEl.value = '';
+      }
+    } catch (e) {
+      console.error(e);
+      triageToast('Snapshot save failed');
+    } finally {
+      saveSnapBtn.disabled = false;
+      saveSnapBtn.innerHTML = '&#128190; Save snapshot';
+    }
+  });
+
+  // History modal
+  const historyBtn = document.getElementById('triageHistoryBtn');
+  const historyModal = document.getElementById('triageHistoryModal');
+  const historyList = document.getElementById('triageHistoryList');
+  const historyCloseBtn = document.getElementById('triageHistoryCloseBtn');
+  function closeHistory() { if (historyModal) historyModal.style.display = 'none'; }
+  if (historyCloseBtn) historyCloseBtn.addEventListener('click', closeHistory);
+  if (historyModal) historyModal.addEventListener('click', function(e) {
+    if (e.target === historyModal) closeHistory();
+  });
+
+  async function loadHistory() {
+    if (!historyList) return;
+    historyList.textContent = 'Loading…';
+    if (!supabase) { historyList.textContent = 'Supabase not connected'; return; }
+    try {
+      const { data, error } = await supabase
+        .from(TRIAGE_SNAPSHOTS_TABLE)
+        .select('id, snapshot_date, note, saved_at, data')
+        .order('saved_at', { ascending: false })
+        .limit(100);
+      if (error) {
+        historyList.textContent = 'Failed to load history';
+        return;
+      }
+      if (!data || data.length === 0) {
+        historyList.textContent = 'No snapshots yet. Click "Save snapshot" to record one.';
+        return;
+      }
+      historyList.innerHTML = '';
+      data.forEach(function(snap) {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:rgba(0,0,0,0.2)';
+        const left = document.createElement('div');
+        left.style.cssText = 'flex:1;min-width:0';
+        const dateLine = document.createElement('div');
+        dateLine.style.cssText = 'font-weight:600;color:var(--text)';
+        dateLine.textContent = (snap.snapshot_date || '—') + (snap.note ? ' · ' + snap.note : '');
+        const meta = document.createElement('div');
+        meta.style.cssText = 'font-size:11px;color:var(--text-muted);margin-top:2px';
+        meta.textContent = 'Saved ' + new Date(snap.saved_at).toLocaleString();
+        left.appendChild(dateLine);
+        left.appendChild(meta);
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn-secondary';
+        viewBtn.textContent = 'View';
+        viewBtn.addEventListener('click', function() {
+          triageViewing = { snapshot: snap };
+          if (snap.data && Array.isArray(snap.data.columns)) {
+            triage = JSON.parse(JSON.stringify(snap.data));
+            renderTriage();
+            const banner = document.getElementById('triageViewingBanner');
+            const lbl = document.getElementById('triageViewingLabel');
+            if (banner && lbl) {
+              banner.style.display = 'flex';
+              lbl.textContent = 'Viewing snapshot from ' + (snap.snapshot_date || '?') +
+                (snap.note ? ' — ' + snap.note : '') +
+                ' (saved ' + new Date(snap.saved_at).toLocaleString() + '). Edits won\'t sync until you go back to live.';
+            }
+          }
+          closeHistory();
+        });
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn-danger';
+        delBtn.textContent = 'Delete';
+        delBtn.addEventListener('click', async function() {
+          if (!confirm('Delete this snapshot permanently?')) return;
+          try {
+            const { error: e2 } = await supabase
+              .from(TRIAGE_SNAPSHOTS_TABLE)
+              .delete()
+              .eq('id', snap.id);
+            if (e2) { triageToast('Delete failed'); return; }
+            loadHistory();
+          } catch (e) { triageToast('Delete failed'); }
+        });
+        actions.appendChild(viewBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(left);
+        row.appendChild(actions);
+        historyList.appendChild(row);
+      });
+    } catch (e) {
+      historyList.textContent = 'Failed to load history';
+    }
+  }
+  if (historyBtn) historyBtn.addEventListener('click', function() {
+    if (historyModal) historyModal.style.display = 'flex';
+    loadHistory();
+  });
+
+  // Restore / back-to-live
+  const restoreBtn = document.getElementById('triageRestoreBtn');
+  if (restoreBtn) restoreBtn.addEventListener('click', function() {
+    if (!triageViewing) return;
+    if (!confirm('Restore this snapshot as the live triage? Other MFG users will see it too.')) return;
+    triageViewing = null;
+    document.getElementById('triageViewingBanner').style.display = 'none';
+    saveTriage(triage); // triggers cloud sync
+    triageToast('Restored');
+  });
+  const backToLiveBtn = document.getElementById('triageBackToLiveBtn');
+  if (backToLiveBtn) backToLiveBtn.addEventListener('click', async function() {
+    triageViewing = null;
+    document.getElementById('triageViewingBanner').style.display = 'none';
+    await refreshFromCloud(false);
+    triageToast('Back to live board');
+  });
 
   // Refresh when user returns to the tab — picks up other MFG users' edits
   document.addEventListener('visibilitychange', function() {
