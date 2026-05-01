@@ -652,12 +652,21 @@ a:hover { opacity: 0.8; }
   background: rgba(0,0,0,0.50);
   color: var(--text);
   border: 1px solid var(--accent, #4ade80);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  height: 24px; box-sizing: border-box;
   color-scheme: dark;
+  font-family: inherit;
 }
-.triage-due-input::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
+.triage-due-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+  margin-left: 4px;
+  padding: 0;
+}
+.triage-due-input::-webkit-datetime-edit { padding: 0; }
+.triage-item-meta { position: relative; }
 .triage-col-autogroup {
   font-size: 10px; color: var(--text-muted);
   border: 1px solid var(--border);
@@ -2827,11 +2836,21 @@ a:hover { opacity: 0.8; }
         const ii = parseInt(t.dataset.item, 10);
         const itemEl = t.closest('.triage-item');
         const dateInput = itemEl && itemEl.querySelector('.triage-due-input');
-        if (dateInput) {
-          dateInput.style.display = 'block';
-          dateInput.style.position = 'absolute';
+        if (dateInput && t.dataset.editing !== '1') {
+          t.dataset.editing = '1';
+          // Hide the pill and show the input in its place (no overlap, no popup)
+          t.style.display = 'none';
+          dateInput.style.display = 'inline-block';
           dateInput.focus();
           if (dateInput.showPicker) try { dateInput.showPicker(); } catch(_) {}
+          // If user blurs without picking, restore the pill
+          const restore = function() {
+            dateInput.removeEventListener('blur', restore);
+            dateInput.removeEventListener('change', restore);
+            renderTriage();
+          };
+          dateInput.addEventListener('blur', restore);
+          dateInput.addEventListener('change', restore);
         }
       } else if (t.classList && t.classList.contains('triage-item') && !t.closest('.triage-item-editor')) {
         // Click anywhere on the card body focuses the editor
