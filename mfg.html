@@ -2365,7 +2365,7 @@ a:hover { opacity: 0.8; }
         // Open and reload the history panel so the user actually sees it
         const hp = document.getElementById('triageHistoryPanel');
         if (hp) hp.style.display = 'block';
-        if (typeof loadHistory === 'function') loadHistory();
+        loadTriageHistory();
       }
     } catch (e) {
       console.error('[triage] snapshot save threw:', e);
@@ -2391,9 +2391,9 @@ a:hover { opacity: 0.8; }
     snapArmed = id;
     clearTimeout(snapArmedTimer);
     snapArmedTimer = setTimeout(function() {
-      if (snapArmed === id) { snapArmed = null; loadHistory(); }
+      if (snapArmed === id) { snapArmed = null; loadTriageHistory(); }
     }, 4000);
-    loadHistory(); // re-render to show armed state
+    loadTriageHistory(); // re-render to show armed state
   }
   // Track armed state for restore
   let restoreArmed = false;
@@ -2410,9 +2410,9 @@ a:hover { opacity: 0.8; }
     if (b) b.textContent = 'Confirm restore';
   }
 
-  window.__triageLoadHistory = function() { loadHistory(); };
-  async function loadHistory() {
-    console.log('[triage] loadHistory called');
+  window.__triageLoadHistory = function() { loadTriageHistory(); };
+  async function loadTriageHistory() {
+    console.log('[triage] loadTriageHistory called');
     if (!historyList) { console.warn('[triage] historyList element missing'); return; }
     const startedAt = Date.now();
     historyList.innerHTML = '<span style="color:#fbbf24">Loading… querying ' + TRIAGE_SNAPSHOTS_TABLE + ' at ' + new Date().toLocaleTimeString() + '</span>';
@@ -2505,7 +2505,7 @@ a:hover { opacity: 0.8; }
               .delete()
               .eq('id', snap.id);
             if (e2) { triageToast('Delete failed'); return; }
-            loadHistory();
+            loadTriageHistory();
           } catch (e) { triageToast('Delete failed'); }
         });
         actions.appendChild(viewBtn);
@@ -2523,9 +2523,9 @@ a:hover { opacity: 0.8; }
     historyBtn.addEventListener('click', function() {
       console.log('[triage] history button clicked');
       if (!historyPanel) { console.warn('[triage] historyPanel missing'); return; }
-      const visible = historyPanel.style.display !== 'none';
-      historyPanel.style.display = visible ? 'none' : 'block';
-      if (!visible) loadHistory();
+      const wasVisible = historyPanel.style.display !== 'none';
+      historyPanel.style.display = wasVisible ? 'none' : 'block';
+      if (!wasVisible) loadTriageHistory();
     });
   } else {
     console.warn('[triage] triageHistoryBtn not found at script load');
