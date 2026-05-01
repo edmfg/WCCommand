@@ -429,6 +429,90 @@ a:hover { opacity: 0.8; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
+/* Global Triage board */
+.triage-board {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  align-items: flex-start;
+}
+.triage-col {
+  flex: 0 0 300px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.triage-col-head { display: flex; align-items: center; gap: 8px; }
+.triage-col-title {
+  flex: 1; min-width: 0;
+  background: transparent; border: none;
+  color: var(--text);
+  font-weight: 600; font-size: 14px;
+  padding: 4px 6px; border-radius: 4px;
+}
+.triage-col-title:focus { outline: 1px solid var(--accent); background: rgba(0,0,0,0.2); }
+.triage-col-count { color: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.triage-col-delete {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  cursor: pointer; font-size: 12px;
+  line-height: 1; padding: 0;
+}
+.triage-col-delete:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.triage-items { display: flex; flex-direction: column; gap: 6px; }
+.triage-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.triage-item input[type="checkbox"] {
+  margin-top: 4px; cursor: pointer;
+  accent-color: var(--accent, #4ade80);
+}
+.triage-item textarea {
+  flex: 1; min-width: 0;
+  background: transparent; border: none; color: var(--text);
+  resize: none; font: inherit;
+  min-height: 18px; line-height: 1.4;
+  padding: 0;
+}
+.triage-item textarea:focus { outline: none; }
+.triage-item.done textarea { text-decoration: line-through; color: var(--text-muted); }
+.triage-item-delete {
+  background: transparent; border: none;
+  color: var(--text-muted);
+  cursor: pointer; padding: 0 4px;
+  font-size: 14px; line-height: 1;
+  align-self: center;
+}
+.triage-item-delete:hover { color: #ff6b6b; }
+.triage-add-item {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  border-radius: 8px; padding: 8px;
+  cursor: pointer; font-size: 12px;
+}
+.triage-add-item:hover { border-color: var(--accent); color: var(--accent); }
+.triage-board::-webkit-scrollbar { height: 8px; }
+.triage-board::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+@media (max-width: 700px) {
+  .triage-col { flex: 0 0 260px; }
+}
+
 /* Main container */
 .main {
   max-width: 1200px;
@@ -1096,6 +1180,7 @@ a:hover { opacity: 0.8; }
 
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="update" onclick="switchTab('update')">&#128229; Daily Update</button>
+    <button class="tab-btn" data-tab="triage" onclick="switchTab('triage')">&#129517; Global Triage</button>
   </nav>
 
   <main class="main">
@@ -1189,6 +1274,27 @@ a:hover { opacity: 0.8; }
         <div id="historyList"></div>
       </div>
 
+    </div>
+
+    <!-- Tab 2: Global Triage -->
+    <div class="tab-panel" id="panel-triage">
+      <div class="section-title">&#129517; Global Triage</div>
+      <p style="color:var(--text-muted);font-size:13px;margin:-6px 0 16px">
+        Free-form board for tracking what's happened and what's next across markets. Add columns, add checklist items, share or export when done. Saved per browser.
+      </p>
+
+      <div class="form-card glass" style="margin-bottom:16px">
+        <div class="form-actions" style="flex-wrap:wrap;gap:8px">
+          <button class="btn-secondary" id="triageAddColumnBtn">+ Add column</button>
+          <button class="btn-secondary" id="triageExportMdBtn">&#128203; Copy as Markdown</button>
+          <button class="btn-secondary" id="triageExportCsvBtn">&#11015; Download CSV</button>
+          <button class="btn-secondary" id="triageExportImgBtn">&#128247; Copy as image</button>
+          <button class="btn-danger" id="triageResetBtn" style="margin-left:auto">Reset</button>
+          <span class="toast" id="triageToast"></span>
+        </div>
+      </div>
+
+      <div id="triageBoard" class="triage-board"></div>
     </div>
 
   </main>
@@ -1588,16 +1694,280 @@ a:hover { opacity: 0.8; }
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === '1') switchTab('update');
+    else if (e.key === '2') switchTab('triage');
   });
 
   // Hash routing
   function applyHash() {
     const hash = location.hash.replace('#', '');
-    if (['update'].includes(hash)) {
+    if (['update', 'triage'].includes(hash)) {
       switchTab(hash);
     }
   }
   window.addEventListener('hashchange', applyHash);
+
+  // --- Global Triage ---
+  const TRIAGE_KEY = 'mfg_global_triage_v1';
+  function defaultTriage() {
+    return {
+      columns: [
+        { id: 't1', title: 'Updates', items: [] },
+        { id: 't2', title: "What's Next", items: [] }
+      ]
+    };
+  }
+  function loadTriage() {
+    try {
+      const raw = localStorage.getItem(TRIAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.columns)) return data;
+      }
+    } catch (e) {}
+    return defaultTriage();
+  }
+  function saveTriage(state) {
+    try { localStorage.setItem(TRIAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  let triage = loadTriage();
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  function escTriage(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+  function autoSize(ta) {
+    ta.style.height = 'auto';
+    ta.style.height = (ta.scrollHeight + 2) + 'px';
+  }
+  function renderTriage() {
+    const board = document.getElementById('triageBoard');
+    if (!board) return;
+    board.innerHTML = '';
+    triage.columns.forEach(function(col, ci) {
+      const colEl = document.createElement('div');
+      colEl.className = 'triage-col';
+      const doneCount = col.items.filter(function(i){return i.done;}).length;
+      colEl.innerHTML =
+        '<div class="triage-col-head">' +
+          '<input class="triage-col-title" value="' + escTriage(col.title) + '" data-col="' + ci + '" />' +
+          '<span class="triage-col-count">' + doneCount + '/' + col.items.length + '</span>' +
+          '<button class="triage-col-delete" data-col="' + ci + '" title="Delete column">&times;</button>' +
+        '</div>' +
+        '<div class="triage-items"></div>' +
+        '<button class="triage-add-item" data-col="' + ci + '">+ Add item</button>';
+      board.appendChild(colEl);
+      const itemsEl = colEl.querySelector('.triage-items');
+      col.items.forEach(function(it, ii) {
+        const itEl = document.createElement('div');
+        itEl.className = 'triage-item' + (it.done ? ' done' : '');
+        itEl.innerHTML =
+          '<input type="checkbox" ' + (it.done ? 'checked' : '') + ' data-col="' + ci + '" data-item="' + ii + '" />' +
+          '<textarea data-col="' + ci + '" data-item="' + ii + '" rows="1" placeholder="Type then press Enter for next…">' + escTriage(it.text) + '</textarea>' +
+          '<button class="triage-item-delete" data-col="' + ci + '" data-item="' + ii + '" title="Delete">&times;</button>';
+        itemsEl.appendChild(itEl);
+        autoSize(itEl.querySelector('textarea'));
+      });
+    });
+  }
+  function exportMarkdown() {
+    const cols = triage.columns;
+    if (cols.length === 0) return '';
+    const max = cols.reduce(function(m, c){ return Math.max(m, c.items.length); }, 0);
+    const lines = [];
+    lines.push('| ' + cols.map(function(c){ return c.title; }).join(' | ') + ' |');
+    lines.push('|' + cols.map(function(){ return '---'; }).join('|') + '|');
+    for (let i = 0; i < max; i++) {
+      const row = cols.map(function(c) {
+        const it = c.items[i];
+        if (!it) return '';
+        const text = (it.text || '').replace(/\|/g, '\\|').replace(/\n+/g, ' ');
+        return (it.done ? '[x]' : '[ ]') + ' ' + text;
+      });
+      lines.push('| ' + row.join(' | ') + ' |');
+    }
+    return lines.join('\n');
+  }
+  function exportCsv() {
+    function esc(v) {
+      const s = String(v == null ? '' : v);
+      return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    const cols = triage.columns;
+    const max = cols.reduce(function(m, c){ return Math.max(m, c.items.length); }, 0);
+    const lines = [cols.map(function(c){ return esc(c.title); }).join(',')];
+    for (let i = 0; i < max; i++) {
+      lines.push(cols.map(function(c) {
+        const it = c.items[i];
+        if (!it) return '';
+        return esc((it.done ? '[x] ' : '[ ] ') + it.text);
+      }).join(','));
+    }
+    return lines.join('\n');
+  }
+  function downloadFile(name, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  function triageToast(msg) {
+    const t = document.getElementById('triageToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(triageToast._t);
+    triageToast._t = setTimeout(function(){ t.style.opacity = '0'; }, 1800);
+  }
+
+  const board = document.getElementById('triageBoard');
+  if (board) {
+    board.addEventListener('click', function(e) {
+      const t = e.target;
+      if (t.classList && t.classList.contains('triage-col-delete')) {
+        const ci = parseInt(t.dataset.col, 10);
+        if (confirm('Delete this column and all its items?')) {
+          triage.columns.splice(ci, 1);
+          saveTriage(triage); renderTriage();
+        }
+      } else if (t.classList && t.classList.contains('triage-add-item')) {
+        const ci = parseInt(t.dataset.col, 10);
+        triage.columns[ci].items.push({ id: uid(), text: '', done: false });
+        saveTriage(triage); renderTriage();
+        const cols = document.querySelectorAll('.triage-col');
+        const tas = cols[ci].querySelectorAll('textarea');
+        if (tas.length) tas[tas.length - 1].focus();
+      } else if (t.classList && t.classList.contains('triage-item-delete')) {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        triage.columns[ci].items.splice(ii, 1);
+        saveTriage(triage); renderTriage();
+      }
+    });
+    board.addEventListener('change', function(e) {
+      const t = e.target;
+      if (t.type === 'checkbox') {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        triage.columns[ci].items[ii].done = t.checked;
+        saveTriage(triage); renderTriage();
+      }
+    });
+    board.addEventListener('input', function(e) {
+      const t = e.target;
+      if (t.classList && t.classList.contains('triage-col-title')) {
+        const ci = parseInt(t.dataset.col, 10);
+        if (triage.columns[ci]) {
+          triage.columns[ci].title = t.value;
+          saveTriage(triage);
+          // Don't re-render — would lose cursor. Just update count badge by sibling.
+        }
+      } else if (t.tagName === 'TEXTAREA' && t.dataset.col != null && t.dataset.item != null) {
+        const ci = parseInt(t.dataset.col, 10);
+        const ii = parseInt(t.dataset.item, 10);
+        if (triage.columns[ci] && triage.columns[ci].items[ii]) {
+          triage.columns[ci].items[ii].text = t.value;
+          saveTriage(triage);
+          autoSize(t);
+        }
+      }
+    });
+    board.addEventListener('keydown', function(e) {
+      const t = e.target;
+      if (t.tagName === 'TEXTAREA' && e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const ci = parseInt(t.dataset.col, 10);
+        triage.columns[ci].items.push({ id: uid(), text: '', done: false });
+        saveTriage(triage); renderTriage();
+        const cols = document.querySelectorAll('.triage-col');
+        const tas = cols[ci].querySelectorAll('textarea');
+        if (tas.length) tas[tas.length - 1].focus();
+      }
+    });
+  }
+
+  const addColBtn = document.getElementById('triageAddColumnBtn');
+  if (addColBtn) addColBtn.addEventListener('click', function() {
+    const title = (prompt('New column title:') || '').trim();
+    if (!title) return;
+    triage.columns.push({ id: uid(), title: title, items: [] });
+    saveTriage(triage); renderTriage();
+  });
+  const resetBtn = document.getElementById('triageResetBtn');
+  if (resetBtn) resetBtn.addEventListener('click', function() {
+    if (confirm('Reset the triage board to defaults? This clears all items.')) {
+      triage = defaultTriage();
+      saveTriage(triage); renderTriage();
+    }
+  });
+  const expMdBtn = document.getElementById('triageExportMdBtn');
+  if (expMdBtn) expMdBtn.addEventListener('click', function() {
+    const md = exportMarkdown();
+    if (!md) return triageToast('Nothing to export');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(
+        function() { triageToast('Copied as Markdown'); },
+        function() { triageToast('Copy failed — check clipboard permissions'); }
+      );
+    } else {
+      triageToast('Clipboard not available');
+    }
+  });
+  const expCsvBtn = document.getElementById('triageExportCsvBtn');
+  if (expCsvBtn) expCsvBtn.addEventListener('click', function() {
+    const csv = exportCsv();
+    if (!csv) return triageToast('Nothing to export');
+    downloadFile('global-triage.csv', csv, 'text/csv;charset=utf-8');
+    triageToast('Downloaded global-triage.csv');
+  });
+  const expImgBtn = document.getElementById('triageExportImgBtn');
+  if (expImgBtn) expImgBtn.addEventListener('click', async function() {
+    const node = document.getElementById('triageBoard');
+    if (!node || node.children.length === 0) return triageToast('Nothing to capture');
+    try {
+      // Use the browser's built-in modal screenshot via the Async Clipboard
+      // ImagBitmap path. Fallback: dynamically load html2canvas if available.
+      if (!window.html2canvas) {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        await new Promise(function(res, rej) { s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+      }
+      const canvas = await window.html2canvas(node, {
+        backgroundColor: '#0a0a0a', scale: 2, useCORS: true
+      });
+      canvas.toBlob(function(blob) {
+        if (!blob) return triageToast('Capture failed');
+        if (navigator.clipboard && window.ClipboardItem) {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(
+            function() { triageToast('Image copied to clipboard'); },
+            function() {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url; a.download = 'global-triage.png';
+              document.body.appendChild(a); a.click();
+              document.body.removeChild(a); URL.revokeObjectURL(url);
+              triageToast('Downloaded global-triage.png');
+            }
+          );
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'global-triage.png';
+          document.body.appendChild(a); a.click();
+          document.body.removeChild(a); URL.revokeObjectURL(url);
+          triageToast('Downloaded global-triage.png');
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      triageToast('Capture failed');
+    }
+  });
+
+  renderTriage();
 
   // --- Supabase helpers ---
   async function sbFetch() {
