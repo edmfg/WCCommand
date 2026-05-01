@@ -2357,20 +2357,23 @@ a:hover { opacity: 0.8; }
   }
 
   async function loadHistory() {
-    if (!historyList) return;
-    historyList.textContent = 'Loading…';
+    console.log('[triage] loadHistory called');
+    if (!historyList) { console.warn('[triage] historyList element missing'); return; }
+    historyList.textContent = 'Loading… (querying ' + TRIAGE_SNAPSHOTS_TABLE + ')';
     if (!supabase) { historyList.textContent = 'Supabase client not initialized — check console.'; return; }
     try {
+      console.log('[triage] querying', TRIAGE_SNAPSHOTS_TABLE);
       const { data, error } = await supabase
         .from(TRIAGE_SNAPSHOTS_TABLE)
         .select('id, snapshot_date, note, saved_at, data')
         .order('saved_at', { ascending: false })
         .limit(100);
+      console.log('[triage] query returned', { dataLen: data && data.length, error });
       if (error) {
         console.error('triage loadHistory error:', error);
-        const msg = error.message || 'Unknown error';
-        const hint = /schema cache|does not exist|relation .* does not exist|42P01/i.test(msg)
-          ? ' — looks like the mfg_triage_snapshots table is missing. Run the SQL in supabase-mfg-triage.sql in your Supabase SQL editor.'
+        const msg = error.message || error.hint || JSON.stringify(error);
+        const hint = (error.code === 'PGRST205' || /schema cache|does not exist|relation .* does not exist|42P01/i.test(msg))
+          ? ' — the mfg_triage_snapshots table is missing. Run the SQL in supabase-mfg-triage.sql in your Supabase SQL editor.'
           : '';
         historyList.textContent = 'Failed to load history: ' + msg + hint;
         return;
@@ -2449,12 +2452,17 @@ a:hover { opacity: 0.8; }
       historyList.textContent = 'Failed to load history: ' + (e && e.message ? e.message : String(e));
     }
   }
-  if (historyBtn) historyBtn.addEventListener('click', function() {
-    if (!historyPanel) return;
-    const visible = historyPanel.style.display !== 'none';
-    historyPanel.style.display = visible ? 'none' : 'block';
-    if (!visible) loadHistory();
-  });
+  if (historyBtn) {
+    historyBtn.addEventListener('click', function() {
+      console.log('[triage] history button clicked');
+      if (!historyPanel) { console.warn('[triage] historyPanel missing'); return; }
+      const visible = historyPanel.style.display !== 'none';
+      historyPanel.style.display = visible ? 'none' : 'block';
+      if (!visible) loadHistory();
+    });
+  } else {
+    console.warn('[triage] triageHistoryBtn not found at script load');
+  }
 
   // Restore / back-to-live (inline armed pattern, no popup)
   const restoreBtn = document.getElementById('triageRestoreBtn');
