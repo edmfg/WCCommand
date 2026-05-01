@@ -2515,7 +2515,6 @@ a:hover { opacity: 0.8; }
         }
         const itEl = document.createElement('div');
         itEl.className = 'triage-item' + (it.done ? ' done' : '') + (tag ? ' tag-' + tag : '') + (visible ? '' : ' filtered-out');
-        itEl.draggable = true;
         itEl.dataset.col = String(ci);
         itEl.dataset.item = String(ii);
         const itArmed = triageArmed === 'item-' + ci + '-' + ii;
@@ -2524,7 +2523,7 @@ a:hover { opacity: 0.8; }
         const ownerLabel = it.owner ? ownerInitials(it.owner) : '+';
         const dueLabel = it.due ? fmtDue(it.due) : '+ due';
         itEl.innerHTML =
-          '<span class="triage-item-grip" title="Drag to reorder">&#8801;</span>' +
+          '<span class="triage-item-grip" draggable="true" title="Drag to reorder">&#8801;</span>' +
           '<button class="triage-item-done" data-col="' + ci + '" data-item="' + ii + '" title="Mark done">&check;</button>' +
           '<div class="triage-item-editor" contenteditable="true" data-col="' + ci + '" data-item="' + ii + '" data-placeholder="Type then press Enter for next… (Cmd+B for bold)">' + itemHtml + '</div>' +
           '<div class="triage-item-meta">' +
@@ -2536,11 +2535,6 @@ a:hover { opacity: 0.8; }
           '<button class="triage-item-delete' + (itArmed ? ' armed' : '') + '" data-col="' + ci + '" data-item="' + ii + '" title="Delete">' +
             (itArmed ? '✓' : '&times;') +
           '</button>';
-        const ed = itEl.querySelector('.triage-item-editor');
-        if (ed) {
-          ed.addEventListener('mousedown', function(){ itEl.draggable = false; });
-          ed.addEventListener('blur', function(){ itEl.draggable = true; });
-        }
         itemsEl.appendChild(itEl);
         if (visible) { visibleInCol += 1; totalShown += 1; }
       });
@@ -2600,22 +2594,32 @@ a:hover { opacity: 0.8; }
       });
     });
   }
-  // Drag-and-drop reordering of triage items
+  // Drag-and-drop reordering of triage items (initiated from the grip handle)
   let dragSrc = null;
   function wireTriageDnD() {
-    document.querySelectorAll('#triageBoard .triage-item').forEach(function(el) {
-      el.addEventListener('dragstart', function(e) {
-        dragSrc = { col: parseInt(el.dataset.col, 10), item: parseInt(el.dataset.item, 10), el: el };
-        el.classList.add('dragging');
-        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'triage'); } catch(_) {}
+    // Grip handles initiate the drag
+    document.querySelectorAll('#triageBoard .triage-item-grip').forEach(function(grip) {
+      grip.addEventListener('dragstart', function(e) {
+        e.stopPropagation();
+        const itemEl = grip.closest('.triage-item');
+        if (!itemEl) return;
+        dragSrc = {
+          col: parseInt(itemEl.dataset.col, 10),
+          item: parseInt(itemEl.dataset.item, 10),
+          el: itemEl
+        };
+        itemEl.classList.add('dragging');
+        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'triage-item'); } catch(_) {}
       });
-      el.addEventListener('dragend', function() {
-        if (dragSrc && dragSrc.el) dragSrc.el.classList.remove('dragging');
-        document.querySelectorAll('#triageBoard .triage-item.drop-above, #triageBoard .triage-item.drop-below').forEach(function(n){
-          n.classList.remove('drop-above','drop-below');
+      grip.addEventListener('dragend', function() {
+        document.querySelectorAll('#triageBoard .triage-item.dragging, #triageBoard .triage-item.drop-above, #triageBoard .triage-item.drop-below').forEach(function(n){
+          n.classList.remove('dragging','drop-above','drop-below');
         });
         dragSrc = null;
       });
+    });
+    // Items are drop targets
+    document.querySelectorAll('#triageBoard .triage-item').forEach(function(el) {
       el.addEventListener('dragover', function(e) {
         if (!dragSrc) return;
         e.preventDefault();
@@ -2628,8 +2632,8 @@ a:hover { opacity: 0.8; }
         el.classList.remove('drop-above','drop-below');
       });
       el.addEventListener('drop', function(e) {
-        e.preventDefault();
         if (!dragSrc) return;
+        e.preventDefault();
         const dstCol = parseInt(el.dataset.col, 10);
         const dstItem = parseInt(el.dataset.item, 10);
         const rect = el.getBoundingClientRect();
@@ -2645,6 +2649,26 @@ a:hover { opacity: 0.8; }
         if (!before) insertAt += 1;
         insertAt = Math.max(0, Math.min(insertAt, toArr.length));
         toArr.splice(insertAt, 0, moved);
+        saveTriage(triage);
+        renderTriage();
+      });
+    });
+    // Empty triage-items containers should also accept drops (drop into empty column)
+    document.querySelectorAll('#triageBoard .triage-items').forEach(function(container) {
+      container.addEventListener('dragover', function(e) {
+        if (!dragSrc) return;
+        if (container.querySelector('.triage-item:not(.filtered-out)')) return;
+        e.preventDefault();
+      });
+      container.addEventListener('drop', function(e) {
+        if (!dragSrc) return;
+        if (container.querySelector('.triage-item:not(.filtered-out)')) return;
+        e.preventDefault();
+        const colEl = container.closest('.triage-col');
+        const dstCol = parseInt(colEl.dataset.colIdx, 10);
+        const fromArr = triage.columns[dragSrc.col].items;
+        const [moved] = fromArr.splice(dragSrc.item, 1);
+        triage.columns[dstCol].items.push(moved);
         saveTriage(triage);
         renderTriage();
       });
