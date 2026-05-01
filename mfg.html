@@ -3040,6 +3040,47 @@ a:hover { opacity: 0.8; }
     });
   }
 
+  // --- Auto-save snapshot every minute when content changes ---
+  const AUTO_SNAPSHOT_NOTE_PREFIX = '[auto] ';
+  let lastAutoSaveHash = hashState(triage);
+  let autoSaveInFlight = false;
+  async function autoSaveSnapshot() {
+    if (!supabase) return;
+    if (triageViewing) return; // don't auto-save while viewing an old snapshot
+    if (autoSaveInFlight) return;
+    const currentHash = hashState(triage);
+    if (currentHash === lastAutoSaveHash) return;
+    autoSaveInFlight = true;
+    const date = triage.date || todayIso();
+    const note = AUTO_SNAPSHOT_NOTE_PREFIX + new Date().toLocaleString();
+    try {
+      const { error } = await supabase
+        .from(TRIAGE_SNAPSHOTS_TABLE)
+        .insert({ snapshot_date: date, data: triage, note: note });
+      if (error) {
+        console.warn('[triage] auto-save failed:', error.message || error);
+      } else {
+        lastAutoSaveHash = currentHash;
+        const status = document.getElementById('triageSyncStatus');
+        if (status) {
+          const old = status.textContent;
+          status.textContent = 'Auto-saved snapshot · ' + new Date().toLocaleTimeString();
+          setTimeout(function(){ if (status.textContent.startsWith('Auto-saved')) status.textContent = old; }, 4000);
+        }
+      }
+    } catch (e) {
+      console.warn('[triage] auto-save threw:', e);
+    } finally {
+      autoSaveInFlight = false;
+    }
+  }
+  setInterval(autoSaveSnapshot, 60 * 1000);
+  // Also flush an auto-save when the user is about to leave the page
+  window.addEventListener('beforeunload', function() {
+    // Use sendBeacon-style fire-and-forget; we won't await
+    autoSaveSnapshot();
+  });
+
   // Snapshot save button
   const saveSnapBtn = document.getElementById('triageSaveSnapshotBtn');
   if (saveSnapBtn) saveSnapBtn.addEventListener('click', async function() {
@@ -3060,6 +3101,7 @@ a:hover { opacity: 0.8; }
       } else {
         console.log('[triage] snapshot inserted:', inserted);
         triageToast('Snapshot saved · ' + date + ' · id ' + (inserted && inserted[0] && inserted[0].id ? inserted[0].id.slice(0,8) : '?'));
+        lastAutoSaveHash = hashState(triage); // suppress immediate auto-save
         const noteEl = document.getElementById('triageSnapshotNote');
         if (noteEl) noteEl.value = '';
         // Open and reload the history panel so the user actually sees it
