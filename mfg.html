@@ -528,16 +528,17 @@ a:hover { opacity: 0.8; }
   padding: 8px 12px;
   font-size: 12px;
 }
-.triage-items { display: flex; flex-direction: column; gap: 6px; }
+.triage-items { display: flex; flex-direction: column; gap: 10px; }
 .triage-item {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-left: 4px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 14px;
+  min-height: 56px;
 }
 .triage-item.tag-creative   { border-left-color: #ec4899; background: rgba(236, 72, 153, 0.10); }
 .triage-item.tag-strategy   { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.10); }
@@ -546,7 +547,7 @@ a:hover { opacity: 0.8; }
 .triage-item-tag {
   font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
   text-transform: uppercase;
-  padding: 2px 6px; border-radius: 4px;
+  padding: 3px 7px; border-radius: 4px;
   align-self: center;
   background: rgba(255,255,255,0.08);
   color: var(--text-muted);
@@ -557,42 +558,59 @@ a:hover { opacity: 0.8; }
 .triage-item.tag-production .triage-item-tag { background: rgba(245, 158, 11, 0.20); color: #fcd34d; }
 .triage-item.tag-else       .triage-item-tag { background: rgba(167, 139, 250, 0.20); color: #c4b5fd; }
 .triage-item-done {
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: rgba(74, 222, 128, 0.10);
+  border: 1px solid rgba(74, 222, 128, 0.40);
+  color: #4ade80;
   cursor: pointer; padding: 0;
-  width: 22px; height: 22px; min-width: 22px;
-  border-radius: 4px;
-  font-size: 13px; line-height: 1;
+  width: 32px; height: 32px; min-width: 32px;
+  border-radius: 8px;
+  font-size: 16px; font-weight: 700; line-height: 1;
   display: flex; align-items: center; justify-content: center;
-  margin-top: 1px;
+  flex-shrink: 0;
   transition: all 0.15s;
 }
-.triage-item-done:hover { border-color: #4ade80; color: #4ade80; }
+.triage-item-done:hover {
+  background: rgba(74, 222, 128, 0.25);
+  border-color: #4ade80;
+  transform: scale(1.05);
+}
 .triage-item.done .triage-item-done {
   background: #4ade80; border-color: #4ade80; color: #052e10;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25);
 }
 .triage-item textarea {
   flex: 1; min-width: 0;
   background: transparent; border: none; color: var(--text);
   resize: none; font: inherit;
-  min-height: 18px; line-height: 1.4;
-  padding: 0;
+  min-height: 24px; line-height: 1.5;
+  padding: 4px 0;
+  font-size: 14px;
 }
 .triage-item textarea:focus { outline: none; }
 .triage-item.done textarea { text-decoration: line-through; color: var(--text-muted); }
 .triage-item-delete {
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.30);
+  color: rgba(255, 107, 107, 0.85);
   cursor: pointer; padding: 0;
-  width: 22px; height: 22px; min-width: 22px;
-  border-radius: 4px;
-  font-size: 14px; line-height: 1;
+  width: 32px; height: 32px; min-width: 32px;
+  border-radius: 8px;
+  font-size: 18px; font-weight: 700; line-height: 1;
   display: flex; align-items: center; justify-content: center;
-  margin-top: 1px;
+  flex-shrink: 0;
   transition: all 0.15s;
 }
-.triage-item-delete:hover { border-color: #ff6b6b; color: #ff6b6b; }
-.triage-item-delete.armed { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.15); }
+.triage-item-delete:hover {
+  background: rgba(255, 107, 107, 0.20);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  transform: scale(1.05);
+}
+.triage-item-delete.armed {
+  border-color: #ff6b6b; color: #fff;
+  background: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.30);
+}
 .triage-add-item {
   background: transparent;
   border: 1px dashed var(--border);
