@@ -479,7 +479,7 @@ a:hover { opacity: 0.8; }
 }
 .triage-col {
   flex: 1 1 0;
-  min-width: 0;
+  min-width: 200px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -487,6 +487,27 @@ a:hover { opacity: 0.8; }
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
+}
+.triage-col-resizer {
+  position: absolute;
+  top: 8px; bottom: 8px;
+  right: -8px;
+  width: 12px;
+  cursor: col-resize;
+  z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+}
+.triage-col-resizer::after {
+  content: '';
+  width: 2px; height: 100%;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+.triage-col-resizer:hover::after,
+.triage-col-resizer.dragging::after {
+  background: var(--accent, #4ade80);
 }
 @media (max-width: 700px) {
   .triage-board { flex-wrap: wrap; }
@@ -559,14 +580,16 @@ a:hover { opacity: 0.8; }
 .triage-item.drop-below { box-shadow: 0 2px 0 0 var(--accent, #4ade80); }
 .triage-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border);
   border-left: 4px solid var(--border);
   border-radius: 10px;
-  padding: 20px 16px;
+  padding: 18px 16px;
   min-height: 80px;
+  height: auto;
+  overflow: visible;
 }
 .triage-item.tag-creative   { border-left-color: #ec4899; background: rgba(236, 72, 153, 0.10); }
 .triage-item.tag-strategy   { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.10); }
@@ -612,7 +635,7 @@ a:hover { opacity: 0.8; }
   flex: 1; min-width: 0;
   background: transparent; border: none; color: var(--text);
   resize: none; font: inherit;
-  min-height: 40px; line-height: 1.55;
+  min-height: 48px; line-height: 1.55;
   padding: 6px 0;
   font-size: 15px;
   word-break: break-word;
@@ -620,18 +643,21 @@ a:hover { opacity: 0.8; }
   white-space: pre-wrap;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 .triage-item-editor {
-  flex: 1; min-width: 0;
+  flex: 1 1 auto; min-width: 0;
   color: var(--text);
   font: inherit; font-size: 15px;
-  min-height: 40px; line-height: 1.55;
-  padding: 6px 0;
+  min-height: 48px; line-height: 1.55;
+  padding: 8px 0;
   word-break: break-word;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
   outline: none;
+  height: auto;
+  overflow: visible;
+  align-self: stretch;
 }
 .triage-item-editor:empty::before {
   content: attr(data-placeholder);
@@ -2149,6 +2175,8 @@ a:hover { opacity: 0.8; }
     triage.columns.forEach(function(col, ci) {
       const colEl = document.createElement('div');
       colEl.className = 'triage-col';
+      const savedWidth = triage.colWidths && triage.colWidths[col.id];
+      if (savedWidth) colEl.style.flex = '0 0 ' + savedWidth + 'px';
       const doneCount = col.items.filter(function(i){return i.done;}).length;
       const colArmed = triageArmed === 'col-' + ci;
       colEl.innerHTML =
@@ -2211,8 +2239,47 @@ a:hover { opacity: 0.8; }
         }
         itemsEl.appendChild(itEl);
       });
+      // Resizer handle on the right edge (skip on last column)
+      if (ci < triage.columns.length - 1) {
+        const resizer = document.createElement('div');
+        resizer.className = 'triage-col-resizer';
+        resizer.dataset.colId = col.id;
+        colEl.appendChild(resizer);
+      }
     });
     wireTriageDnD();
+    wireTriageColResize();
+  }
+  function wireTriageColResize() {
+    document.querySelectorAll('#triageBoard .triage-col-resizer').forEach(function(handle) {
+      handle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        const colEl = handle.parentElement;
+        const colId = handle.dataset.colId;
+        const startX = e.clientX;
+        const startWidth = colEl.getBoundingClientRect().width;
+        handle.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        function onMove(ev) {
+          const dx = ev.clientX - startX;
+          const next = Math.max(180, startWidth + dx);
+          colEl.style.flex = '0 0 ' + next + 'px';
+          if (!triage.colWidths) triage.colWidths = {};
+          triage.colWidths[colId] = Math.round(next);
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          handle.classList.remove('dragging');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+          saveTriage(triage);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    });
   }
   // Drag-and-drop reordering of triage items
   let dragSrc = null;
