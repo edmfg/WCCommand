@@ -2794,7 +2794,7 @@ function renderCountdown() {
 let liveFilter = 'all';
 const liveFilterDefs = [
   { id: 'all', label: '🌐 All' },
-  { id: '24h', label: '⏱ Last 24 Hours' },
+  { id: '24h', label: '⏱ RECENT' },
   { id: 'canada', label: '🇨🇦 Canada' },
   { id: 'germany', label: '🇩🇪 Germany' },
   { id: 'uk', label: '🇬🇧 UK' },
@@ -2823,7 +2823,7 @@ function withinLast24h(isoTs) {
   if (!isoTs) return false;
   const t = Date.parse(isoTs);
   if (isNaN(t)) return false;
-  return (Date.now() - t) <= 24 * 60 * 60 * 1000 && t <= Date.now();
+  return (Date.now() - t) <= 72 * 60 * 60 * 1000 && t <= Date.now();
 }
 
 function setLiveFilter(id) {
