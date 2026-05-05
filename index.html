@@ -4790,6 +4790,18 @@
         var pwInput = document.getElementById("gatePassword");
         var rememberInput = document.getElementById("gateRemember");
         var errEl = document.getElementById("gateError");
+        // Open the gate: drop the gated class and kick off the dashboard
+        // boot sequence (intro animation + data render). If bootDashboard
+        // hasn't been defined yet (the bottom-of-page script hasn't parsed),
+        // leave a marker so it boots as soon as it loads.
+        function openGate() {
+          body.classList.remove("gated");
+          if (typeof window.bootDashboard === "function") {
+            window.bootDashboard();
+          } else {
+            window._gateOpenedEarly = true;
+          }
+        }
         if (form) form.addEventListener("submit", onSubmit);
         async function onSubmit(e) {
           e.preventDefault();
@@ -4811,8 +4823,8 @@
               data = await res.json();
             } catch (er) {}
             if (res.ok && data.ok) {
-              body.classList.remove("gated");
               pwInput.value = "";
+              openGate();
             } else {
               errEl.textContent =
                 data && data.error === "GATE_PASSWORD env var not configured"
@@ -4836,7 +4848,7 @@
           })
           .then(function (d) {
             if (d && d.ok) {
-              body.classList.remove("gated");
+              openGate();
             } else {
               setTimeout(function () {
                 if (pwInput) pwInput.focus();
@@ -11365,10 +11377,26 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         }, 4500);
       }
 
-      runIntro();
-      setupTheme();
-      init();
-      setupMfgSync();
+      // The whole dashboard boot — intro animation, theme, data init, MFG
+      // sync — is held back until the password gate is opened. The gate
+      // script at the top of <body> calls window.bootDashboard() when the
+      // user is authenticated (either via existing cookie or a fresh login).
+      function bootDashboard() {
+        if (window._dashboardBooted) return;
+        window._dashboardBooted = true;
+        runIntro();
+        setupTheme();
+        init();
+        setupMfgSync();
+      }
+      window.bootDashboard = bootDashboard;
+      // If the gate finished verifying before this script ran, boot now.
+      if (
+        !document.body.classList.contains("gated") ||
+        window._gateOpenedEarly
+      ) {
+        bootDashboard();
+      }
     </script>
     <script src="countdown.js" defer></script>
     <script src="gemini-assistant.js" defer></script>
