@@ -9,6 +9,7 @@
       content="World Cup HQ: live fixtures, standings, news, and the social pulse of the tournament — in one command center."
     />
     <meta name="theme-color" content="#0a0c14" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
     <link rel="canonical" href="https://wccommand.vercel.app/" />
 
     <meta property="og:type" content="website" />
@@ -1583,6 +1584,67 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
+      .date-group.is-today {
+        position: relative;
+      }
+      .date-group.is-today::before {
+        content: "";
+        position: absolute;
+        top: 4px;
+        bottom: 4px;
+        left: -16px;
+        width: 3px;
+        border-radius: 3px;
+        background: linear-gradient(180deg, var(--gold), var(--red));
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+      }
+      .today-badge {
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        font-size: 10px;
+        letter-spacing: 1.4px;
+        background: linear-gradient(135deg, var(--gold), var(--red));
+        color: #1a1a2e;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+      .next24h-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px 7px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        cursor: pointer;
+        user-select: none;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        color: var(--text-dim);
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .next24h-toggle:hover {
+        background: rgba(255, 255, 255, 0.09);
+        color: #fff;
+      }
+      .next24h-toggle input {
+        accent-color: var(--red);
+      }
+      .next24h-toggle:has(input:checked) {
+        background: rgba(204, 0, 0, 0.18);
+        border-color: rgba(204, 0, 0, 0.45);
+        color: #fff;
+      }
+      body.light .next24h-toggle {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.12);
+        color: #555;
+      }
       .date-header .match-count {
         font-family: "Inter", sans-serif;
         font-size: 11px;
@@ -2309,9 +2371,10 @@
         white-space: nowrap;
       }
       body.light .asset-market-pill {
-        background: rgba(99, 102, 241, 0.1);
-        border-color: rgba(99, 102, 241, 0.28);
-        color: #4338ca;
+        background: rgba(99, 102, 241, 0.16);
+        border-color: rgba(99, 102, 241, 0.45);
+        color: #312e81;
+        font-weight: 700;
       }
       .asset-status-pill {
         font-size: 0.6rem;
@@ -2365,6 +2428,117 @@
       }
 
       /* ── CARD EXPAND MODAL ── */
+      /* ── Keyboard shortcuts overlay ── */
+      .shortcuts-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9700;
+        background: rgba(0, 0, 0, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        animation: fadeIn 0.2s ease;
+      }
+      .shortcuts-overlay[hidden] {
+        display: none;
+      }
+      .shortcuts-card {
+        position: relative;
+        background: rgba(14, 16, 24, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 28px 28px 22px;
+        max-width: 380px;
+        width: 100%;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+      }
+      .shortcuts-title {
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #fff;
+        margin: 0 0 16px;
+      }
+      .shortcuts-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .shortcuts-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.78);
+      }
+      .shortcuts-list kbd {
+        font-family:
+          ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #fff;
+        min-width: 22px;
+        text-align: center;
+      }
+      .shortcuts-list span {
+        flex: 1;
+      }
+      .shortcuts-foot {
+        margin: 16px 0 0;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .shortcuts-close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .shortcuts-close:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      body.light .shortcuts-card {
+        background: rgba(255, 255, 255, 0.96);
+        border-color: rgba(0, 0, 0, 0.08);
+      }
+      body.light .shortcuts-title {
+        color: #1a1a2e;
+      }
+      body.light .shortcuts-list li {
+        color: rgba(26, 26, 46, 0.78);
+      }
+      body.light .shortcuts-list kbd {
+        background: rgba(0, 0, 0, 0.06);
+        border-color: rgba(0, 0, 0, 0.12);
+        color: #1a1a2e;
+      }
+      body.light .shortcuts-foot {
+        color: rgba(26, 26, 46, 0.5);
+      }
+
       /* ── Creative play overlay (Drive iframe modal) ── */
       .creative-play-overlay {
         position: fixed;
@@ -5098,6 +5272,19 @@
         text-decoration: underline;
       }
     </style>
+    <script>
+      // Silence chatty debug logs in prod. Append ?debug=1 to bring them back.
+      (function () {
+        try {
+          if (
+            !new URLSearchParams(location.search).has("debug") &&
+            typeof console !== "undefined"
+          ) {
+            console.log = function () {};
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="dashboard-hidden gated">
     <!-- PASSWORD GATE -->
@@ -5487,6 +5674,13 @@
             <option value="Third Place">Third Place</option>
             <option value="Final 🏆">Final</option>
           </select>
+          <label
+            class="next24h-toggle"
+            title="Show only matches kicking off within 24 hours"
+          >
+            <input type="checkbox" id="next24hToggle" onchange="renderMatches()" />
+            <span>⏱ Next 24h</span>
+          </label>
         </div>
         <div id="matchList"></div>
       </div>
@@ -5782,6 +5976,32 @@
     </div>
 
     <!-- ── CREATIVE TAB VIEW GATE (separate from dashboard gate) ── -->
+    <!-- ── KEYBOARD SHORTCUTS HINT ── -->
+    <div class="shortcuts-overlay" id="shortcutsOverlay" hidden>
+      <div class="shortcuts-card">
+        <button
+          class="shortcuts-close"
+          aria-label="Close"
+          onclick="document.getElementById('shortcutsOverlay').hidden=true"
+        >
+          ×
+        </button>
+        <h3 class="shortcuts-title">Keyboard shortcuts</h3>
+        <ul class="shortcuts-list">
+          <li><kbd>1</kbd><span>Live tab</span></li>
+          <li><kbd>2</kbd><span>Fixtures tab</span></li>
+          <li><kbd>3</kbd><span>Creative tab</span></li>
+          <li><kbd>G</kbd><span>Open Gemini chat</span></li>
+          <li><kbd>⌘</kbd><kbd>K</kbd><span>Focus search</span></li>
+          <li><kbd>?</kbd><span>Toggle this help</span></li>
+          <li><kbd>Esc</kbd><span>Close any open panel</span></li>
+        </ul>
+        <p class="shortcuts-foot">
+          Shortcuts ignore typing in inputs / textareas.
+        </p>
+      </div>
+    </div>
+
     <div class="card-modal-overlay" id="creativeViewGateOverlay">
       <div
         class="card-modal creative-unlock-modal"
@@ -5846,72 +6066,6 @@
       </div>
     </div>
 
-    <div class="card-modal-overlay" id="creativeUnlockOverlay">
-      <div
-        class="card-modal creative-unlock-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="creativeUnlockTitle"
-      >
-        <button
-          class="card-modal-close"
-          id="creativeUnlockClose"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <h3
-          id="creativeUnlockTitle"
-          style="
-            font-family: &quot;Oswald&quot;, sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-          "
-        >
-          🔒 Unlock Upload
-        </h3>
-        <p
-          style="
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            margin-bottom: 16px;
-            line-height: 1.5;
-          "
-        >
-          Enter the MFG password to enable uploads in the creative tabs. Anyone
-          you share this password with will be able to publish assets visible to
-          all visitors.
-        </p>
-        <input
-          type="password"
-          id="creativeUnlockInput"
-          class="creative-unlock-input"
-          placeholder="MFG password"
-          autocomplete="off"
-        />
-        <p id="creativeUnlockError" class="creative-unlock-error">
-          Incorrect password.
-        </p>
-        <div class="creative-unlock-actions">
-          <button
-            type="button"
-            class="creative-lock-btn"
-            id="creativeUnlockCancel"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="creative-lock-btn creative-upload-btn"
-            id="creativeUnlockSubmit"
-          >
-            Unlock
-          </button>
-        </div>
-      </div>
-    </div>
 
     <div class="fact-bar" id="factBar">
       <div class="fact-label">⚽ Fun Fact</div>
@@ -10768,6 +10922,28 @@
       }
 
       function renderSocial() {
+        // Defensive: every social item MUST have a non-empty platforms array;
+        // the renderer below calls s.platforms.map(). A missing field used to
+        // crash init() and silently kill the Gemini button. Synthesize from
+        // quotes[] when possible, otherwise drop the item with a warning.
+        DASHBOARD_DATA.social = (DASHBOARD_DATA.social || [])
+          .map((s) => {
+            if (s && Array.isArray(s.platforms) && s.platforms.length) return s;
+            const fromQuotes = Array.isArray(s && s.quotes)
+              ? Array.from(
+                  new Set(s.quotes.map((q) => q && q.platform).filter(Boolean)),
+                )
+              : [];
+            if (fromQuotes.length) {
+              return { ...s, platforms: fromQuotes };
+            }
+            console.warn(
+              "social item missing platforms[], skipped:",
+              s && s.id,
+            );
+            return null;
+          })
+          .filter(Boolean);
         let filtered = DASHBOARD_DATA.social.filter(
           (s) => matchesLiveFilter(s, "social") && matchesSearch(s),
         );
@@ -11299,12 +11475,26 @@
     </div>`;
       }
 
+      function matchKickoffTs(m) {
+        if (!m || !m.date) return null;
+        const t = Date.parse(m.date + "T12:00:00Z");
+        return isNaN(t) ? null : t;
+      }
       function renderMatches() {
         const container = document.getElementById("matchList");
         const filterVal = document.getElementById("groupFilter").value;
+        const next24 = document.getElementById("next24hToggle")?.checked;
         let matches = DASHBOARD_DATA.matches.filter((m) => matchesSearch(m));
         if (filterVal !== "all") {
           matches = matches.filter((m) => m.stage === filterVal);
+        }
+        if (next24) {
+          const now = Date.now();
+          const cutoff = now + 24 * 60 * 60 * 1000;
+          matches = matches.filter((m) => {
+            const t = matchKickoffTs(m);
+            return t != null && t >= now - 6 * 60 * 60 * 1000 && t <= cutoff;
+          });
         }
 
         if (fixtureView === "calendar") {
@@ -11324,6 +11514,7 @@
             if (!byDate[m.date]) byDate[m.date] = [];
             byDate[m.date].push(m);
           });
+          const todayIso = new Date().toISOString().slice(0, 10);
           container.innerHTML = Object.entries(byDate)
             .map(([date, games]) => {
               const dateStr = new Date(date + "T12:00:00").toLocaleDateString(
@@ -11335,8 +11526,9 @@
                   year: "numeric",
                 },
               );
-              return `<div class="date-group">
-        <div class="date-header">${escapeHtml(dateStr)} <span class="match-count">${games.length} match${games.length > 1 ? "es" : ""}</span></div>
+              const isToday = date === todayIso;
+              return `<div class="date-group${isToday ? " is-today" : ""}">
+        <div class="date-header">${escapeHtml(dateStr)}${isToday ? ' <span class="today-badge">TODAY</span>' : ""} <span class="match-count">${games.length} match${games.length > 1 ? "es" : ""}</span></div>
         <div class="matches-list">${games.map(renderMatchRow).join("")}</div>
       </div>`;
             })
@@ -11450,9 +11642,9 @@
         return `<div class="groups-grid">${cards}</div>`;
       }
 
-      // \u2500\u2500 Creative editor unlock (password = 'mfg') \u2500\u2500
+      // \u2500\u2500 Creative editor unlock (in-memory toggle; no longer modal-gated) \u2500\u2500
+      // Real upload flow lives in MFG mode under #mfg-creative.
       const CREATIVE_UNLOCK_KEY = "creative_unlock";
-      const CREATIVE_PASSWORD = "mfg";
       function isCreativeUnlocked() {
         return localStorage.getItem(CREATIVE_UNLOCK_KEY) === "on";
       }
@@ -11485,21 +11677,6 @@
           t.style.display = unlocked ? "" : "none";
         });
       }
-      function openCreativeUnlockModal() {
-        const overlay = document.getElementById("creativeUnlockOverlay");
-        const input = document.getElementById("creativeUnlockInput");
-        const err = document.getElementById("creativeUnlockError");
-        if (!overlay) return;
-        err.classList.remove("shown");
-        input.value = "";
-        overlay.classList.add("open");
-        setTimeout(() => input.focus(), 50);
-      }
-      function closeCreativeUnlockModal() {
-        document
-          .getElementById("creativeUnlockOverlay")
-          ?.classList.remove("open");
-      }
 
       function setupCreativeLock() {
         refreshCreativeLockUI();
@@ -11510,8 +11687,8 @@
               setCreativeUnlocked(false);
               return;
             }
-            // Redirect to MFG mode — uploads happen there now (Creative
-            // Uploads tab). The MFG page has its own password gate.
+            // Upload modal lives in MFG mode now. Redirect to its Creative
+            // Uploads tab — the MFG page has its own password gate.
             window.location.href = "mfg.html#mfg-creative";
           });
         document
@@ -11522,37 +11699,6 @@
               openAssetUploadModal();
             });
           });
-
-        const overlay = document.getElementById("creativeUnlockOverlay");
-        const input = document.getElementById("creativeUnlockInput");
-        const err = document.getElementById("creativeUnlockError");
-        const submitBtn = document.getElementById("creativeUnlockSubmit");
-        const cancelBtn = document.getElementById("creativeUnlockCancel");
-        const closeBtn = document.getElementById("creativeUnlockClose");
-
-        function tryUnlock() {
-          if (input.value === CREATIVE_PASSWORD) {
-            err.classList.remove("shown");
-            closeCreativeUnlockModal();
-            setCreativeUnlocked(true);
-          } else {
-            err.classList.add("shown");
-            input.select();
-          }
-        }
-        submitBtn?.addEventListener("click", tryUnlock);
-        cancelBtn?.addEventListener("click", closeCreativeUnlockModal);
-        closeBtn?.addEventListener("click", closeCreativeUnlockModal);
-        overlay?.addEventListener("click", (e) => {
-          if (e.target === overlay) closeCreativeUnlockModal();
-        });
-        input?.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            tryUnlock();
-          }
-          if (e.key === "Escape") closeCreativeUnlockModal();
-        });
       }
 
       // \u2500\u2500 Shared creative assets (Supabase Storage + creative_assets table) \u2500\u2500
@@ -12965,15 +13111,26 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           if (e.key === "1") switchTab("live");
           else if (e.key === "2") switchTab("calendar");
           else if (e.key === "3") switchTab("creative");
-          else if (e.key === "g" || e.key === "G") {
+          else if (e.key === "?") {
+            e.preventDefault();
+            toggleShortcutsOverlay();
+          } else if (e.key === "g" || e.key === "G") {
             document.getElementById("geminiOverlay").classList.add("open");
             document.getElementById("geminiPanel").classList.add("open");
             document.getElementById("geminiInput").focus();
           } else if (e.key === "Escape") {
             document.getElementById("geminiOverlay").classList.remove("open");
             document.getElementById("geminiPanel").classList.remove("open");
+            const sc = document.getElementById("shortcutsOverlay");
+            if (sc && !sc.hidden) sc.hidden = true;
           }
         });
+      }
+
+      function toggleShortcutsOverlay() {
+        const el = document.getElementById("shortcutsOverlay");
+        if (!el) return;
+        el.hidden = !el.hidden;
       }
 
       // ── Feature 4: Global Search ──
