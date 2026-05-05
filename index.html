@@ -4619,9 +4619,232 @@
           transform: translateY(0);
         }
       }
+      /* ── PASSWORD GATE ── */
+      .gate-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: radial-gradient(
+          ellipse at 50% 30%,
+          #1a1a2e 0%,
+          #050508 75%
+        );
+        font-family: "Inter", -apple-system, sans-serif;
+      }
+      body.gated {
+        overflow: hidden;
+      }
+      body.gated .gate-overlay {
+        display: flex;
+      }
+      .gate-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 36px 32px;
+        max-width: 380px;
+        width: 100%;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .gate-logo {
+        width: 64px;
+        height: auto;
+        opacity: 0.95;
+      }
+      .gate-emoji {
+        font-size: 38px;
+        margin: 8px 0 18px;
+        line-height: 1;
+      }
+      .gate-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #fff;
+        margin: 0 0 6px;
+      }
+      .gate-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0 20px;
+      }
+      .gate-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .gate-form input[type="password"] {
+        padding: 11px 14px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        font-family: inherit;
+      }
+      .gate-form input[type="password"]:focus {
+        border-color: rgba(99, 102, 241, 0.6);
+      }
+      .gate-remember {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        user-select: none;
+      }
+      .gate-remember input {
+        accent-color: #6366f1;
+      }
+      .gate-submit {
+        padding: 11px 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-weight: 600;
+        font-size: 13px;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        transition:
+          filter 0.15s,
+          box-shadow 0.15s;
+      }
+      .gate-submit:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      }
+      .gate-error {
+        color: #f87171;
+        font-size: 12px;
+        margin: 4px 0 0;
+        min-height: 16px;
+      }
+      .gate-help {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.45);
+        margin: 22px 0 0;
+        line-height: 1.55;
+      }
+      .gate-help a {
+        color: #a5b4fc;
+        text-decoration: none;
+      }
+      .gate-help a:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
-  <body class="dashboard-hidden">
+  <body class="dashboard-hidden gated">
+    <!-- PASSWORD GATE -->
+    <div class="gate-overlay" id="gateOverlay">
+      <div class="gate-card">
+        <img src="assets/mfg-logo.png" class="gate-logo" alt="MFG" />
+        <div class="gate-emoji" aria-hidden="true">⚽</div>
+        <h1 class="gate-title">World Cup HQ</h1>
+        <p class="gate-subtitle">Enter password to access the dashboard</p>
+        <form class="gate-form" id="gateForm" autocomplete="on">
+          <input
+            type="password"
+            id="gatePassword"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+            aria-label="Password"
+          />
+          <label class="gate-remember">
+            <input type="checkbox" id="gateRemember" />
+            <span>Remember me for 7 days</span>
+          </label>
+          <button type="submit" class="gate-submit">Enter</button>
+          <p class="gate-error" id="gateError" role="alert"></p>
+        </form>
+        <p class="gate-help">
+          Email
+          <a href="mailto:ed.tsue@mediafuturesgroup.com"
+            >ed.tsue@mediafuturesgroup.com</a
+          >
+          or your local MFGer for the password.
+        </p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var body = document.body;
+        var form = document.getElementById("gateForm");
+        var pwInput = document.getElementById("gatePassword");
+        var rememberInput = document.getElementById("gateRemember");
+        var errEl = document.getElementById("gateError");
+        if (form) form.addEventListener("submit", onSubmit);
+        async function onSubmit(e) {
+          e.preventDefault();
+          errEl.textContent = "";
+          var btn = form.querySelector("button[type=submit]");
+          if (btn) btn.disabled = true;
+          try {
+            var res = await fetch("/api/gate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                password: pwInput.value,
+                remember: rememberInput.checked,
+              }),
+            });
+            var data = {};
+            try {
+              data = await res.json();
+            } catch (er) {}
+            if (res.ok && data.ok) {
+              body.classList.remove("gated");
+              pwInput.value = "";
+            } else {
+              errEl.textContent =
+                data && data.error === "GATE_PASSWORD env var not configured"
+                  ? "Gate not configured on server. Contact an admin."
+                  : "Wrong password.";
+              pwInput.focus();
+              pwInput.select();
+            }
+          } catch (er) {
+            errEl.textContent = "Network error. Try again.";
+          } finally {
+            if (btn) btn.disabled = false;
+          }
+        }
+        // Verify any existing session before showing the form.
+        fetch("/api/gate", { credentials: "same-origin" })
+          .then(function (r) {
+            return r.json().catch(function () {
+              return {};
+            });
+          })
+          .then(function (d) {
+            if (d && d.ok) {
+              body.classList.remove("gated");
+            } else {
+              setTimeout(function () {
+                if (pwInput) pwInput.focus();
+              }, 50);
+            }
+          })
+          .catch(function () {
+            /* keep gated; user can submit */
+          });
+      })();
+    </script>
     <!-- STADIUM FLYOVER INTRO -->
     <div class="intro-overlay" id="introOverlay" style="display: none">
       <div class="intro-pitch" id="introPitch">
