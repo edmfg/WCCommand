@@ -2968,6 +2968,59 @@
 
               <div class="form-group" style="margin-bottom: 18px">
                 <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    color: var(--text-muted);
+                  "
+                  >Bento
+                  <span
+                    style="
+                      color: var(--text-muted);
+                      text-transform: none;
+                      letter-spacing: 0;
+                      font-size: 11px;
+                    "
+                    >(optional, pick one)</span
+                  ></label
+                >
+                <div class="creative-bento-chips" id="creativeBentoChips">
+                  <button
+                    type="button"
+                    class="creative-chip creative-chip-bento"
+                    data-bento="BENTO 1: Long/Results/16"
+                  >
+                    🍱 BENTO 1: Long/Results/16
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip creative-chip-bento"
+                    data-bento="BENTO 2: Query/Result/Query/23"
+                  >
+                    🍱 BENTO 2: Query/Result/Query/23
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip creative-chip-bento"
+                    data-bento="BENTO 3: Query/Query/16"
+                  >
+                    🍱 BENTO 3: Query/Query/16
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip creative-chip-bento"
+                    data-bento="ELSE"
+                  >
+                    … ELSE
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px">
+                <label
                   for="creativeTitle"
                   style="
                     display: block;
@@ -3160,6 +3213,41 @@
               display: grid;
               grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
               gap: 12px;
+              margin-bottom: 32px;
+            "
+          ></div>
+
+          <div
+            class="section-title"
+            style="font-size: 14px; margin-bottom: 4px; display:flex; align-items:baseline; gap:10px;"
+          >
+            All uploads
+            <span
+              id="creativeAllCount"
+              style="
+                font-size: 11px;
+                color: var(--text-muted);
+                font-weight: 400;
+                letter-spacing: 0;
+                text-transform: none;
+              "
+            ></span>
+          </div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 12px;
+              margin: -4px 0 12px;
+            "
+          >
+            Full archive of every Drive link MFG has published. Hover any card to delete.
+          </p>
+          <div
+            id="creativeAllList"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+              gap: 10px;
             "
           ></div>
         </div>
@@ -5714,6 +5802,7 @@
 
         const form = document.getElementById("creativeUploadForm");
         const chipsBar = document.getElementById("creativeMarketChips");
+        const bentoBar = document.getElementById("creativeBentoChips");
         const titleInput = document.getElementById("creativeTitle");
         const startInput = document.getElementById("creativeStartDate");
         const endInput = document.getElementById("creativeEndDate");
@@ -5722,9 +5811,10 @@
         const submitBtn = document.getElementById("creativeUploadSubmit");
         const toastEl = document.getElementById("creativeUploadToast");
         const recentList = document.getElementById("creativeRecentList");
+        const allList = document.getElementById("creativeAllList");
+        const allCountEl = document.getElementById("creativeAllCount");
 
-        // Multi-select: each chip click toggles its own active state.
-        // Submitted as a comma-joined string (e.g. "Canada,USA").
+        // Markets — multi-select. Submitted as a comma-joined string.
         function getSelectedMarkets() {
           if (!chipsBar) return [];
           return Array.from(chipsBar.querySelectorAll(".creative-chip.active")).map(
@@ -5736,6 +5826,24 @@
             const chip = e.target.closest(".creative-chip");
             if (!chip) return;
             chip.classList.toggle("active");
+          });
+        }
+
+        // Bento — single-select, clicking the active chip clears it.
+        function getSelectedBento() {
+          if (!bentoBar) return null;
+          const active = bentoBar.querySelector(".creative-chip.active");
+          return active ? active.dataset.bento : null;
+        }
+        if (bentoBar) {
+          bentoBar.addEventListener("click", function (e) {
+            const chip = e.target.closest(".creative-chip");
+            if (!chip) return;
+            const wasActive = chip.classList.contains("active");
+            bentoBar
+              .querySelectorAll(".creative-chip")
+              .forEach((c) => c.classList.remove("active"));
+            if (!wasActive) chip.classList.add("active");
           });
         }
 
@@ -5796,6 +5904,7 @@
             }
             const title = (titleInput.value || "").trim();
             const channel = channelInput.value || "IG";
+            const bento = getSelectedBento();
             // Headline is NOT NULL on the table — fall back to a sensible
             // auto-title when the user didn't supply one.
             const headlineFallback =
@@ -5811,6 +5920,7 @@
                 deploy_date: startDate,
                 live_end_date: endDate,
                 channel: channel,
+                bento: bento,
                 subtab: "engine",
                 kind: "drive",
                 drive_url: driveUrl,
@@ -5823,6 +5933,10 @@
               chipsBar
                 .querySelectorAll(".creative-chip")
                 .forEach((c) => c.classList.remove("active"));
+              if (bentoBar)
+                bentoBar
+                  .querySelectorAll(".creative-chip")
+                  .forEach((c) => c.classList.remove("active"));
               loadRecentCreativeUploads();
             } catch (err) {
               console.error("creative upload failed", err);
@@ -5854,31 +5968,7 @@
           });
         }
 
-        async function loadRecentCreativeUploads() {
-          if (!recentList) return;
-          const sb = getCreativeSb();
-          if (!sb) {
-            recentList.innerHTML =
-              '<p style="color:var(--text-muted);font-size:13px">Supabase not loaded.</p>';
-            return;
-          }
-          try {
-            const { data, error } = await sb
-              .from("creative_assets")
-              .select(
-                "id, headline, market, channel, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind"
-              )
-              .eq("kind", "drive")
-              .order("created_at", { ascending: false })
-              .limit(12);
-            if (error) throw error;
-            if (!data || data.length === 0) {
-              recentList.innerHTML =
-                '<p style="color:var(--text-muted);font-size:13px">No Drive uploads yet. Add your first link above.</p>';
-              return;
-            }
-            recentList.innerHTML = data
-              .map(function (r) {
+        function renderUploadCard(r) {
                 const fid = r.drive_file_id || "";
                 const fidEnc = encodeURIComponent(fid);
                 const lh3 = "https://lh3.googleusercontent.com/d/" + fidEnc + "=w400";
@@ -5901,6 +5991,11 @@
                 if (start && end) dateStr = start + " → " + end;
                 else if (start) dateStr = "From " + start;
                 else if (end) dateStr = "Until " + end;
+                const bentoPill = r.bento
+                  ? '<span style="background:rgba(245,158,11,0.18);color:#fcd34d;border:1px solid rgba(245,158,11,0.32)">🍱 ' +
+                    escapeHtml(r.bento) +
+                    "</span>"
+                  : "";
                 return (
                   '<div class="creative-recent-card" data-asset-id="' +
                   escapeHtml(r.id) +
@@ -5925,6 +6020,7 @@
                   '<span>' +
                   escapeHtml(r.channel || "IG") +
                   "</span>" +
+                  bentoPill +
                   (dateStr ? "<span>" + escapeHtml(dateStr) + "</span>" : "") +
                   "</div>" +
                   '<a href="' +
@@ -5932,65 +6028,136 @@
                   '" target="_blank" rel="noopener" class="creative-recent-link">Open in Drive →</a>' +
                   "</div>"
                 );
-              })
-              .join("");
+        }
 
-            // Wire delete buttons. Two-step arm pattern: first click arms,
-            // second click deletes. Click anywhere else cancels.
-            recentList.querySelectorAll(".creative-recent-delete").forEach(
-              function (btn) {
-                btn.addEventListener("click", async function (e) {
-                  e.stopPropagation();
-                  if (!btn.classList.contains("armed")) {
-                    btn.classList.add("armed");
-                    btn.textContent = "Delete?";
-                    btn.style.width = "auto";
-                    btn.style.padding = "0 10px";
-                    btn.style.borderRadius = "999px";
-                    btn.style.fontSize = "11px";
-                    setTimeout(function () {
-                      if (btn.classList.contains("armed")) {
-                        btn.classList.remove("armed");
-                        btn.textContent = "×";
-                        btn.style.width = "";
-                        btn.style.padding = "";
-                        btn.style.borderRadius = "";
-                        btn.style.fontSize = "";
-                      }
-                    }, 3000);
-                    return;
-                  }
-                  const card = btn.closest(".creative-recent-card");
-                  const id = card && card.dataset.assetId;
-                  if (!id) return;
-                  btn.disabled = true;
-                  btn.textContent = "…";
-                  try {
-                    const sb2 = getCreativeSb();
-                    const { error: delErr } = await sb2
-                      .from("creative_assets")
-                      .delete()
-                      .eq("id", id);
-                    if (delErr) throw delErr;
-                    if (card) card.remove();
-                    showToast("Deleted.");
-                  } catch (err) {
-                    console.error("delete failed", err);
-                    showToast(
-                      "Delete failed: " + (err.message || String(err)),
-                      true
+        function wireDeleteButtons(container) {
+          container
+            .querySelectorAll(".creative-recent-delete")
+            .forEach(function (btn) {
+              btn.addEventListener("click", async function (e) {
+                e.stopPropagation();
+                if (!btn.classList.contains("armed")) {
+                  btn.classList.add("armed");
+                  btn.textContent = "Delete?";
+                  btn.style.width = "auto";
+                  btn.style.padding = "0 10px";
+                  btn.style.borderRadius = "999px";
+                  btn.style.fontSize = "11px";
+                  setTimeout(function () {
+                    if (btn.classList.contains("armed")) {
+                      btn.classList.remove("armed");
+                      btn.textContent = "×";
+                      btn.style.width = "";
+                      btn.style.padding = "";
+                      btn.style.borderRadius = "";
+                      btn.style.fontSize = "";
+                    }
+                  }, 3000);
+                  return;
+                }
+                const card = btn.closest(".creative-recent-card");
+                const id = card && card.dataset.assetId;
+                if (!id) return;
+                btn.disabled = true;
+                btn.textContent = "…";
+                try {
+                  const sb2 = getCreativeSb();
+                  const { error: delErr } = await sb2
+                    .from("creative_assets")
+                    .delete()
+                    .eq("id", id);
+                  if (delErr) throw delErr;
+                  // Remove the matching card from BOTH lists if present.
+                  document
+                    .querySelectorAll(
+                      '.creative-recent-card[data-asset-id="' + id + '"]'
+                    )
+                    .forEach((c) => c.remove());
+                  showToast("Deleted.");
+                  if (allCountEl) {
+                    const n = parseInt(
+                      (allCountEl.textContent || "").replace(/\D/g, "") || "0",
+                      10
                     );
-                    btn.disabled = false;
-                    btn.classList.remove("armed");
-                    btn.textContent = "×";
+                    if (n > 0) allCountEl.textContent = n - 1 + " total";
                   }
-                });
-              }
-            );
+                } catch (err) {
+                  console.error("delete failed", err);
+                  showToast(
+                    "Delete failed: " + (err.message || String(err)),
+                    true
+                  );
+                  btn.disabled = false;
+                  btn.classList.remove("armed");
+                  btn.textContent = "×";
+                }
+              });
+            });
+        }
+
+        async function loadRecentCreativeUploads() {
+          if (!recentList) return;
+          const sb = getCreativeSb();
+          if (!sb) {
+            recentList.innerHTML =
+              '<p style="color:var(--text-muted);font-size:13px">Supabase not loaded.</p>';
+            return;
+          }
+          try {
+            const { data, error } = await sb
+              .from("creative_assets")
+              .select(
+                "id, headline, market, channel, bento, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind"
+              )
+              .eq("kind", "drive")
+              .order("created_at", { ascending: false })
+              .limit(12);
+            if (error) throw error;
+            if (!data || data.length === 0) {
+              recentList.innerHTML =
+                '<p style="color:var(--text-muted);font-size:13px">No Drive uploads yet. Add your first link above.</p>';
+            } else {
+              recentList.innerHTML = data.map(renderUploadCard).join("");
+              wireDeleteButtons(recentList);
+            }
+            loadAllCreativeUploads();
           } catch (err) {
             console.error("recent uploads load failed", err);
             recentList.innerHTML =
               '<p style="color:#f87171;font-size:13px">Could not load recent uploads: ' +
+              escapeHtml(err.message || String(err)) +
+              "</p>";
+          }
+        }
+
+        async function loadAllCreativeUploads() {
+          if (!allList) return;
+          const sb = getCreativeSb();
+          if (!sb) return;
+          try {
+            const { data, error } = await sb
+              .from("creative_assets")
+              .select(
+                "id, headline, market, channel, bento, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind",
+                { count: "exact" }
+              )
+              .eq("kind", "drive")
+              .order("created_at", { ascending: false })
+              .limit(500);
+            if (error) throw error;
+            if (allCountEl)
+              allCountEl.textContent = (data ? data.length : 0) + " total";
+            if (!data || data.length === 0) {
+              allList.innerHTML =
+                '<p style="color:var(--text-muted);font-size:13px">Nothing yet.</p>';
+              return;
+            }
+            allList.innerHTML = data.map(renderUploadCard).join("");
+            wireDeleteButtons(allList);
+          } catch (err) {
+            console.error("all uploads load failed", err);
+            allList.innerHTML =
+              '<p style="color:#f87171;font-size:13px">Could not load full archive: ' +
               escapeHtml(err.message || String(err)) +
               "</p>";
           }
