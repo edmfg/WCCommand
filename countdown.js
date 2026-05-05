@@ -75,8 +75,7 @@
       '<span class="wcc-label">WC 2026</span>' +
       '<span class="wcc-num" data-d>--</span><span class="wcc-unit">d</span>' +
       '<span class="wcc-num" data-h>--</span><span class="wcc-unit">h</span>' +
-      '<span class="wcc-num" data-m>--</span><span class="wcc-unit">m</span>' +
-      '<span class="wcc-num" data-s>--</span><span class="wcc-unit">s</span>';
+      '<span class="wcc-num" data-m>--</span><span class="wcc-unit">m</span>';
     return pill;
   }
 
@@ -164,7 +163,6 @@
       d: pill.querySelector("[data-d]"),
       h: pill.querySelector("[data-h]"),
       m: pill.querySelector("[data-m]"),
-      s: pill.querySelector("[data-s]"),
     };
     function update() {
       var f = fmt(KICKOFF_UTC - Date.now());
@@ -178,10 +176,10 @@
       els.d.textContent = f.d;
       els.h.textContent = pad(f.h);
       els.m.textContent = pad(f.m);
-      els.s.textContent = pad(f.s);
     }
     update();
-    setInterval(update, 1000);
+    // Tick once per minute since seconds are no longer displayed.
+    setInterval(update, 30 * 1000);
   }
 
   function init() {
