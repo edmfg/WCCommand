@@ -446,10 +446,114 @@
     document.head.appendChild(style);
   }
 
+  // ── Coach mark: floating tip pointing at the Gemini button ──
+  // Shown once on the first session; click the × or click the Gemini button
+  // to dismiss. Dismissal is persisted in localStorage.
+  var COACH_KEY = "wcc_gemini_coach_dismissed_v1";
+
+  function injectCoachStyles() {
+    if (document.getElementById("gemini-coach-style")) return;
+    var css =
+      "" +
+      ".gemini-coach{" +
+      "position:fixed;bottom:62px;right:160px;z-index:9100;" +
+      "max-width:260px;padding:14px 38px 14px 16px;" +
+      "background:linear-gradient(135deg,rgba(99,102,241,0.96),rgba(139,92,246,0.96));" +
+      "color:#fff;border-radius:14px;" +
+      "box-shadow:0 12px 32px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.08) inset;" +
+      "font-family:'Inter',-apple-system,sans-serif;font-size:0.82rem;line-height:1.45;" +
+      "opacity:0;transform:translateY(8px) scale(0.96);" +
+      "transition:opacity 0.3s ease,transform 0.3s ease;" +
+      "pointer-events:none;" +
+      "}" +
+      ".gemini-coach.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;animation:gemini-coach-pulse 2.6s ease-in-out infinite}" +
+      ".gemini-coach::after{" +
+      "content:'';position:absolute;top:50%;right:-8px;margin-top:-7px;" +
+      "width:14px;height:14px;" +
+      "background:linear-gradient(135deg,rgba(99,102,241,0.96),rgba(139,92,246,0.96));" +
+      "transform:rotate(45deg);" +
+      "border-top:1px solid rgba(255,255,255,0.08);" +
+      "border-right:1px solid rgba(255,255,255,0.08);" +
+      "border-radius:2px;" +
+      "}" +
+      ".gemini-coach-title{font-weight:700;font-size:0.82rem;margin-bottom:4px;letter-spacing:0.2px;display:flex;align-items:center;gap:6px}" +
+      ".gemini-coach-body{opacity:0.94}" +
+      ".gemini-coach-close{" +
+      "position:absolute;top:6px;right:8px;background:transparent;border:none;" +
+      "color:rgba(255,255,255,0.85);font-size:1.15rem;line-height:1;cursor:pointer;" +
+      "padding:2px 6px;border-radius:5px;" +
+      "}" +
+      ".gemini-coach-close:hover{background:rgba(255,255,255,0.18);color:#fff}" +
+      "@keyframes gemini-coach-pulse{" +
+      "0%,100%{box-shadow:0 12px 32px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.08) inset,0 0 0 0 rgba(99,102,241,0.45)}" +
+      "50%{box-shadow:0 12px 32px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.08) inset,0 0 0 12px rgba(99,102,241,0)}" +
+      "}" +
+      "@media (max-width:640px){" +
+      ".gemini-coach{right:24px;bottom:130px;max-width:calc(100vw - 48px)}" +
+      ".gemini-coach::after{display:none}" +
+      "}";
+    var style = document.createElement("style");
+    style.id = "gemini-coach-style";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  function showCoachMark() {
+    try {
+      if (localStorage.getItem(COACH_KEY) === "1") return;
+    } catch (e) {}
+    var toggle =
+      document.getElementById("geminiToggle") ||
+      document.getElementById("geminiToggleShared");
+    if (!toggle) return;
+    if (document.getElementById("geminiCoach")) return;
+    injectCoachStyles();
+    var el = document.createElement("div");
+    el.id = "geminiCoach";
+    el.className = "gemini-coach";
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    el.innerHTML =
+      '<button class="gemini-coach-close" aria-label="Dismiss tip">&times;</button>' +
+      '<div class="gemini-coach-title">✨ Ask Gemini anything</div>' +
+      '<div class="gemini-coach-body">Gemini already knows everything on this dashboard — news, social trends, fixtures, creative pipeline. Click <strong>Gemini</strong> to ask.</div>';
+    document.body.appendChild(el);
+    function dismiss(persist) {
+      el.classList.remove("show");
+      if (persist !== false) {
+        try {
+          localStorage.setItem(COACH_KEY, "1");
+        } catch (e) {}
+      }
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 300);
+    }
+    el.querySelector(".gemini-coach-close").addEventListener("click", function (
+      e,
+    ) {
+      e.stopPropagation();
+      dismiss();
+    });
+    toggle.addEventListener("click", function () {
+      dismiss();
+    });
+    // Slide in 1.4s after page settles so it doesn't compete with first paint.
+    setTimeout(function () {
+      el.classList.add("show");
+    }, 1400);
+    // Auto-dismiss after 12s if the user doesn't engage — without persisting
+    // (so it shows again next visit).
+    setTimeout(function () {
+      if (el.classList.contains("show")) dismiss(false);
+    }, 12000);
+  }
+
   function init() {
     if (!enhanceExistingPanel()) {
       injectFullPanel();
     }
+    showCoachMark();
   }
 
   if (document.readyState === "loading") {
