@@ -476,6 +476,8 @@
     var css =
       "" +
       ".gemini-coach{" +
+      // Bottom-aligned with the Gemini button so the right-edge arrow can
+      // land squarely at the button's vertical centre.
       "position:fixed;bottom:62px;right:160px;z-index:9100;" +
       "max-width:260px;padding:14px 38px 14px 16px;" +
       "background:linear-gradient(135deg,rgba(99,102,241,0.96),rgba(139,92,246,0.96));" +
@@ -485,16 +487,18 @@
       "opacity:0;transform:translateY(8px) scale(0.96);" +
       "transition:opacity 0.3s ease,transform 0.3s ease;" +
       "pointer-events:none;" +
+      "filter:drop-shadow(0 4px 14px rgba(0,0,0,0.35));" +
       "}" +
       ".gemini-coach.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;animation:gemini-coach-pulse 2.6s ease-in-out infinite}" +
+      // Solid triangular arrow tail anchored near the bubble's bottom-right
+      // (same vertical zone as the button). Pure CSS triangle, no rotated
+      // square — points clearly to the right.
       ".gemini-coach::after{" +
-      "content:'';position:absolute;top:50%;right:-8px;margin-top:-7px;" +
-      "width:14px;height:14px;" +
-      "background:linear-gradient(135deg,rgba(99,102,241,0.96),rgba(139,92,246,0.96));" +
-      "transform:rotate(45deg);" +
-      "border-top:1px solid rgba(255,255,255,0.08);" +
-      "border-right:1px solid rgba(255,255,255,0.08);" +
-      "border-radius:2px;" +
+      "content:'';position:absolute;right:-15px;bottom:18px;" +
+      "width:0;height:0;" +
+      "border-top:13px solid transparent;" +
+      "border-bottom:13px solid transparent;" +
+      "border-left:18px solid rgba(139,92,246,0.96);" +
       "}" +
       ".gemini-coach-title{font-weight:700;font-size:0.82rem;margin-bottom:4px;letter-spacing:0.2px;display:flex;align-items:center;gap:6px}" +
       ".gemini-coach-body{opacity:0.94}" +
