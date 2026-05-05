@@ -678,6 +678,82 @@
         display: block;
       }
 
+      /* Creative Uploads — chip selector + recent list */
+      .creative-market-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .creative-chip {
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .creative-chip:hover {
+        background: rgba(255, 255, 255, 0.09);
+        color: var(--text);
+      }
+      .creative-chip.active {
+        background: var(--red);
+        color: #fff;
+        border-color: var(--red);
+      }
+      .creative-recent-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .creative-recent-thumb {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+      }
+      .creative-recent-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .creative-recent-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .creative-recent-meta span {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .creative-recent-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.3;
+      }
+      .creative-recent-link {
+        font-size: 11px;
+        color: var(--gold);
+        text-decoration: none;
+      }
+      .creative-recent-link:hover {
+        text-decoration: underline;
+      }
+
       /* Global Triage toolbar — uniform 40px control heights, baseline-aligned */
       .triage-toolbar-row {
         display: flex;
@@ -2538,6 +2614,23 @@
       </header>
 
       <main class="main">
+        <nav class="tab-nav" id="mfgTabNav" aria-label="MFG sections">
+          <button
+            class="tab-btn active"
+            type="button"
+            data-mfg-tab="triage"
+          >
+            🧯 Global Triage
+          </button>
+          <button
+            class="tab-btn"
+            type="button"
+            data-mfg-tab="creative"
+          >
+            🎬 Creative Uploads
+          </button>
+        </nav>
+
         <div class="tab-panel active" id="panel-triage">
           <div class="section-title">&#129517; Global Triage</div>
           <p
@@ -2742,6 +2835,273 @@
           </div>
 
           <div id="triageBoard" class="triage-board"></div>
+        </div>
+
+        <!-- ── CREATIVE UPLOADS TAB ── -->
+        <div class="tab-panel" id="panel-creative">
+          <div class="section-title">🎬 Creative Uploads</div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            Drop a Drive link here and it shows up on the public Creative tab
+            for clients to view. Files stay on Drive — only the link is stored.
+            Make sure your Drive file is set to <strong>Anyone with the link
+            can view</strong> so embeds and previews work for clients.
+          </p>
+
+          <div class="form-card glass" style="margin-bottom: 20px">
+            <form id="creativeUploadForm" autocomplete="off">
+              <div class="form-group" style="margin-bottom: 18px">
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    color: var(--text-muted);
+                  "
+                  >Market <span style="color: var(--red)">*</span></label
+                >
+                <div class="creative-market-chips" id="creativeMarketChips">
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="Canada"
+                  >
+                    🇨🇦 Canada
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="USA"
+                  >
+                    🇺🇸 USA
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="Germany"
+                  >
+                    🇩🇪 Germany
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="UK"
+                  >
+                    🇬🇧 UK
+                  </button>
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="Global"
+                  >
+                    🌐 Global
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px">
+                <label
+                  for="creativeTitle"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    color: var(--text-muted);
+                  "
+                  >Title <span style="color: var(--text-muted)">(optional)</span></label
+                >
+                <input
+                  type="text"
+                  id="creativeTitle"
+                  placeholder="e.g. Davies Goal Reactive — Group Stage"
+                  style="
+                    width: 100%;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    background: var(--bg);
+                    border: 1px solid var(--glass-border);
+                    color: var(--text);
+                    font-size: 14px;
+                  "
+                />
+              </div>
+
+              <div
+                class="form-group"
+                style="margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+              >
+                <div>
+                  <label
+                    for="creativeStartDate"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 12px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.8px;
+                      color: var(--text-muted);
+                    "
+                    >Live from <span style="color: var(--text-muted)">(optional)</span></label
+                  >
+                  <input
+                    type="date"
+                    id="creativeStartDate"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      background: var(--bg);
+                      border: 1px solid var(--glass-border);
+                      color: var(--text);
+                      font-size: 14px;
+                    "
+                  />
+                </div>
+                <div>
+                  <label
+                    for="creativeEndDate"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 12px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.8px;
+                      color: var(--text-muted);
+                    "
+                    >Live until <span style="color: var(--text-muted)">(optional)</span></label
+                  >
+                  <input
+                    type="date"
+                    id="creativeEndDate"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      background: var(--bg);
+                      border: 1px solid var(--glass-border);
+                      color: var(--text);
+                      font-size: 14px;
+                    "
+                  />
+                </div>
+              </div>
+
+              <div
+                class="form-group"
+                style="margin-bottom: 18px; display: grid; grid-template-columns: 200px 1fr; gap: 12px"
+              >
+                <div>
+                  <label
+                    for="creativeChannel"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 12px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.8px;
+                      color: var(--text-muted);
+                    "
+                    >Channel</label
+                  >
+                  <select
+                    id="creativeChannel"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      background: var(--bg);
+                      border: 1px solid var(--glass-border);
+                      color: var(--text);
+                      font-size: 14px;
+                    "
+                  >
+                    <option value="IG" selected>📸 Instagram</option>
+                    <option value="TT">🎵 TikTok</option>
+                    <option value="YT">▶️ YouTube</option>
+                    <option value="FB">📘 Facebook</option>
+                    <option value="X">𝕏 (Twitter)</option>
+                    <option value="DOOH">🪧 DOOH</option>
+                    <option value="ELSE">… Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    for="creativeDriveUrl"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 12px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.8px;
+                      color: var(--text-muted);
+                    "
+                    >Drive link <span style="color: var(--red)">*</span></label
+                  >
+                  <input
+                    type="url"
+                    id="creativeDriveUrl"
+                    placeholder="https://drive.google.com/file/d/..."
+                    required
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      background: var(--bg);
+                      border: 1px solid var(--glass-border);
+                      color: var(--text);
+                      font-size: 14px;
+                    "
+                  />
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 12px;
+                "
+              >
+                <button
+                  class="btn-primary"
+                  type="submit"
+                  id="creativeUploadSubmit"
+                >
+                  📤 Publish to Creative tab
+                </button>
+                <span
+                  id="creativeUploadToast"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    min-height: 18px;
+                  "
+                ></span>
+              </div>
+            </form>
+          </div>
+
+          <div class="section-title" style="font-size: 14px; margin-bottom: 12px">
+            Recent uploads
+          </div>
+          <div
+            id="creativeRecentList"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+              gap: 12px;
+            "
+          ></div>
         </div>
       </main>
     </div>
@@ -5249,6 +5609,251 @@
             localStorage.getItem("mfg-supabase-url") ||
             "https://ypisjfefbccgtxesteja.supabase.co";
         if (sbKey) sbKey.value = localStorage.getItem("mfg-supabase-key") || "";
+      })();
+
+      // ── MFG TAB SWITCHER + CREATIVE UPLOADS ──
+      (function () {
+        // Tab switching ----------------------------------------------------
+        const tabNav = document.getElementById("mfgTabNav");
+        if (!tabNav) return;
+        function activateTab(name) {
+          tabNav.querySelectorAll(".tab-btn").forEach((b) => {
+            b.classList.toggle("active", b.dataset.mfgTab === name);
+          });
+          document.querySelectorAll("#app .tab-panel").forEach((p) => {
+            const matches =
+              (name === "triage" && p.id === "panel-triage") ||
+              (name === "creative" && p.id === "panel-creative");
+            p.classList.toggle("active", matches);
+          });
+          try {
+            history.replaceState(null, "", "#mfg-" + name);
+          } catch (e) {}
+          if (name === "creative") {
+            loadRecentCreativeUploads();
+          }
+        }
+        tabNav.addEventListener("click", function (e) {
+          const btn = e.target.closest(".tab-btn");
+          if (!btn) return;
+          activateTab(btn.dataset.mfgTab);
+        });
+        if (location.hash === "#mfg-creative") activateTab("creative");
+
+        // Creative Uploads form -------------------------------------------
+        const SUPABASE_URL = "https://ypisjfefbccgtxesteja.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
+        let creativeSb = null;
+        function getCreativeSb() {
+          if (creativeSb) return creativeSb;
+          if (window.supabase && window.supabase.createClient) {
+            creativeSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          }
+          return creativeSb;
+        }
+
+        const form = document.getElementById("creativeUploadForm");
+        const chipsBar = document.getElementById("creativeMarketChips");
+        const titleInput = document.getElementById("creativeTitle");
+        const startInput = document.getElementById("creativeStartDate");
+        const endInput = document.getElementById("creativeEndDate");
+        const channelInput = document.getElementById("creativeChannel");
+        const driveInput = document.getElementById("creativeDriveUrl");
+        const submitBtn = document.getElementById("creativeUploadSubmit");
+        const toastEl = document.getElementById("creativeUploadToast");
+        const recentList = document.getElementById("creativeRecentList");
+
+        let selectedMarket = null;
+        if (chipsBar) {
+          chipsBar.addEventListener("click", function (e) {
+            const chip = e.target.closest(".creative-chip");
+            if (!chip) return;
+            chipsBar
+              .querySelectorAll(".creative-chip")
+              .forEach((c) => c.classList.toggle("active", c === chip));
+            selectedMarket = chip.dataset.market;
+          });
+        }
+
+        function showToast(msg, isError) {
+          if (!toastEl) return;
+          toastEl.textContent = msg;
+          toastEl.style.color = isError ? "#f87171" : "var(--green, #4ade80)";
+          if (!isError) {
+            setTimeout(() => {
+              if (toastEl.textContent === msg) toastEl.textContent = "";
+            }, 4000);
+          }
+        }
+
+        function extractDriveFileId(url) {
+          if (!url) return null;
+          // Common Drive URL patterns: /file/d/<id>, ?id=<id>, /open?id=<id>
+          const patterns = [
+            /\/file\/d\/([A-Za-z0-9_-]{10,})/,
+            /[?&]id=([A-Za-z0-9_-]{10,})/,
+            /\/d\/([A-Za-z0-9_-]{10,})/,
+          ];
+          for (const p of patterns) {
+            const m = url.match(p);
+            if (m) return m[1];
+          }
+          return null;
+        }
+
+        if (form) {
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            showToast("");
+            if (!selectedMarket) {
+              showToast("Pick a market first.", true);
+              return;
+            }
+            const driveUrl = (driveInput.value || "").trim();
+            const fileId = extractDriveFileId(driveUrl);
+            if (!fileId) {
+              showToast(
+                "That doesn't look like a Drive file URL. Use the share link, e.g. https://drive.google.com/file/d/<id>/view",
+                true
+              );
+              return;
+            }
+            const startDate = startInput.value || null;
+            const endDate = endInput.value || null;
+            if (startDate && endDate && endDate < startDate) {
+              showToast("End date is before start date.", true);
+              return;
+            }
+            const sb = getCreativeSb();
+            if (!sb) {
+              showToast("Supabase not loaded — check your network.", true);
+              return;
+            }
+            const title = (titleInput.value || "").trim();
+            const channel = channelInput.value || "IG";
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Publishing…";
+            try {
+              const { error } = await sb.from("creative_assets").insert({
+                headline: title || null,
+                market: selectedMarket,
+                format: "Drive",
+                status: "Live",
+                deploy_date: startDate,
+                live_end_date: endDate,
+                channel: channel,
+                subtab: "engine",
+                kind: "drive",
+                drive_url: driveUrl,
+                drive_file_id: fileId,
+                uploaded_by: "MFG",
+              });
+              if (error) throw error;
+              showToast("Published. Visible on the dashboard's Creative tab now.");
+              form.reset();
+              chipsBar
+                .querySelectorAll(".creative-chip")
+                .forEach((c) => c.classList.remove("active"));
+              selectedMarket = null;
+              loadRecentCreativeUploads();
+            } catch (err) {
+              console.error("creative upload failed", err);
+              showToast(
+                "Upload failed: " + (err.message || String(err)),
+                true
+              );
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "📤 Publish to Creative tab";
+            }
+          });
+        }
+
+        function escapeHtml(s) {
+          const d = document.createElement("div");
+          d.textContent = s == null ? "" : String(s);
+          return d.innerHTML;
+        }
+
+        function fmtDate(iso) {
+          if (!iso) return null;
+          const d = new Date(iso + "T12:00:00");
+          if (isNaN(d)) return null;
+          return d.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+        }
+
+        async function loadRecentCreativeUploads() {
+          if (!recentList) return;
+          const sb = getCreativeSb();
+          if (!sb) {
+            recentList.innerHTML =
+              '<p style="color:var(--text-muted);font-size:13px">Supabase not loaded.</p>';
+            return;
+          }
+          try {
+            const { data, error } = await sb
+              .from("creative_assets")
+              .select(
+                "id, headline, market, channel, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind"
+              )
+              .eq("kind", "drive")
+              .order("created_at", { ascending: false })
+              .limit(12);
+            if (error) throw error;
+            if (!data || data.length === 0) {
+              recentList.innerHTML =
+                '<p style="color:var(--text-muted);font-size:13px">No Drive uploads yet. Add your first link above.</p>';
+              return;
+            }
+            recentList.innerHTML = data
+              .map(function (r) {
+                const thumb = r.drive_file_id
+                  ? '<img src="https://drive.google.com/thumbnail?id=' +
+                    encodeURIComponent(r.drive_file_id) +
+                    '&sz=w400" alt="preview" referrerpolicy="no-referrer" />'
+                  : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:11px">No preview</div>';
+                const start = fmtDate(r.deploy_date);
+                const end = fmtDate(r.live_end_date);
+                let dateStr = "";
+                if (start && end) dateStr = start + " → " + end;
+                else if (start) dateStr = "From " + start;
+                else if (end) dateStr = "Until " + end;
+                return (
+                  '<div class="creative-recent-card">' +
+                  '<div class="creative-recent-thumb">' +
+                  thumb +
+                  "</div>" +
+                  '<div class="creative-recent-title">' +
+                  escapeHtml(r.headline || "Untitled creative") +
+                  "</div>" +
+                  '<div class="creative-recent-meta">' +
+                  '<span>' +
+                  escapeHtml(r.market || "—") +
+                  "</span>" +
+                  '<span>' +
+                  escapeHtml(r.channel || "IG") +
+                  "</span>" +
+                  (dateStr ? "<span>" + escapeHtml(dateStr) + "</span>" : "") +
+                  "</div>" +
+                  '<a href="' +
+                  escapeHtml(r.drive_url || "#") +
+                  '" target="_blank" rel="noopener" class="creative-recent-link">Open in Drive →</a>' +
+                  "</div>"
+                );
+              })
+              .join("");
+          } catch (err) {
+            console.error("recent uploads load failed", err);
+            recentList.innerHTML =
+              '<p style="color:#f87171;font-size:13px">Could not load recent uploads: ' +
+              escapeHtml(err.message || String(err)) +
+              "</p>";
+          }
+        }
       })();
     </script>
     <script src="countdown.js" defer></script>

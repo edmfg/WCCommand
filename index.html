@@ -2213,6 +2213,107 @@
       }
 
       /* ── CARD EXPAND MODAL ── */
+      /* ── Creative play overlay (Drive iframe modal) ── */
+      .creative-play-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9800;
+        background: rgba(0, 0, 0, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        animation: fadeIn 0.25s ease;
+      }
+      .creative-play-overlay[hidden] {
+        display: none;
+      }
+      .creative-play-close {
+        position: absolute;
+        top: 18px;
+        right: 22px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.15s;
+      }
+      .creative-play-close:hover {
+        background: rgba(255, 255, 255, 0.16);
+        transform: scale(1.06);
+      }
+      .creative-play-stage {
+        width: 100%;
+        max-width: 1100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      .creative-play-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: rgba(255, 255, 255, 0.95);
+        text-align: center;
+      }
+      .creative-play-frame {
+        width: 100%;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+        aspect-ratio: 16 / 9;
+      }
+      .creative-play-frame iframe {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border: 0;
+      }
+      .creative-play-drive-link {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        letter-spacing: 0.6px;
+      }
+      .creative-play-drive-link:hover {
+        color: #fff;
+        text-decoration: underline;
+      }
+      .creative-play-badge {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 56px;
+        height: 56px;
+        margin: -28px 0 0 -28px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: #fff;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0.85;
+        transition: opacity 0.2s, transform 0.2s;
+      }
+      .asset-card[data-creative-play]:hover .creative-play-badge {
+        opacity: 1;
+        transform: scale(1.08);
+      }
+
       .card-modal-overlay {
         position: fixed;
         inset: 0;
@@ -5359,6 +5460,38 @@
           ×
         </button>
         <div id="cardModalBody"></div>
+      </div>
+    </div>
+
+    <!-- ── CREATIVE PLAYER OVERLAY (Drive embed) ── -->
+    <div class="creative-play-overlay" id="creativePlayOverlay" hidden>
+      <button
+        class="creative-play-close"
+        id="creativePlayClose"
+        aria-label="Close player"
+      >
+        ×
+      </button>
+      <div class="creative-play-stage">
+        <div class="creative-play-title" id="creativePlayTitle"></div>
+        <div class="creative-play-frame">
+          <iframe
+            id="creativePlayIframe"
+            src=""
+            frameborder="0"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowfullscreen
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <a
+          id="creativePlayDriveLink"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          class="creative-play-drive-link"
+          >Open in Drive ↗</a
+        >
       </div>
     </div>
 
@@ -9705,6 +9838,7 @@
         setupKeyboard();
         setupSearch();
         setupCardExpand();
+        setupCreativePlayer();
         setupAssetUpload();
         setupCreativeLock();
         setupHeatmapToggle();
@@ -11042,15 +11176,19 @@
           SHARED_CREATIVE_ASSETS = (data || []).map((r) => ({
             id: "sa_" + r.id,
             sharedId: r.id,
-            headline: r.headline,
+            headline: r.headline || "Untitled creative",
             market: r.market,
             format: r.format,
             status: r.status,
             deployDate: r.deploy_date,
+            liveEndDate: r.live_end_date || null,
+            channel: r.channel || null,
             subtab: r.subtab || "engine",
             kind: r.kind,
             youtubeUrl: r.youtube_url,
             imageUrl: r.image_url,
+            driveUrl: r.drive_url || null,
+            driveFileId: r.drive_file_id || null,
             uploadedBy: r.uploaded_by,
             sharedUpload: true,
             createdAt: r.created_at,
@@ -11149,19 +11287,45 @@
         const removeBtn = removable
           ? `<button class="asset-remove" data-asset-id="${escapeHtml(a.id)}" data-shared-id="${escapeHtml(a.sharedId || "")}" title="Remove">\u00d7</button>`
           : "";
-        const dateStr = a.deployDate
-          ? `Deploy: ${new Date(a.deployDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+        const fmtD = (iso) => {
+          if (!iso) return null;
+          const d = new Date(iso + "T12:00:00");
+          if (isNaN(d)) return null;
+          return d.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+        };
+        const startDate = fmtD(a.deployDate);
+        const endDate = fmtD(a.liveEndDate);
+        let dateStr = "";
+        if (startDate && endDate) dateStr = `${startDate} → ${endDate}`;
+        else if (startDate) dateStr = `Live from ${startDate}`;
+        else if (endDate) dateStr = `Live until ${endDate}`;
+        const channelStr = a.channel
+          ? `<span class="asset-format">${escapeHtml(a.channel)}</span>`
           : "";
         const uploaderLine = a.uploadedBy
           ? `<span class="asset-date" style="color:var(--text-dim);font-size:11px">By ${escapeHtml(a.uploadedBy)}</span>`
           : "";
-        return `<div class="asset-card glass">
+        // Drive cards open a click-to-play modal; YouTube + image cards keep
+        // their existing flow.
+        const playable = !!a.driveFileId;
+        const playableAttrs = playable
+          ? ` data-creative-play="${escapeHtml(a.driveFileId)}" data-creative-title="${escapeHtml(a.headline || "Creative")}" style="cursor:pointer"`
+          : "";
+        const playBadge = playable
+          ? `<div class="creative-play-badge" aria-hidden="true">▶</div>`
+          : "";
+        return `<div class="asset-card glass"${playableAttrs}>
     ${removeBtn}
-    <div class="asset-thumb">${thumb}</div>
+    <div class="asset-thumb">${thumb}${playBadge}</div>
     <div class="asset-body">
       <h4>${escapeHtml(a.headline)}</h4>
       <div class="asset-meta">
         ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ""}
+        ${channelStr}
         ${a.status ? `<span class="asset-status-pill ${sc}">${escapeHtml(a.status)}</span>` : ""}
       </div>
       ${dateStr ? `<span class="asset-date">${escapeHtml(dateStr)}</span>` : ""}
@@ -11737,6 +11901,52 @@
             submit.disabled = false;
             submit.textContent = "Send";
           }
+        });
+      }
+
+      // Click any creative asset card with a Drive file id → open the inline
+      // Drive preview iframe in an overlay.
+      function setupCreativePlayer() {
+        const overlay = document.getElementById("creativePlayOverlay");
+        const iframe = document.getElementById("creativePlayIframe");
+        const titleEl = document.getElementById("creativePlayTitle");
+        const driveLink = document.getElementById("creativePlayDriveLink");
+        const closeBtn = document.getElementById("creativePlayClose");
+        if (!overlay || !iframe) return;
+        function open(fileId, title) {
+          if (!fileId) return;
+          iframe.src =
+            "https://drive.google.com/file/d/" +
+            encodeURIComponent(fileId) +
+            "/preview";
+          if (titleEl) titleEl.textContent = title || "";
+          if (driveLink)
+            driveLink.href =
+              "https://drive.google.com/file/d/" +
+              encodeURIComponent(fileId) +
+              "/view";
+          overlay.hidden = false;
+          document.body.style.overflow = "hidden";
+        }
+        function close() {
+          overlay.hidden = true;
+          iframe.src = ""; // stop playback
+          document.body.style.overflow = "";
+        }
+        document.addEventListener("click", (e) => {
+          if (e.target.closest(".asset-remove")) return;
+          if (e.target.closest(".asset-link")) return;
+          const card = e.target.closest("[data-creative-play]");
+          if (!card) return;
+          e.preventDefault();
+          open(card.dataset.creativePlay, card.dataset.creativeTitle);
+        });
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) close();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !overlay.hidden) close();
         });
       }
 
