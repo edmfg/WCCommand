@@ -6544,7 +6544,20 @@
         setInterval(tick, 1000);
       }
 
-      let liveFilter = "all";
+      // Multi-select live filters. `liveFilters` is a Set of pill ids;
+      // when it's empty (or contains "all"), every item passes. Otherwise
+      // an item passes if ANY selected pill matches it (OR semantics).
+      let liveFilters = new Set(["all"]);
+      // Backwards-compat alias for any external code that still reads the
+      // single-pill global. Reads return the first non-"all" selection.
+      Object.defineProperty(window, "liveFilter", {
+        get() {
+          if (liveFilters.has("all") && liveFilters.size === 1) return "all";
+          for (const id of liveFilters) if (id !== "all") return id;
+          return "all";
+        },
+        configurable: true,
+      });
       const liveFilterDefs = [
         { id: "all", label: "🌐 All" },
         { id: "24h", label: "⏱ RECENT" },
@@ -6579,47 +6592,33 @@
         return Date.now() - t <= 72 * 60 * 60 * 1000 && t <= Date.now();
       }
 
-      function setLiveFilter(id) {
-        liveFilter = id;
-        renderLiveFilters();
-        renderNews();
-        renderSocial();
-      }
-
-      function renderLiveFilters() {
-        const bar = document.getElementById("liveFilters");
-        bar.innerHTML = liveFilterDefs
-          .map(
-            (f) =>
-              `<button class="live-filter${f.id === liveFilter ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
-          )
-          .join("");
-      }
-
-      function matchesLiveFilter(item, type) {
-        if (liveFilter === "all") return true;
-        if (liveFilter === "24h") {
+      // Per-pill match predicates. Each returns true if `item` (a news or
+      // social object) matches that single pill. matchesLiveFilter() ORs the
+      // results across whatever pills are currently selected.
+      const LIVE_PILL_MATCHERS = {
+        all: () => true,
+        "24h": (item, type) => {
           if (type === "news") return withinLast24h(item.timestamp);
           return withinLast24h(socialItemTimestamp(item));
-        }
-        if (liveFilter === "canada") {
+        },
+        canada: (item, type) => {
           if (type === "news") return item.tag === "Canada";
-          return (
+          return !!(
             item.topic?.toLowerCase().includes("canada") ||
             item.summary?.toLowerCase().includes("canada")
           );
-        }
-        if (liveFilter === "germany") {
+        },
+        germany: (item, type) => {
           if (type === "news") return item.tag === "Germany";
-          return (
+          return !!(
             item.topic?.toLowerCase().includes("germany") ||
             item.summary?.toLowerCase().includes("germany") ||
             item.summary?.toLowerCase().includes("nagelsmann") ||
             item.summary?.toLowerCase().includes("wirtz") ||
             item.summary?.toLowerCase().includes("musiala")
           );
-        }
-        if (liveFilter === "usa") {
+        },
+        usa: (item, type) => {
           if (type === "news") return item.tag === "USA";
           const t = (item.topic + " " + item.summary).toLowerCase();
           return (
@@ -6631,8 +6630,8 @@
             t.includes("tolkin") ||
             t.includes("america")
           );
-        }
-        if (liveFilter === "uk") {
+        },
+        uk: (item, type) => {
           if (type === "news") return item.tag === "UK";
           const t = (item.topic + " " + item.summary).toLowerCase();
           return (
@@ -6643,20 +6642,57 @@
             t.includes("kane") ||
             t.includes("three lions")
           );
-        }
-        if (liveFilter === "game") {
-          if (type === "news") return true; // all news is game-related
+        },
+        game: (item, type) => {
+          if (type === "news") return true; // every news item is game-related
           return item.category === "game";
-        }
-        if (liveFilter === "culture") {
+        },
+        culture: (item, type) => {
           if (type === "news") return false;
           return ["food", "music", "fashion", "fandom"].includes(item.category);
-        }
-        if (liveFilter === "viral") {
+        },
+        viral: (item, type) => {
           if (type === "news") return false;
           return item.volume?.includes("🔥🔥🔥");
+        },
+      };
+
+      function setLiveFilter(id) {
+        // "All" clears everything else.
+        if (id === "all") {
+          liveFilters = new Set(["all"]);
+        } else {
+          liveFilters.delete("all");
+          if (liveFilters.has(id)) {
+            liveFilters.delete(id);
+          } else {
+            liveFilters.add(id);
+          }
+          // Empty selection → fall back to All so something always renders.
+          if (liveFilters.size === 0) liveFilters.add("all");
         }
-        return true;
+        renderLiveFilters();
+        renderNews();
+        renderSocial();
+      }
+
+      function renderLiveFilters() {
+        const bar = document.getElementById("liveFilters");
+        bar.innerHTML = liveFilterDefs
+          .map(
+            (f) =>
+              `<button class="live-filter${liveFilters.has(f.id) ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
+          )
+          .join("");
+      }
+
+      function matchesLiveFilter(item, type) {
+        if (liveFilters.has("all")) return true;
+        for (const id of liveFilters) {
+          const fn = LIVE_PILL_MATCHERS[id];
+          if (fn && fn(item, type)) return true;
+        }
+        return false;
       }
 
       // ── Card Carousel Engine (3 per page, slide motion, pin + hover-pause) ──
@@ -9326,10 +9362,15 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
                   if (payload.finishReason) finishReason = payload.finishReason;
                   if (Array.isArray(payload.groundingChunks))
                     groundingChunks = payload.groundingChunks;
+                  // Vercel Node functions buffer the response, so delta
+                  // events may not actually stream — done carries the full
+                  // aggregated text as a fallback.
+                  if (!reply && payload.text) {
+                    reply = payload.text;
+                    liveEl.innerHTML = renderMarkdown(reply);
+                  }
                 } else if (event === "error") {
-                  throw new Error(
-                    payload.message || "Upstream error",
-                  );
+                  throw new Error(payload.message || "Upstream error");
                 }
               }
             }

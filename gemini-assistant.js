@@ -393,6 +393,13 @@
             if (event === "delta" && obj.text) {
               reply += obj.text;
               thinking.innerHTML = renderMd(reply);
+            } else if (event === "done") {
+              // Fallback when Vercel buffers and delta events don't stream:
+              // pull the full aggregated text from the done event.
+              if (!reply && obj.text) {
+                reply = obj.text;
+                thinking.innerHTML = renderMd(reply);
+              }
             } else if (event === "error") {
               thinking.innerHTML =
                 "<em>Error: " + escHtml(obj.message || "upstream") + "</em>";
