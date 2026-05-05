@@ -36,8 +36,18 @@
     ],
   };
 
+  var CHIP_LIMIT = 3;
   function chipsFor(mode) {
-    return PROMPTS[mode] || PROMPTS.dashboard;
+    var pool = (PROMPTS[mode] || PROMPTS.dashboard).slice();
+    // Show CHIP_LIMIT at a time. Shuffle so different sessions see different
+    // prompts; if the pool is shorter than the limit, return everything.
+    for (var i = pool.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = tmp;
+    }
+    return pool.slice(0, CHIP_LIMIT);
   }
 
   function buildSystemInstruction(mode) {
@@ -268,13 +278,38 @@
       return html;
     }
 
+    // Sticky-bottom autoscroll: only follow if the user is near the bottom
+    // (within 80px). If they've scrolled up to read history, leave them put.
+    function autoScroll() {
+      if (!messages) return;
+      var nearBottom =
+        messages.scrollHeight - messages.scrollTop - messages.clientHeight < 80;
+      if (nearBottom) {
+        requestAnimationFrame(function () {
+          messages.scrollTop = messages.scrollHeight;
+        });
+      }
+    }
+
     function appendMsg(role, text) {
       var d = document.createElement("div");
       d.className = "gemini-msg-shared " + role;
       d.innerHTML = role === "assistant" ? renderMd(text) : escHtml(text);
       messages.appendChild(d);
-      messages.scrollTop = messages.scrollHeight;
+      autoScroll();
       return d;
+    }
+
+    // Watch the messages container for any DOM mutation (e.g. when thinking
+    // placeholder gets its innerHTML rewritten with the real response) and
+    // keep the view pinned to the bottom while streaming.
+    if (typeof MutationObserver !== "undefined" && messages) {
+      var mo = new MutationObserver(autoScroll);
+      mo.observe(messages, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
     }
 
     async function send() {

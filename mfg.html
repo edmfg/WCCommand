@@ -632,8 +632,9 @@
       .tab-nav {
         display: flex;
         gap: 4px;
-        padding: 16px 28px 0;
-        max-width: 1200px;
+        padding: 16px 32px 0;
+        max-width: none;
+        width: 100%;
         margin: 0 auto;
       }
 
@@ -1507,9 +1508,10 @@
 
       /* Main container */
       .main {
-        max-width: 1200px;
+        max-width: none;
+        width: 100%;
         margin: 0 auto;
-        padding: 24px 28px 60px;
+        padding: 24px 32px 60px;
       }
 
       /* Section headers */
@@ -3236,11 +3238,10 @@
           if (e.key === "Enter") tryAuth();
         });
 
-        // Auto-load snapshot history once the app is ready
+        // Auto-load snapshot history once the app is ready (panel stays
+        // collapsed by default; the user clicks History to expand it).
         window.addEventListener("DOMContentLoaded", function () {
           if (typeof window.__triageLoadHistory === "function") {
-            const hp = document.getElementById("triageHistoryPanel");
-            if (hp) hp.style.display = "block";
             window.__triageLoadHistory();
           }
         });
