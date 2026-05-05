@@ -24,7 +24,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Vercel Web Analytics -->
     <script>
-      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
     <style>
@@ -48,8 +52,12 @@
         --glass-bg: rgba(255, 255, 255, 0.04);
         --glass-border: rgba(255, 255, 255, 0.08);
         --glass-blur: blur(16px);
-        --font-display: "Oswald", sans-serif;
-        --font-body: "Inter", sans-serif;
+        --font-display:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          "Twemoji Mozilla", sans-serif;
+        --font-body:
+          "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          "Twemoji Mozilla", sans-serif;
       }
 
       body {
@@ -2666,18 +2674,10 @@
 
       <main class="main">
         <nav class="tab-nav" id="mfgTabNav" aria-label="MFG sections">
-          <button
-            class="tab-btn active"
-            type="button"
-            data-mfg-tab="triage"
-          >
+          <button class="tab-btn active" type="button" data-mfg-tab="triage">
             🧯 Global Triage
           </button>
-          <button
-            class="tab-btn"
-            type="button"
-            data-mfg-tab="creative"
-          >
+          <button class="tab-btn" type="button" data-mfg-tab="creative">
             🎬 Creative Uploads
           </button>
         </nav>
@@ -2900,8 +2900,9 @@
           >
             Drop a Drive link here and it shows up on the public Creative tab
             for clients to view. Files stay on Drive — only the link is stored.
-            Make sure your Drive file is set to <strong>Anyone with the link
-            can view</strong> so embeds and previews work for clients.
+            Make sure your Drive file is set to
+            <strong>Anyone with the link can view</strong> so embeds and
+            previews work for clients.
           </p>
 
           <div class="form-card glass" style="margin-bottom: 20px">
@@ -2935,11 +2936,7 @@
                   >
                     🇨🇦 Canada
                   </button>
-                  <button
-                    type="button"
-                    class="creative-chip"
-                    data-market="USA"
-                  >
+                  <button type="button" class="creative-chip" data-market="USA">
                     🇺🇸 USA
                   </button>
                   <button
@@ -2949,11 +2946,7 @@
                   >
                     🇩🇪 Germany
                   </button>
-                  <button
-                    type="button"
-                    class="creative-chip"
-                    data-market="UK"
-                  >
+                  <button type="button" class="creative-chip" data-market="UK">
                     🇬🇧 UK
                   </button>
                   <button
@@ -3030,7 +3023,10 @@
                     letter-spacing: 0.8px;
                     color: var(--text-muted);
                   "
-                  >Title <span style="color: var(--text-muted)">(optional)</span></label
+                  >Title
+                  <span style="color: var(--text-muted)"
+                    >(optional)</span
+                  ></label
                 >
                 <input
                   type="text"
@@ -3050,7 +3046,12 @@
 
               <div
                 class="form-group"
-                style="margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+                style="
+                  margin-bottom: 18px;
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 12px;
+                "
               >
                 <div>
                   <label
@@ -3063,7 +3064,10 @@
                       letter-spacing: 0.8px;
                       color: var(--text-muted);
                     "
-                    >Live from <span style="color: var(--text-muted)">(optional)</span></label
+                    >Live from
+                    <span style="color: var(--text-muted)"
+                      >(optional)</span
+                    ></label
                   >
                   <input
                     type="date"
@@ -3090,7 +3094,10 @@
                       letter-spacing: 0.8px;
                       color: var(--text-muted);
                     "
-                    >Live until <span style="color: var(--text-muted)">(optional)</span></label
+                    >Live until
+                    <span style="color: var(--text-muted)"
+                      >(optional)</span
+                    ></label
                   >
                   <input
                     type="date"
@@ -3110,7 +3117,12 @@
 
               <div
                 class="form-group"
-                style="margin-bottom: 18px; display: grid; grid-template-columns: 200px 1fr; gap: 12px"
+                style="
+                  margin-bottom: 18px;
+                  display: grid;
+                  grid-template-columns: 200px 1fr;
+                  gap: 12px;
+                "
               >
                 <div>
                   <label
@@ -3204,7 +3216,10 @@
             </form>
           </div>
 
-          <div class="section-title" style="font-size: 14px; margin-bottom: 12px">
+          <div
+            class="section-title"
+            style="font-size: 14px; margin-bottom: 12px"
+          >
             Recent uploads
           </div>
           <div
@@ -3219,7 +3234,13 @@
 
           <div
             class="section-title"
-            style="font-size: 14px; margin-bottom: 4px; display:flex; align-items:baseline; gap:10px;"
+            style="
+              font-size: 14px;
+              margin-bottom: 4px;
+              display: flex;
+              align-items: baseline;
+              gap: 10px;
+            "
           >
             All uploads
             <span
@@ -3240,7 +3261,8 @@
               margin: -4px 0 12px;
             "
           >
-            Full archive of every Drive link MFG has published. Hover any card to delete.
+            Full archive of every Drive link MFG has published. Hover any card
+            to delete.
           </p>
           <div
             id="creativeAllList"
@@ -5795,7 +5817,10 @@
         function getCreativeSb() {
           if (creativeSb) return creativeSb;
           if (window.supabase && window.supabase.createClient) {
-            creativeSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            creativeSb = window.supabase.createClient(
+              SUPABASE_URL,
+              SUPABASE_KEY,
+            );
           }
           return creativeSb;
         }
@@ -5817,9 +5842,9 @@
         // Markets — multi-select. Submitted as a comma-joined string.
         function getSelectedMarkets() {
           if (!chipsBar) return [];
-          return Array.from(chipsBar.querySelectorAll(".creative-chip.active")).map(
-            (c) => c.dataset.market,
-          );
+          return Array.from(
+            chipsBar.querySelectorAll(".creative-chip.active"),
+          ).map((c) => c.dataset.market);
         }
         if (chipsBar) {
           chipsBar.addEventListener("click", function (e) {
@@ -5887,7 +5912,7 @@
             if (!fileId) {
               showToast(
                 "That doesn't look like a Drive file URL. Use the share link, e.g. https://drive.google.com/file/d/<id>/view",
-                true
+                true,
               );
               return;
             }
@@ -5907,8 +5932,7 @@
             const bento = getSelectedBento();
             // Headline is NOT NULL on the table — fall back to a sensible
             // auto-title when the user didn't supply one.
-            const headlineFallback =
-              "Creative — " + markets.join(" / ");
+            const headlineFallback = "Creative — " + markets.join(" / ");
             submitBtn.disabled = true;
             submitBtn.textContent = "Publishing…";
             try {
@@ -5928,7 +5952,9 @@
                 uploaded_by: "MFG",
               });
               if (error) throw error;
-              showToast("Published. Visible on the dashboard's Creative tab now.");
+              showToast(
+                "Published. Visible on the dashboard's Creative tab now.",
+              );
               form.reset();
               chipsBar
                 .querySelectorAll(".creative-chip")
@@ -5940,10 +5966,7 @@
               loadRecentCreativeUploads();
             } catch (err) {
               console.error("creative upload failed", err);
-              showToast(
-                "Upload failed: " + (err.message || String(err)),
-                true
-              );
+              showToast("Upload failed: " + (err.message || String(err)), true);
             } finally {
               submitBtn.disabled = false;
               submitBtn.textContent = "📤 Publish to Creative tab";
@@ -5969,65 +5992,65 @@
         }
 
         function renderUploadCard(r) {
-                const fid = r.drive_file_id || "";
-                const fidEnc = encodeURIComponent(fid);
-                const lh3 = "https://lh3.googleusercontent.com/d/" + fidEnc + "=w400";
-                const fallback =
-                  "https://drive.google.com/thumbnail?id=" + fidEnc + "&sz=w400";
-                const onerr =
-                  "if(!this.dataset.r){this.dataset.r=1;this.src='" +
-                  fallback +
-                  "';}else{this.style.display='none';}";
-                const thumb = fid
-                  ? '<img src="' +
-                    lh3 +
-                    '" alt="" referrerpolicy="no-referrer" onerror="' +
-                    onerr +
-                    '" />'
-                  : "";
-                const start = fmtDate(r.deploy_date);
-                const end = fmtDate(r.live_end_date);
-                let dateStr = "";
-                if (start && end) dateStr = start + " → " + end;
-                else if (start) dateStr = "From " + start;
-                else if (end) dateStr = "Until " + end;
-                const bentoPill = r.bento
-                  ? '<span style="background:rgba(245,158,11,0.18);color:#fcd34d;border:1px solid rgba(245,158,11,0.32)">🍱 ' +
-                    escapeHtml(r.bento) +
-                    "</span>"
-                  : "";
-                return (
-                  '<div class="creative-recent-card" data-asset-id="' +
-                  escapeHtml(r.id) +
-                  '">' +
-                  '<button class="creative-recent-delete" title="Delete this upload" aria-label="Delete">×</button>' +
-                  '<div class="creative-recent-thumb">' +
-                  thumb +
-                  "</div>" +
-                  '<div class="creative-recent-title">' +
-                  escapeHtml(r.headline || "Untitled creative") +
-                  "</div>" +
-                  '<div class="creative-recent-meta">' +
-                  '<span>' +
-                  escapeHtml(
-                    (r.market || "—")
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                      .join(" · ") || "—"
-                  ) +
-                  "</span>" +
-                  '<span>' +
-                  escapeHtml(r.channel || "IG") +
-                  "</span>" +
-                  bentoPill +
-                  (dateStr ? "<span>" + escapeHtml(dateStr) + "</span>" : "") +
-                  "</div>" +
-                  '<a href="' +
-                  escapeHtml(r.drive_url || "#") +
-                  '" target="_blank" rel="noopener" class="creative-recent-link">Open in Drive →</a>' +
-                  "</div>"
-                );
+          const fid = r.drive_file_id || "";
+          const fidEnc = encodeURIComponent(fid);
+          const lh3 = "https://lh3.googleusercontent.com/d/" + fidEnc + "=w400";
+          const fallback =
+            "https://drive.google.com/thumbnail?id=" + fidEnc + "&sz=w400";
+          const onerr =
+            "if(!this.dataset.r){this.dataset.r=1;this.src='" +
+            fallback +
+            "';}else{this.style.display='none';}";
+          const thumb = fid
+            ? '<img src="' +
+              lh3 +
+              '" alt="" referrerpolicy="no-referrer" onerror="' +
+              onerr +
+              '" />'
+            : "";
+          const start = fmtDate(r.deploy_date);
+          const end = fmtDate(r.live_end_date);
+          let dateStr = "";
+          if (start && end) dateStr = start + " → " + end;
+          else if (start) dateStr = "From " + start;
+          else if (end) dateStr = "Until " + end;
+          const bentoPill = r.bento
+            ? '<span style="background:rgba(245,158,11,0.18);color:#fcd34d;border:1px solid rgba(245,158,11,0.32)">🍱 ' +
+              escapeHtml(r.bento) +
+              "</span>"
+            : "";
+          return (
+            '<div class="creative-recent-card" data-asset-id="' +
+            escapeHtml(r.id) +
+            '">' +
+            '<button class="creative-recent-delete" title="Delete this upload" aria-label="Delete">×</button>' +
+            '<div class="creative-recent-thumb">' +
+            thumb +
+            "</div>" +
+            '<div class="creative-recent-title">' +
+            escapeHtml(r.headline || "Untitled creative") +
+            "</div>" +
+            '<div class="creative-recent-meta">' +
+            "<span>" +
+            escapeHtml(
+              (r.market || "—")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .join(" · ") || "—",
+            ) +
+            "</span>" +
+            "<span>" +
+            escapeHtml(r.channel || "IG") +
+            "</span>" +
+            bentoPill +
+            (dateStr ? "<span>" + escapeHtml(dateStr) + "</span>" : "") +
+            "</div>" +
+            '<a href="' +
+            escapeHtml(r.drive_url || "#") +
+            '" target="_blank" rel="noopener" class="creative-recent-link">Open in Drive →</a>' +
+            "</div>"
+          );
         }
 
         function wireDeleteButtons(container) {
@@ -6070,14 +6093,14 @@
                   // Remove the matching card from BOTH lists if present.
                   document
                     .querySelectorAll(
-                      '.creative-recent-card[data-asset-id="' + id + '"]'
+                      '.creative-recent-card[data-asset-id="' + id + '"]',
                     )
                     .forEach((c) => c.remove());
                   showToast("Deleted.");
                   if (allCountEl) {
                     const n = parseInt(
                       (allCountEl.textContent || "").replace(/\D/g, "") || "0",
-                      10
+                      10,
                     );
                     if (n > 0) allCountEl.textContent = n - 1 + " total";
                   }
@@ -6085,7 +6108,7 @@
                   console.error("delete failed", err);
                   showToast(
                     "Delete failed: " + (err.message || String(err)),
-                    true
+                    true,
                   );
                   btn.disabled = false;
                   btn.classList.remove("armed");
@@ -6107,7 +6130,7 @@
             const { data, error } = await sb
               .from("creative_assets")
               .select(
-                "id, headline, market, channel, bento, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind"
+                "id, headline, market, channel, bento, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind",
               )
               .eq("kind", "drive")
               .order("created_at", { ascending: false })
@@ -6139,7 +6162,7 @@
               .from("creative_assets")
               .select(
                 "id, headline, market, channel, bento, drive_file_id, drive_url, deploy_date, live_end_date, created_at, kind",
-                { count: "exact" }
+                { count: "exact" },
               )
               .eq("kind", "drive")
               .order("created_at", { ascending: false })

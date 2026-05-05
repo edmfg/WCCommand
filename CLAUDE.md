@@ -9,6 +9,7 @@ There is no build step. Edit the HTML / JS files directly and push to `main`; Ve
 ## Pages
 
 ### `index.html` — public dashboard
+
 A single-file HTML/JS app. Everything below lives inside it unless noted.
 
 - **Password gate** — full-screen overlay shown until the user authenticates. Calls `POST /api/gate` with `{ password, remember }`; on success the body's `gated` class is removed and the dashboard boots. Remember-me persists locally for ~7 days so returning users never see the gate flash.
@@ -31,6 +32,7 @@ A single-file HTML/JS app. Everything below lives inside it unless noted.
 - **Floating countdown pill** at the top-center — drag to reposition (position persisted to localStorage). Shows days/hours/minutes to kickoff (June 11, 2026 18:00 UTC). Lives in `countdown.js`.
 
 ### `mfg.html` — MFG production cockpit
+
 Password-gated separately (password literal `mfg`). Two-tab layout:
 
 - **🧯 Global Triage** — drag-and-drop kanban-style board for tracking work across markets. Auto-grouping by tag (creative / strategy / macro / activation / media / production / talent / partnerships / legal / else). Each tag has its own color. Snapshots saved to Supabase `mfg_triage_snapshots` and `mfg_triage` tables. Snapshot history panel is collapsed by default.
@@ -49,16 +51,20 @@ Password-gated separately (password literal `mfg`). Two-tab layout:
 ## Serverless functions (`api/`)
 
 ### `api/gemini.js`
+
 Proxies POSTs to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, injecting the `GEMINI_API_KEY` env var. Request shape mirrors Gemini's REST API.
 
 Two access paths:
+
 1. **Browser (default)** — `Origin` / `Referer` header check against `ALLOWED_ORIGINS`.
 2. **Server-to-server** — `x-mfg-server-secret` header (timing-safe compared to `SERVER_API_SECRET` env var). Lets the daily-refresh routine call the proxy without an `Origin`.
 
 Rate limit: 20 req/min per IP. Body cap: 256 KB.
 
 ### `api/gate.js`
+
 Password gate for the public dashboard.
+
 - `POST /api/gate` with `{ password, remember }` — verifies against `GATE_PASSWORD` env var (constant-time compare). On success sets a signed httpOnly cookie `wcc_gate=<base64url(expiry)>.<base64url(hmac)>` (HMAC-SHA-256 keyed with the password). TTL is 8h or 7d depending on `remember`.
 - `GET /api/gate` — verifies the cookie's HMAC + expiry, returns `{ ok: true|false }`.
 - `DELETE /api/gate` — clears the cookie.
@@ -70,10 +76,13 @@ Cookie attrs: `HttpOnly; Secure; SameSite=Lax; Path=/`.
 ## Static JS files
 
 ### `countdown.js`
+
 Self-contained floating pill. Auto-injects on load. Counts down to `Date.UTC(2026, 5, 11, 18, 0, 0)` in days/hours/minutes. Drag with mouse or touch; position persisted to localStorage `wcc_countdown_pos_v1`. Wired on both `index.html` and `mfg.html`.
 
 ### `gemini-assistant.js`
+
 Shared Gemini panel logic. URL-based mode detection (`mfg.html` → MFG mode; otherwise → Dashboard mode). Two paths:
+
 - If `#geminiPanel` exists (the dashboard already has its own inline panel) → only inject prepopulated chips above its input field.
 - Otherwise (MFG mode) → inject the full button + slide-in panel + chips.
 
@@ -86,6 +95,7 @@ Mode-aware system instruction. Google Search grounding always on. Three randomiz
 Project: `https://ypisjfefbccgtxesteja.supabase.co` (URL is hard-coded in both pages; only the publishable key is shipped client-side; service-role keys never leave Vercel env).
 
 Tables in use:
+
 - `mfg_triage` — single row keyed by `id='global'`, jsonb data column. Live state of the Triage board. See `supabase-mfg-triage.sql`.
 - `mfg_triage_snapshots` — saved snapshots. See same SQL file.
 - `dashboard_updates` — Daily Update history (legacy from a removed tab). See `supabase-dashboard-updates.sql`.
@@ -99,6 +109,8 @@ Row-level security is permissive on every table — the app-level password gates
 
 When changing schema, write a new `supabase-<topic>.sql` file at the repo root and tell the user to run it in the Supabase SQL editor. Use `if not exists` / `drop constraint if exists` so migrations are idempotent.
 
+**Important: uploads persist across code deploys.** Data lives in Supabase, not in the codebase. The only delete paths are user-triggered (the `×` button on a Creative card and the Triage snapshot delete). Pushing new HTML / JS never touches `creative_assets` rows. Don't add automated DELETE / TRUNCATE on this table for any reason — even refresh routines.
+
 ---
 
 ## Vercel config
@@ -106,6 +118,7 @@ When changing schema, write a new `supabase-<topic>.sql` file at the repo root a
 `vercel.json` — only contains rewrites for `/api/gemini` and `/api/gate`. The static-file behavior is the default Vercel deploys.
 
 Required env vars on Vercel:
+
 - `GEMINI_API_KEY` — the Google AI Studio API key the proxy uses.
 - `ALLOWED_ORIGINS` — comma-separated list of allowed `Origin` / `Referer` host prefixes.
 - `GATE_PASSWORD` — the dashboard gate password (currently `mfg`).
@@ -120,6 +133,7 @@ Deployment Protection: previously enabled, currently OFF on Production (the dash
 A scheduled remote agent was set up at one point to auto-refresh content via Gemini-via-Vercel-proxy. It's currently **disabled** because Vercel's edge consistently returned `403 host_not_allowed` for the Anthropic cloud agent's IP range, even with the protection bypass token. The owner decided to do refreshes manually in chat instead.
 
 When the user types **"refresh everything"** (or "refresh content" / "do the daily" / "pull fresh news"):
+
 - Search the web AND Reddit (r/soccer, r/worldcup, team-specific subs) for the past 24–48h of WC2026 news, fan reactions, and cultural moments. Reddit is a first-class source, not an afterthought.
 - Edit `index.html` `DASHBOARD_DATA`:
   - `news[]` — prepend ~5–10 items, each with the right `tag` (Canada / USA / Germany / UK / Macro / Global).

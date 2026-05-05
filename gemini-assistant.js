@@ -75,12 +75,12 @@
       modeBlock +
       "\n\n" +
       "## Format — bullets only, concise (HARD RULE)\n" +
-      "- **Always answer in bullet points.** No prose paragraphs, no intros, no outros, no \"Sure!\" / \"Great question\" / \"Based on the dashboard\". Just bullets.\n" +
+      '- **Always answer in bullet points.** No prose paragraphs, no intros, no outros, no "Sure!" / "Great question" / "Based on the dashboard". Just bullets.\n' +
       "- **3–5 bullets is the default.** 7 maximum. Stop the second the question is answered.\n" +
       "- Each bullet is one short scannable line. Lead the first bullet with the answer; the rest add supporting facts. Don't restate the question.\n" +
       "- **bold** key terms inside bullets. Numbered lists only when the order genuinely matters.\n" +
       "- ### headers only when the user explicitly asks for a multi-section answer.\n" +
-      "- Skip caveats, disclaimers, and \"I cannot…\" preambles unless directly relevant.\n" +
+      '- Skip caveats, disclaimers, and "I cannot…" preambles unless directly relevant.\n' +
       '- Only switch to longer prose if the user explicitly asks ("dig deeper", "give me more", "explain in detail").\n\n' +
       "## Web search\n" +
       "You have live Google Search. Use it for late-breaking news, scores, transfers, injuries, " +
@@ -555,12 +555,13 @@
         if (el.parentNode) el.parentNode.removeChild(el);
       }, 300);
     }
-    el.querySelector(".gemini-coach-close").addEventListener("click", function (
-      e,
-    ) {
-      e.stopPropagation();
-      dismiss();
-    });
+    el.querySelector(".gemini-coach-close").addEventListener(
+      "click",
+      function (e) {
+        e.stopPropagation();
+        dismiss();
+      },
+    );
     toggle.addEventListener("click", function () {
       dismiss();
     });

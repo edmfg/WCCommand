@@ -1,6 +1,6 @@
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
-  .split(',')
-  .map(s => s.trim())
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
   .filter(Boolean);
 
 const MAX_BODY_BYTES = 256 * 1024;
@@ -26,16 +26,16 @@ function rateLimited(ip) {
 }
 
 function clientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
-  if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
-  return req.socket?.remoteAddress || 'unknown';
+  const fwd = req.headers["x-forwarded-for"];
+  if (typeof fwd === "string" && fwd.length) return fwd.split(",")[0].trim();
+  return req.socket?.remoteAddress || "unknown";
 }
 
 function originAllowed(req) {
   if (!ALLOWED_ORIGINS.length) return true;
-  const origin = req.headers.origin || '';
-  const referer = req.headers.referer || '';
-  return ALLOWED_ORIGINS.some(o => origin === o || referer.startsWith(o));
+  const origin = req.headers.origin || "";
+  const referer = req.headers.referer || "";
+  return ALLOWED_ORIGINS.some((o) => origin === o || referer.startsWith(o));
 }
 
 // Server-to-server bypass for trusted callers (e.g. the daily-refresh routine).
@@ -44,81 +44,85 @@ function originAllowed(req) {
 function serverAuthorized(req) {
   const expected = process.env.SERVER_API_SECRET;
   if (!expected) return false;
-  const provided = req.headers['x-mfg-server-secret'];
-  if (typeof provided !== 'string' || provided.length === 0) return false;
+  const provided = req.headers["x-mfg-server-secret"];
+  if (typeof provided !== "string" || provided.length === 0) return false;
   if (provided.length !== expected.length) return false;
   try {
-    const a = Buffer.from(provided, 'utf8');
-    const b = Buffer.from(expected, 'utf8');
-    return require('crypto').timingSafeEqual(a, b);
+    const a = Buffer.from(provided, "utf8");
+    const b = Buffer.from(expected, "utf8");
+    return require("crypto").timingSafeEqual(a, b);
   } catch (e) {
     return false;
   }
 }
 
 function validShape(body) {
-  if (!body || typeof body !== 'object') return false;
+  if (!body || typeof body !== "object") return false;
   if (!Array.isArray(body.contents)) return false;
   if (body.contents.length === 0 || body.contents.length > 32) return false;
   return true;
 }
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const isServer = serverAuthorized(req);
   if (!isServer && !originAllowed(req)) {
-    return res.status(403).json({ error: 'Origin not allowed' });
+    return res.status(403).json({ error: "Origin not allowed" });
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
-    return res.status(500).json({ error: 'API key not configured' });
+    return res.status(500).json({ error: "API key not configured" });
   }
 
   const ip = clientIp(req);
   if (rateLimited(ip)) {
-    res.setHeader('Retry-After', '60');
-    return res.status(429).json({ error: 'Too many requests' });
+    res.setHeader("Retry-After", "60");
+    return res.status(429).json({ error: "Too many requests" });
   }
 
-  const size = Number(req.headers['content-length'] || 0);
+  const size = Number(req.headers["content-length"] || 0);
   if (size && size > MAX_BODY_BYTES) {
-    return res.status(413).json({ error: 'Payload too large' });
+    return res.status(413).json({ error: "Payload too large" });
   }
 
   if (!validShape(req.body)) {
-    return res.status(400).json({ error: 'Invalid request body' });
+    return res.status(400).json({ error: "Invalid request body" });
   }
 
   try {
     const upstream = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': GEMINI_API_KEY,
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY,
         },
         body: JSON.stringify(req.body),
-      }
+      },
     );
 
     const data = await upstream.json();
 
     if (!upstream.ok) {
-      console.error('Gemini upstream error', upstream.status, JSON.stringify(data).slice(0, 500));
+      console.error(
+        "Gemini upstream error",
+        upstream.status,
+        JSON.stringify(data).slice(0, 500),
+      );
       return res.status(upstream.status).json({
-        error: { message: 'Upstream request failed', status: upstream.status },
+        error: { message: "Upstream request failed", status: upstream.status },
       });
     }
 
     return res.status(200).json(data);
   } catch (e) {
-    console.error('Gemini proxy exception', e);
-    return res.status(502).json({ error: { message: 'Upstream unavailable' } });
+    console.error("Gemini proxy exception", e);
+    return res.status(502).json({ error: { message: "Upstream unavailable" } });
   }
 };
 
