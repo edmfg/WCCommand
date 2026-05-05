@@ -5679,6 +5679,86 @@
       </div>
     </div>
 
+    <!-- ── CREATIVE TAB VIEW GATE (separate from dashboard gate) ── -->
+    <div class="card-modal-overlay" id="creativeViewGateOverlay">
+      <div
+        class="card-modal creative-unlock-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="creativeViewGateTitle"
+      >
+        <button
+          class="card-modal-close"
+          id="creativeViewGateClose"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h2
+          id="creativeViewGateTitle"
+          style="
+            margin: 0 0 6px;
+            font-family:
+              'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
+              'Noto Color Emoji', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+          "
+        >
+          🔒 Creative access
+        </h2>
+        <p style="font-size: 13px; color: var(--text-dim); margin: 0 0 16px">
+          Enter the password to view creative assets. Ask your local MFG
+          person, or use the <strong>Help</strong> button to request the
+          password.
+        </p>
+        <input
+          type="password"
+          id="creativeViewGateInput"
+          class="creative-unlock-input"
+          placeholder="Password"
+          autocomplete="current-password"
+        />
+        <label
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0 4px;
+            font-size: 12px;
+            color: var(--text-dim);
+            cursor: pointer;
+            user-select: none;
+          "
+        >
+          <input type="checkbox" id="creativeViewGateRemember" />
+          <span>Remember for 7 days on this device</span>
+        </label>
+        <p
+          id="creativeViewGateError"
+          class="creative-unlock-error"
+          role="alert"
+        ></p>
+        <div class="creative-unlock-actions">
+          <button
+            class="btn-secondary"
+            id="creativeViewGateCancel"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn-primary"
+            id="creativeViewGateSubmit"
+            type="button"
+          >
+            Unlock
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="card-modal-overlay" id="creativeUnlockOverlay">
       <div
         class="card-modal creative-unlock-modal"
@@ -11926,9 +12006,14 @@
         btns.forEach((btn) => {
           btn.addEventListener("click", () => switchTab(btn.dataset.tab));
         });
+        setupCreativeViewGate();
       }
 
       function switchTab(tab) {
+        if (tab === "creative" && !window._creativeViewUnlocked) {
+          openCreativeViewGate();
+          return;
+        }
         document
           .querySelectorAll(".tab-btn")
           .forEach((b) => b.classList.remove("active"));
@@ -11945,6 +12030,107 @@
           panel.style.animation = "";
         }
         history.replaceState(null, "", `#${tab}`);
+      }
+
+      // ── Creative tab view gate ──
+      // Separate cookie / endpoint from the dashboard-level gate. Verifies a
+      // session cookie on first attempt to enter the Creative tab, prompts
+      // for password if missing/expired. CREATIVE_KEY env var on Vercel.
+      function openCreativeViewGate() {
+        const overlay = document.getElementById("creativeViewGateOverlay");
+        const input = document.getElementById("creativeViewGateInput");
+        const err = document.getElementById("creativeViewGateError");
+        if (!overlay) return;
+        if (err) err.classList.remove("shown");
+        if (input) input.value = "";
+        overlay.classList.add("open");
+        setTimeout(() => input && input.focus(), 50);
+      }
+      function closeCreativeViewGate() {
+        document
+          .getElementById("creativeViewGateOverlay")
+          ?.classList.remove("open");
+      }
+      function setupCreativeViewGate() {
+        const overlay = document.getElementById("creativeViewGateOverlay");
+        const input = document.getElementById("creativeViewGateInput");
+        const remember = document.getElementById("creativeViewGateRemember");
+        const err = document.getElementById("creativeViewGateError");
+        const submit = document.getElementById("creativeViewGateSubmit");
+        const cancel = document.getElementById("creativeViewGateCancel");
+        const closeX = document.getElementById("creativeViewGateClose");
+        if (!overlay) return;
+
+        // Background-verify any existing cookie on page load — silently
+        // unlocks if still valid so a returning user never sees the modal.
+        fetch("/api/creative-gate", { credentials: "same-origin" })
+          .then((r) => r.json().catch(() => ({})))
+          .then((d) => {
+            if (d && d.ok) window._creativeViewUnlocked = true;
+          })
+          .catch(() => {});
+
+        async function tryUnlock() {
+          const pw = (input && input.value) || "";
+          if (err) err.classList.remove("shown");
+          if (submit) submit.disabled = true;
+          try {
+            const res = await fetch("/api/creative-gate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                password: pw,
+                remember: remember && remember.checked,
+              }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.ok) {
+              window._creativeViewUnlocked = true;
+              closeCreativeViewGate();
+              switchTab("creative");
+            } else {
+              if (err) {
+                err.textContent =
+                  data && data.error === "CREATIVE_KEY env var not configured"
+                    ? "Creative gate not configured on the server. Contact Ed."
+                    : "Wrong password.";
+                err.classList.add("shown");
+              }
+              if (input) {
+                input.focus();
+                input.select();
+              }
+            }
+          } catch (e) {
+            if (err) {
+              err.textContent = "Network error. Try again.";
+              err.classList.add("shown");
+            }
+          } finally {
+            if (submit) submit.disabled = false;
+          }
+        }
+
+        if (submit) submit.addEventListener("click", tryUnlock);
+        if (input) {
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              tryUnlock();
+            }
+          });
+        }
+        if (cancel) cancel.addEventListener("click", closeCreativeViewGate);
+        if (closeX) closeX.addEventListener("click", closeCreativeViewGate);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeCreativeViewGate();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("open")) {
+            closeCreativeViewGate();
+          }
+        });
       }
 
       function handleHash() {
