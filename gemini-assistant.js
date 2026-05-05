@@ -354,63 +354,35 @@
             thinkingConfig: { thinkingBudget: 0 },
           },
         };
-        var res = await fetch("/api/gemini?stream=1", {
+        var res = await fetch("/api/gemini", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if (!res.ok || !res.body) {
+        var data = await res.json();
+        if (data && data.error) {
           thinking.innerHTML =
-            "<em>Error: HTTP " + res.status + "</em>";
+            "<em>Error: " + escHtml(data.error.message || "unknown") + "</em>";
           return;
         }
-        thinking.innerHTML = "";
-        var reply = "";
-        var reader = res.body.getReader();
-        var decoder = new TextDecoder();
-        var buf = "";
-        while (true) {
-          var chunk = await reader.read();
-          if (chunk.done) break;
-          buf += decoder.decode(chunk.value, { stream: true });
-          var idx;
-          while ((idx = buf.indexOf("\n\n")) >= 0) {
-            var block = buf.slice(0, idx);
-            buf = buf.slice(idx + 2);
-            var event = "message";
-            var dataStr = "";
-            block.split("\n").forEach(function (line) {
-              if (line.indexOf("event: ") === 0) event = line.slice(7);
-              else if (line.indexOf("data: ") === 0) dataStr += line.slice(6);
-            });
-            if (!dataStr) continue;
-            var obj;
-            try {
-              obj = JSON.parse(dataStr);
-            } catch (er) {
-              continue;
-            }
-            if (event === "delta" && obj.text) {
-              reply += obj.text;
-              thinking.innerHTML = renderMd(reply);
-            } else if (event === "done") {
-              // Fallback when Vercel buffers and delta events don't stream:
-              // pull the full aggregated text from the done event.
-              if (!reply && obj.text) {
-                reply = obj.text;
-                thinking.innerHTML = renderMd(reply);
-              }
-            } else if (event === "error") {
-              thinking.innerHTML =
-                "<em>Error: " + escHtml(obj.message || "upstream") + "</em>";
-              return;
-            }
-          }
-        }
+        var reply = (
+          (data &&
+            data.candidates &&
+            data.candidates[0] &&
+            data.candidates[0].content &&
+            data.candidates[0].content.parts) ||
+          []
+        )
+          .map(function (p) {
+            return p.text || "";
+          })
+          .join("")
+          .trim();
         if (!reply) {
           thinking.innerHTML = "<em>(empty response)</em>";
           return;
         }
+        thinking.innerHTML = renderMd(reply);
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
       } catch (err) {
         thinking.innerHTML =

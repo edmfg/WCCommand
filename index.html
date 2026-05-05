@@ -9308,86 +9308,37 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
               },
             };
 
-            // Streaming via SSE — tokens append as they arrive.
-            const res = await fetch("/api/gemini?stream=1", {
+            const res = await fetch("/api/gemini", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
             });
-            if (!res.ok || !res.body) {
-              throw new Error(
-                "Stream failed: HTTP " +
-                  res.status +
-                  ". Try again or refresh.",
-              );
-            }
-            // Replace the placeholder typing indicator with a live message.
-            typingEl.style.opacity = "1";
-            typingEl.textContent = "";
-            const liveEl = typingEl;
-            let reply = "";
-            let groundingChunks = [];
-            let finishReason = null;
 
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-            let buf = "";
-            while (true) {
-              const { value, done } = await reader.read();
-              if (done) break;
-              buf += decoder.decode(value, { stream: true });
-              let idx;
-              while ((idx = buf.indexOf("\n\n")) >= 0) {
-                const block = buf.slice(0, idx);
-                buf = buf.slice(idx + 2);
-                let event = "message";
-                let dataStr = "";
-                for (const line of block.split("\n")) {
-                  if (line.startsWith("event: ")) event = line.slice(7);
-                  else if (line.startsWith("data: "))
-                    dataStr += line.slice(6);
-                }
-                if (!dataStr) continue;
-                let payload;
-                try {
-                  payload = JSON.parse(dataStr);
-                } catch (er) {
-                  continue;
-                }
-                if (event === "delta" && payload.text) {
-                  reply += payload.text;
-                  liveEl.innerHTML = renderMarkdown(reply);
-                  messages.scrollTop = messages.scrollHeight;
-                } else if (event === "done") {
-                  if (payload.finishReason) finishReason = payload.finishReason;
-                  if (Array.isArray(payload.groundingChunks))
-                    groundingChunks = payload.groundingChunks;
-                  // Vercel Node functions buffer the response, so delta
-                  // events may not actually stream — done carries the full
-                  // aggregated text as a fallback.
-                  if (!reply && payload.text) {
-                    reply = payload.text;
-                    liveEl.innerHTML = renderMarkdown(reply);
-                  }
-                } else if (event === "error") {
-                  throw new Error(payload.message || "Upstream error");
-                }
-              }
+            const data = await res.json();
+            if (data?.error) {
+              throw new Error(data.error.message || JSON.stringify(data.error));
             }
-
+            const candidate = data?.candidates?.[0];
+            let reply =
+              candidate?.content?.parts
+                ?.map((p) => p.text)
+                .filter(Boolean)
+                .join("\n") || "";
             if (!reply) {
-              reply = `No response generated${
-                finishReason ? " (" + finishReason + ")" : ""
-              }.`;
-              liveEl.innerHTML = renderMarkdown(reply);
-            } else if (finishReason === "MAX_TOKENS") {
+              const reason = candidate?.finishReason || "No content";
+              const block = data?.promptFeedback?.blockReason;
+              reply = block
+                ? `Response blocked (${block}). Try rephrasing.`
+                : `No response generated (${reason}).`;
+            } else if (candidate?.finishReason === "MAX_TOKENS") {
               reply += "\n\n_⚠ Response truncated — token cap reached._";
-              liveEl.innerHTML = renderMarkdown(reply);
             }
 
             // Surface grounding citations if the model used web search
-            if (groundingChunks && groundingChunks.length) {
-              const cites = groundingChunks
+            let citationsHtml = "";
+            const gm = candidate?.groundingMetadata;
+            if (gm?.groundingChunks?.length) {
+              const cites = gm.groundingChunks
                 .map((c) =>
                   c.web && c.web.uri
                     ? { uri: c.web.uri, title: c.web.title || c.web.uri }
@@ -9395,7 +9346,7 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
                 )
                 .filter(Boolean);
               if (cites.length) {
-                const citationsHtml =
+                citationsHtml =
                   `<div class="gemini-citations"><div class="gemini-citations-label">🌐 Sources from web search</div>` +
                   cites
                     .slice(0, 6)
@@ -9405,15 +9356,16 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
                     )
                     .join("") +
                   `</div>`;
-                liveEl.insertAdjacentHTML("beforeend", citationsHtml);
               }
             }
 
             chatHistory.push({ role: "model", parts: [{ text: reply }] });
+
+            typingEl.remove();
+            messages.innerHTML += `<div class="gemini-msg assistant">${renderMarkdown(reply)}${citationsHtml}</div>`;
           } catch (e) {
-            typingEl.style.opacity = "1";
-            typingEl.style.color = "#ff4444";
-            typingEl.textContent = "Error: " + (e.message || String(e));
+            typingEl.remove();
+            messages.innerHTML += `<div class="gemini-msg assistant" style="color:#ff4444">Error: ${escapeHtml(e.message)}</div>`;
           }
           messages.scrollTop = messages.scrollHeight;
         }
