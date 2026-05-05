@@ -754,10 +754,13 @@ a:hover { opacity: 0.8; }
 .triage-item.tag-talent       .triage-item-tag { background: rgba(251, 113, 133, 0.20); color: #fda4af; }
 .triage-item.tag-partnerships .triage-item-tag { background: rgba(45, 212, 191, 0.20); color: #99f6e4; }
 .triage-item.tag-legal        .triage-item-tag { background: rgba(148, 163, 184, 0.20); color: #cbd5e1; }
+.triage-item.tag-macro        { border-left-color: #6366f1; background: rgba(99, 102, 241, 0.10); }
+.triage-item.tag-macro        .triage-item-tag { background: rgba(99, 102, 241, 0.22); color: #a5b4fc; }
 .triage-group-header.tag-media        { color: #d9f99d; border-color: rgba(163,230,53,0.30); }
 .triage-group-header.tag-talent       { color: #fda4af; border-color: rgba(251,113,133,0.30); }
 .triage-group-header.tag-partnerships { color: #99f6e4; border-color: rgba(45,212,191,0.30); }
 .triage-group-header.tag-legal        { color: #cbd5e1; border-color: rgba(148,163,184,0.30); }
+.triage-group-header.tag-macro        { color: #a5b4fc; border-color: rgba(99,102,241,0.30); }
 .triage-group-header {
   font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
   color: var(--text-muted); padding: 4px 4px 2px;
@@ -1631,6 +1634,7 @@ a:hover { opacity: 0.8; }
             <option value="">All tags</option>
             <option value="creative">Creative</option>
             <option value="strategy">Strategy</option>
+            <option value="macro">Macro</option>
             <option value="activation">Activation</option>
             <option value="media">Media</option>
             <option value="production">Production</option>
@@ -2295,6 +2299,7 @@ a:hover { opacity: 0.8; }
     const s = String(text || '').toLowerCase();
     if (/\bcreative\b/.test(s)) return 'creative';
     if (/\bstrategy\b/.test(s) || /\bstrategic\b/.test(s)) return 'strategy';
+    if (/\bmacro\b/.test(s) || /\bfifa\b/.test(s) || /\btournament[- ]?wide\b/.test(s) || /\bprize pool\b/.test(s) || /\bpolicy\b/.test(s) || /\binfrastructure\b/.test(s) || /\bhost city\b|\bhost cities\b/.test(s) || /\btransit\b/.test(s) || /\bpricing\b/.test(s) || /\bticket(s|ing)?\b/.test(s) || /\bgeopolitic\w*\b/.test(s) || /\bregulation\b/.test(s) || /\beconomy\b|\beconomic\b/.test(s)) return 'macro';
     if (/\bactivation(s)?\b/.test(s) || /\bevent(s)?\b/.test(s) || /\bexperiential\b/.test(s)) return 'activation';
     if (/\bmedia\b/.test(s) || /\bpaid\b/.test(s)) return 'media';
     if (/\bproduction\b/.test(s) || /\bprod\b/.test(s)) return 'production';
@@ -3488,6 +3493,7 @@ window.clearAllData = function() {
   if (sbKey) sbKey.value = localStorage.getItem('mfg-supabase-key') || '';
 })();
 </script>
+<script src="countdown.js" defer></script>
 
 </body>
 </html>
