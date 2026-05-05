@@ -3628,8 +3628,11 @@
             const colEl = document.createElement("div");
             colEl.className = "triage-col";
             colEl.dataset.colIdx = String(ci);
+            // Saved width is treated as the flex basis (the column's "starting"
+            // width during resize), not a fixed cap — so columns still grow to
+            // fill the available screen width while preserving relative sizing.
             const savedWidth = triage.colWidths && triage.colWidths[col.id];
-            if (savedWidth) colEl.style.flex = "0 0 " + savedWidth + "px";
+            if (savedWidth) colEl.style.flex = "1 1 " + savedWidth + "px";
             const doneCount = col.items.filter(function (i) {
               return i.done;
             }).length;
@@ -3845,7 +3848,9 @@
                 function onMove(ev) {
                   const dx = ev.clientX - startX;
                   const next = Math.max(180, startWidth + dx);
-                  colEl.style.flex = "0 0 " + next + "px";
+                  // Match the renderer: keep flex-grow on so columns continue
+                  // to fill remaining width — saved width is the basis, not a cap.
+                  colEl.style.flex = "1 1 " + next + "px";
                   if (!triage.colWidths) triage.colWidths = {};
                   triage.colWidths[colId] = Math.round(next);
                 }
