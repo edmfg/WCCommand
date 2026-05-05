@@ -2865,7 +2865,16 @@
                     letter-spacing: 0.8px;
                     color: var(--text-muted);
                   "
-                  >Market <span style="color: var(--red)">*</span></label
+                  >Markets <span style="color: var(--red)">*</span>
+                  <span
+                    style="
+                      color: var(--text-muted);
+                      text-transform: none;
+                      letter-spacing: 0;
+                      font-size: 11px;
+                    "
+                    >(pick one or more)</span
+                  ></label
                 >
                 <div class="creative-market-chips" id="creativeMarketChips">
                   <button
@@ -5663,15 +5672,19 @@
         const toastEl = document.getElementById("creativeUploadToast");
         const recentList = document.getElementById("creativeRecentList");
 
-        let selectedMarket = null;
+        // Multi-select: each chip click toggles its own active state.
+        // Submitted as a comma-joined string (e.g. "Canada,USA").
+        function getSelectedMarkets() {
+          if (!chipsBar) return [];
+          return Array.from(chipsBar.querySelectorAll(".creative-chip.active")).map(
+            (c) => c.dataset.market,
+          );
+        }
         if (chipsBar) {
           chipsBar.addEventListener("click", function (e) {
             const chip = e.target.closest(".creative-chip");
             if (!chip) return;
-            chipsBar
-              .querySelectorAll(".creative-chip")
-              .forEach((c) => c.classList.toggle("active", c === chip));
-            selectedMarket = chip.dataset.market;
+            chip.classList.toggle("active");
           });
         }
 
@@ -5705,8 +5718,9 @@
           form.addEventListener("submit", async function (e) {
             e.preventDefault();
             showToast("");
-            if (!selectedMarket) {
-              showToast("Pick a market first.", true);
+            const markets = getSelectedMarkets();
+            if (markets.length === 0) {
+              showToast("Pick at least one market.", true);
               return;
             }
             const driveUrl = (driveInput.value || "").trim();
@@ -5731,12 +5745,16 @@
             }
             const title = (titleInput.value || "").trim();
             const channel = channelInput.value || "IG";
+            // Headline is NOT NULL on the table — fall back to a sensible
+            // auto-title when the user didn't supply one.
+            const headlineFallback =
+              "Creative — " + markets.join(" / ");
             submitBtn.disabled = true;
             submitBtn.textContent = "Publishing…";
             try {
               const { error } = await sb.from("creative_assets").insert({
-                headline: title || null,
-                market: selectedMarket,
+                headline: title || headlineFallback,
+                market: markets.join(","),
                 format: "Drive",
                 status: "Live",
                 deploy_date: startDate,
@@ -5754,7 +5772,6 @@
               chipsBar
                 .querySelectorAll(".creative-chip")
                 .forEach((c) => c.classList.remove("active"));
-              selectedMarket = null;
               loadRecentCreativeUploads();
             } catch (err) {
               console.error("creative upload failed", err);
@@ -5832,7 +5849,13 @@
                   "</div>" +
                   '<div class="creative-recent-meta">' +
                   '<span>' +
-                  escapeHtml(r.market || "—") +
+                  escapeHtml(
+                    (r.market || "—")
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                      .join(" · ") || "—"
+                  ) +
                   "</span>" +
                   '<span>' +
                   escapeHtml(r.channel || "IG") +

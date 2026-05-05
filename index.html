@@ -11379,12 +11379,21 @@
         }
       }
 
+      function assetMatchesMarket(a, filter) {
+        if (filter === "All") return true;
+        if (!a.market) return false;
+        // A creative can be tagged to multiple markets, stored comma-joined.
+        return a.market
+          .split(",")
+          .map((s) => s.trim())
+          .includes(filter);
+      }
       function renderAssets(filter = "All") {
         const grid = document.getElementById("assetsGrid");
         if (!grid) return;
         const all = getAssetsForSubtab("engine");
         const filtered = all.filter(
-          (a) => (filter === "All" || a.market === filter) && matchesSearch(a),
+          (a) => assetMatchesMarket(a, filter) && matchesSearch(a),
         );
 
         const unlocked = isCreativeUnlocked();
