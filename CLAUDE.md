@@ -1,8 +1,10 @@
 # MFG World Cup HQ — project notes for Claude
 
-A two-page static site that ships as a Vercel deployment, plus three small serverless functions and a Supabase project for shared state. Audience is the MFG strategy team running reactive Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada / Mexico / USA).
+A two-page static site that ships as a Vercel deployment, plus a handful of small serverless functions and a Supabase project for shared state. Audience is the MFG strategy team running reactive Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada / Mexico / USA).
 
 There is no build step. Edit the HTML / JS files directly and push to `main`; Vercel auto-deploys on push.
+
+**Important — content lives in `data.js`, not `index.html`.** The `DASHBOARD_DATA` literal (news, social, ticker, fixtures, assets) was extracted into a separate `data.js` file in May 2026 so the HTML can be cached long-term and parses faster on first paint. `index.html` loads `<script src="data.js">` synchronously before its inline init script, then reads `window.DASHBOARD_DATA`. Daily refreshes edit `data.js`; never paste the literal back into `index.html`.
 
 ---
 
@@ -135,7 +137,7 @@ A scheduled remote agent was set up at one point to auto-refresh content via Gem
 When the user types **"refresh everything"** (or "refresh content" / "do the daily" / "pull fresh news"):
 
 - Search the web AND Reddit (r/soccer, r/worldcup, team-specific subs) for the past 24–48h of WC2026 news, fan reactions, and cultural moments. Reddit is a first-class source, not an afterthought.
-- Edit `index.html` `DASHBOARD_DATA`:
+- Edit `data.js` (the `window.DASHBOARD_DATA` object lives there now):
   - `news[]` — prepend ~5–10 items, each with the right `tag` (Canada / USA / Germany / UK / Macro / Global).
   - `social[]` — prepend ~5 items, each with the right `category`, `volume`, `sentiment`, AND a non-empty `platforms` array (mandatory — the renderer crashes if it's missing).
   - `ticker[]` — prepend ~5 items.
