@@ -192,9 +192,16 @@
     tick(pill);
   }
 
+  function lazyInit() {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(init, { timeout: 1500 });
+    } else {
+      setTimeout(init, 200);
+    }
+  }
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", lazyInit);
   } else {
-    init();
+    lazyInit();
   }
 })();

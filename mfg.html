@@ -2811,16 +2811,44 @@
               "
             ></span>
           </div>
-          <p
+          <div
             style="
-              color: var(--text-muted);
-              font-size: 12px;
-              margin: -4px 0 12px;
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              margin: 4px 0 12px;
+              flex-wrap: wrap;
             "
           >
-            Full archive of every Drive link MFG has published. Hover any card
-            to delete.
-          </p>
+            <p
+              style="
+                color: var(--text-muted);
+                font-size: 12px;
+                margin: 0;
+                flex: 1;
+                min-width: 240px;
+              "
+            >
+              Full archive of every Drive link MFG has published. Hover any
+              card to delete.
+            </p>
+            <input
+              type="search"
+              id="creativeAllSearch"
+              placeholder="🔍 Filter title, market, channel, bento…"
+              style="
+                width: 280px;
+                max-width: 100%;
+                padding: 8px 14px;
+                border-radius: 999px;
+                background: var(--bg);
+                border: 1px solid var(--glass-border);
+                color: var(--text);
+                font-size: 12px;
+                font-family: inherit;
+              "
+            />
+          </div>
           <div
             id="creativeAllList"
             style="
@@ -2836,7 +2864,6 @@
     <script>
       (function () {
         // --- Constants ---
-        const PASSWORD = "mfg";
         const SUPABASE_URL = "https://ypisjfefbccgtxesteja.supabase.co";
         const SUPABASE_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
         let supabase = null;
@@ -2893,16 +2920,49 @@
           marketSelect.focus();
         }
 
-        function tryAuth() {
-          if (gateInput.value === PASSWORD) {
-            if (currentMarket && currentUserLabel) showApp();
-            else showMarketGate();
-          } else {
+        // Server-side gate. Falls back to GATE_PASSWORD if MFG_KEY isn't set
+        // on Vercel yet, so this keeps working during the env-var migration.
+        async function tryAuth() {
+          const pw = gateInput.value;
+          gateBtn.disabled = true;
+          try {
+            const res = await fetch("/api/mfg-gate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify({ password: pw }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.ok) {
+              if (currentMarket && currentUserLabel) showApp();
+              else showMarketGate();
+            } else {
+              gateError.style.display = "block";
+              gateInput.value = "";
+              gateInput.focus();
+            }
+          } catch (e) {
             gateError.style.display = "block";
-            gateInput.value = "";
-            gateInput.focus();
+            gateError.textContent =
+              "Network error. Check your connection and try again.";
+          } finally {
+            gateBtn.disabled = false;
           }
         }
+
+        // Skip the gate if a valid cookie is already present.
+        (async function preauth() {
+          try {
+            const res = await fetch("/api/mfg-gate", {
+              credentials: "same-origin",
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data && data.ok) {
+              if (currentMarket && currentUserLabel) showApp();
+              else showMarketGate();
+            }
+          } catch (e) {}
+        })();
 
         // --- Global Triage (Supabase synced, MFG-shared) ---
         const TRIAGE_KEY = "mfg_global_triage_v1";
@@ -3909,6 +3969,36 @@
             t.style.opacity = "0";
           }, 1800);
         }
+        // Undo toast for triage item deletion. Shows a button for 5s; clicking
+        // it splices the item back into its original position.
+        function showTriageUndo(item, ci, ii) {
+          if (!item) return;
+          const t = document.getElementById("triageToast");
+          if (!t) return;
+          t.innerHTML = "";
+          const label = document.createElement("span");
+          label.textContent = "Item deleted";
+          const btn = document.createElement("button");
+          btn.textContent = "Undo";
+          btn.style.cssText =
+            "margin-left:12px;padding:3px 10px;border-radius:6px;background:transparent;border:1px solid var(--gold);color:var(--gold);font:inherit;font-size:11px;cursor:pointer;";
+          btn.addEventListener("click", function () {
+            if (!triage.columns[ci]) return;
+            const insertAt = Math.min(ii, triage.columns[ci].items.length);
+            triage.columns[ci].items.splice(insertAt, 0, item);
+            saveTriage(triage);
+            renderTriage();
+            t.style.opacity = "0";
+            clearTimeout(triageToast._t);
+          });
+          t.appendChild(label);
+          t.appendChild(btn);
+          t.style.opacity = "1";
+          clearTimeout(triageToast._t);
+          triageToast._t = setTimeout(function () {
+            t.style.opacity = "0";
+          }, 5000);
+        }
 
         const board = document.getElementById("triageBoard");
         if (board) {
@@ -3959,9 +4049,10 @@
               const id = "item-" + ci + "-" + ii;
               if (triageArmed === id) {
                 disarm();
-                triage.columns[ci].items.splice(ii, 1);
+                const removed = triage.columns[ci].items.splice(ii, 1)[0];
                 saveTriage(triage);
                 renderTriage();
+                showTriageUndo(removed, ci, ii);
               } else {
                 arm(id);
               }
@@ -4962,6 +5053,49 @@
         const allList = document.getElementById("creativeAllList");
         const allCountEl = document.getElementById("creativeAllCount");
         const sortSelect = document.getElementById("creativeUploadSort");
+        const allSearch = document.getElementById("creativeAllSearch");
+        let _allUploadsCache = [];
+        let _allSearchTimer = null;
+        if (allSearch) {
+          allSearch.addEventListener("input", function () {
+            clearTimeout(_allSearchTimer);
+            _allSearchTimer = setTimeout(renderAllFiltered, 150);
+          });
+        }
+        function renderAllFiltered() {
+          if (!allList) return;
+          const q = (allSearch && allSearch.value.trim().toLowerCase()) || "";
+          let rows = _allUploadsCache;
+          if (q) {
+            rows = rows.filter((r) => {
+              const hay = [
+                r.headline,
+                r.market,
+                r.channel,
+                r.bento,
+                r.uploaded_by,
+              ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+              return hay.indexOf(q) >= 0;
+            });
+          }
+          if (allCountEl)
+            allCountEl.textContent =
+              q && rows.length !== _allUploadsCache.length
+                ? rows.length + " of " + _allUploadsCache.length
+                : _allUploadsCache.length + " total";
+          if (rows.length === 0) {
+            allList.innerHTML =
+              '<p style="color:var(--text-muted);font-size:13px">' +
+              (q ? "No matches." : "Nothing yet.") +
+              "</p>";
+            return;
+          }
+          allList.innerHTML = sortUploads(rows).map(renderUploadCard).join("");
+          wireDeleteButtons(allList);
+        }
 
         function getUploadSortMode() {
           return (sortSelect && sortSelect.value) || "newest";
@@ -5329,14 +5463,8 @@
             if (error) throw error;
             if (allCountEl)
               allCountEl.textContent = (data ? data.length : 0) + " total";
-            if (!data || data.length === 0) {
-              allList.innerHTML =
-                '<p style="color:var(--text-muted);font-size:13px">Nothing yet.</p>';
-              return;
-            }
-            const sortedAll = sortUploads(data);
-            allList.innerHTML = sortedAll.map(renderUploadCard).join("");
-            wireDeleteButtons(allList);
+            _allUploadsCache = data || [];
+            renderAllFiltered();
           } catch (err) {
             console.error("all uploads load failed", err);
             allList.innerHTML =

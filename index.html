@@ -2428,6 +2428,119 @@
       }
 
       /* ── CARD EXPAND MODAL ── */
+      /* ── Bookmarks bar (pinned cards) ── */
+      .bookmarks-bar {
+        background: rgba(255, 215, 0, 0.06);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+      }
+      .bookmarks-bar[hidden] {
+        display: none;
+      }
+      .bookmarks-bar-head {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: var(--gold);
+      }
+      .bookmarks-bar-count {
+        font-size: 11px;
+        color: var(--text-dim);
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .bookmarks-bar-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .bookmark-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 280px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 215, 0, 0.28);
+        color: var(--text);
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .bookmark-chip:hover {
+        background: rgba(255, 215, 0, 0.12);
+        border-color: var(--gold);
+      }
+      .bookmark-chip-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+      }
+      .bookmark-chip-x {
+        color: var(--text-dim);
+        margin-left: 2px;
+        cursor: pointer;
+      }
+      .bookmark-chip-x:hover {
+        color: #fff;
+      }
+      body.light .bookmarks-bar {
+        background: rgba(255, 195, 0, 0.1);
+        border-color: rgba(255, 195, 0, 0.4);
+      }
+      body.light .bookmarks-bar-head {
+        color: #b88200;
+      }
+
+      /* ── "What's new" tab badges ── */
+      .whats-new-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 6px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--gold), var(--red));
+        color: #1a1a2e;
+        font-size: 10px;
+        font-weight: 700;
+        font-family: "Inter", sans-serif;
+        letter-spacing: 0;
+        line-height: 1;
+        vertical-align: 2px;
+        animation: whats-new-pulse 1.6s ease-in-out infinite;
+      }
+      .whats-new-badge[hidden] {
+        display: none;
+      }
+      @keyframes whats-new-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.55);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(255, 215, 0, 0);
+        }
+      }
+
       /* ── Keyboard shortcuts overlay ── */
       .shortcuts-overlay {
         position: fixed;
@@ -5508,9 +5621,15 @@
           ><span class="beta-badge">BETA v2.9</span></a
         >
         <nav class="header-nav">
-          <button class="tab-btn active" data-tab="live">Live</button>
-          <button class="tab-btn" data-tab="calendar">Fixtures</button>
-          <button class="tab-btn" data-tab="creative">Creative</button>
+          <button class="tab-btn active" data-tab="live"
+            >Live<span class="whats-new-badge" data-whats-new="live" hidden></span
+          ></button>
+          <button class="tab-btn" data-tab="calendar"
+            >Fixtures<span class="whats-new-badge" data-whats-new="calendar" hidden></span
+          ></button>
+          <button class="tab-btn" data-tab="creative"
+            >Creative<span class="whats-new-badge" data-whats-new="creative" hidden></span
+          ></button>
         </nav>
         <div class="header-actions">
           <button class="help-link" id="helpBtn" type="button">
@@ -5560,6 +5679,14 @@
 
       <!-- LIVE -->
       <div class="tab-panel active" id="panel-live">
+        <!-- Pinned cards strip (shows whatever the user has starred) -->
+        <div id="bookmarksBar" class="bookmarks-bar" hidden>
+          <div class="bookmarks-bar-head">
+            <span>★ Pinned</span>
+            <span class="bookmarks-bar-count" id="bookmarksCount"></span>
+          </div>
+          <div class="bookmarks-bar-list" id="bookmarksList"></div>
+        </div>
         <div class="live-filters" id="liveFilters"></div>
 
         <!-- Sentiment Heatmap -->
@@ -10388,7 +10515,9 @@
         renderLiveFilters();
         renderNews();
         renderSocial();
-        renderMatches();
+        // Fixtures rendering is heavy (104 matches + standings). Defer it
+        // until the user actually opens the Fixtures tab — switchTab handles
+        // the lazy first paint.
         renderAssets();
         renderSubtabAssets("genius");
         renderSubtabAssets("s2");
@@ -10733,6 +10862,9 @@
         savePinned(pinned);
         renderNews();
         renderSocial();
+        try {
+          renderBookmarksBar();
+        } catch (e) {}
       }
 
       function createCarousel(containerId, dotsId, interval = 5000) {
@@ -11043,6 +11175,27 @@
         document
           .getElementById("heatmapClear")
           ?.addEventListener("click", clearHeatmapFilter);
+
+        // Flash the heatmap open briefly on the first dashboard visit so
+        // people notice it exists, then auto-collapse. Skip after the user
+        // has manually engaged the toggle (we just key off "have they seen
+        // the flash yet").
+        try {
+          const SEEN_KEY = "wcc_heatmap_flash_seen_v1";
+          if (!localStorage.getItem(SEEN_KEY) && wrap) {
+            // Wait until the first paint settles, then expand for a few
+            // seconds and collapse again.
+            setTimeout(() => {
+              wrap.classList.remove("collapsed");
+              btn?.setAttribute("aria-expanded", "true");
+              setTimeout(() => {
+                wrap.classList.add("collapsed");
+                btn?.setAttribute("aria-expanded", "false");
+              }, 2800);
+            }, 900);
+            localStorage.setItem(SEEN_KEY, "1");
+          }
+        } catch (e) {}
       }
 
       function classifySocialMarket(s) {
@@ -12287,6 +12440,150 @@
           btn.addEventListener("click", () => switchTab(btn.dataset.tab));
         });
         setupCreativeViewGate();
+        renderWhatsNewBadges();
+        renderBookmarksBar();
+      }
+
+      // ── "What's new since last visit" badges ──
+      // Tracks the last time the user viewed each tab and counts items
+      // newer than that timestamp. Click the tab → counter clears.
+      const WHATS_NEW_KEY = "wcc_last_tab_visit_v1";
+      function getLastVisitMap() {
+        try {
+          return JSON.parse(localStorage.getItem(WHATS_NEW_KEY) || "{}") || {};
+        } catch (e) {
+          return {};
+        }
+      }
+      function setLastVisit(tab) {
+        try {
+          const m = getLastVisitMap();
+          m[tab] = Date.now();
+          localStorage.setItem(WHATS_NEW_KEY, JSON.stringify(m));
+        } catch (e) {}
+      }
+      function countNewSince(items, ts, getDate) {
+        if (!ts || !items) return 0;
+        let n = 0;
+        for (const it of items) {
+          const d = getDate(it);
+          if (!d) continue;
+          const t = Date.parse(d);
+          if (!isNaN(t) && t > ts) n++;
+        }
+        return n;
+      }
+      function renderWhatsNewBadges() {
+        const map = getLastVisitMap();
+        const liveTs = map.live || 0;
+        const fixturesTs = map.calendar || 0;
+        const creativeTs = map.creative || 0;
+        // Live = news + social created since last live-visit
+        const liveCount =
+          countNewSince(
+            DASHBOARD_DATA.news || [],
+            liveTs,
+            (n) => n.timestamp,
+          ) +
+          countNewSince(
+            DASHBOARD_DATA.social || [],
+            liveTs,
+            (s) => s.timestamp || s.sourceTimestamp,
+          );
+        // Fixtures = matches whose date is today/tomorrow not previously surfaced
+        const now = Date.now();
+        const upcomingSoon = (DASHBOARD_DATA.matches || []).filter((m) => {
+          const t = matchKickoffTs(m);
+          return t && t >= now && t <= now + 24 * 60 * 60 * 1000;
+        }).length;
+        const fixturesCount = fixturesTs ? upcomingSoon : 0;
+        // Creative = creative_assets we don't have a count for client-side
+        // (Supabase-backed). Skip for now.
+        const creativeCount = 0;
+        setBadge("live", liveCount);
+        setBadge("calendar", fixturesCount);
+        setBadge("creative", creativeCount);
+      }
+      function renderBookmarksBar() {
+        const bar = document.getElementById("bookmarksBar");
+        const list = document.getElementById("bookmarksList");
+        const count = document.getElementById("bookmarksCount");
+        if (!bar || !list) return;
+        const pinned = loadPinned();
+        const ids = Array.from(pinned);
+        if (ids.length === 0) {
+          bar.hidden = true;
+          return;
+        }
+        const newsById = new Map((DASHBOARD_DATA.news || []).map((n) => [n.id, n]));
+        const socialById = new Map(
+          (DASHBOARD_DATA.social || []).map((s) => [s.id, s]),
+        );
+        const items = ids
+          .map((id) => {
+            if (newsById.has(id))
+              return { id, kind: "news", label: newsById.get(id).headline };
+            if (socialById.has(id))
+              return { id, kind: "social", label: socialById.get(id).topic };
+            return null;
+          })
+          .filter(Boolean);
+        if (items.length === 0) {
+          bar.hidden = true;
+          return;
+        }
+        bar.hidden = false;
+        if (count)
+          count.textContent =
+            items.length + " card" + (items.length === 1 ? "" : "s");
+        list.innerHTML = items
+          .map(
+            (i) =>
+              `<button class="bookmark-chip" data-bm-id="${escapeHtml(i.id)}" data-bm-kind="${i.kind}" title="${escapeHtml(i.label || "")}"><span class="bookmark-chip-text">${escapeHtml(i.label || "(untitled)")}</span><span class="bookmark-chip-x" data-bm-unpin="${escapeHtml(i.id)}" aria-label="Unpin">×</span></button>`,
+          )
+          .join("");
+        list.querySelectorAll(".bookmark-chip").forEach((chip) => {
+          chip.addEventListener("click", (e) => {
+            // Unpin click target
+            if (e.target.classList.contains("bookmark-chip-x")) {
+              e.stopPropagation();
+              const id = e.target.dataset.bmUnpin;
+              const set = loadPinned();
+              set.delete(id);
+              localStorage.setItem(PINNED_LS_KEY, JSON.stringify([...set]));
+              renderBookmarksBar();
+              try {
+                renderNews();
+                renderSocial();
+              } catch (er) {}
+              return;
+            }
+            const id = chip.dataset.bmId;
+            const kind = chip.dataset.bmKind;
+            const card = document.querySelector(
+              `[data-card-type="${kind}"][data-card-id="${id}"]`,
+            );
+            if (card) {
+              card.scrollIntoView({ behavior: "smooth", block: "center" });
+              card.style.transition = "outline 0.4s ease";
+              card.style.outline = "2px solid var(--gold)";
+              setTimeout(() => (card.style.outline = ""), 1200);
+            }
+          });
+        });
+      }
+      function setBadge(tab, n) {
+        const el = document.querySelector(
+          `.whats-new-badge[data-whats-new="${tab}"]`,
+        );
+        if (!el) return;
+        if (!n || n <= 0) {
+          el.hidden = true;
+          el.textContent = "";
+        } else {
+          el.hidden = false;
+          el.textContent = n > 99 ? "99+" : String(n);
+        }
       }
 
       function switchTab(tab, opts) {
@@ -12309,6 +12606,20 @@
         ) {
           tab = "live";
         }
+        // Lazy first paint for the Fixtures tab — saves work on initial load.
+        if (tab === "calendar" && !window._matchesRendered) {
+          try {
+            renderMatches();
+          } catch (e) {
+            console.error("renderMatches failed", e);
+          }
+          window._matchesRendered = true;
+        }
+        // Mark this tab as visited and clear its "what's new" badge.
+        try {
+          setLastVisit(tab);
+          setBadge(tab, 0);
+        } catch (e) {}
         document
           .querySelectorAll(".tab-btn")
           .forEach((b) => b.classList.remove("active"));

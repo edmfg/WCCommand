@@ -583,9 +583,16 @@
     showCoachMark();
   }
 
+  function lazyInit() {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(init, { timeout: 2000 });
+    } else {
+      setTimeout(init, 250);
+    }
+  }
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", lazyInit);
   } else {
-    init();
+    lazyInit();
   }
 })();

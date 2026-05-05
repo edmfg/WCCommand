@@ -2,6 +2,8 @@
   "rewrites": [
     { "source": "/api/gemini", "destination": "/api/gemini" },
     { "source": "/api/gate", "destination": "/api/gate" },
-    { "source": "/api/creative-gate", "destination": "/api/creative-gate" }
+    { "source": "/api/creative-gate", "destination": "/api/creative-gate" },
+    { "source": "/api/mfg-gate", "destination": "/api/mfg-gate" },
+    { "source": "/api/health", "destination": "/api/health" }
   ]
 }
