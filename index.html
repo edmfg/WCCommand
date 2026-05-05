@@ -12209,14 +12209,10 @@
         const closeX = document.getElementById("creativeViewGateClose");
         if (!overlay) return;
 
-        // Background-verify any existing cookie on page load — silently
-        // unlocks if still valid so a returning user never sees the modal.
-        fetch("/api/creative-gate", { credentials: "same-origin" })
-          .then((r) => r.json().catch(() => ({})))
-          .then((d) => {
-            if (d && d.ok) window._creativeViewUnlocked = true;
-          })
-          .catch(() => {});
+        // No page-load cookie pre-check. The gate shows on the first Creative
+        // click of every page session; once the user types the password, an
+        // in-memory flag keeps subsequent clicks from re-prompting until the
+        // page is reloaded.
 
         async function tryUnlock() {
           const pw = (input && input.value) || "";
