@@ -5470,7 +5470,49 @@
           </button>
         </div>
         <div class="sub-panel active" id="sub-wc-engine" data-subtab="engine">
-          <div class="filter-bar" id="filterBar"></div>
+          <div
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 12px;
+              margin-bottom: 14px;
+            "
+          >
+            <div class="filter-bar" id="filterBar" style="margin: 0"></div>
+            <span style="flex: 1"></span>
+            <label
+              for="assetSort"
+              style="
+                font-family:
+                  'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
+                  'Noto Color Emoji', sans-serif;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 1.4px;
+                text-transform: uppercase;
+                color: var(--text-dim);
+              "
+              >Sort</label
+            >
+            <select
+              id="assetSort"
+              style="
+                padding: 7px 12px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                color: var(--text);
+                font-size: 12px;
+                font-family: inherit;
+              "
+            >
+              <option value="newest">🆕 Newest first</option>
+              <option value="oldest">⏳ Oldest first</option>
+              <option value="live-soonest">🚀 Live date — soonest</option>
+              <option value="live-latest">🛬 Live date — latest</option>
+            </select>
+          </div>
           <div class="assets-grid" id="assetsGrid"></div>
         </div>
         <div class="sub-panel" id="sub-yt-genius" data-subtab="genius">
@@ -11423,7 +11465,9 @@
               setCreativeUnlocked(false);
               return;
             }
-            openCreativeUnlockModal();
+            // Redirect to MFG mode — uploads happen there now (Creative
+            // Uploads tab). The MFG page has its own password gate.
+            window.location.href = "mfg.html#mfg-creative";
           });
         document
           .querySelectorAll(".creative-upload-btn, .creative-upload-tile")
@@ -11726,13 +11770,58 @@
           .map((s) => s.trim())
           .includes(filter);
       }
+      function sortAssets(arr, mode) {
+        const ts = (s) => {
+          const t = s ? Date.parse(s) : NaN;
+          return isNaN(t) ? 0 : t;
+        };
+        const cpy = arr.slice();
+        if (mode === "oldest")
+          cpy.sort((a, b) => ts(a.createdAt) - ts(b.createdAt));
+        else if (mode === "live-soonest")
+          cpy.sort((a, b) => {
+            const ad = ts(a.deployDate),
+              bd = ts(b.deployDate);
+            // Items without a deploy date sink to the bottom.
+            if (!ad && !bd) return 0;
+            if (!ad) return 1;
+            if (!bd) return -1;
+            return ad - bd;
+          });
+        else if (mode === "live-latest")
+          cpy.sort((a, b) => ts(b.deployDate) - ts(a.deployDate));
+        else
+          // newest first (default)
+          cpy.sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
+        return cpy;
+      }
+      function getAssetSortMode() {
+        const sel = document.getElementById("assetSort");
+        return sel ? sel.value : "newest";
+      }
+      // Wire the sort dropdown once.
+      (function bindAssetSort() {
+        document.addEventListener("DOMContentLoaded", () => {
+          const sel = document.getElementById("assetSort");
+          if (sel && !sel._wired) {
+            sel._wired = true;
+            sel.addEventListener("change", () => {
+              const activeMarket =
+                document.querySelector("#filterBar .filter-pill.active")?.dataset
+                  .market || "All";
+              renderAssets(activeMarket);
+            });
+          }
+        });
+      })();
       function renderAssets(filter = "All") {
         const grid = document.getElementById("assetsGrid");
         if (!grid) return;
         const all = getAssetsForSubtab("engine");
-        const filtered = all.filter(
+        let filtered = all.filter(
           (a) => assetMatchesMarket(a, filter) && matchesSearch(a),
         );
+        filtered = sortAssets(filtered, getAssetSortMode());
 
         const unlocked = isCreativeUnlocked();
         const uploadCard = unlocked

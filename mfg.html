@@ -3217,10 +3217,49 @@
           </div>
 
           <div
-            class="section-title"
-            style="font-size: 14px; margin-bottom: 12px"
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 12px;
+              margin-bottom: 12px;
+            "
           >
-            Recent uploads
+            <div
+              class="section-title"
+              style="font-size: 14px; margin: 0"
+            >
+              Recent uploads
+            </div>
+            <span style="flex: 1"></span>
+            <label
+              for="creativeUploadSort"
+              style="
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 1.4px;
+                text-transform: uppercase;
+                color: var(--text-muted);
+              "
+              >Sort</label
+            >
+            <select
+              id="creativeUploadSort"
+              style="
+                padding: 6px 12px;
+                border-radius: 999px;
+                background: var(--bg);
+                border: 1px solid var(--glass-border);
+                color: var(--text);
+                font-size: 12px;
+                font-family: inherit;
+              "
+            >
+              <option value="newest">🆕 Newest first</option>
+              <option value="oldest">⏳ Oldest first</option>
+              <option value="live-soonest">🚀 Live date — soonest</option>
+              <option value="live-latest">🛬 Live date — latest</option>
+            </select>
           </div>
           <div
             id="creativeRecentList"
@@ -5838,6 +5877,41 @@
         const recentList = document.getElementById("creativeRecentList");
         const allList = document.getElementById("creativeAllList");
         const allCountEl = document.getElementById("creativeAllCount");
+        const sortSelect = document.getElementById("creativeUploadSort");
+
+        function getUploadSortMode() {
+          return (sortSelect && sortSelect.value) || "newest";
+        }
+        function sortUploads(arr) {
+          const ts = (s) => {
+            const t = s ? Date.parse(s) : NaN;
+            return isNaN(t) ? 0 : t;
+          };
+          const cpy = arr.slice();
+          const mode = getUploadSortMode();
+          if (mode === "oldest") {
+            cpy.sort((a, b) => ts(a.created_at) - ts(b.created_at));
+          } else if (mode === "live-soonest") {
+            cpy.sort((a, b) => {
+              const ad = ts(a.deploy_date),
+                bd = ts(b.deploy_date);
+              if (!ad && !bd) return 0;
+              if (!ad) return 1;
+              if (!bd) return -1;
+              return ad - bd;
+            });
+          } else if (mode === "live-latest") {
+            cpy.sort((a, b) => ts(b.deploy_date) - ts(a.deploy_date));
+          } else {
+            cpy.sort((a, b) => ts(b.created_at) - ts(a.created_at));
+          }
+          return cpy;
+        }
+        if (sortSelect) {
+          sortSelect.addEventListener("change", function () {
+            loadRecentCreativeUploads();
+          });
+        }
 
         // Markets — multi-select. Submitted as a comma-joined string.
         function getSelectedMarkets() {
@@ -6140,7 +6214,8 @@
               recentList.innerHTML =
                 '<p style="color:var(--text-muted);font-size:13px">No Drive uploads yet. Add your first link above.</p>';
             } else {
-              recentList.innerHTML = data.map(renderUploadCard).join("");
+              const sorted = sortUploads(data);
+              recentList.innerHTML = sorted.map(renderUploadCard).join("");
               wireDeleteButtons(recentList);
             }
             loadAllCreativeUploads();
@@ -6175,7 +6250,8 @@
                 '<p style="color:var(--text-muted);font-size:13px">Nothing yet.</p>';
               return;
             }
-            allList.innerHTML = data.map(renderUploadCard).join("");
+            const sortedAll = sortUploads(data);
+            allList.innerHTML = sortedAll.map(renderUploadCard).join("");
             wireDeleteButtons(allList);
           } catch (err) {
             console.error("all uploads load failed", err);
