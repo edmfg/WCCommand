@@ -12098,10 +12098,25 @@
         setupCreativeViewGate();
       }
 
-      function switchTab(tab) {
-        if (tab === "creative" && !window._creativeViewUnlocked) {
+      function switchTab(tab, opts) {
+        opts = opts || {};
+        if (
+          tab === "creative" &&
+          !window._creativeViewUnlocked &&
+          !opts.suppressGate
+        ) {
           openCreativeViewGate();
           return;
+        }
+        // Hash-driven navigation (refresh, deep link) hits this path with
+        // suppressGate=true. If the user isn't unlocked, silently fall back
+        // to the Live tab instead of yelling at them with a modal.
+        if (
+          tab === "creative" &&
+          !window._creativeViewUnlocked &&
+          opts.suppressGate
+        ) {
+          tab = "live";
         }
         document
           .querySelectorAll(".tab-btn")
@@ -12224,7 +12239,8 @@
 
       function handleHash() {
         const hash = location.hash.replace("#", "");
-        if (["live", "calendar", "creative"].includes(hash)) switchTab(hash);
+        if (["live", "calendar", "creative"].includes(hash))
+          switchTab(hash, { suppressGate: true });
       }
       window.addEventListener("hashchange", handleHash);
 
