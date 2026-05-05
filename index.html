@@ -2081,6 +2081,66 @@
         justify-content: flex-end;
         margin-top: 18px;
       }
+      /* Cleaner buttons specifically for the Creative gate modal */
+      .creative-gate-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 22px;
+      }
+      .creative-gate-btn {
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease,
+          transform 0.1s ease,
+          box-shadow 0.15s ease;
+      }
+      .creative-gate-btn:active {
+        transform: translateY(1px);
+      }
+      .creative-gate-btn-ghost {
+        background: transparent;
+        border-color: rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, 0.78);
+      }
+      .creative-gate-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.28);
+        color: #fff;
+      }
+      .creative-gate-btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+      }
+      .creative-gate-btn-primary:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 6px 22px rgba(99, 102, 241, 0.5);
+      }
+      .creative-gate-btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: none;
+      }
+      body.light .creative-gate-btn-ghost {
+        border-color: rgba(0, 0, 0, 0.18);
+        color: rgba(0, 0, 0, 0.7);
+      }
+      body.light .creative-gate-btn-ghost:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: #000;
+      }
       .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -5762,40 +5822,25 @@
           placeholder="Password"
           autocomplete="current-password"
         />
-        <label
-          style="
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 12px 0 4px;
-            font-size: 12px;
-            color: var(--text-dim);
-            cursor: pointer;
-            user-select: none;
-          "
-        >
-          <input type="checkbox" id="creativeViewGateRemember" />
-          <span>Remember for 7 days on this device</span>
-        </label>
         <p
           id="creativeViewGateError"
           class="creative-unlock-error"
           role="alert"
         ></p>
-        <div class="creative-unlock-actions">
+        <div class="creative-gate-actions">
           <button
-            class="btn-secondary"
+            class="creative-gate-btn creative-gate-btn-ghost"
             id="creativeViewGateCancel"
             type="button"
           >
             Cancel
           </button>
           <button
-            class="btn-primary"
+            class="creative-gate-btn creative-gate-btn-primary"
             id="creativeViewGateSubmit"
             type="button"
           >
-            Unlock
+            Unlock →
           </button>
         </div>
       </div>
@@ -12158,7 +12203,6 @@
       function setupCreativeViewGate() {
         const overlay = document.getElementById("creativeViewGateOverlay");
         const input = document.getElementById("creativeViewGateInput");
-        const remember = document.getElementById("creativeViewGateRemember");
         const err = document.getElementById("creativeViewGateError");
         const submit = document.getElementById("creativeViewGateSubmit");
         const cancel = document.getElementById("creativeViewGateCancel");
@@ -12185,7 +12229,7 @@
               credentials: "same-origin",
               body: JSON.stringify({
                 password: pw,
-                remember: remember && remember.checked,
+                remember: false,
               }),
             });
             const data = await res.json().catch(() => ({}));
