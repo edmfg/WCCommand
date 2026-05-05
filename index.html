@@ -4795,6 +4795,35 @@
         var pwInput = document.getElementById("gatePassword");
         var rememberInput = document.getElementById("gateRemember");
         var errEl = document.getElementById("gateError");
+        var REMEMBER_KEY = "wcc_gate_remember_until";
+        var REMEMBER_MS = 7 * 24 * 60 * 60 * 1000;
+        // Local hint (synchronous, beats network) so a remembered user never
+        // flashes the gate. Set to slightly under 7 days so the local hint
+        // expires before the server cookie does.
+        var REMEMBER_LOCAL_MS = 6.9 * 24 * 60 * 60 * 1000;
+
+        function rememberHintValid() {
+          try {
+            var v = parseInt(localStorage.getItem(REMEMBER_KEY) || "0", 10);
+            return v > Date.now();
+          } catch (e) {
+            return false;
+          }
+        }
+        function setRememberHint() {
+          try {
+            localStorage.setItem(
+              REMEMBER_KEY,
+              String(Date.now() + REMEMBER_LOCAL_MS),
+            );
+          } catch (e) {}
+        }
+        function clearRememberHint() {
+          try {
+            localStorage.removeItem(REMEMBER_KEY);
+          } catch (e) {}
+        }
+
         // Open the gate: drop the gated class and kick off the dashboard
         // boot sequence (intro animation + data render). If bootDashboard
         // hasn't been defined yet (the bottom-of-page script hasn't parsed),
@@ -4829,6 +4858,11 @@
             } catch (er) {}
             if (res.ok && data.ok) {
               pwInput.value = "";
+              if (rememberInput.checked) {
+                setRememberHint();
+              } else {
+                clearRememberHint();
+              }
               openGate();
             } else {
               errEl.textContent =
@@ -4844,7 +4878,38 @@
             if (btn) btn.disabled = false;
           }
         }
-        // Verify any existing session before showing the form.
+
+        // FAST PATH: if the user previously checked Remember-me and the local
+        // hint is still valid, skip the gate entirely — no flash. The server
+        // cookie verifies in the background; if the server says no, we'll
+        // restore the gate.
+        if (rememberHintValid()) {
+          openGate();
+          fetch("/api/gate", { credentials: "same-origin" })
+            .then(function (r) {
+              return r.json().catch(function () {
+                return {};
+              });
+            })
+            .then(function (d) {
+              if (!d || !d.ok) {
+                // Server says no — local hint was stale. Restore the gate.
+                clearRememberHint();
+                window._dashboardBooted = false;
+                body.classList.add("gated");
+                setTimeout(function () {
+                  if (pwInput) pwInput.focus();
+                }, 50);
+              }
+            })
+            .catch(function () {
+              /* keep dashboard up; user can retry if it really failed */
+            });
+          return;
+        }
+
+        // SLOW PATH: no remember hint — verify the server cookie before
+        // showing the form so a session-only cookie also avoids a flash.
         fetch("/api/gate", { credentials: "same-origin" })
           .then(function (r) {
             return r.json().catch(function () {
@@ -11378,15 +11443,24 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           // Force a reflow so the browser registers the starting position
           title.offsetHeight;
 
-          // Now measure the brand target
-          const brand = document.querySelector(".brand");
-          const brandRect = brand.getBoundingClientRect();
+          // Target the actual "World Cup HQ" text node inside the brand
+          // (the <span> sibling of .brand-logo and .beta-badge), not the
+          // .brand container — otherwise the title lands at the container's
+          // left edge, which sits behind the logo image.
+          const brandText =
+            document.querySelector(".brand > span:not(.beta-badge)") ||
+            document.querySelector(".brand");
+          const brandRect = brandText.getBoundingClientRect();
 
-          // Animate to brand position (0.9s smooth cubic-bezier)
-          title.style.top = brandRect.top + "px";
-          title.style.left = brandRect.left + "px";
+          // Match the brand's exact text style so glyph widths line up at
+          // the end of the transition (Oswald 700, 2.2rem, 3px tracking).
+          title.style.fontWeight = "700";
           title.style.fontSize = "2.2rem";
           title.style.letterSpacing = "3px";
+
+          // Animate to the brand text's exact position (0.9s cubic-bezier)
+          title.style.top = brandRect.top + "px";
+          title.style.left = brandRect.left + "px";
           title.style.filter = "drop-shadow(0 0 0px transparent)";
         }, 3000);
 
