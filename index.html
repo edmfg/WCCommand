@@ -4653,9 +4653,12 @@
         -webkit-backdrop-filter: blur(20px);
       }
       .gate-logo {
-        width: 64px;
-        height: auto;
-        opacity: 0.95;
+        font-family: "Oswald", "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        letter-spacing: 4px;
+        color: #fff;
+        line-height: 1;
       }
       .gate-emoji {
         font-size: 38px;
@@ -4751,7 +4754,7 @@
     <!-- PASSWORD GATE -->
     <div class="gate-overlay" id="gateOverlay">
       <div class="gate-card">
-        <img src="assets/mfg-logo.png" class="gate-logo" alt="MFG" />
+        <div class="gate-logo">MFG</div>
         <div class="gate-emoji" aria-hidden="true">⚽</div>
         <h1 class="gate-title">World Cup HQ</h1>
         <p class="gate-subtitle">Enter password to access the dashboard</p>
