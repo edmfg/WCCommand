@@ -894,7 +894,7 @@
       }
       .ticker-track {
         display: flex;
-        animation: marquee 182s linear infinite;
+        animation: marquee 364s linear infinite;
         white-space: nowrap;
       }
       .ticker-bar:hover .ticker-track {
@@ -4903,7 +4903,7 @@
             src="assets/mfg-logo.png"
             alt="Media Futures Group"
             class="brand-logo"
-          /><span>World Cup HQ</span><span class="beta-badge">BETA</span></a
+          /><span>World Cup HQ</span><span class="beta-badge">BETA v2.4</span></a
         >
         <nav class="header-nav">
           <button class="tab-btn active" data-tab="live">Live</button>
@@ -8922,9 +8922,9 @@
         requestAnimationFrame(() => {
           const breakingTrack = document.getElementById("tickerTrack");
           if (!breakingTrack) return;
-          // Breaking ticker animation: 182s for translateX(-50%) of doubled content
+          // Breaking ticker animation: 364s for translateX(-50%) of doubled content
           const breakingHalfWidth = breakingTrack.scrollWidth / 2;
-          const breakingPxPerSec = breakingHalfWidth / 182;
+          const breakingPxPerSec = breakingHalfWidth / 364;
           const factHalfWidth = track.scrollWidth / 2;
           if (breakingPxPerSec > 0 && factHalfWidth > 0) {
             const factDuration = factHalfWidth / breakingPxPerSec;
