@@ -38,6 +38,24 @@ function originAllowed(req) {
   return ALLOWED_ORIGINS.some(o => origin === o || referer.startsWith(o));
 }
 
+// Server-to-server bypass for trusted callers (e.g. the daily-refresh routine).
+// Caller sends `x-mfg-server-secret: <value>`; if it matches SERVER_API_SECRET
+// (timing-safe compare) we skip the browser origin check.
+function serverAuthorized(req) {
+  const expected = process.env.SERVER_API_SECRET;
+  if (!expected) return false;
+  const provided = req.headers['x-mfg-server-secret'];
+  if (typeof provided !== 'string' || provided.length === 0) return false;
+  if (provided.length !== expected.length) return false;
+  try {
+    const a = Buffer.from(provided, 'utf8');
+    const b = Buffer.from(expected, 'utf8');
+    return require('crypto').timingSafeEqual(a, b);
+  } catch (e) {
+    return false;
+  }
+}
+
 function validShape(body) {
   if (!body || typeof body !== 'object') return false;
   if (!Array.isArray(body.contents)) return false;
@@ -50,7 +68,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!originAllowed(req)) {
+  const isServer = serverAuthorized(req);
+  if (!isServer && !originAllowed(req)) {
     return res.status(403).json({ error: 'Origin not allowed' });
   }
 
