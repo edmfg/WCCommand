@@ -2161,6 +2161,24 @@
         color: var(--text-dim);
         clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
       }
+      .asset-market-pill {
+        font-family: "Oswald", sans-serif;
+        font-weight: 600;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 3px 10px;
+        background: rgba(99, 102, 241, 0.16);
+        border: 1px solid rgba(99, 102, 241, 0.32);
+        color: #c7d2fe;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      body.light .asset-market-pill {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.28);
+        color: #4338ca;
+      }
       .asset-status-pill {
         font-size: 0.6rem;
         font-weight: 700;
@@ -9817,6 +9835,11 @@
 };
 
       function driveThumbnail(fileId, size = 800) {
+        // Google's image CDN is materially more reliable than the legacy
+        // /thumbnail endpoint, especially for videos.
+        return `https://lh3.googleusercontent.com/d/${fileId}=w${size}`;
+      }
+      function driveThumbnailFallback(fileId, size = 400) {
         return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
       }
 
@@ -11270,7 +11293,10 @@
         } else if (ytId) {
           thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
         } else if (a.driveFileId) {
-          thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="fallback" style="display:none;position:absolute;inset:0">${formatEsc}</div>`;
+          const fidEsc = escapeHtml(a.driveFileId);
+          // Try lh3 first; on error swap to legacy /thumbnail; on second
+          // error hide the broken img and reveal the play-icon fallback.
+          thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" referrerpolicy="no-referrer" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${escapeHtml(driveThumbnailFallback(a.driveFileId, 400))}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="fallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,0.55)">▶</div>`;
         } else {
           thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${formatEsc}</div>`;
         }
@@ -11306,6 +11332,22 @@
         const channelStr = a.channel
           ? `<span class="asset-format">${escapeHtml(a.channel)}</span>`
           : "";
+        const marketEmojis = {
+          Canada: "🇨🇦",
+          USA: "🇺🇸",
+          Germany: "🇩🇪",
+          UK: "🇬🇧",
+          Global: "🌐",
+        };
+        const marketPills = (a.market || "")
+          .split(",")
+          .map((m) => m.trim())
+          .filter(Boolean)
+          .map(
+            (m) =>
+              `<span class="asset-market-pill">${marketEmojis[m] || ""} ${escapeHtml(m)}</span>`,
+          )
+          .join("");
         const uploaderLine = a.uploadedBy
           ? `<span class="asset-date" style="color:var(--text-dim);font-size:11px">By ${escapeHtml(a.uploadedBy)}</span>`
           : "";
@@ -11324,6 +11366,7 @@
     <div class="asset-body">
       <h4>${escapeHtml(a.headline)}</h4>
       <div class="asset-meta">
+        ${marketPills}
         ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ""}
         ${channelStr}
         ${a.status ? `<span class="asset-status-pill ${sc}">${escapeHtml(a.status)}</span>` : ""}

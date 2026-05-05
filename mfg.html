@@ -722,10 +722,61 @@
         overflow: hidden;
         position: relative;
       }
+      .creative-recent-thumb::after {
+        content: "▶";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: rgba(255, 255, 255, 0.45);
+        pointer-events: none;
+        z-index: 0;
+      }
       .creative-recent-thumb img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        position: relative;
+        z-index: 1;
+      }
+      .creative-recent-card {
+        position: relative;
+      }
+      .creative-recent-delete {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition:
+          opacity 0.15s,
+          background 0.15s;
+      }
+      .creative-recent-card:hover .creative-recent-delete {
+        opacity: 1;
+      }
+      .creative-recent-delete:hover {
+        background: rgba(204, 0, 0, 0.85);
+        color: #fff;
+      }
+      .creative-recent-delete.armed {
+        opacity: 1;
+        background: rgba(204, 0, 0, 0.95);
+        color: #fff;
       }
       .creative-recent-meta {
         display: flex;
@@ -5828,11 +5879,22 @@
             }
             recentList.innerHTML = data
               .map(function (r) {
-                const thumb = r.drive_file_id
-                  ? '<img src="https://drive.google.com/thumbnail?id=' +
-                    encodeURIComponent(r.drive_file_id) +
-                    '&sz=w400" alt="preview" referrerpolicy="no-referrer" />'
-                  : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:11px">No preview</div>';
+                const fid = r.drive_file_id || "";
+                const fidEnc = encodeURIComponent(fid);
+                const lh3 = "https://lh3.googleusercontent.com/d/" + fidEnc + "=w400";
+                const fallback =
+                  "https://drive.google.com/thumbnail?id=" + fidEnc + "&sz=w400";
+                const onerr =
+                  "if(!this.dataset.r){this.dataset.r=1;this.src='" +
+                  fallback +
+                  "';}else{this.style.display='none';}";
+                const thumb = fid
+                  ? '<img src="' +
+                    lh3 +
+                    '" alt="" referrerpolicy="no-referrer" onerror="' +
+                    onerr +
+                    '" />'
+                  : "";
                 const start = fmtDate(r.deploy_date);
                 const end = fmtDate(r.live_end_date);
                 let dateStr = "";
@@ -5840,7 +5902,10 @@
                 else if (start) dateStr = "From " + start;
                 else if (end) dateStr = "Until " + end;
                 return (
-                  '<div class="creative-recent-card">' +
+                  '<div class="creative-recent-card" data-asset-id="' +
+                  escapeHtml(r.id) +
+                  '">' +
+                  '<button class="creative-recent-delete" title="Delete this upload" aria-label="Delete">×</button>' +
                   '<div class="creative-recent-thumb">' +
                   thumb +
                   "</div>" +
@@ -5869,6 +5934,59 @@
                 );
               })
               .join("");
+
+            // Wire delete buttons. Two-step arm pattern: first click arms,
+            // second click deletes. Click anywhere else cancels.
+            recentList.querySelectorAll(".creative-recent-delete").forEach(
+              function (btn) {
+                btn.addEventListener("click", async function (e) {
+                  e.stopPropagation();
+                  if (!btn.classList.contains("armed")) {
+                    btn.classList.add("armed");
+                    btn.textContent = "Delete?";
+                    btn.style.width = "auto";
+                    btn.style.padding = "0 10px";
+                    btn.style.borderRadius = "999px";
+                    btn.style.fontSize = "11px";
+                    setTimeout(function () {
+                      if (btn.classList.contains("armed")) {
+                        btn.classList.remove("armed");
+                        btn.textContent = "×";
+                        btn.style.width = "";
+                        btn.style.padding = "";
+                        btn.style.borderRadius = "";
+                        btn.style.fontSize = "";
+                      }
+                    }, 3000);
+                    return;
+                  }
+                  const card = btn.closest(".creative-recent-card");
+                  const id = card && card.dataset.assetId;
+                  if (!id) return;
+                  btn.disabled = true;
+                  btn.textContent = "…";
+                  try {
+                    const sb2 = getCreativeSb();
+                    const { error: delErr } = await sb2
+                      .from("creative_assets")
+                      .delete()
+                      .eq("id", id);
+                    if (delErr) throw delErr;
+                    if (card) card.remove();
+                    showToast("Deleted.");
+                  } catch (err) {
+                    console.error("delete failed", err);
+                    showToast(
+                      "Delete failed: " + (err.message || String(err)),
+                      true
+                    );
+                    btn.disabled = false;
+                    btn.classList.remove("armed");
+                    btn.textContent = "×";
+                  }
+                });
+              }
+            );
           } catch (err) {
             console.error("recent uploads load failed", err);
             recentList.innerHTML =
