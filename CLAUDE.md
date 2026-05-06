@@ -18,7 +18,7 @@ countdown.js                            floating WC2026 countdown pill (both pag
 gemini-assistant.js                     shared Gemini button + panel for MFG mode
 api/gate.js                             dashboard password gate (GATE_PASSWORD env)
 api/creative-gate.js                    Creative-tab view gate (CREATIVE_KEY env)
-api/mfg-gate.js                         MFG-mode password gate (MFG_KEY env)
+api/mfg-gate.js                         MFG-mode password gate (MFG_MODE_PASSWORD env)
 api/gemini.js                           Gemini API proxy with rate-limit + streaming
 api/health.js                           liveness probe + env-var presence reporter
 supabase-*.sql                          one-shot SQL migrations (run in Supabase editor)
@@ -81,7 +81,7 @@ A single-file HTML/JS app. Everything below lives inside it unless noted.
 
 ### `mfg.html` — MFG production cockpit
 
-Password-gated by `/api/mfg-gate` (env var `MFG_KEY`, falls back to `GATE_PASSWORD` during migration). 7-day session cookie. Two-tab layout:
+Password-gated by `/api/mfg-gate` (env var `MFG_MODE_PASSWORD`, falls back to legacy `MFG_KEY`, then `GATE_PASSWORD` during migration). 7-day session cookie. Two-tab layout:
 
 - **🧯 Global Triage** — drag-and-drop kanban-style board for tracking work across markets. Auto-grouping by tag (creative / strategy / **macro** / activation / media / production / talent / partnerships / legal / else) with per-tag colours. Snapshots saved to Supabase `mfg_triage_snapshots` and `mfg_triage` tables. Snapshot history panel is collapsed by default. **Item delete is soft** — a 5-second toast shows an `Undo` button; clicking it splices the item back into its original position.
 - **🎬 Creative Uploads** — form for posting Drive-hosted creative assets to the public Creative tab. Files are NOT uploaded to Supabase — only the link is stored. Form fields:
@@ -137,7 +137,7 @@ Creative-tab view gate. Same shape as `gate.js` but keyed off `CREATIVE_KEY` and
 
 ### `api/mfg-gate.js`
 
-MFG-mode password gate. Same shape, keyed off `MFG_KEY` (with `GATE_PASSWORD` fallback during migration). Cookie `wcc_mfg_gate`, 7-day session.
+MFG-mode password gate. Same shape, keyed off `MFG_MODE_PASSWORD` (with legacy `MFG_KEY` and `GATE_PASSWORD` fallbacks during migration). Cookie `wcc_mfg_gate`, 7-day session.
 
 ### `api/health.js`
 
@@ -203,7 +203,7 @@ When changing schema, write a new `supabase-<topic>.sql` file at the repo root a
 | `GEMINI_API_KEY` | `api/gemini.js` | Google AI Studio API key the proxy uses. |
 | `GATE_PASSWORD` | `api/gate.js`, fallback for `api/mfg-gate.js` | Dashboard gate password (currently `mfg`). |
 | `CREATIVE_KEY` | `api/creative-gate.js` | Creative-tab view password. |
-| `MFG_KEY` | `api/mfg-gate.js` | MFG-mode password. Falls back to `GATE_PASSWORD` if missing. |
+| `MFG_MODE_PASSWORD` | `api/mfg-gate.js` | MFG-mode password. Falls back to legacy `MFG_KEY`, then `GATE_PASSWORD`. |
 | `ALLOWED_ORIGINS` | `api/gemini.js` | Comma-separated browser-Origin / Referer allowlist. |
 | `SERVER_API_SECRET` | `api/gemini.js` | Server-to-server bypass header (`x-mfg-server-secret`). |
 | `UPSTASH_REDIS_REST_URL` | `api/gemini.js` (optional) | Upstash REST URL for persistent rate-limit. Falls back to in-memory. |

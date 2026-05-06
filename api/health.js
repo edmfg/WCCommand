@@ -14,6 +14,7 @@ module.exports = async function handler(req, res) {
     GEMINI_API_KEY: !!process.env.GEMINI_API_KEY,
     GATE_PASSWORD: !!process.env.GATE_PASSWORD,
     CREATIVE_KEY: !!process.env.CREATIVE_KEY,
+    MFG_MODE_PASSWORD: !!process.env.MFG_MODE_PASSWORD,
     MFG_KEY: !!process.env.MFG_KEY,
     SERVER_API_SECRET: !!process.env.SERVER_API_SECRET,
     ALLOWED_ORIGINS: !!process.env.ALLOWED_ORIGINS,
