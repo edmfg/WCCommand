@@ -2950,6 +2950,15 @@
           }
         }
 
+        // Wire the gate up — click button or press Enter in the input.
+        gateBtn.addEventListener("click", tryAuth);
+        gateInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            tryAuth();
+          }
+        });
+
         // Skip the gate if a valid cookie is already present.
         (async function preauth() {
           try {
