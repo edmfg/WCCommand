@@ -1,6 +1,7 @@
 // Second-factor gate for the public Creative tab. Same HMAC-cookie pattern
-// as api/gate.js but keyed off CREATIVE_KEY and a separate cookie name, so a
-// dashboard-gate session does NOT automatically unlock the Creative tab.
+// as api/gate.js. Now keyed off the same GATE_PASSWORD as the dashboard
+// gate (consolidated single password), but uses a separate cookie name so
+// the two sessions stay independent.
 //
 // POST /api/creative-gate    body: { password, remember }    → on match, sets cookie.
 // GET  /api/creative-gate                                    → returns { ok }.
@@ -114,11 +115,11 @@ async function readJson(req) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  const password = process.env.CREATIVE_KEY;
+  const password = process.env.GATE_PASSWORD;
   if (!password) {
     return res
       .status(500)
-      .json({ error: "CREATIVE_KEY env var not configured" });
+      .json({ error: "GATE_PASSWORD env var not configured" });
   }
   const secret = password;
 

@@ -17,8 +17,8 @@ data.js                                 window.DASHBOARD_DATA — all dashboard 
 countdown.js                            floating WC2026 countdown pill (both pages)
 gemini-assistant.js                     shared Gemini button + panel for MFG mode
 api/gate.js                             dashboard password gate (GATE_PASSWORD env)
-api/creative-gate.js                    Creative-tab view gate (CREATIVE_KEY env)
-api/mfg-gate.js                         MFG-mode password gate (MFG_MODE_PASSWORD env)
+api/creative-gate.js                    Creative-tab view gate (GATE_PASSWORD env)
+api/mfg-gate.js                         MFG-mode password gate (GATE_PASSWORD env)
 api/gemini.js                           Gemini API proxy with rate-limit + streaming
 api/health.js                           liveness probe + env-var presence reporter
 supabase-*.sql                          one-shot SQL migrations (run in Supabase editor)
@@ -81,7 +81,7 @@ A single-file HTML/JS app. Everything below lives inside it unless noted.
 
 ### `mfg.html` — MFG production cockpit
 
-Password-gated by `/api/mfg-gate` (env var `MFG_MODE_PASSWORD`, falls back to legacy `MFG_KEY`, then `GATE_PASSWORD` during migration). 7-day session cookie. Two-tab layout:
+Password-gated by `/api/mfg-gate` (env var `GATE_PASSWORD` — same single password as the dashboard and Creative gates; separate cookie). 7-day session cookie. Two-tab layout:
 
 - **🧯 Global Triage** — drag-and-drop kanban-style board for tracking work across markets. Auto-grouping by tag (creative / strategy / **macro** / activation / media / production / talent / partnerships / legal / else) with per-tag colours. Snapshots saved to Supabase `mfg_triage_snapshots` and `mfg_triage` tables. Snapshot history panel is collapsed by default. **Item delete is soft** — a 5-second toast shows an `Undo` button; clicking it splices the item back into its original position.
 - **🎬 Creative Uploads** — form for posting Drive-hosted creative assets to the public Creative tab. Files are NOT uploaded to Supabase — only the link is stored. Form fields:
@@ -133,11 +133,11 @@ Dashboard password gate.
 
 ### `api/creative-gate.js`
 
-Creative-tab view gate. Same shape as `gate.js` but keyed off `CREATIVE_KEY` and a separate cookie `wcc_creative_view`. 12-hour session only (no 7-day option). The dashboard skips the page-load cookie pre-check and only opens the modal on a real Creative-tab click.
+Creative-tab view gate. Same shape as `gate.js`, now reads the same `GATE_PASSWORD` (consolidated single password), but uses a separate cookie `wcc_creative_view`. 12-hour session only (no 7-day option). The dashboard skips the page-load cookie pre-check and only opens the modal on a real Creative-tab click.
 
 ### `api/mfg-gate.js`
 
-MFG-mode password gate. Same shape, keyed off `MFG_MODE_PASSWORD` (with legacy `MFG_KEY` and `GATE_PASSWORD` fallbacks during migration). Cookie `wcc_mfg_gate`, 7-day session.
+MFG-mode password gate. Same shape, reads the same `GATE_PASSWORD` (consolidated single password). Cookie `wcc_mfg_gate`, 7-day session.
 
 ### `api/health.js`
 
@@ -201,13 +201,13 @@ When changing schema, write a new `supabase-<topic>.sql` file at the repo root a
 | Variable | Used by | Purpose |
 |---|---|---|
 | `GEMINI_API_KEY` | `api/gemini.js` | Google AI Studio API key the proxy uses. |
-| `GATE_PASSWORD` | `api/gate.js`, fallback for `api/mfg-gate.js` | Dashboard gate password (currently `mfg`). |
-| `CREATIVE_KEY` | `api/creative-gate.js` | Creative-tab view password. |
-| `MFG_MODE_PASSWORD` | `api/mfg-gate.js` | MFG-mode password. Falls back to legacy `MFG_KEY`, then `GATE_PASSWORD`. |
+| `GATE_PASSWORD` | `api/gate.js`, `api/creative-gate.js`, `api/mfg-gate.js` | Single password used by all three gates. Each gate uses its own cookie name so the sessions stay independent. |
 | `ALLOWED_ORIGINS` | `api/gemini.js` | Comma-separated browser-Origin / Referer allowlist. |
 | `SERVER_API_SECRET` | `api/gemini.js` | Server-to-server bypass header (`x-mfg-server-secret`). |
 | `UPSTASH_REDIS_REST_URL` | `api/gemini.js` (optional) | Upstash REST URL for persistent rate-limit. Falls back to in-memory. |
 | `UPSTASH_REDIS_REST_TOKEN` | `api/gemini.js` (optional) | Upstash REST token. |
+
+The legacy `CREATIVE_KEY`, `MFG_KEY`, and `MFG_MODE_PASSWORD` env vars are no longer read by the code. Safe to delete from Vercel; safe to leave (ignored).
 
 Deployment Protection: previously enabled, **currently OFF on Production** (the dashboard's own gate is the access control). The `Protection Bypass for Automation` token from when we tried to use the Vercel proxy from a remote agent is harmless to leave or delete.
 

@@ -1,5 +1,7 @@
-// MFG mode gate. Same HMAC-cookie pattern as api/gate.js but keyed off
-// MFG_MODE_PASSWORD and a separate cookie name (`wcc_mfg_gate`). 7-day TTL.
+// MFG mode gate. Same HMAC-cookie pattern as api/gate.js. Keyed off the
+// same GATE_PASSWORD as the dashboard gate (consolidated single password),
+// but uses a separate cookie name (`wcc_mfg_gate`) so MFG-mode sessions
+// are independent. 7-day TTL.
 //
 // POST /api/mfg-gate    body: { password }    → on match, sets cookie.
 // GET  /api/mfg-gate                          → returns { ok }.
@@ -101,19 +103,11 @@ async function readJson(req) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  // Primary: MFG_MODE_PASSWORD. Falls back to legacy MFG_KEY, then to
-  // GATE_PASSWORD, so older env-var setups still work during migration.
-  const password =
-    process.env.MFG_MODE_PASSWORD ||
-    process.env.MFG_KEY ||
-    process.env.GATE_PASSWORD;
+  const password = process.env.GATE_PASSWORD;
   if (!password) {
     return res
       .status(500)
-      .json({
-        error:
-          "MFG_MODE_PASSWORD env var is not configured (also tried MFG_KEY and GATE_PASSWORD)",
-      });
+      .json({ error: "GATE_PASSWORD env var not configured" });
   }
 
   if (req.method === "GET") {
