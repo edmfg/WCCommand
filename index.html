@@ -1071,6 +1071,7 @@
         color: #fff;
       }
       .live-filter.live-filter-reactive {
+        position: relative;
         min-width: 220px;
         padding: 7px 24px;
         background: linear-gradient(
@@ -1081,6 +1082,37 @@
         border-color: rgba(255, 215, 0, 0.4);
         color: #fff;
         font-weight: 700;
+        overflow: hidden;
+      }
+      .live-filter.live-filter-reactive::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 35%;
+        height: 100%;
+        background: linear-gradient(
+          110deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.18) 50%,
+          transparent 100%
+        );
+        transform: skewX(-20deg);
+        animation: reactivePillShine 5s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes reactivePillShine {
+        0%, 28% {
+          left: -60%;
+          opacity: 0;
+        }
+        35% {
+          opacity: 1;
+        }
+        70%, 100% {
+          left: 130%;
+          opacity: 0;
+        }
       }
       .live-filter.live-filter-reactive:hover {
         background: linear-gradient(
@@ -9807,14 +9839,14 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         });
       }
 
-      // ── Stadium Flyover Intro (plays every 3rd visit) ──
+      // ── Stadium Flyover Intro (plays every 5th visit) ──
       function runIntro() {
         const VISIT_KEY = "wc-visit-count";
         const count =
           (parseInt(localStorage.getItem(VISIT_KEY) || "0", 10) || 0) + 1;
         localStorage.setItem(VISIT_KEY, String(count));
-        // Play on visits 1, 4, 7, 10, … (every 3rd)
-        if (count % 3 !== 1) {
+        // Play on visits 1, 6, 11, 16, … (every 5th)
+        if (count % 5 !== 1) {
           document.body.classList.remove("dashboard-hidden");
           document.getElementById("introOverlay").remove();
           return;

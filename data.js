@@ -2,8 +2,14 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-05T16:15:33.337Z",
+  lastUpdated: "2026-05-07T16:30:00.000Z",
         ticker: [
+          "🇨🇦 Toronto WC tickets now capped at face value on FIFA Marketplace — Ontario resale ban forces FIFA's hand (May 7)",
+          "🌭 Infantino laughs off $2M Final ticket reports — promises to 'personally deliver a hot dog' to anyone who pays (May 6)",
+          "💸 FIFA pushes Final ceiling from $6,730 to $10,990 — fresh Cat-1 inventory drops (May 6)",
+          "🛒 Phase 4 last-minute sales live — 80+ group-stage games still available on FIFA.com (May 7)",
+          "📈 Reddit: WC2026 mentions hit 77M+ views, conversation more than tripled YoY (May 6)",
+          "🇧🇷 Eder Militão's WC dream over — thigh injury surgery confirmed (May 6)",
           "🚨 BREAKING: WC Final tickets surface on FIFA's resale site at €1.9M each (May 4)",
           "🇺🇸 FOX Sports launches 'Miracle' WC2026 campaign — Tom Brady, Zlatan, Pulisic, Bruce Arena (May 4)",
           "🇺🇸 USMNT 26-man squad reveal locked for May 26, Pier 17 NYC, live on FOX 3pm ET",
@@ -36,6 +42,72 @@ window.DASHBOARD_DATA = {
           "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
         ],
         news: [
+          {
+            id: "n096",
+            headline:
+              "🇨🇦 Toronto WC Resales Capped at Face Value — Ontario Forces FIFA's Hand",
+            source: "Al Jazeera",
+            timestamp: "2026-05-07T13:00:00Z",
+            summary:
+              "FIFA updated its Marketplace policy for Toronto matches to comply with Ontario's recent ban on reselling event tickets above face value. The platform was previously allowing markups; the cap drops the ceiling to original list price for Toronto fixtures only 🇨🇦",
+            url: "https://www.aljazeera.com/sports/2026/5/7/toronto-world-cup-tickets-to-be-resold-for-face-value-on-fifa-marketplace",
+            tag: "Canada",
+          },
+          {
+            id: "n097",
+            headline:
+              "🌭 Infantino Laughs Off $2M Final Tickets — Offers Hot Dogs",
+            source: "Sports Illustrated",
+            timestamp: "2026-05-06T22:00:00Z",
+            summary:
+              "After reports of single Final tickets listed near $2.3M, FIFA president Gianni Infantino joked he would 'personally deliver a hot dog' to anyone who actually paid. The line is everywhere on social — meme-template territory and another fuel-on-fire moment for #FIFAFixThis 🌭",
+            url: "https://www.si.com/soccer/fifa-president-ridicules-2026-world-cup-ticket-price-backlash-hot-dog-promise",
+            tag: "Global",
+          },
+          {
+            id: "n098",
+            headline:
+              "💸 FIFA Pushes Final Ceiling From $6,730 to $10,990 — New Cat-1 Drop",
+            source: "FOX LA",
+            timestamp: "2026-05-06T18:00:00Z",
+            summary:
+              "Late-April direct inventory release pushed the official Front Cat-1 Final price from the announced $6,730 ceiling up to $10,990. Four Block 124 / Row 45 seats also briefly listed at $2.3M each on the resale layer. Pricing strategy is the dominant narrative this week 📈",
+            url: "https://www.foxla.com/news/world-cup-2026-ticket-prices-fifa-strategy",
+            tag: "Global",
+          },
+          {
+            id: "n099",
+            headline:
+              "🇺🇸 FOX's 'Ultimate Miracle' — Eruzione Headlines Fresh Hype Spot",
+            source: "FOX Sports",
+            timestamp: "2026-05-06T15:00:00Z",
+            summary:
+              "FOX dropped a follow-up to its 'Miracle' platform: a stoppage-time-winner fantasy spot fronted by 1980 USA hockey captain Mike Eruzione, imagining a USA-Brazil Final ending on a US goal. Sports-tradition crossover is landing well with the diaspora-fan crowd ⛸️⚽",
+            url: "https://www.foxsports.com/stories/soccer/2026-world-cup-hype-video-mike-eruzione-ultimate-miracle",
+            tag: "USA",
+          },
+          {
+            id: "n100b",
+            headline:
+              "📈 Reddit: WC2026 Mentions Hit 77M+ Views, Conversation Triples YoY",
+            source: "Social Media Today",
+            timestamp: "2026-05-06T11:00:00Z",
+            summary:
+              "Reddit data: 'FIFA World Cup' mentions in the US hit 77M+ views over the past year, with weekly volume more than tripling year-over-year. r/WorldCup, r/USSoccer, r/Soccer, r/Sports are the load-bearing communities. Implication: Reddit warrants a real always-on listening cell, not just an X-and-TikTok read 🧵",
+            url: "https://www.socialmediatoday.com/news/reddit-shares-insight-into-rising-world-cup-discussion/812488/",
+            tag: "Macro",
+          },
+          {
+            id: "n100c",
+            headline:
+              "🇧🇷 Eder Militão's WC Over — Thigh Surgery Confirmed",
+            source: "Wikipedia",
+            timestamp: "2026-05-06T09:00:00Z",
+            summary:
+              "Real Madrid defender Eder Militão's 2026 World Cup is over after the confirmation of a thigh injury that required immediate surgery. Brazil lose a starter at the back two months from kickoff 🩼",
+            url: "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup",
+            tag: "Macro",
+          },
           {
             id: "n100",
             headline:
@@ -2645,6 +2717,175 @@ window.DASHBOARD_DATA = {
           },
         ],
         social: [
+          {
+            id: "s094",
+            topic: "🌭 'Hot Dog' Becomes the WC2026 Meme Template",
+            category: "memes",
+            volume: "🔥🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "Infantino's promise to 'personally deliver a hot dog' to anyone who pays $2M for a Final ticket exploded into a meme template within hours. TikTok edits of him jogging with a tray, X reposting the line as a header. Half mocking, half affectionate — but it's the dominant joke this week 🌭",
+            sampleQuote:
+              '"Infantino said \'hot dog\' and broke the internet for free."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Infantino delivering hot dogs to people who paid $2M for tickets is the most FIFA thing ever 🌭",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: $2M ticket arrives via Uber Eats with a single hot dog 💀",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccer turned this into 6 different megathreads in 12 hours",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit"],
+            sourceUrl:
+              "https://www.si.com/soccer/fifa-president-ridicules-2026-world-cup-ticket-price-backlash-hot-dog-promise",
+            timestamp: "2026-05-07T10:00:00Z",
+          },
+          {
+            id: "s095",
+            topic: "🤠 'Cowboy Ahh Song' — WC Anthem Meme Won't Die",
+            category: "music",
+            volume: "🔥🔥🔥",
+            sentiment: "negative",
+            summary:
+              "The official WC2026 anthem keeps getting clowned. The dominant TikTok format compares it to a Ford truck commercial — 'cowboy ahh song' / 'Gold Rush intro' — with thousands of stitch reactions. Brand opportunity: stay completely away from the anthem in any creative ⚠️",
+            sampleQuote:
+              '"They didn\'t make a World Cup anthem. They made a Ford F-150 commercial."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "Bro this song belongs in a Ford F-150 ad not the WC final 🤠",
+              },
+              {
+                platform: "X",
+                text: "Cowboy ahh song. Gold Rush intro. Make it stop.",
+              },
+              {
+                platform: "Reddit",
+                text: "Petition to replace the anthem with literally anything else, even Crazy Frog",
+              },
+            ],
+            platforms: ["TikTok", "X", "Reddit"],
+            sourceUrl: "https://www.tiktok.com/discover/world-cup-song-meme",
+            timestamp: "2026-05-07T08:00:00Z",
+          },
+          {
+            id: "s096",
+            topic: "📺 'VAR Monitor' Tiny-TV Watch-Party Format Goes Viral",
+            category: "memes",
+            volume: "🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Format of the week: fans setting up massive elaborate WC watch-party rooms with one tiny TV labeled 'VAR monitor,' then cutting to someone screaming. Stitch chains across countries. Cheap, repeatable, very on-brand for fan-side content — easy to land in 🇨🇦 / 🇺🇸 versions 📺",
+            sampleQuote:
+              '"My living room finally has 12 screens and a VAR monitor. We are READY."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "12 TVs and one tiny VAR monitor. WC ready 📺",
+              },
+              {
+                platform: "IG",
+                text: "Watch parties have become production sets. Help.",
+              },
+            ],
+            platforms: ["TikTok", "IG", "X"],
+            sourceUrl:
+              "https://thedailyscroll.co/article/world-cup-2026-memes-trending-and-the-internet-is-not-ready",
+            timestamp: "2026-05-06T20:00:00Z",
+          },
+          {
+            id: "s097",
+            topic: "🇨🇦 Toronto Multicultural Pride — 'Most Diverse Fan Zone on Earth'",
+            category: "fandom",
+            volume: "🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Coverage of Toronto's host-city culture leaning into 'nearly half of Toronto was born outside Canada' — close to every competing nation has a real diaspora here. Fan-zone content is heavy on local-pride angles. Strong territory for 🇨🇦 reactive plays that aren't just 'Maple Leaf and a hockey joke' 🌍",
+            sampleQuote:
+              '"Toronto IS the World Cup. Every flag in the tournament already lives here."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Toronto is the only host city where every team has a home crowd.",
+              },
+              {
+                platform: "Reddit",
+                text: "r/canadasoccer is leaning hard into the diaspora pride angle. It's working.",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: Toronto's waterfront fan zone has 200 flags and they're all ours 🇨🇦",
+              },
+            ],
+            platforms: ["X", "Reddit", "TikTok"],
+            sourceUrl:
+              "https://www.betting-site.ca/world-cup-2026-fan-experience-cities-culture-atmosphere/",
+            timestamp: "2026-05-06T16:00:00Z",
+          },
+          {
+            id: "s098",
+            topic: "🎨 Swifties Adopt WC Teams by Jersey Vibes",
+            category: "fashion",
+            volume: "🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Taylor Swift x NFL Travis Kelce effect spreading into soccer ahead of the WC. Swifties are picking national teams based on jersey aesthetics, color stories, and 'vibes' — Argentina blue, Spain red, Germany retro, Mexico's green-and-white. Surprisingly large fashion-content vector forming on TikTok and Pinterest 👗⚽",
+            sampleQuote:
+              '"I picked Argentina because the jersey matches my eye color, idgaf about offside."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "Swifties picking WC teams by jersey vibes. Argentina blue won me over.",
+              },
+              {
+                platform: "IG",
+                text: "Pinterest mood boards of WC kits = my new personality 👗",
+              },
+              {
+                platform: "X",
+                text: "We are SO eating with these Mexico training kits 🇲🇽",
+              },
+            ],
+            platforms: ["TikTok", "IG", "X"],
+            sourceUrl:
+              "https://www.foxsports.com/stories/soccer/2026-fifa-world-cup-ultimate-fanbase",
+            timestamp: "2026-05-06T13:00:00Z",
+          },
+          {
+            id: "s099",
+            topic: "🏟️ NJ vs LA — Host-City Trash Talk Heats Up",
+            category: "fandom",
+            volume: "🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "MetLife (NJ) and SoFi/Pasadena (LA) fan accounts are escalating a low-stakes trash-talk arc. NJ posts 'we host the Final, we just are better people.' LA replies with palm trees and 75°F. Wholesome rivalry content that's getting genuine engagement on both X and TikTok — running room for a 🇺🇸 reactive that punches into it 🥊",
+            sampleQuote:
+              '"NJ has the Final. LA has 75 degrees. Pick your fighter."',
+            quotes: [
+              {
+                platform: "X",
+                text: "NJ hosts the Final and that simply makes us better people 🏆",
+              },
+              {
+                platform: "TikTok",
+                text: "LA fans posting palm trees and 75° like that's a competitive advantage 🌴",
+              },
+              {
+                platform: "X",
+                text: "Mexico City fans watching all this from Azteca like 😏",
+              },
+            ],
+            platforms: ["X", "TikTok"],
+            sourceUrl:
+              "https://thedailyscroll.co/article/world-cup-2026-memes-trending-and-the-internet-is-not-ready",
+            timestamp: "2026-05-06T10:00:00Z",
+          },
           {
             id: "s100",
             topic: "💸 €1.9M Final Tickets — Outrage Reaches Boiling Point",
