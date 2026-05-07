@@ -1070,6 +1070,42 @@
         background: var(--red);
         color: #fff;
       }
+      .live-filter.live-filter-reactive {
+        min-width: 220px;
+        padding: 7px 24px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.15),
+          rgba(204, 0, 0, 0.18)
+        );
+        border-color: rgba(255, 215, 0, 0.4);
+        color: #fff;
+        font-weight: 700;
+      }
+      .live-filter.live-filter-reactive:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.28),
+          rgba(204, 0, 0, 0.32)
+        );
+        border-color: rgba(255, 215, 0, 0.65);
+      }
+      body.light .live-filter.live-filter-reactive {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.22),
+          rgba(204, 0, 0, 0.18)
+        );
+        border-color: rgba(204, 0, 0, 0.35);
+        color: #1a1a2e;
+      }
+      body.light .live-filter.live-filter-reactive:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.32),
+          rgba(204, 0, 0, 0.28)
+        );
+      }
       .live-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -6395,6 +6431,28 @@
       </div>
     </div>
 
+    <!-- ── TODAY'S REACTIVE PANEL ── -->
+    <div class="card-modal-overlay" id="todayReactiveOverlay">
+      <div
+        class="card-modal"
+        id="todayReactiveModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="todayReactiveTitle"
+      >
+        <button
+          class="card-modal-close"
+          id="todayReactiveClose"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h3 id="todayReactiveTitle">🔥 Today's Reactive</h3>
+        <div class="meta" id="todayReactiveMeta"></div>
+        <div id="todayReactiveBody"></div>
+      </div>
+    </div>
+
     <!-- ── CREATIVE PLAYER OVERLAY (Drive embed) ── -->
     <div class="creative-play-overlay" id="creativePlayOverlay" hidden>
       <button
@@ -6641,6 +6699,7 @@
         setupKeyboard();
         setupSearch();
         setupCardExpand();
+        setupTodayReactive();
         setupCreativePlayer();
         setupAssetUpload();
         setupCreativeLock();
@@ -6973,12 +7032,14 @@
 
       function renderLiveFilters() {
         const bar = document.getElementById("liveFilters");
-        bar.innerHTML = liveFilterDefs
+        const filters = liveFilterDefs
           .map(
             (f) =>
               `<button class="live-filter${liveFilters.has(f.id) ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
           )
           .join("");
+        const reactive = `<button class="live-filter live-filter-reactive" id="todayReactivePill" type="button">🔥 Today's Reactive</button>`;
+        bar.innerHTML = filters + reactive;
       }
 
       function matchesLiveFilter(item, type) {
@@ -9258,6 +9319,140 @@
         });
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape" && !overlay.hidden) close();
+        });
+      }
+
+      function setupTodayReactive() {
+        const overlay = document.getElementById("todayReactiveOverlay");
+        const meta = document.getElementById("todayReactiveMeta");
+        const body = document.getElementById("todayReactiveBody");
+        const closeBtn = document.getElementById("todayReactiveClose");
+        if (!overlay || !body) return;
+
+        function buildContent() {
+          const todayIso = new Date().toISOString().slice(0, 10);
+          const dateLabel = new Date().toLocaleDateString(undefined, {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          });
+          meta.textContent = dateLabel;
+
+          const matchesToday = (
+            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.matches) ||
+            []
+          ).filter((m) => m && m.date === todayIso);
+
+          const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+          const recentNews = (
+            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.news) ||
+            []
+          )
+            .filter((n) => {
+              if (!n || !n.timestamp) return false;
+              const t = new Date(n.timestamp).getTime();
+              return Number.isFinite(t) && t >= cutoff;
+            })
+            .slice(0, 6);
+
+          const recentSocial = (
+            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.social) ||
+            []
+          ).slice(0, 4);
+
+          let html = "";
+
+          html += `<div style="margin-bottom:18px;color:var(--text-dim);font-size:0.88rem;line-height:1.5;">A quick brief for today's reactive content. Use it to spot the moment, then build.</div>`;
+
+          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Matches today</h4>`;
+          if (matchesToday.length === 0) {
+            html += `<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px;">No fixtures kicking off today.</div>`;
+          } else {
+            html +=
+              `<ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">` +
+              matchesToday
+                .map((m) => {
+                  const home =
+                    (m.home && (m.home.flag || "") + " " + (m.home.name || m.home.code || "")) ||
+                    "";
+                  const away =
+                    (m.away && (m.away.flag || "") + " " + (m.away.name || m.away.code || "")) ||
+                    "";
+                  const venue = m.venue ? ` · ${escapeHtml(m.venue)}` : "";
+                  const ko = m.kickoff ? ` · ${escapeHtml(m.kickoff)}` : "";
+                  return `<li style="font-size:0.9rem;line-height:1.4;">${escapeHtml(home)} <span style="color:var(--text-dim);">vs</span> ${escapeHtml(away)}<span style="color:var(--text-dim);font-size:0.78rem;">${ko}${venue}</span></li>`;
+                })
+                .join("") +
+              `</ul>`;
+          }
+
+          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Past 24h headlines</h4>`;
+          if (recentNews.length === 0) {
+            html += `<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px;">No fresh news in the last day.</div>`;
+          } else {
+            html +=
+              `<ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:10px;">` +
+              recentNews
+                .map((n) => {
+                  const tag = n.tag
+                    ? `<span style="display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,0.08);font-size:0.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-right:6px;vertical-align:middle;">${escapeHtml(n.tag)}</span>`
+                    : "";
+                  const url = n.url
+                    ? ` <a href="${encodeURI(n.url)}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;font-size:0.78rem;">↗</a>`
+                    : "";
+                  return `<li style="font-size:0.9rem;line-height:1.4;">${tag}${escapeHtml(n.headline || "")}${url}</li>`;
+                })
+                .join("") +
+              `</ul>`;
+          }
+
+          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Trending social</h4>`;
+          if (recentSocial.length === 0) {
+            html += `<div style="color:var(--text-dim);font-size:0.85rem;">No social trends loaded.</div>`;
+          } else {
+            html +=
+              `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">` +
+              recentSocial
+                .map((s) => {
+                  const cat = s.category
+                    ? `<span style="display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,0.08);font-size:0.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-right:6px;vertical-align:middle;">${escapeHtml(s.category)}</span>`
+                    : "";
+                  return `<li style="font-size:0.9rem;line-height:1.4;">${cat}${escapeHtml(s.topic || "")}</li>`;
+                })
+                .join("") +
+              `</ul>`;
+          }
+
+          body.innerHTML = html;
+        }
+
+        function open() {
+          buildContent();
+          overlay.classList.add("open");
+          document.body.style.overflow = "hidden";
+        }
+        function close() {
+          overlay.classList.remove("open");
+          document.body.style.overflow = "";
+        }
+
+        document.addEventListener("click", (e) => {
+          const pill = e.target.closest("#todayReactivePill");
+          if (pill) {
+            e.preventDefault();
+            open();
+          }
+        });
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) close();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (
+            e.key === "Escape" &&
+            overlay.classList.contains("open")
+          )
+            close();
         });
       }
 
