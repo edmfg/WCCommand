@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daily Formation — World Cup HQ</title>
+    <title>Today's Reactive — World Cup HQ</title>
     <meta name="description" content="The day's signals, translated into three plays you can run." />
     <meta name="theme-color" content="#0a0c14" />
     <meta name="robots" content="noindex,nofollow,noarchive" />
@@ -67,95 +67,167 @@
         z-index: 0;
       }
 
-      /* ===== header ===== */
+      /* ===== header (matched to World Cup HQ main site) ===== */
       .header {
         position: sticky;
         top: 0;
         z-index: 100;
-        backdrop-filter: blur(18px) saturate(160%);
-        -webkit-backdrop-filter: blur(18px) saturate(160%);
-        background: rgba(10, 12, 20, 0.7);
-        border-bottom: 1px solid var(--border);
+        background: linear-gradient(
+          115deg,
+          #b3e0ff 0%,
+          #c7b8ff 14%,
+          #ffb8e0 28%,
+          #ffd9a8 42%,
+          #b8f0c8 56%,
+          #a8e6ff 70%,
+          #d6b8ff 84%,
+          #b3e0ff 100%
+        );
+        background-size: 500% 500%;
+        animation: nav-wave 30s linear infinite;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow:
+          0 8px 30px rgba(15, 23, 42, 0.1),
+          0 1px 0 rgba(255, 255, 255, 0.85) inset,
+          0 -1px 0 rgba(0, 0, 0, 0.04) inset;
+        padding: 0 24px;
+        overflow: hidden;
+      }
+      @keyframes nav-wave {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
       .header-inner {
-        max-width: var(--max);
+        max-width: none;
+        width: 100%;
         margin: 0 auto;
-        padding: 14px 28px;
+        padding: 0 32px;
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        height: 72px;
         gap: 16px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
       }
       .brand {
-        font-family: "Oswald", sans-serif;
+        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
         font-weight: 700;
-        font-size: 17px;
-        letter-spacing: 0.06em;
+        font-size: 2.2rem;
         text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--text);
-        text-decoration: none;
-      }
-      .brand .ball { font-size: 22px; line-height: 1; }
-      .brand .pipe { color: var(--text-dim); font-weight: 400; opacity: 0.7; }
-      .brand .sub {
-        background: linear-gradient(135deg, var(--gold), #fff6c4);
+        letter-spacing: 3px;
+        background: linear-gradient(135deg, #0a1628 0%, #1a3a6b 50%, #cc0000 100%);
+        background-size: 200% 200%;
         -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         background-clip: text;
         color: transparent;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .brand-logo {
+        height: 42px;
+        width: auto;
+        flex-shrink: 0;
+        -webkit-background-clip: initial;
+        -webkit-text-fill-color: initial;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+      }
+      .beta-badge {
+        font-family: "JetBrains Mono", "Inter", monospace;
+        font-size: 0.55rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: rgba(204, 0, 0, 0.12);
+        color: var(--red);
+        border: 1px solid rgba(204, 0, 0, 0.25);
+        text-transform: uppercase;
+        align-self: center;
+      }
+      @media (max-width: 760px) {
+        .brand { font-size: 1.5rem; letter-spacing: 2px; }
+        .brand-logo { height: 32px; }
       }
       .header-nav {
         display: flex;
-        gap: 2px;
-        margin-left: 20px;
-      }
-      .tab-btn {
-        background: transparent;
-        border: none;
-        color: var(--text-dim);
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 8px 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s var(--t);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-      .tab-btn:hover { color: var(--text); background: var(--surface); }
-      .tab-btn.active {
-        color: var(--text);
-        background: linear-gradient(180deg, rgba(204, 0, 0, 0.45), rgba(204, 0, 0, 0.15));
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-      }
-      .header-actions {
-        margin-left: auto;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      .live-pill {
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 600;
-        color: var(--green);
-        display: flex;
         align-items: center;
         gap: 6px;
-        background: rgba(74, 222, 128, 0.08);
-        border: 1px solid rgba(74, 222, 128, 0.25);
-        padding: 5px 10px;
-        border-radius: 99px;
       }
-      .live-dot {
-        width: 6px;
-        height: 6px;
+      .tab-btn {
+        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 9px 22px;
+        border-radius: 999px;
+        cursor: pointer;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.55),
+          rgba(255, 255, 255, 0.25)
+        );
+        color: #1a1a2e;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: blur(20px) saturate(180%);
+        transition: all 0.25s var(--t);
+      }
+      .tab-btn:hover {
+        transform: translateY(-1px);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.7),
+          rgba(255, 255, 255, 0.35)
+        );
+        box-shadow:
+          0 10px 22px rgba(0, 0, 0, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+      }
+      .tab-btn.active {
+        background: linear-gradient(180deg, #ff3333 0%, var(--red) 60%, var(--red-dark) 100%);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow:
+          0 8px 22px rgba(204, 0, 0, 0.45),
+          0 4px 10px rgba(204, 0, 0, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.4),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-close {
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: var(--green);
-        animation: pulse 2s infinite;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        background: rgba(0, 0, 0, 0.05);
+        color: #1a1a2e;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.15s;
+      }
+      .header-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        transform: scale(1.06);
       }
       @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
@@ -1199,18 +1271,31 @@
   <body>
     <header class="header">
       <div class="header-inner">
-        <a class="brand" href="#">
-          <span class="ball">⚽</span> World Cup HQ <span class="pipe">/</span> <span class="sub">Daily Formation</span>
+        <a class="brand" href="#" id="brandHome" data-wcc-nav="live">
+          <img
+            src="assets/mfg-logo.png"
+            alt="Media Futures Group"
+            class="brand-logo"
+          />
+          <span>World Cup HQ</span>
+          <span class="beta-badge">BETA v2.9</span>
         </a>
         <nav class="header-nav">
-          <button class="tab-btn">Fixtures</button>
-          <button class="tab-btn">Standings</button>
-          <button class="tab-btn">News</button>
-          <button class="tab-btn">Pulse</button>
-          <button class="tab-btn active">Daily Formation</button>
+          <button class="tab-btn" type="button" data-wcc-nav="live">Live</button>
+          <button class="tab-btn" type="button" data-wcc-nav="calendar">Fixtures</button>
+          <button class="tab-btn" type="button" data-wcc-nav="creative">Creative</button>
+          <button class="tab-btn active" type="button" aria-current="page">Today's Reactive</button>
         </nav>
         <div class="header-actions">
-          <span class="live-pill"><span class="live-dot"></span> Agents Live</span>
+          <button
+            class="header-close"
+            type="button"
+            id="headerClose"
+            aria-label="Close Today's Reactive"
+            title="Close"
+          >
+            ×
+          </button>
         </div>
       </div>
     </header>
@@ -1223,7 +1308,7 @@
           <span class="seg" id="hero-market">Canada</span>
           <span class="seg" id="hero-window">Last 24h</span>
         </div>
-        <h1>Today's <span class="stroke">formation</span>.</h1>
+        <h1>Today's <span class="stroke">reactive</span>.</h1>
         <p class="lede">
           Our reader agents swept the cultural and match-event signal landscape overnight. Here's
           what's spiking — and three plays we'd run today.
@@ -1254,7 +1339,7 @@
     </main>
 
     <footer>
-      <span>Daily Formation</span>
+      <span>Today's Reactive</span>
       <span class="dot">·</span>
       <span>Powered by Google AI Mode reader agents, reviewed by a strategist before drop.</span>
       <span class="dot">·</span>
@@ -1267,6 +1352,45 @@
         <div id="modal-body"></div>
       </article>
     </div>
+
+    <script>
+      // When this page is loaded inside the World Cup HQ iframe overlay,
+      // header nav + close should drive the parent (close iframe + switch tab).
+      // When opened directly (no parent / different origin), fall back gracefully.
+      (function () {
+        function postToParent(payload) {
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage(payload, "*");
+              return true;
+            }
+          } catch (_) {}
+          return false;
+        }
+        function navigate(tab) {
+          if (postToParent({ type: "wcc-nav", tab: tab })) return;
+          // Standalone fallback — bounce to the main page anchor.
+          window.location.href = "index.html#" + encodeURIComponent(tab);
+        }
+        function close() {
+          if (postToParent({ type: "wcc-nav-close" })) return;
+          window.history.back();
+        }
+        document.addEventListener("click", function (e) {
+          var navBtn = e.target.closest("[data-wcc-nav]");
+          if (navBtn) {
+            e.preventDefault();
+            navigate(navBtn.getAttribute("data-wcc-nav"));
+            return;
+          }
+          var closeBtn = e.target.closest("#headerClose");
+          if (closeBtn) {
+            e.preventDefault();
+            close();
+          }
+        });
+      })();
+    </script>
 
     <script>
       // ============================================================================

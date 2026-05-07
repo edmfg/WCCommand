@@ -10036,6 +10036,24 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
             if (e.target === overlay) closeReactiveFrame();
           });
         }
+        // Listen for nav messages posted by social.html when it's iframed in.
+        window.addEventListener("message", function (e) {
+          var d = e && e.data;
+          if (!d || typeof d !== "object") return;
+          if (d.type === "wcc-nav-close") {
+            closeReactiveFrame();
+            return;
+          }
+          if (d.type === "wcc-nav" && typeof d.tab === "string") {
+            closeReactiveFrame();
+            if (typeof window.switchTab === "function") {
+              try {
+                window.switchTab(d.tab);
+                location.hash = d.tab;
+              } catch (_) {}
+            }
+          }
+        });
       })();
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
