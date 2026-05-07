@@ -2491,86 +2491,48 @@
         background: rgba(255, 195, 0, 0.18);
       }
 
-      /* ── Today's Reactive pill (links to Daily Formation surface) ── */
-      .reactive-pill {
-        position: relative;
-        width: 100%;
+      /* ── Today's Reactive iframe overlay (Canada → social.html) ── */
+      .reactive-frame-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9900;
+        background: rgba(5, 7, 12, 0.94);
         display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 14px 22px;
-        margin-bottom: 16px;
-        font-family: "Oswald", "Inter", sans-serif;
-        font-weight: 700;
-        font-size: 15px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: #fff;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 45%),
-          linear-gradient(135deg, #ff1a1a 0%, #cc0000 50%, #990000 100%);
-        border: 1px solid rgba(255, 215, 0, 0.45);
-        border-radius: 999px;
-        cursor: pointer;
-        overflow: hidden;
-        box-shadow:
-          0 8px 24px rgba(204, 0, 0, 0.35),
-          inset 0 1px 0 rgba(255, 255, 255, 0.25),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        align-items: stretch;
+        justify-content: stretch;
+        animation: fadeIn 0.2s ease;
       }
-      .reactive-pill:hover {
-        transform: translateY(-1px);
-        box-shadow:
-          0 12px 32px rgba(204, 0, 0, 0.5),
-          inset 0 1px 0 rgba(255, 255, 255, 0.3),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+      .reactive-frame-overlay[hidden] {
+        display: none;
       }
-      .reactive-pill:active {
-        transform: translateY(0);
-      }
-      .reactive-pill::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -60%;
-        width: 40%;
+      .reactive-frame-iframe {
+        flex: 1;
+        width: 100%;
         height: 100%;
-        background: linear-gradient(
-          110deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.45) 50%,
-          transparent 100%
-        );
-        transform: skewX(-20deg);
-        animation: reactiveShine 3.6s ease-in-out infinite;
-        pointer-events: none;
+        border: 0;
+        background: #0a0c14;
       }
-      @keyframes reactiveShine {
-        0% { left: -60%; }
-        60% { left: 120%; }
-        100% { left: 120%; }
-      }
-      .reactive-pill .bolt {
-        font-size: 16px;
-        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.85));
-        animation: reactivePulse 1.8s ease-in-out infinite;
-      }
-      @keyframes reactivePulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.18); }
-      }
-      .reactive-pill .arrow {
-        font-size: 18px;
-        opacity: 0.85;
-        transition: transform 0.2s ease;
-      }
-      .reactive-pill:hover .arrow {
-        transform: translateX(4px);
-      }
-      body.light .reactive-pill {
+      .reactive-frame-close {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         color: #fff;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 10000;
+        transition:
+          background 0.15s,
+          transform 0.15s;
+      }
+      .reactive-frame-close:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: scale(1.06);
       }
 
       /* ── Market chooser modal ── */
@@ -6027,18 +5989,6 @@
 
       <!-- LIVE -->
       <div class="tab-panel active" id="panel-live">
-        <!-- Today's Reactive (links to Daily Formation surface) -->
-        <button
-          type="button"
-          class="reactive-pill"
-          id="reactivePill"
-          onclick="openMarketChooser()"
-          aria-haspopup="dialog"
-        >
-          <span class="bolt" aria-hidden="true">⚡</span>
-          <span>Today's Reactive</span>
-          <span class="arrow" aria-hidden="true">›</span>
-        </button>
 
         <!-- Pinned cards strip (shows whatever the user has starred) -->
         <div id="bookmarksBar" class="bookmarks-bar" hidden>
@@ -6431,26 +6381,30 @@
       </div>
     </div>
 
-    <!-- ── TODAY'S REACTIVE PANEL ── -->
-    <div class="card-modal-overlay" id="todayReactiveOverlay">
-      <div
-        class="card-modal"
-        id="todayReactiveModal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="todayReactiveTitle"
+    <!-- ── CANADA TODAY'S REACTIVE OVERLAY (embeds social.html) ── -->
+    <div
+      class="reactive-frame-overlay"
+      id="reactiveFrameOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Today's Reactive — Canada"
+      hidden
+    >
+      <button
+        type="button"
+        class="reactive-frame-close"
+        id="reactiveFrameClose"
+        aria-label="Close"
       >
-        <button
-          class="card-modal-close"
-          id="todayReactiveClose"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <h3 id="todayReactiveTitle">🔥 Today's Reactive</h3>
-        <div class="meta" id="todayReactiveMeta"></div>
-        <div id="todayReactiveBody"></div>
-      </div>
+        ×
+      </button>
+      <iframe
+        class="reactive-frame-iframe"
+        id="reactiveFrameIframe"
+        src=""
+        title="Today's Reactive — Canada"
+        loading="lazy"
+      ></iframe>
     </div>
 
     <!-- ── CREATIVE PLAYER OVERLAY (Drive embed) ── -->
@@ -6699,7 +6653,6 @@
         setupKeyboard();
         setupSearch();
         setupCardExpand();
-        setupTodayReactive();
         setupCreativePlayer();
         setupAssetUpload();
         setupCreativeLock();
@@ -7038,7 +6991,7 @@
               `<button class="live-filter${liveFilters.has(f.id) ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
           )
           .join("");
-        const reactive = `<button class="live-filter live-filter-reactive" id="todayReactivePill" type="button">🔥 Today's Reactive</button>`;
+        const reactive = `<button class="live-filter live-filter-reactive" id="todayReactivePill" type="button" onclick="openMarketChooser()">🔥 Today's Reactive</button>`;
         bar.innerHTML = filters + reactive;
       }
 
@@ -9322,140 +9275,6 @@
         });
       }
 
-      function setupTodayReactive() {
-        const overlay = document.getElementById("todayReactiveOverlay");
-        const meta = document.getElementById("todayReactiveMeta");
-        const body = document.getElementById("todayReactiveBody");
-        const closeBtn = document.getElementById("todayReactiveClose");
-        if (!overlay || !body) return;
-
-        function buildContent() {
-          const todayIso = new Date().toISOString().slice(0, 10);
-          const dateLabel = new Date().toLocaleDateString(undefined, {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          });
-          meta.textContent = dateLabel;
-
-          const matchesToday = (
-            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.matches) ||
-            []
-          ).filter((m) => m && m.date === todayIso);
-
-          const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-          const recentNews = (
-            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.news) ||
-            []
-          )
-            .filter((n) => {
-              if (!n || !n.timestamp) return false;
-              const t = new Date(n.timestamp).getTime();
-              return Number.isFinite(t) && t >= cutoff;
-            })
-            .slice(0, 6);
-
-          const recentSocial = (
-            (window.DASHBOARD_DATA && window.DASHBOARD_DATA.social) ||
-            []
-          ).slice(0, 4);
-
-          let html = "";
-
-          html += `<div style="margin-bottom:18px;color:var(--text-dim);font-size:0.88rem;line-height:1.5;">A quick brief for today's reactive content. Use it to spot the moment, then build.</div>`;
-
-          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Matches today</h4>`;
-          if (matchesToday.length === 0) {
-            html += `<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px;">No fixtures kicking off today.</div>`;
-          } else {
-            html +=
-              `<ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:8px;">` +
-              matchesToday
-                .map((m) => {
-                  const home =
-                    (m.home && (m.home.flag || "") + " " + (m.home.name || m.home.code || "")) ||
-                    "";
-                  const away =
-                    (m.away && (m.away.flag || "") + " " + (m.away.name || m.away.code || "")) ||
-                    "";
-                  const venue = m.venue ? ` · ${escapeHtml(m.venue)}` : "";
-                  const ko = m.kickoff ? ` · ${escapeHtml(m.kickoff)}` : "";
-                  return `<li style="font-size:0.9rem;line-height:1.4;">${escapeHtml(home)} <span style="color:var(--text-dim);">vs</span> ${escapeHtml(away)}<span style="color:var(--text-dim);font-size:0.78rem;">${ko}${venue}</span></li>`;
-                })
-                .join("") +
-              `</ul>`;
-          }
-
-          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Past 24h headlines</h4>`;
-          if (recentNews.length === 0) {
-            html += `<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:18px;">No fresh news in the last day.</div>`;
-          } else {
-            html +=
-              `<ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:10px;">` +
-              recentNews
-                .map((n) => {
-                  const tag = n.tag
-                    ? `<span style="display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,0.08);font-size:0.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-right:6px;vertical-align:middle;">${escapeHtml(n.tag)}</span>`
-                    : "";
-                  const url = n.url
-                    ? ` <a href="${encodeURI(n.url)}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;font-size:0.78rem;">↗</a>`
-                    : "";
-                  return `<li style="font-size:0.9rem;line-height:1.4;">${tag}${escapeHtml(n.headline || "")}${url}</li>`;
-                })
-                .join("") +
-              `</ul>`;
-          }
-
-          html += `<h4 style="font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1.2px;font-size:0.78rem;color:var(--gold);margin:0 0 10px;">Trending social</h4>`;
-          if (recentSocial.length === 0) {
-            html += `<div style="color:var(--text-dim);font-size:0.85rem;">No social trends loaded.</div>`;
-          } else {
-            html +=
-              `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">` +
-              recentSocial
-                .map((s) => {
-                  const cat = s.category
-                    ? `<span style="display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,0.08);font-size:0.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-right:6px;vertical-align:middle;">${escapeHtml(s.category)}</span>`
-                    : "";
-                  return `<li style="font-size:0.9rem;line-height:1.4;">${cat}${escapeHtml(s.topic || "")}</li>`;
-                })
-                .join("") +
-              `</ul>`;
-          }
-
-          body.innerHTML = html;
-        }
-
-        function open() {
-          buildContent();
-          overlay.classList.add("open");
-          document.body.style.overflow = "hidden";
-        }
-        function close() {
-          overlay.classList.remove("open");
-          document.body.style.overflow = "";
-        }
-
-        document.addEventListener("click", (e) => {
-          const pill = e.target.closest("#todayReactivePill");
-          if (pill) {
-            e.preventDefault();
-            open();
-          }
-        });
-        if (closeBtn) closeBtn.addEventListener("click", close);
-        overlay.addEventListener("click", (e) => {
-          if (e.target === overlay) close();
-        });
-        document.addEventListener("keydown", (e) => {
-          if (
-            e.key === "Escape" &&
-            overlay.classList.contains("open")
-          )
-            close();
-        });
-      }
-
       function setupCardExpand() {
         const overlay = document.getElementById("cardModalOverlay");
         const body = document.getElementById("cardModalBody");
@@ -10189,12 +10008,44 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
       }
       function pickMarket(market) {
         if (market !== "ca") return;
-        window.location.href = "formation.html?market=" + encodeURIComponent(market);
+        closeMarketChooser();
+        openReactiveFrame();
       }
+      function openReactiveFrame() {
+        var overlay = document.getElementById("reactiveFrameOverlay");
+        var iframe = document.getElementById("reactiveFrameIframe");
+        if (!overlay || !iframe) return;
+        iframe.src = "social.html";
+        overlay.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+      function closeReactiveFrame() {
+        var overlay = document.getElementById("reactiveFrameOverlay");
+        var iframe = document.getElementById("reactiveFrameIframe");
+        if (!overlay) return;
+        overlay.hidden = true;
+        if (iframe) iframe.src = "";
+        document.body.style.overflow = "";
+      }
+      (function bindReactiveFrame() {
+        var btn = document.getElementById("reactiveFrameClose");
+        if (btn) btn.addEventListener("click", closeReactiveFrame);
+        var overlay = document.getElementById("reactiveFrameOverlay");
+        if (overlay) {
+          overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) closeReactiveFrame();
+          });
+        }
+      })();
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
-        var overlay = document.getElementById("marketModalOverlay");
-        if (overlay && overlay.classList.contains("open")) closeMarketChooser();
+        var marketOverlay = document.getElementById("marketModalOverlay");
+        if (marketOverlay && marketOverlay.classList.contains("open")) {
+          closeMarketChooser();
+          return;
+        }
+        var frameOverlay = document.getElementById("reactiveFrameOverlay");
+        if (frameOverlay && !frameOverlay.hidden) closeReactiveFrame();
       });
     </script>
 
