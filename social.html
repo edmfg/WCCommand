@@ -67,6 +67,16 @@
         z-index: 0;
       }
 
+      /* When embedded inside index.html via iframe, hide our own header
+         and footer so the parent's nav is the single source of chrome. */
+      body.embed .header,
+      body.embed footer {
+        display: none !important;
+      }
+      body.embed main {
+        padding-top: 32px;
+      }
+
       /* ===== header (matched to World Cup HQ main site) ===== */
       .header {
         position: sticky;
@@ -1290,6 +1300,18 @@
     </style>
   </head>
   <body>
+    <script>
+      // ?embed=1 (or being inside an iframe) hides the redundant header/footer
+      // so the parent's nav is the canonical chrome.
+      (function () {
+        try {
+          var p = new URLSearchParams(window.location.search);
+          if (p.get("embed") === "1" || window.parent !== window) {
+            document.body.classList.add("embed");
+          }
+        } catch (_) {}
+      })();
+    </script>
     <header class="header">
       <div class="header-inner">
         <a class="brand" href="#" id="brandHome" data-wcc-nav="live">
@@ -1303,9 +1325,9 @@
         </a>
         <nav class="header-nav">
           <button class="tab-btn" type="button" data-wcc-nav="live">Live</button>
+          <button class="tab-btn active" type="button" aria-current="page">Today's Reactive</button>
           <button class="tab-btn" type="button" data-wcc-nav="calendar">Fixtures</button>
           <button class="tab-btn" type="button" data-wcc-nav="creative">Creative</button>
-          <button class="tab-btn active" type="button" aria-current="page">Today's Reactive</button>
         </nav>
         <div class="header-actions">
           <button

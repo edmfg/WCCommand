@@ -3069,19 +3069,40 @@
           }
         });
 
-        // Skip the gate if a valid cookie is already present.
-        (async function preauth() {
-          try {
-            const res = await fetch("/api/mfg-gate", {
-              credentials: "same-origin",
-            });
-            const data = await res.json().catch(() => ({}));
-            if (data && data.ok) {
-              if (currentMarket && currentUserLabel) showApp();
-              else showMarketGate();
-            }
-          } catch (e) {}
+        // Local-dev bypass: skip the password gate entirely off localhost /
+        // file:// / a private network. The /api/mfg-gate function only runs
+        // on Vercel.
+        const _mfgIsLocalDev = (function () {
+          const h = window.location.hostname || "";
+          if (window.location.protocol === "file:") return true;
+          if (/^localhost$/i.test(h)) return true;
+          if (/^127\./.test(h)) return true;
+          if (/^\[::1\]$/i.test(h) || h === "::1") return true;
+          if (/^10\./.test(h)) return true;
+          if (/^192\.168\./.test(h)) return true;
+          if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)) return true;
+          if (/\.local$/i.test(h)) return true;
+          return false;
         })();
+
+        if (_mfgIsLocalDev) {
+          if (currentMarket && currentUserLabel) showApp();
+          else showMarketGate();
+        } else {
+          // Skip the gate if a valid cookie is already present.
+          (async function preauth() {
+            try {
+              const res = await fetch("/api/mfg-gate", {
+                credentials: "same-origin",
+              });
+              const data = await res.json().catch(() => ({}));
+              if (data && data.ok) {
+                if (currentMarket && currentUserLabel) showApp();
+                else showMarketGate();
+              }
+            } catch (e) {}
+          })();
+        }
 
         // --- Global Triage (Supabase synced, MFG-shared) ---
         const TRIAGE_KEY = "mfg_global_triage_v1";

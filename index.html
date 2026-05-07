@@ -956,6 +956,21 @@
       .tab-panel.active {
         display: block;
       }
+      /* Today's Reactive surface — full-bleed iframe of social.html?embed=1 */
+      #panel-reactive {
+        margin: -24px -32px;
+      }
+      .reactive-frame {
+        display: block;
+        width: 100%;
+        height: calc(100vh - 72px - 36px);
+        border: 0;
+        background: #0a0c14;
+      }
+      @media (max-width: 760px) {
+        #panel-reactive { margin: -16px -16px; }
+        .reactive-frame { height: calc(100vh - 60px); }
+      }
       @keyframes fadeUp {
         from {
           opacity: 0;
@@ -1069,58 +1084,6 @@
       body.light .live-filter.active {
         background: var(--red);
         color: #fff;
-      }
-      .live-filter.live-filter-reactive {
-        position: relative;
-        min-width: 220px;
-        padding: 7px 24px;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 215, 0, 0.15),
-          rgba(204, 0, 0, 0.18)
-        );
-        border-color: rgba(255, 215, 0, 0.4);
-        color: #fff;
-        font-weight: 700;
-        overflow: hidden;
-      }
-      .live-filter.live-filter-reactive::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -60%;
-        width: 35%;
-        height: 100%;
-        background: linear-gradient(
-          110deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.18) 50%,
-          transparent 100%
-        );
-        transform: skewX(-20deg);
-        animation: reactivePillShine 5s ease-in-out infinite;
-        pointer-events: none;
-      }
-      @keyframes reactivePillShine {
-        0%, 28% {
-          left: -60%;
-          opacity: 0;
-        }
-        35% {
-          opacity: 1;
-        }
-        70%, 100% {
-          left: 130%;
-          opacity: 0;
-        }
-      }
-      .live-filter.live-filter-reactive:hover {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 215, 0, 0.28),
-          rgba(204, 0, 0, 0.32)
-        );
-        border-color: rgba(255, 215, 0, 0.65);
       }
       body.light .live-filter.live-filter-reactive {
         background: linear-gradient(
@@ -2521,211 +2484,6 @@
       body.light .entity-link:hover {
         color: #1a1a2e;
         background: rgba(255, 195, 0, 0.18);
-      }
-
-      /* ── Today's Reactive iframe overlay (Canada → social.html) ── */
-      .reactive-frame-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 9900;
-        background: rgba(5, 7, 12, 0.94);
-        display: flex;
-        align-items: stretch;
-        justify-content: stretch;
-        animation: fadeIn 0.2s ease;
-      }
-      .reactive-frame-overlay[hidden] {
-        display: none;
-      }
-      .reactive-frame-iframe {
-        flex: 1;
-        width: 100%;
-        height: 100%;
-        border: 0;
-        background: #0a0c14;
-      }
-      .reactive-frame-close {
-        position: absolute;
-        top: 16px;
-        right: 18px;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: #fff;
-        font-size: 24px;
-        line-height: 1;
-        cursor: pointer;
-        z-index: 10000;
-        transition:
-          background 0.15s,
-          transform 0.15s;
-      }
-      .reactive-frame-close:hover {
-        background: rgba(255, 255, 255, 0.18);
-        transform: scale(1.06);
-      }
-
-      /* ── Market chooser modal ── */
-      .market-modal-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        background: rgba(5, 7, 12, 0.72);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
-      .market-modal-overlay.open {
-        display: flex;
-        animation: marketFade 0.2s ease;
-      }
-      @keyframes marketFade {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      .market-modal {
-        position: relative;
-        width: 100%;
-        max-width: 520px;
-        background: linear-gradient(180deg, #14181f, #0d1018);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 20px;
-        padding: 32px 28px 28px;
-        animation: marketRise 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .market-modal::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #cc0000, transparent 80%);
-        border-radius: 20px 20px 0 0;
-      }
-      @keyframes marketRise {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      .market-modal-close {
-        position: absolute;
-        top: 14px;
-        right: 14px;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(255, 255, 255, 0.04);
-        color: #b8bcc8;
-        cursor: pointer;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-      }
-      .market-modal-close:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.08);
-      }
-      .market-modal-tag {
-        font-family: "Oswald", "Inter", sans-serif;
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: #ffd700;
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
-      .market-modal-title {
-        font-family: "Oswald", "Inter", sans-serif;
-        font-weight: 600;
-        font-size: 26px;
-        color: #fff;
-        line-height: 1.2;
-        margin-bottom: 6px;
-      }
-      .market-modal-sub {
-        font-size: 13px;
-        color: #8a8fa0;
-        margin-bottom: 22px;
-      }
-      .market-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
-      .market-card {
-        position: relative;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 16px 18px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: left;
-        font-family: inherit;
-        color: #fff;
-      }
-      .market-card:hover:not(.disabled) {
-        transform: translateY(-2px);
-        border-color: rgba(204, 0, 0, 0.5);
-        background: rgba(204, 0, 0, 0.08);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      }
-      .market-card.disabled {
-        cursor: not-allowed;
-        opacity: 0.55;
-      }
-      .market-card-flag {
-        font-size: 30px;
-        line-height: 1;
-        width: 46px;
-        height: 46px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        flex-shrink: 0;
-      }
-      .market-card-name {
-        font-family: "Oswald", "Inter", sans-serif;
-        font-weight: 600;
-        font-size: 15px;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #fff;
-        margin-bottom: 2px;
-      }
-      .market-card-meta {
-        font-size: 11px;
-        color: #8a8fa0;
-        letter-spacing: 0.04em;
-      }
-      .market-card-soon {
-        position: absolute;
-        top: 10px;
-        right: 12px;
-        font-family: "Oswald", "Inter", sans-serif;
-        font-size: 9px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: #ffd700;
-        background: rgba(255, 215, 0, 0.1);
-        border: 1px solid rgba(255, 215, 0, 0.3);
-        padding: 3px 7px;
-        border-radius: 4px;
       }
 
       /* ── Bookmarks bar (pinned cards) ── */
@@ -5788,6 +5546,22 @@
         var errEl = document.getElementById("gateError");
         var REMEMBER_KEY = "wcc_gate_remember_until";
         var REMEMBER_MS = 7 * 24 * 60 * 60 * 1000;
+        // Local-dev bypass: when running off localhost / file:// / a private
+        // network the serverless `/api/gate` route doesn't exist, so just
+        // skip the gate entirely. Production deploys (vercel.app + custom
+        // domain) still go through the real auth flow.
+        var isLocalDev = (function () {
+          var h = window.location.hostname || "";
+          if (window.location.protocol === "file:") return true;
+          if (/^(localhost|127\.|\[::1\]|::1)$/i.test(h)) return true;
+          if (/^localhost$/i.test(h)) return true;
+          if (/^127\./.test(h)) return true;
+          if (/^10\./.test(h)) return true;
+          if (/^192\.168\./.test(h)) return true;
+          if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)) return true;
+          if (/\.local$/i.test(h)) return true;
+          return false;
+        })();
         // Local hint (synchronous, beats network) so a remembered user never
         // flashes the gate. Set to slightly under 7 days so the local hint
         // expires before the server cookie does.
@@ -5868,6 +5642,13 @@
           } finally {
             if (btn) btn.disabled = false;
           }
+        }
+
+        // LOCAL DEV: skip the gate entirely off localhost / file:// — there
+        // is no /api/gate to verify against under `npx serve`.
+        if (isLocalDev) {
+          openGate();
+          return;
         }
 
         // FAST PATH: if the user previously checked Remember-me and the local
@@ -5986,6 +5767,9 @@
         <nav class="header-nav">
           <button class="tab-btn active" data-tab="live"
             >Live<span class="whats-new-badge" data-whats-new="live" hidden></span
+          ></button>
+          <button class="tab-btn" data-tab="reactive" type="button"
+            >Today's Reactive<span class="whats-new-badge" data-whats-new="reactive" hidden></span
           ></button>
           <button class="tab-btn" data-tab="calendar"
             >Fixtures<span class="whats-new-badge" data-whats-new="calendar" hidden></span
@@ -6267,6 +6051,16 @@
           <div class="assets-grid" id="foxS2Grid"></div>
         </div>
       </div>
+
+      <!-- TODAY'S REACTIVE -->
+      <div class="tab-panel" id="panel-reactive">
+        <iframe
+          class="reactive-frame"
+          id="reactiveFrame"
+          title="Today's Reactive"
+          loading="lazy"
+        ></iframe>
+      </div>
     </main>
 
     <footer
@@ -6432,32 +6226,6 @@
         </button>
         <div id="cardModalBody"></div>
       </div>
-    </div>
-
-    <!-- ── CANADA TODAY'S REACTIVE OVERLAY (embeds social.html) ── -->
-    <div
-      class="reactive-frame-overlay"
-      id="reactiveFrameOverlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Today's Reactive — Canada"
-      hidden
-    >
-      <button
-        type="button"
-        class="reactive-frame-close"
-        id="reactiveFrameClose"
-        aria-label="Close"
-      >
-        ×
-      </button>
-      <iframe
-        class="reactive-frame-iframe"
-        id="reactiveFrameIframe"
-        src=""
-        title="Today's Reactive — Canada"
-        loading="lazy"
-      ></iframe>
     </div>
 
     <!-- ── CREATIVE PLAYER OVERLAY (Drive embed) ── -->
@@ -7038,14 +6806,12 @@
 
       function renderLiveFilters() {
         const bar = document.getElementById("liveFilters");
-        const filters = liveFilterDefs
+        bar.innerHTML = liveFilterDefs
           .map(
             (f) =>
               `<button class="live-filter${liveFilters.has(f.id) ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
           )
           .join("");
-        const reactive = `<button class="live-filter live-filter-reactive" id="todayReactivePill" type="button" onclick="openMarketChooser()">🔥 Today's Reactive</button>`;
-        bar.innerHTML = filters + reactive;
       }
 
       function matchesLiveFilter(item, type) {
@@ -8938,6 +8704,13 @@
           }
           window._matchesRendered = true;
         }
+        // Lazy-load the Today's Reactive iframe on first activation so a
+        // 65KB embedded page doesn't hit the network until the user asks.
+        if (tab === "reactive" && !window._reactiveLoaded) {
+          const fr = document.getElementById("reactiveFrame");
+          if (fr) fr.src = "social.html?embed=1";
+          window._reactiveLoaded = true;
+        }
         // Mark this tab as visited and clear its "what's new" badge.
         try {
           setLastVisit(tab);
@@ -9966,157 +9739,23 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         bootDashboard();
       }
     </script>
-    <!-- Market chooser modal (Today's Reactive pill → market picker → formation.html) -->
-    <div
-      class="market-modal-overlay"
-      id="marketModalOverlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="marketModalTitle"
-      onclick="marketModalOnBg(event)"
-    >
-      <div class="market-modal" id="marketModal">
-        <button
-          type="button"
-          class="market-modal-close"
-          onclick="closeMarketChooser()"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <div class="market-modal-tag">Today's Reactive</div>
-        <h2 class="market-modal-title" id="marketModalTitle">
-          Pick a market
-        </h2>
-        <p class="market-modal-sub">
-          Reader-agent briefings + storyboard plays for today.
-        </p>
-        <div class="market-grid">
-          <button
-            type="button"
-            class="market-card"
-            onclick="pickMarket('ca')"
-            data-market="ca"
-          >
-            <span class="market-card-flag">🇨🇦</span>
-            <span>
-              <span class="market-card-name">Canada</span>
-              <span class="market-card-meta">Cultural + Match · Today</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            class="market-card disabled"
-            disabled
-            aria-disabled="true"
-            data-market="uk"
-          >
-            <span class="market-card-flag">🇬🇧</span>
-            <span>
-              <span class="market-card-name">United Kingdom</span>
-              <span class="market-card-meta">Reader agents booting</span>
-            </span>
-            <span class="market-card-soon">Soon</span>
-          </button>
-          <button
-            type="button"
-            class="market-card disabled"
-            disabled
-            aria-disabled="true"
-            data-market="de"
-          >
-            <span class="market-card-flag">🇩🇪</span>
-            <span>
-              <span class="market-card-name">Germany</span>
-              <span class="market-card-meta">Reader agents booting</span>
-            </span>
-            <span class="market-card-soon">Soon</span>
-          </button>
-          <button
-            type="button"
-            class="market-card disabled"
-            disabled
-            aria-disabled="true"
-            data-market="usa"
-          >
-            <span class="market-card-flag">🇺🇸</span>
-            <span>
-              <span class="market-card-name">USA</span>
-              <span class="market-card-meta">Reader agents booting</span>
-            </span>
-            <span class="market-card-soon">Soon</span>
-          </button>
-        </div>
-      </div>
-    </div>
     <script>
-      function openMarketChooser() {
-        document.getElementById("marketModalOverlay").classList.add("open");
-      }
-      function closeMarketChooser() {
-        document.getElementById("marketModalOverlay").classList.remove("open");
-      }
-      function marketModalOnBg(e) {
-        if (e.target.id === "marketModalOverlay") closeMarketChooser();
-      }
-      function pickMarket(market) {
-        if (market !== "ca") return;
-        closeMarketChooser();
-        openReactiveFrame();
-      }
-      function openReactiveFrame() {
-        var overlay = document.getElementById("reactiveFrameOverlay");
-        var iframe = document.getElementById("reactiveFrameIframe");
-        if (!overlay || !iframe) return;
-        iframe.src = "social.html";
-        overlay.hidden = false;
-        document.body.style.overflow = "hidden";
-      }
-      function closeReactiveFrame() {
-        var overlay = document.getElementById("reactiveFrameOverlay");
-        var iframe = document.getElementById("reactiveFrameIframe");
-        if (!overlay) return;
-        overlay.hidden = true;
-        if (iframe) iframe.src = "";
-        document.body.style.overflow = "";
-      }
-      (function bindReactiveFrame() {
-        var btn = document.getElementById("reactiveFrameClose");
-        if (btn) btn.addEventListener("click", closeReactiveFrame);
-        var overlay = document.getElementById("reactiveFrameOverlay");
-        if (overlay) {
-          overlay.addEventListener("click", function (e) {
-            if (e.target === overlay) closeReactiveFrame();
-          });
+      // social.html (Today's Reactive) is loaded as an iframe inside
+      // panel-reactive. When its embedded nav posts back, route into the
+      // parent's switchTab so the user navigates without an iframe nav loop.
+      window.addEventListener("message", function (e) {
+        var d = e && e.data;
+        if (!d || typeof d !== "object") return;
+        if (
+          (d.type === "wcc-nav" || d.type === "wcc-nav-close") &&
+          typeof window.switchTab === "function"
+        ) {
+          try {
+            var tab = d.type === "wcc-nav-close" ? "live" : d.tab || "live";
+            window.switchTab(tab);
+            location.hash = tab;
+          } catch (_) {}
         }
-        // Listen for nav messages posted by social.html when it's iframed in.
-        window.addEventListener("message", function (e) {
-          var d = e && e.data;
-          if (!d || typeof d !== "object") return;
-          if (d.type === "wcc-nav-close") {
-            closeReactiveFrame();
-            return;
-          }
-          if (d.type === "wcc-nav" && typeof d.tab === "string") {
-            closeReactiveFrame();
-            if (typeof window.switchTab === "function") {
-              try {
-                window.switchTab(d.tab);
-                location.hash = d.tab;
-              } catch (_) {}
-            }
-          }
-        });
-      })();
-      document.addEventListener("keydown", function (e) {
-        if (e.key !== "Escape") return;
-        var marketOverlay = document.getElementById("marketModalOverlay");
-        if (marketOverlay && marketOverlay.classList.contains("open")) {
-          closeMarketChooser();
-          return;
-        }
-        var frameOverlay = document.getElementById("reactiveFrameOverlay");
-        if (frameOverlay && !frameOverlay.hidden) closeReactiveFrame();
       });
     </script>
 
