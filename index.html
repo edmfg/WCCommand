@@ -916,7 +916,7 @@
       }
       .ticker-track {
         display: flex;
-        animation: marquee 364s linear infinite;
+        animation: marquee 728s linear infinite;
         white-space: nowrap;
       }
       .ticker-bar:hover .ticker-track {
@@ -5613,6 +5613,11 @@
       body.gated .gate-overlay {
         display: flex;
       }
+      /* While the cookie probe is in flight, keep the gate hidden so an
+         already-authenticated user never sees a flash of the password form. */
+      body.gate-probing .gate-overlay {
+        visibility: hidden;
+      }
       .gate-card {
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -5895,7 +5900,21 @@
         }
 
         // SLOW PATH: no remember hint — verify the server cookie before
-        // showing the form so a session-only cookie also avoids a flash.
+        // showing the form so a session-only cookie (or any prior auth
+        // session) also avoids a flash of the password form.
+        body.classList.add("gate-probing");
+        var probeRevealed = false;
+        function revealGateForm() {
+          if (probeRevealed) return;
+          probeRevealed = true;
+          body.classList.remove("gate-probing");
+          setTimeout(function () {
+            if (pwInput) pwInput.focus();
+          }, 50);
+        }
+        // Safety: if the probe takes too long, show the gate anyway so
+        // the user can type rather than stare at a blank page.
+        var probeTimeout = setTimeout(revealGateForm, 2500);
         fetch("/api/gate", { credentials: "same-origin" })
           .then(function (r) {
             return r.json().catch(function () {
@@ -5903,16 +5922,18 @@
             });
           })
           .then(function (d) {
+            clearTimeout(probeTimeout);
             if (d && d.ok) {
+              probeRevealed = true;
+              body.classList.remove("gate-probing");
               openGate();
             } else {
-              setTimeout(function () {
-                if (pwInput) pwInput.focus();
-              }, 50);
+              revealGateForm();
             }
           })
           .catch(function () {
-            /* keep gated; user can submit */
+            clearTimeout(probeTimeout);
+            revealGateForm();
           });
       })();
     </script>
@@ -6810,9 +6831,9 @@
         requestAnimationFrame(() => {
           const breakingTrack = document.getElementById("tickerTrack");
           if (!breakingTrack) return;
-          // Breaking ticker animation: 364s for translateX(-50%) of doubled content
+          // Breaking ticker animation: 728s for translateX(-50%) of doubled content
           const breakingHalfWidth = breakingTrack.scrollWidth / 2;
-          const breakingPxPerSec = breakingHalfWidth / 364;
+          const breakingPxPerSec = breakingHalfWidth / 728;
           const factHalfWidth = track.scrollWidth / 2;
           if (breakingPxPerSec > 0 && factHalfWidth > 0) {
             const factDuration = factHalfWidth / breakingPxPerSec;

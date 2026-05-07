@@ -2146,6 +2146,28 @@
           maxlength="40"
           style="margin-top: 10px"
         />
+        <label
+          id="marketRememberLabel"
+          for="marketRemember"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--text-dim);
+            cursor: pointer;
+            user-select: none;
+          "
+        >
+          <input
+            type="checkbox"
+            id="marketRemember"
+            checked
+            style="cursor: pointer"
+          />
+          <span>Remember me — skip this next time</span>
+        </label>
         <button class="gate-btn" id="marketContinue" style="margin-top: 14px">
           Continue
         </button>
@@ -2891,8 +2913,49 @@
 
         const MARKET_LS_KEY = "mfg_market";
         const MARKET_USER_LS_KEY = "mfg_user_label";
-        let currentMarket = localStorage.getItem(MARKET_LS_KEY) || "";
-        let currentUserLabel = localStorage.getItem(MARKET_USER_LS_KEY) || "";
+        // sessionStorage path is used when "Remember me" is unchecked — the
+        // identity sticks for the tab session but a fresh visit re-prompts.
+        function readIdentity() {
+          let m = "",
+            u = "";
+          try {
+            m =
+              localStorage.getItem(MARKET_LS_KEY) ||
+              sessionStorage.getItem(MARKET_LS_KEY) ||
+              "";
+            u =
+              localStorage.getItem(MARKET_USER_LS_KEY) ||
+              sessionStorage.getItem(MARKET_USER_LS_KEY) ||
+              "";
+          } catch (e) {}
+          return { market: m, user: u };
+        }
+        function writeIdentity(market, user, remember) {
+          try {
+            if (remember) {
+              localStorage.setItem(MARKET_LS_KEY, market);
+              localStorage.setItem(MARKET_USER_LS_KEY, user);
+              sessionStorage.removeItem(MARKET_LS_KEY);
+              sessionStorage.removeItem(MARKET_USER_LS_KEY);
+            } else {
+              sessionStorage.setItem(MARKET_LS_KEY, market);
+              sessionStorage.setItem(MARKET_USER_LS_KEY, user);
+              localStorage.removeItem(MARKET_LS_KEY);
+              localStorage.removeItem(MARKET_USER_LS_KEY);
+            }
+          } catch (e) {}
+        }
+        function clearIdentity() {
+          try {
+            localStorage.removeItem(MARKET_LS_KEY);
+            localStorage.removeItem(MARKET_USER_LS_KEY);
+            sessionStorage.removeItem(MARKET_LS_KEY);
+            sessionStorage.removeItem(MARKET_USER_LS_KEY);
+          } catch (e) {}
+        }
+        const _identity = readIdentity();
+        let currentMarket = _identity.market;
+        let currentUserLabel = _identity.user;
 
         function showMarketBadge() {
           const b = document.getElementById("marketBadge");
@@ -2918,6 +2981,53 @@
           if (currentMarket) marketSelect.value = currentMarket;
           if (currentUserLabel) marketUser.value = currentUserLabel;
           marketSelect.focus();
+        }
+
+        function submitMarketIdentity() {
+          const market = (marketSelect.value || "").trim();
+          const user = (marketUser.value || "").trim();
+          if (!market || !user) {
+            marketError.style.display = "block";
+            (market ? marketUser : marketSelect).focus();
+            return;
+          }
+          marketError.style.display = "none";
+          const remember = !!(
+            document.getElementById("marketRemember") &&
+            document.getElementById("marketRemember").checked
+          );
+          currentMarket = market;
+          currentUserLabel = user;
+          writeIdentity(market, user, remember);
+          showApp();
+        }
+        marketContinue.addEventListener("click", submitMarketIdentity);
+        marketUser.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submitMarketIdentity();
+          }
+        });
+        marketSelect.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            marketUser.focus();
+          }
+        });
+
+        // Switch Market: wipe stored identity and re-show the market gate.
+        const switchMarketBtn = document.getElementById("switchMarketBtn");
+        if (switchMarketBtn) {
+          switchMarketBtn.addEventListener("click", () => {
+            clearIdentity();
+            currentMarket = "";
+            currentUserLabel = "";
+            marketSelect.value = "";
+            marketUser.value = "";
+            const rem = document.getElementById("marketRemember");
+            if (rem) rem.checked = true;
+            showMarketGate();
+          });
         }
 
         // Server-side gate. Falls back to GATE_PASSWORD if MFG_KEY isn't set
