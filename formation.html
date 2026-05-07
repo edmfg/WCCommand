@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Today's Reactive — World Cup HQ</title>
+    <meta name="description" content="The day's signals, translated into three plays you can run." />
+    <meta name="theme-color" content="#0a0c14" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%BD</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      :root {
+        --red: #cc0000;
+        --red-dark: #990000;
+        --gold: #ffd700;
+        --blue: #1a3a6b;
+        --purple: #b48ef5;
+        --bg: #0a0c14;
+        --surface: rgba(255, 255, 255, 0.04);
+        --surface-2: rgba(255, 255, 255, 0.06);
+        --surface-3: rgba(255, 255, 255, 0.09);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-2: rgba(255, 255, 255, 0.14);
+        --text: #e8e8e8;
+        --text-mid: #b8bcc8;
+        --text-dim: #8a8fa0;
+        --green: #4ade80;
+        --amber: #fbbf24;
+        --radius: 12px;
+        --radius-lg: 20px;
+        --t: cubic-bezier(0.4, 0, 0.2, 1);
+        --max: 1400px;
+      }
+
+      html { scroll-behavior: smooth; }
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body.gated > *:not(#bootGate) { visibility: hidden; }
+      #bootGate {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        color: var(--text-dim);
+        font-family: "Oswald", "Inter", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      body:not(.gated) #bootGate { display: none; }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(900px 500px at 85% -10%, rgba(204, 0, 0, 0.18), transparent 60%),
+          radial-gradient(900px 600px at 0% 25%, rgba(26, 58, 107, 0.22), transparent 60%),
+          radial-gradient(700px 400px at 60% 100%, rgba(255, 215, 0, 0.06), transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ===== header ===== */
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(18px) saturate(160%);
+        -webkit-backdrop-filter: blur(18px) saturate(160%);
+        background: rgba(10, 12, 20, 0.7);
+        border-bottom: 1px solid var(--border);
+      }
+      .header-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .brand {
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        font-size: 17px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand .ball { font-size: 22px; line-height: 1; }
+      .brand .pipe { color: var(--text-dim); font-weight: 400; opacity: 0.7; }
+      .brand .sub {
+        background: linear-gradient(135deg, var(--gold), #fff6c4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .header-back {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        color: var(--text-dim);
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        transition: all 0.2s var(--t);
+      }
+      .header-back:hover {
+        color: var(--text);
+        border-color: var(--border-2);
+        background: var(--surface-2);
+      }
+      .header-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .live-pill {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(74, 222, 128, 0.08);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        padding: 5px 10px;
+        border-radius: 99px;
+      }
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+      /* ===== layout ===== */
+      main {
+        position: relative;
+        z-index: 1;
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 56px 28px 96px;
+      }
+
+      /* ===== hero ===== */
+      .hero {
+        margin-bottom: 72px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--border);
+      }
+      .date-strip {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin-bottom: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 8px 14px;
+        border-radius: 99px;
+      }
+      .date-strip .pulse-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--red);
+        animation: pulse 2s infinite;
+      }
+      .date-strip .seg { color: var(--text-mid); }
+      .date-strip .seg + .seg::before {
+        content: "·";
+        margin-right: 12px;
+        color: var(--text-dim);
+      }
+      .hero h1 {
+        font-family: "Oswald", sans-serif;
+        font-weight: 600;
+        font-size: clamp(48px, 8vw, 96px);
+        line-height: 0.92;
+        letter-spacing: -0.015em;
+        margin-bottom: 24px;
+        text-transform: uppercase;
+      }
+      .hero h1 .stroke {
+        background: linear-gradient(135deg, var(--red) 20%, var(--gold) 80%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .hero .lede {
+        font-size: 18px;
+        color: var(--text-mid);
+        max-width: 640px;
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
+
+      /* ===== section ===== */
+      .section { margin-bottom: 96px; }
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+        margin-bottom: 8px;
+      }
+      .section-num {
+        font-family: "Oswald", sans-serif;
+        font-size: 14px;
+        color: var(--gold);
+        letter-spacing: 0.16em;
+        font-weight: 500;
+      }
+      .section-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 500;
+        font-size: 32px;
+        letter-spacing: -0.005em;
+        text-transform: uppercase;
+      }
+      .section-sub {
+        color: var(--text-dim);
+        font-size: 14px;
+        margin-bottom: 32px;
+        max-width: 700px;
+        line-height: 1.5;
+      }
+
+      /* ===== briefings ===== */
+      .briefings {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+      @media (max-width: 1100px) { .briefings { grid-template-columns: 1fr; } }
+
+      .briefing {
+        --accent: var(--red);
+        background: linear-gradient(180deg, var(--surface-2), var(--surface));
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s var(--t);
+      }
+      .briefing:hover { border-color: var(--border-2); }
+      .briefing::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), transparent 80%);
+      }
+      .briefing[data-tone="cultural"] { --accent: var(--purple); }
+      .briefing[data-tone="match"] { --accent: var(--red); }
+
+      .briefing-watermark {
+        position: absolute;
+        top: 24px; right: 24px;
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        font-size: 88px;
+        line-height: 0.8;
+        color: var(--accent);
+        opacity: 0.06;
+        letter-spacing: -0.02em;
+        pointer-events: none;
+      }
+
+      .briefing-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .agent-tag { display: flex; align-items: center; gap: 12px; }
+      .agent-flag {
+        font-size: 22px;
+        line-height: 1;
+        width: 36px; height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .agent-name {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .agent-window { font-size: 12px; color: var(--text-dim); }
+      .agent-status {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        color: var(--green);
+        background: rgba(74, 222, 128, 0.08);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        padding: 5px 9px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .agent-status::before {
+        content: "";
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .briefing-headline {
+        font-family: "Oswald", sans-serif;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 1.25;
+        margin-bottom: 28px;
+        color: var(--text);
+        letter-spacing: -0.005em;
+      }
+
+      .spikes-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .spikes-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .spikes {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .spike {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all 0.25s var(--t);
+        position: relative;
+        overflow: hidden;
+      }
+      .spike::after {
+        content: "↗";
+        position: absolute;
+        top: 14px; right: 14px;
+        color: var(--text-dim);
+        opacity: 0;
+        transition: all 0.25s var(--t);
+        font-size: 14px;
+      }
+      .spike:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-2);
+        background: var(--surface-2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      .spike:hover::after {
+        opacity: 1;
+        color: var(--accent);
+        transform: translate(2px, -2px);
+      }
+
+      .spike-row1 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .spike-num {
+        font-family: "Oswald", sans-serif;
+        font-size: 13px;
+        color: var(--accent);
+        letter-spacing: 0.08em;
+        width: 24px;
+        flex-shrink: 0;
+        font-weight: 600;
+      }
+      .spike-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        flex: 1;
+        line-height: 1.3;
+        padding-right: 20px;
+      }
+      .spike-meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: 36px;
+      }
+      .vol-bar {
+        flex: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 99px;
+        overflow: hidden;
+        max-width: 110px;
+      }
+      .vol-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 50%, white));
+        border-radius: 99px;
+      }
+      .spike-pct {
+        font-family: "Oswald", sans-serif;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-dim);
+        letter-spacing: 0.04em;
+      }
+      .spike-pct strong { color: var(--text-mid); font-weight: 600; }
+      .sentiment-pill {
+        font-size: 9px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 99px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-left: auto;
+      }
+      .sentiment-pill[data-tone="positive"] { color: var(--green); background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.25); }
+      .sentiment-pill[data-tone="neutral"] { color: var(--gold); background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); }
+      .sentiment-pill[data-tone="caution"] { color: var(--red); background: rgba(204, 0, 0, 0.1); border: 1px solid rgba(204, 0, 0, 0.3); }
+
+      .spike-quote {
+        margin-left: 36px;
+        font-size: 12px;
+        color: var(--text-dim);
+        font-style: italic;
+        line-height: 1.45;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.3s var(--t), opacity 0.3s var(--t), margin-top 0.3s var(--t);
+      }
+      .spike-quote::before { content: "\201C"; color: var(--accent); margin-right: 4px; font-weight: 700; }
+      .spike:hover .spike-quote {
+        max-height: 80px;
+        opacity: 1;
+        margin-top: 8px;
+      }
+
+      /* accordion */
+      .accordion {
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+        margin-top: 14px;
+      }
+      .accordion-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+        padding: 4px 0;
+      }
+      .accordion-head:hover .lbl { color: var(--text); }
+      .accordion-head .lbl {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        color: var(--text-dim);
+        transition: color 0.2s;
+      }
+      .accordion-head .count {
+        font-size: 11px;
+        font-family: "Oswald", sans-serif;
+        font-variant-numeric: tabular-nums;
+        color: var(--accent);
+        margin-left: 8px;
+      }
+      .accordion-toggle {
+        font-size: 14px;
+        color: var(--text-dim);
+        transition: transform 0.25s var(--t);
+        line-height: 1;
+      }
+      .accordion.open .accordion-toggle { transform: rotate(45deg); color: var(--text); }
+      .accordion-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s var(--t);
+      }
+      .accordion.open .accordion-body { max-height: 1000px; }
+      .accordion-inner { padding-top: 14px; }
+
+      .watch-item {
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--border);
+        display: flex;
+        gap: 12px;
+      }
+      .watch-item:last-child { border-bottom: none; padding-bottom: 0; }
+      .watch-item .dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-top: 7px;
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+      .watch-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+      .watch-note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+      .briefing-sig {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        color: var(--text-dim);
+        letter-spacing: 0.04em;
+      }
+
+      /* ===== modal ===== */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 7, 12, 0.72);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .modal {
+        --accent: var(--red);
+        background: linear-gradient(180deg, #14181f, #0d1018);
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 640px;
+        padding: 36px;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: rise 0.3s var(--t);
+      }
+      .modal::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      }
+      @keyframes rise {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .modal-close {
+        position: absolute;
+        top: 18px; right: 18px;
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .modal-close:hover { color: var(--text); border-color: var(--border-2); background: var(--surface-2); }
+
+      .modal-tag {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+      .modal-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 1.15;
+        margin-bottom: 28px;
+        letter-spacing: -0.005em;
+      }
+      .modal-stats {
+        display: flex;
+        gap: 16px;
+        padding: 18px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 28px;
+      }
+      .modal-stat { flex: 1; }
+      .modal-stat .num {
+        font-family: "Oswald", sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .modal-stat .lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        color: var(--text-dim);
+      }
+      .modal-block { margin-bottom: 20px; }
+      .modal-block .lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+      .modal-block .body { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+      .modal-block.voice .body {
+        font-style: italic;
+        border-left: 2px solid var(--accent);
+        padding-left: 14px;
+        color: var(--text);
+      }
+      .modal-block.hook .body {
+        background: linear-gradient(90deg, rgba(255, 215, 0, 0.08), transparent);
+        border-radius: 8px;
+        padding: 12px 14px;
+        color: var(--text);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+      }
+      .modal-block.hook .lbl { color: var(--gold); }
+
+      /* ===== storyboards ===== */
+      .storyboards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 36px;
+      }
+      @media (max-width: 1100px) {
+        .storyboards-grid { grid-template-columns: 1fr; gap: 64px; }
+      }
+
+      .storyboard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      .sb-header { width: 100%; text-align: center; }
+      .sb-num {
+        font-family: "Oswald", sans-serif;
+        font-size: 11px;
+        color: var(--gold);
+        letter-spacing: 0.18em;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .sb-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 500;
+        font-size: 24px;
+        margin-bottom: 6px;
+        line-height: 1.2;
+        letter-spacing: -0.005em;
+      }
+
+      /* iPhone */
+      .phone {
+        width: 280px;
+        height: 580px;
+        background: linear-gradient(160deg, #1a1a1f, #08080a);
+        border-radius: 42px;
+        padding: 6px;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.6),
+          0 0 0 1.5px rgba(255, 255, 255, 0.06),
+          inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+        position: relative;
+      }
+      .phone-screen {
+        width: 100%; height: 100%;
+        border-radius: 36px;
+        overflow: hidden;
+        position: relative;
+        background: #050507;
+        cursor: pointer;
+      }
+      .phone-island {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 92px; height: 26px;
+        background: #000;
+        border-radius: 20px;
+        z-index: 20;
+      }
+
+      /* reels chrome */
+      .reels-progress {
+        position: absolute;
+        top: 50px; left: 12px; right: 12px;
+        z-index: 18;
+        display: flex;
+        gap: 4px;
+      }
+      .reels-progress .seg {
+        flex: 1;
+        height: 2.5px;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .reels-progress .seg .fill {
+        display: block;
+        width: 0%;
+        height: 100%;
+        background: white;
+        transition: width 0.4s var(--t);
+      }
+      .reels-progress .seg.done .fill,
+      .reels-progress .seg.active .fill { width: 100%; }
+
+      .reels-meta {
+        position: absolute;
+        top: 64px; left: 12px; right: 12px;
+        z-index: 18;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+      }
+      .reels-avatar {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--red), var(--gold));
+        border: 1.5px solid white;
+        flex-shrink: 0;
+      }
+      .reels-username { font-size: 12px; font-weight: 600; color: white; }
+      .reels-time { font-size: 11px; color: rgba(255, 255, 255, 0.7); }
+      .reels-menu { margin-left: auto; color: white; font-size: 18px; line-height: 0.5; }
+
+      .reels-rail {
+        position: absolute;
+        right: 10px; bottom: 70px;
+        z-index: 18;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+      }
+      .reels-rail-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+      .reels-rail-icon {
+        width: 30px; height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+      }
+      .reels-rail-label {
+        font-size: 10px;
+        color: white;
+        font-weight: 600;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      }
+
+      .reels-bottom {
+        position: absolute;
+        left: 12px; right: 60px; bottom: 18px;
+        z-index: 18;
+      }
+      .reels-bottom .audio {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      }
+
+      /* frames */
+      .frames { position: absolute; inset: 0; z-index: 10; }
+      .frame {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.4s var(--t);
+        pointer-events: none;
+        padding: 96px 60px 110px 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+      }
+      .frame.active { opacity: 1; }
+      .frame-bg { position: absolute; inset: 0; z-index: -1; }
+      .frame[data-beat="intro"] .frame-bg {
+        background:
+          radial-gradient(circle at 30% 25%, rgba(204, 0, 0, 0.55), transparent 60%),
+          radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.4), transparent 60%),
+          linear-gradient(180deg, #1a1018, #0a0c14);
+      }
+      .frame[data-beat="prompt"] .frame-bg {
+        background:
+          radial-gradient(circle at 50% 30%, rgba(180, 142, 245, 0.3), transparent 60%),
+          linear-gradient(180deg, #14182a, #0a0c14);
+      }
+      .frame[data-beat="results"] .frame-bg {
+        background: linear-gradient(180deg, #0c1418, #050a0e);
+      }
+      .frame[data-beat="payoff"] .frame-bg {
+        background:
+          radial-gradient(circle at 50% 60%, rgba(180, 142, 245, 0.45), transparent 70%),
+          radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.25), transparent 60%),
+          linear-gradient(180deg, #1a1126, #0a0c14);
+      }
+      .frame-tag {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 14px;
+        font-weight: 600;
+      }
+      .frame-body { font-size: 15px; line-height: 1.5; color: white; }
+      .frame[data-beat="intro"] .frame-body {
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.97);
+        font-size: 18px;
+        font-family: "Oswald", sans-serif;
+        font-weight: 400;
+        line-height: 1.3;
+        letter-spacing: 0.005em;
+      }
+
+      .ai-mode-bar {
+        background: rgba(255, 255, 255, 0.96);
+        color: #1f1f1f;
+        border-radius: 16px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+      }
+      .ai-mode-bar .sparkle { color: var(--purple); font-size: 16px; flex-shrink: 0; }
+      .ai-mode-bar .label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #888;
+        margin-bottom: 2px;
+        font-weight: 600;
+      }
+      .ai-mode-bar .text { font-size: 12.5px; color: #1f1f1f; line-height: 1.4; font-weight: 500; }
+
+      .ai-results {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        padding: 14px;
+        backdrop-filter: blur(8px);
+      }
+      .ai-results-head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--purple);
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .ai-results-head .shimmer {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--purple);
+        animation: pulse 1.4s infinite;
+      }
+      .ai-results-body {
+        font-size: 13px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.95);
+      }
+      .ai-results-cards { display: flex; gap: 6px; margin-top: 10px; }
+      .ai-results-cards .mini {
+        flex: 1;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .payoff-poster { text-align: center; padding: 8px; }
+      .payoff-poster .text {
+        font-family: "Oswald", sans-serif;
+        font-size: 19px;
+        line-height: 1.25;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+        font-weight: 400;
+        letter-spacing: 0.005em;
+      }
+
+      /* phone nav */
+      .phone-nav {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 6px;
+      }
+      .phone-nav-btn {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .phone-nav-btn:hover:not(:disabled) {
+        border-color: var(--border-2);
+        background: var(--surface-3);
+        transform: scale(1.05);
+      }
+      .phone-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+      .phone-nav-counter {
+        font-family: "Oswald", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        color: var(--text-dim);
+        font-variant-numeric: tabular-nums;
+        min-width: 100px;
+        text-align: center;
+        font-weight: 600;
+      }
+      .phone-nav-counter .beat-name {
+        display: block;
+        font-size: 9px;
+        color: var(--text-mid);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        margin-top: 3px;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+      }
+
+      /* spec strip */
+      .spec {
+        width: 100%;
+        background: linear-gradient(180deg, var(--surface-2), var(--surface));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+      }
+      .spec-prompt {
+        background: rgba(180, 142, 245, 0.08);
+        border: 1px solid rgba(180, 142, 245, 0.22);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .spec-prompt .sp { color: var(--purple); font-size: 16px; line-height: 1; padding-top: 2px; flex-shrink: 0; }
+      .spec-prompt .sp-body { font-size: 13px; color: var(--text); line-height: 1.4; flex: 1; }
+      .spec-prompt .sp-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--purple);
+        margin-bottom: 4px;
+        display: block;
+        font-weight: 700;
+      }
+
+      .spec-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .chip {
+        font-size: 10px;
+        padding: 5px 10px;
+        border-radius: 99px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-mid);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 500;
+      }
+      .chip strong {
+        color: var(--text-dim);
+        font-weight: 600;
+        margin-right: 5px;
+      }
+
+      .spec-why {
+        font-size: 11.5px;
+        color: var(--text-dim);
+        line-height: 1.5;
+        border-top: 1px dashed var(--border);
+        padding-top: 12px;
+        margin-bottom: 12px;
+      }
+      .spec-why::before {
+        content: "Why this prompt — ";
+        color: var(--text-mid);
+        font-weight: 700;
+      }
+
+      .ip-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        border: 1px solid;
+      }
+      .ip-check[data-status="clear"] {
+        border-color: rgba(74, 222, 128, 0.3);
+        background: rgba(74, 222, 128, 0.06);
+        color: var(--green);
+      }
+      .ip-check[data-status="watch"] {
+        border-color: rgba(251, 191, 36, 0.3);
+        background: rgba(251, 191, 36, 0.06);
+        color: var(--amber);
+      }
+      .ip-check .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+      .ip-check .ip-tag {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 10px;
+        flex-shrink: 0;
+      }
+      .ip-check .ip-body { color: var(--text-mid); flex: 1; line-height: 1.45; }
+
+      footer {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 32px 28px;
+        color: var(--text-dim);
+        font-size: 12px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      footer .dot { color: var(--border-2); }
+      footer code {
+        font-family: "JetBrains Mono", monospace;
+        background: var(--surface);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body class="gated">
+    <div id="bootGate">Verifying access…</div>
+
+    <header class="header">
+      <div class="header-inner">
+        <a class="brand" href="index.html">
+          <span class="ball">⚽</span> World Cup HQ <span class="pipe">/</span>
+          <span class="sub">Today's Reactive</span>
+        </a>
+        <a class="header-back" href="index.html">‹ Back to dashboard</a>
+        <div class="header-actions">
+          <span class="live-pill"><span class="live-dot"></span> Agents Live</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="date-strip">
+          <span class="pulse-dot"></span>
+          <span class="seg" id="hero-date"></span>
+          <span class="seg" id="hero-market"></span>
+          <span class="seg" id="hero-window"></span>
+        </div>
+        <h1>Today's <span class="stroke">reactive</span>.</h1>
+        <p class="lede">
+          Our reader agents swept the cultural and match-event signal landscape overnight. Here's
+          what's spiking — and three plays we'd run today.
+        </p>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">01 ·</span>
+          <h2 class="section-title">Today's intelligence</h2>
+        </div>
+        <p class="section-sub">
+          Hover any spike to surface the fan voice. Click for the full read.
+        </p>
+        <div class="briefings" id="briefings"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">02 ·</span>
+          <h2 class="section-title">Today's plays</h2>
+        </div>
+        <p class="section-sub">
+          Three storyboards engineered from today's spikes. Click through the frames like a Reels storyboard, or tap the right side of the phone to advance.
+        </p>
+        <div class="storyboards-grid" id="storyboards"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Today's Reactive</span>
+      <span class="dot">·</span>
+      <span>Powered by Google AI Mode reader agents, reviewed by a strategist before drop.</span>
+      <span class="dot">·</span>
+      <span>Data block: <code>FORMATION</code> + <code>CULTURAL</code> + <code>MATCH</code> + <code>STORYBOARDS</code></span>
+    </footer>
+
+    <div class="modal-overlay" id="modal" onclick="closeModalOnBg(event)">
+      <article class="modal" id="modal-content">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div id="modal-body"></div>
+      </article>
+    </div>
+
+    <script src="formation-data.js"></script>
+    <script>
+      // ============================================================================
+      //  Gate check — inherits dashboard wcc_gate cookie. Redirect to / if missing.
+      // ============================================================================
+      (async function gateCheck() {
+        try {
+          const r = await fetch("/api/gate", { method: "GET", credentials: "same-origin" });
+          if (!r.ok) throw new Error("gate failed");
+          const j = await r.json();
+          if (!j || !j.ok) throw new Error("not authed");
+          document.body.classList.remove("gated");
+          boot();
+        } catch (_) {
+          window.location.href = "index.html";
+        }
+      })();
+
+      // ============================================================================
+      //  Market routing — reads ?market=<key> from URL, falls back to ca.
+      // ============================================================================
+      function getMarketKey() {
+        const u = new URL(window.location.href);
+        const m = (u.searchParams.get("market") || "ca").toLowerCase();
+        const data = window.FORMATION_DATA || {};
+        if (data[m]) return m;
+        return "ca";
+      }
+
+      function boot() {
+        const key = getMarketKey();
+        const market = (window.FORMATION_DATA || {})[key];
+        if (!market) {
+          // No data for the requested market — bounce home rather than render blank.
+          window.location.href = "index.html";
+          return;
+        }
+
+        const FORMATION = market.formation;
+        const CULTURAL_BRIEFING = market.cultural;
+        const MATCH_BRIEFING = market.match;
+        const STORYBOARDS = market.storyboards;
+
+        document.getElementById("hero-date").textContent = FORMATION.date;
+        document.getElementById("hero-market").textContent = FORMATION.market;
+        document.getElementById("hero-window").textContent = FORMATION.window;
+
+        function renderBriefing(b, tone) {
+          const spikesHTML = b.spikes
+            .map(
+              (s, i) => `
+            <div class="spike" onclick="openModal('${b.agentId}', ${i})">
+              <div class="spike-row1">
+                <span class="spike-num">${String(i + 1).padStart(2, "0")}</span>
+                <span class="spike-title">${s.title}</span>
+                <span class="sentiment-pill" data-tone="${s.tone}">${s.tone}</span>
+              </div>
+              <div class="spike-meta">
+                <div class="vol-bar"><div class="vol-fill" style="width:${Math.min(s.volume * 2.2, 100)}%"></div></div>
+                <span class="spike-pct"><strong>${s.volume}%</strong> vol</span>
+                <span class="spike-pct">·</span>
+                <span class="spike-pct"><strong>${s.sentiment}%</strong> pos</span>
+              </div>
+              <div class="spike-quote">${s.voice}</div>
+            </div>
+          `
+            )
+            .join("");
+
+          const watchHTML = b.watchlist
+            .map(
+              (w) => `
+            <div class="watch-item">
+              <span class="dot"></span>
+              <div class="watch-item-body">
+                <div class="watch-title">${w.title}</div>
+                <div class="watch-note">${w.note}</div>
+              </div>
+            </div>
+          `
+            )
+            .join("");
+
+          const sigId = b.agentName.toUpperCase().replace(/ /g, "_");
+          const sigDate = FORMATION.date.toLowerCase().replace(/[, ]+/g, "-");
+
+          return `
+            <article class="briefing" data-tone="${tone}">
+              <div class="briefing-watermark">${b.watermark}</div>
+              <div class="briefing-head">
+                <div class="agent-tag">
+                  <span class="agent-flag">${b.flag}</span>
+                  <div>
+                    <div class="agent-name">${b.agentName}</div>
+                    <div class="agent-window">${FORMATION.market} · ${FORMATION.window}</div>
+                  </div>
+                </div>
+                <span class="agent-status">Synced</span>
+              </div>
+              <h3 class="briefing-headline">${b.headline}</h3>
+              <div class="spikes-label">Top spikes — ${b.spikes.length}</div>
+              <div class="spikes">${spikesHTML}</div>
+              <div class="accordion open">
+                <div class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
+                  <span><span class="lbl">Watchlist</span><span class="count">${b.watchlist.length}</span></span>
+                  <span class="accordion-toggle">+</span>
+                </div>
+                <div class="accordion-body"><div class="accordion-inner">${watchHTML}</div></div>
+              </div>
+              <div class="briefing-sig">// ${sigId} · run_${sigDate}</div>
+            </article>
+          `;
+        }
+
+        document.getElementById("briefings").innerHTML =
+          renderBriefing(CULTURAL_BRIEFING, "cultural") +
+          renderBriefing(MATCH_BRIEFING, "match");
+
+        window.openModal = function (agentId, idx) {
+          const b = agentId === "ccr" ? CULTURAL_BRIEFING : MATCH_BRIEFING;
+          const s = b.spikes[idx];
+          const accent = agentId === "ccr" ? "#b48ef5" : "#cc0000";
+          const modal = document.getElementById("modal-content");
+          modal.style.setProperty("--accent", accent);
+
+          document.getElementById("modal-body").innerHTML = `
+            <div class="modal-tag">${b.agentName} · Spike ${String(idx + 1).padStart(2, "0")} · ${s.type}</div>
+            <h2 class="modal-title">${s.title}</h2>
+            <div class="modal-stats">
+              <div class="modal-stat"><div class="num">${s.volume}%</div><div class="lbl">Volume share</div></div>
+              <div class="modal-stat"><div class="num">${s.sentiment}%</div><div class="lbl">Positive sentiment</div></div>
+              <div class="modal-stat"><div class="num" style="text-transform:capitalize">${s.tone}</div><div class="lbl">Net tone</div></div>
+            </div>
+            <div class="modal-block"><div class="lbl">The signal</div><div class="body">${s.signal}</div></div>
+            <div class="modal-block"><div class="lbl">The context</div><div class="body">${s.context}</div></div>
+            <div class="modal-block voice"><div class="lbl">Representative voice</div><div class="body">${s.voice}</div></div>
+            ${s.hook ? `<div class="modal-block hook"><div class="lbl">Curiosity hook</div><div class="body">${s.hook}</div></div>` : ""}
+          `;
+          document.getElementById("modal").classList.add("open");
+        };
+        window.closeModal = function () {
+          document.getElementById("modal").classList.remove("open");
+        };
+        window.closeModalOnBg = function (e) {
+          if (e.target.id === "modal") window.closeModal();
+        };
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") window.closeModal();
+        });
+
+        function beatTypeFor(name) {
+          const lc = name.toLowerCase();
+          if (lc.includes("intro")) return "intro";
+          if (lc.includes("prompt")) return "prompt";
+          if (lc.includes("result")) return "results";
+          return "payoff";
+        }
+
+        function renderFrame(beat, sb, idx) {
+          const type = beatTypeFor(beat.name);
+          const tagText = `${String(idx + 1).padStart(2, "0")} · ${beat.name}`;
+
+          let inner = "";
+          if (type === "intro") {
+            inner = `
+              <div class="frame-tag">${tagText}</div>
+              <div class="frame-body">${beat.body}</div>
+            `;
+          } else if (type === "prompt") {
+            inner = `
+              <div class="frame-tag">${tagText}</div>
+              <div class="ai-mode-bar">
+                <span class="sparkle">✦</span>
+                <div style="flex:1">
+                  <div class="label">AI Mode</div>
+                  <div class="text">${sb.prompt}</div>
+                </div>
+              </div>
+              <div class="frame-body" style="font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5">${beat.body}</div>
+            `;
+          } else if (type === "results") {
+            inner = `
+              <div class="frame-tag">${tagText}</div>
+              <div class="ai-results">
+                <div class="ai-results-head"><span class="shimmer"></span> AI Mode · Generated</div>
+                <div class="ai-results-body">${beat.body}</div>
+                <div class="ai-results-cards">
+                  <div class="mini"></div>
+                  <div class="mini"></div>
+                  <div class="mini"></div>
+                </div>
+              </div>
+            `;
+          } else {
+            inner = `
+              <div class="frame-tag" style="text-align:center">${tagText}</div>
+              <div class="payoff-poster"><div class="text">${beat.body}</div></div>
+            `;
+          }
+
+          return `<div class="frame" data-beat="${type}"><div class="frame-bg"></div>${inner}</div>`;
+        }
+
+        function renderStoryboard(sb, idx) {
+          const framesHTML = sb.beats.map((b, i) => renderFrame(b, sb, i)).join("");
+          const segments = sb.beats
+            .map((_, i) => `<div class="seg" data-i="${i}"><div class="fill"></div></div>`)
+            .join("");
+
+          return `
+            <div class="storyboard" data-sb="${idx}">
+              <div class="spec">
+                <div class="spec-prompt">
+                  <span class="sp">✦</span>
+                  <div class="sp-body">
+                    <span class="sp-label">Prompt direction</span>
+                    ${sb.prompt}
+                  </div>
+                </div>
+                <div class="spec-row">
+                  <span class="chip"><strong>Source</strong>${sb.sourceSignal}</span>
+                  <span class="chip"><strong>Audience</strong>${sb.audienceCut}</span>
+                  <span class="chip"><strong>Bucket</strong>${sb.bucket}</span>
+                </div>
+                <div class="spec-why">${sb.whyPrompt}</div>
+                <div class="ip-check" data-status="${sb.ipCheck.status}">
+                  <span class="dot"></span>
+                  <span class="ip-tag">IP — ${sb.ipCheck.status}</span>
+                  <span class="ip-body">${sb.ipCheck.note}</span>
+                </div>
+              </div>
+              <div class="sb-header">
+                <div class="sb-num">STORYBOARD ${sb.number}</div>
+                <div class="sb-title">${sb.title}</div>
+              </div>
+              <div class="phone">
+                <div class="phone-island"></div>
+                <div class="phone-screen">
+                  <div class="reels-progress">${segments}</div>
+                  <div class="reels-meta">
+                    <div class="reels-avatar"></div>
+                    <div>
+                      <div class="reels-username">@google</div>
+                    </div>
+                    <div class="reels-time">· now</div>
+                    <div class="reels-menu">⋯</div>
+                  </div>
+                  <div class="frames">${framesHTML}</div>
+                  <div class="reels-rail">
+                    <div class="reels-rail-item"><div class="reels-rail-icon">♥</div><div class="reels-rail-label">12.4K</div></div>
+                    <div class="reels-rail-item"><div class="reels-rail-icon">💬</div><div class="reels-rail-label">247</div></div>
+                    <div class="reels-rail-item"><div class="reels-rail-icon">↗</div><div class="reels-rail-label">Share</div></div>
+                    <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
+                  </div>
+                  <div class="reels-bottom">
+                    <div class="audio">♫ Original · @google</div>
+                  </div>
+                </div>
+              </div>
+              <div class="phone-nav">
+                <button class="phone-nav-btn" onclick="frameStep(${idx},-1)">‹</button>
+                <span class="phone-nav-counter">
+                  <span id="counter-${idx}">01 / 0${sb.beats.length}</span>
+                  <span class="beat-name" id="beatname-${idx}">${sb.beats[0].name}</span>
+                </span>
+                <button class="phone-nav-btn" onclick="frameStep(${idx},1)">›</button>
+              </div>
+            </div>
+          `;
+        }
+
+        document.getElementById("storyboards").innerHTML = STORYBOARDS.map((sb, i) =>
+          renderStoryboard(sb, i)
+        ).join("");
+
+        const frameState = STORYBOARDS.map((sb) => ({ idx: 0, total: sb.beats.length }));
+
+        function setFrames() {
+          document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
+            const state = frameState[i];
+            const sb = STORYBOARDS[i];
+            sbEl.querySelectorAll(".frame").forEach((f, j) => f.classList.toggle("active", j === state.idx));
+            sbEl.querySelectorAll(".reels-progress .seg").forEach((s, j) => {
+              s.classList.toggle("active", j === state.idx);
+              s.classList.toggle("done", j < state.idx);
+            });
+            const counter = document.getElementById(`counter-${i}`);
+            if (counter) counter.textContent = `0${state.idx + 1} / 0${state.total}`;
+            const beatName = document.getElementById(`beatname-${i}`);
+            if (beatName) beatName.textContent = sb.beats[state.idx].name;
+            const btns = sbEl.querySelectorAll(".phone-nav-btn");
+            btns[0].disabled = state.idx === 0;
+            btns[1].disabled = state.idx === state.total - 1;
+          });
+        }
+
+        window.frameStep = function (sbIdx, dir) {
+          const s = frameState[sbIdx];
+          s.idx = Math.max(0, Math.min(s.total - 1, s.idx + dir));
+          setFrames();
+        };
+
+        document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
+          const screen = sbEl.querySelector(".phone-screen");
+          screen.addEventListener("click", (e) => {
+            if (e.target.closest(".reels-rail, .reels-meta")) return;
+            const rect = screen.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            if (x > rect.width / 2) window.frameStep(i, 1);
+            else window.frameStep(i, -1);
+          });
+        });
+
+        let lastHovered = 0;
+        document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
+          sbEl.addEventListener("mouseenter", () => (lastHovered = i));
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowRight") window.frameStep(lastHovered, 1);
+          if (e.key === "ArrowLeft") window.frameStep(lastHovered, -1);
+        });
+
+        setFrames();
+      }
+    </script>
+  </body>
+</html>

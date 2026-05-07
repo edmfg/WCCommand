@@ -13,7 +13,9 @@ There is no build step. Edit the HTML / JS / data files directly and push to `ma
 ```
 index.html                              public dashboard (Live / Fixtures / Creative)
 mfg.html                                MFG production cockpit (Triage / Creative Uploads)
+formation.html                          Today's Reactive surface (per-market daily briefings + storyboards)
 data.js                                 window.DASHBOARD_DATA — all dashboard content
+formation-data.js                       window.FORMATION_DATA — per-market briefings for formation.html
 countdown.js                            floating WC2026 countdown pill (both pages)
 gemini-assistant.js                     shared Gemini button + panel for MFG mode
 api/gate.js                             dashboard password gate (GATE_PASSWORD env)
@@ -96,6 +98,34 @@ Password-gated by `/api/mfg-gate` (env var `GATE_PASSWORD` — same single passw
 - **Sort dropdown** above Recent — Newest / Oldest / Live soonest / Live latest. Applies to both grids.
 - **Search filter** above All — debounced text match across title / market / channel / bento / uploaded_by.
 - **Hover-armed delete** on every card — `×` arms ("Delete?") for 3 seconds, second click deletes from Supabase + both grids + the public Creative tab.
+
+### `formation.html` — Today's Reactive
+
+Per-market daily briefing surface, reached from the **Today's Reactive** red pill at the top of the Live tab on `index.html`. The pill opens a market chooser modal (Canada / UK / Germany / USA). Only Canada is enabled — the other three render with a `Soon` tag and are disabled until briefings exist.
+
+- Inherits the dashboard `wcc_gate` cookie. On load `formation.html` calls `GET /api/gate`; if it doesn't return `{ ok: true }`, the page redirects to `/` (no separate password). Body starts with class `gated` and a `Verifying access…` overlay; the page renders only after the gate check resolves.
+- Routing is via the `?market=<key>` query param. Defaults to `ca` if missing or unknown. Each market's data lives in `window.FORMATION_DATA[<key>]` (see `formation-data.js`). If the market key has no data, `formation.html` bounces back to `/`.
+- Layout: hero ("Today's reactive."), then **Today's intelligence** (two side-by-side briefings — Cultural Conversation Reader + Match Event Reader, each with three spike cards, a watchlist accordion, and IP flags), then **Today's plays** (three storyboards rendered as iPhone-style Reels mockups, click the right side of the phone to advance frames, ←/→ keys also work).
+- Spike cards open a detail modal with volume / sentiment / tone stats + signal / context / representative voice / curiosity hook.
+
+**`formation-data.js` shape** — one entry per market key:
+```js
+window.FORMATION_DATA = {
+  ca: {
+    formation: { date, market, window },
+    cultural:  { agentName, agentId: "ccr", flag, watermark, headline, spikes[], watchlist[], flags[] },
+    match:     { agentName, agentId: "mer", flag, watermark, headline, spikes[], watchlist[], flags[] },
+    storyboards: [{ number, title, revised, sourceSignal, sourceDetail, audienceCut, bucket, prompt, whyPrompt, ipCheck, beats[] }, ...]
+  },
+  uk:  null,  // disabled in market chooser
+  de:  null,
+  usa: null,
+};
+```
+
+Spike: `{ title, type, signal, context, voice, hook?, volume, sentiment, tone: "positive" | "neutral" | "caution" }`. Storyboard beat names should contain "intro" / "prompt" / "result" / (anything else → "payoff") — drives the frame styling.
+
+To enable UK / DE / USA, populate the matching key with the same shape and remove the `disabled` attribute from the corresponding `.market-card` button in `index.html`.
 
 ---
 
