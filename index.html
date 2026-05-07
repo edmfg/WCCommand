@@ -656,6 +656,17 @@
         pointer-events: none;
         transform: translateY(8px) scale(0.95);
       }
+      /* Hide the Gemini launcher whenever any auth/gate overlay is up:
+         - body.gated (dashboard or MFG password gate)
+         - body.gate-probing (mid-cookie-check, before gate decision)
+         - any .card-modal-overlay.open (creative gate, market chooser) */
+      body.gated .gemini-toggle,
+      body.gate-probing .gemini-toggle,
+      body:has(.card-modal-overlay.open) .gemini-toggle {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden;
+      }
       @keyframes gemini-flow {
         0% {
           background-position: 0% 50%;

@@ -289,6 +289,15 @@
         position: relative;
         z-index: 1;
       }
+      /* Hide the floating Gemini launcher whenever the password gate or
+         market gate is up. Both #gate and #marketGate are visible while
+         the user hasn't authenticated yet. */
+      body:has(#gate:not([style*="display: none"])) .gemini-toggle-shared,
+      body:has(#marketGate.shown) .gemini-toggle-shared {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+      }
 
       /* Header */
       .header {
