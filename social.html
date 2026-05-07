@@ -1723,6 +1723,23 @@
       //  RENDER
       // ============================================================================
 
+      // HTML-escape every user-supplied field that flows into innerHTML.
+      // Today's Reactive payloads come from MFG users via Supabase; an
+      // escape pass here keeps a malicious payload from running script in
+      // the public dashboard.
+      function e(v) {
+        if (v == null) return "";
+        return String(v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+      // For values that land inside an HTML attribute. Same rules as e()
+      // but explicit so call sites read clearly.
+      const ea = e;
+
       let frameState = [];
       function paintHero() {
         document.getElementById("hero-date").textContent = FORMATION.date;
@@ -1732,76 +1749,90 @@
       paintHero();
 
       function renderBriefing(b, tone) {
-        const spikesHTML = b.spikes
+        const spikesHTML = (b.spikes || [])
           .map(
             (s, i) => `
-          <div class="spike" onclick="openModal('${b.agentId}', ${i})">
+          <div class="spike" data-spike-agent="${ea(b.agentId)}" data-spike-idx="${i}">
             <div class="spike-row1">
               <span class="spike-num">${String(i + 1).padStart(2, "0")}</span>
-              <span class="spike-title">${s.title}</span>
-              <span class="sentiment-pill" data-tone="${s.tone}">${s.tone}</span>
+              <span class="spike-title">${e(s.title)}</span>
+              <span class="sentiment-pill" data-tone="${ea(s.tone)}">${e(s.tone)}</span>
             </div>
             <div class="spike-meta">
-              <div class="vol-bar"><div class="vol-fill" style="width:${Math.min(s.volume * 2.2, 100)}%"></div></div>
-              <span class="spike-pct"><strong>${s.volume}%</strong> vol</span>
+              <div class="vol-bar"><div class="vol-fill" style="width:${Math.min(Number(s.volume) * 2.2, 100)}%"></div></div>
+              <span class="spike-pct"><strong>${e(s.volume)}%</strong> vol</span>
               <span class="spike-pct">·</span>
-              <span class="spike-pct"><strong>${s.sentiment}%</strong> pos</span>
+              <span class="spike-pct"><strong>${e(s.sentiment)}%</strong> pos</span>
             </div>
-            <div class="spike-quote">${s.voice}</div>
+            <div class="spike-quote">${e(s.voice)}</div>
           </div>
         `
           )
           .join("");
 
-        const watchHTML = b.watchlist
+        const watchHTML = (b.watchlist || [])
           .map(
             (w) => `
           <div class="watch-item">
             <span class="dot"></span>
             <div class="watch-item-body">
-              <div class="watch-title">${w.title}</div>
-              <div class="watch-note">${w.note}</div>
+              <div class="watch-title">${e(w.title)}</div>
+              <div class="watch-note">${e(w.note)}</div>
             </div>
           </div>
         `
           )
           .join("");
 
-        const sigId = b.agentName.toUpperCase().replace(/ /g, "_");
-        const sigDate = FORMATION.date.toLowerCase().replace(/[, ]+/g, "-");
+        const sigId = String(b.agentName || "").toUpperCase().replace(/ /g, "_");
+        const sigDate = String(FORMATION.date || "").toLowerCase().replace(/[, ]+/g, "-");
 
         return `
-          <article class="briefing" data-tone="${tone}">
-            <div class="briefing-watermark">${b.watermark}</div>
+          <article class="briefing" data-tone="${ea(tone)}">
+            <div class="briefing-watermark">${e(b.watermark)}</div>
             <div class="briefing-head">
               <div class="agent-tag">
-                <span class="agent-flag">${b.flag}</span>
+                <span class="agent-flag">${e(b.flag)}</span>
                 <div>
-                  <div class="agent-name">${b.agentName}</div>
-                  <div class="agent-window">${FORMATION.market} · ${FORMATION.window}</div>
+                  <div class="agent-name">${e(b.agentName)}</div>
+                  <div class="agent-window">${e(FORMATION.market)} · ${e(FORMATION.window)}</div>
                 </div>
               </div>
               <span class="agent-status">Synced</span>
             </div>
-            <h3 class="briefing-headline">${b.headline}</h3>
-            <div class="spikes-label">Top spikes — ${b.spikes.length}</div>
+            <h3 class="briefing-headline">${e(b.headline)}</h3>
+            <div class="spikes-label">Top spikes — ${(b.spikes || []).length}</div>
             <div class="spikes">${spikesHTML}</div>
             <div class="accordion open">
-              <div class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
-                <span><span class="lbl">Watchlist</span><span class="count">${b.watchlist.length}</span></span>
+              <div class="accordion-head" data-accordion-toggle="1">
+                <span><span class="lbl">Watchlist</span><span class="count">${(b.watchlist || []).length}</span></span>
                 <span class="accordion-toggle">+</span>
               </div>
               <div class="accordion-body"><div class="accordion-inner">${watchHTML}</div></div>
             </div>
-            <div class="briefing-sig">// ${sigId} · run_${sigDate}</div>
+            <div class="briefing-sig">// ${e(sigId)} · run_${e(sigDate)}</div>
           </article>
         `;
       }
 
       function paintBriefings() {
-        document.getElementById("briefings").innerHTML =
+        const root = document.getElementById("briefings");
+        root.innerHTML =
           renderBriefing(CULTURAL_BRIEFING, "cultural") +
           renderBriefing(MATCH_BRIEFING, "match");
+        root.addEventListener("click", function (ev) {
+          const t = ev.target.closest("[data-accordion-toggle]");
+          if (t) {
+            t.parentElement.classList.toggle("open");
+            return;
+          }
+          const sp = ev.target.closest(".spike[data-spike-agent]");
+          if (sp) {
+            const a = sp.getAttribute("data-spike-agent");
+            const i = parseInt(sp.getAttribute("data-spike-idx"), 10);
+            if (a && Number.isFinite(i)) openModal(a, i);
+          }
+        });
       }
       paintBriefings();
 
@@ -1813,17 +1844,17 @@
         modal.style.setProperty("--accent", accent);
 
         document.getElementById("modal-body").innerHTML = `
-          <div class="modal-tag">${b.agentName} · Spike ${String(idx + 1).padStart(2, "0")} · ${s.type}</div>
-          <h2 class="modal-title">${s.title}</h2>
+          <div class="modal-tag">${e(b.agentName)} · Spike ${String(idx + 1).padStart(2, "0")} · ${e(s.type)}</div>
+          <h2 class="modal-title">${e(s.title)}</h2>
           <div class="modal-stats">
-            <div class="modal-stat"><div class="num">${s.volume}%</div><div class="lbl">Volume share</div></div>
-            <div class="modal-stat"><div class="num">${s.sentiment}%</div><div class="lbl">Positive sentiment</div></div>
-            <div class="modal-stat"><div class="num" style="text-transform:capitalize">${s.tone}</div><div class="lbl">Net tone</div></div>
+            <div class="modal-stat"><div class="num">${e(s.volume)}%</div><div class="lbl">Volume share</div></div>
+            <div class="modal-stat"><div class="num">${e(s.sentiment)}%</div><div class="lbl">Positive sentiment</div></div>
+            <div class="modal-stat"><div class="num" style="text-transform:capitalize">${e(s.tone)}</div><div class="lbl">Net tone</div></div>
           </div>
-          <div class="modal-block"><div class="lbl">The signal</div><div class="body">${s.signal}</div></div>
-          <div class="modal-block"><div class="lbl">The context</div><div class="body">${s.context}</div></div>
-          <div class="modal-block voice"><div class="lbl">Representative voice</div><div class="body">${s.voice}</div></div>
-          ${s.hook ? `<div class="modal-block hook"><div class="lbl">Curiosity hook</div><div class="body">${s.hook}</div></div>` : ""}
+          <div class="modal-block"><div class="lbl">The signal</div><div class="body">${e(s.signal)}</div></div>
+          <div class="modal-block"><div class="lbl">The context</div><div class="body">${e(s.context)}</div></div>
+          <div class="modal-block voice"><div class="lbl">Representative voice</div><div class="body">${e(s.voice)}</div></div>
+          ${s.hook ? `<div class="modal-block hook"><div class="lbl">Curiosity hook</div><div class="body">${e(s.hook)}</div></div>` : ""}
         `;
         document.getElementById("modal").classList.add("open");
       }
@@ -1846,14 +1877,14 @@
       }
 
       function renderFrame(beat, sb, idx) {
-        const type = beatTypeFor(beat.name);
-        const tagText = `${String(idx + 1).padStart(2, "0")} · ${beat.name}`;
+        const type = beatTypeFor(String(beat.name || ""));
+        const tagText = `${String(idx + 1).padStart(2, "0")} · ${e(beat.name)}`;
 
         let inner = "";
         if (type === "intro") {
           inner = `
             <div class="frame-tag">${tagText}</div>
-            <div class="frame-body">${beat.body}</div>
+            <div class="frame-body">${e(beat.body)}</div>
           `;
         } else if (type === "prompt") {
           inner = `
@@ -1862,17 +1893,17 @@
               <span class="sparkle">✦</span>
               <div style="flex:1">
                 <div class="label">AI Mode</div>
-                <div class="text">${sb.prompt}</div>
+                <div class="text">${e(sb.prompt)}</div>
               </div>
             </div>
-            <div class="frame-body" style="font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5">${beat.body}</div>
+            <div class="frame-body" style="font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5">${e(beat.body)}</div>
           `;
         } else if (type === "results") {
           inner = `
             <div class="frame-tag">${tagText}</div>
             <div class="ai-results">
               <div class="ai-results-head"><span class="shimmer"></span> AI Mode · Generated</div>
-              <div class="ai-results-body">${beat.body}</div>
+              <div class="ai-results-body">${e(beat.body)}</div>
               <div class="ai-results-cards">
                 <div class="mini"></div>
                 <div class="mini"></div>
@@ -1883,18 +1914,22 @@
         } else {
           inner = `
             <div class="frame-tag" style="text-align:center">${tagText}</div>
-            <div class="payoff-poster"><div class="text">${beat.body}</div></div>
+            <div class="payoff-poster"><div class="text">${e(beat.body)}</div></div>
           `;
         }
 
-        return `<div class="frame" data-beat="${type}"><div class="frame-bg"></div>${inner}</div>`;
+        return `<div class="frame" data-beat="${ea(type)}"><div class="frame-bg"></div>${inner}</div>`;
       }
 
       function renderStoryboard(sb, idx) {
-        const framesHTML = sb.beats.map((b, i) => renderFrame(b, sb, i)).join("");
-        const segments = sb.beats
+        const beats = sb.beats || [];
+        const framesHTML = beats.map((b, i) => renderFrame(b, sb, i)).join("");
+        const segments = beats
           .map((_, i) => `<div class="seg" data-i="${i}"><div class="fill"></div></div>`)
           .join("");
+        const ipStatus = sb.ipCheck && sb.ipCheck.status ? sb.ipCheck.status : "";
+        const ipNote = sb.ipCheck && sb.ipCheck.note ? sb.ipCheck.note : "";
+        const firstBeatName = beats[0] && beats[0].name ? beats[0].name : "";
 
         return `
           <div class="storyboard" data-sb="${idx}">
@@ -1903,24 +1938,24 @@
                 <span class="sp">✦</span>
                 <div class="sp-body">
                   <span class="sp-label">Prompt direction</span>
-                  ${sb.prompt}
+                  ${e(sb.prompt)}
                 </div>
               </div>
               <div class="spec-row">
-                <span class="chip"><strong>Source</strong>${sb.sourceSignal}</span>
-                <span class="chip"><strong>Audience</strong>${sb.audienceCut}</span>
-                <span class="chip"><strong>Bucket</strong>${sb.bucket}</span>
+                <span class="chip"><strong>Source</strong>${e(sb.sourceSignal)}</span>
+                <span class="chip"><strong>Audience</strong>${e(sb.audienceCut)}</span>
+                <span class="chip"><strong>Bucket</strong>${e(sb.bucket)}</span>
               </div>
-              <div class="spec-why">${sb.whyPrompt}</div>
-              <div class="ip-check" data-status="${sb.ipCheck.status}">
+              <div class="spec-why">${e(sb.whyPrompt)}</div>
+              <div class="ip-check" data-status="${ea(ipStatus)}">
                 <span class="dot"></span>
-                <span class="ip-tag">IP — ${sb.ipCheck.status}</span>
-                <span class="ip-body">${sb.ipCheck.note}</span>
+                <span class="ip-tag">IP — ${e(ipStatus)}</span>
+                <span class="ip-body">${e(ipNote)}</span>
               </div>
             </div>
             <div class="sb-header">
-              <div class="sb-num">STORYBOARD ${sb.number}</div>
-              <div class="sb-title">${sb.title}</div>
+              <div class="sb-num">STORYBOARD ${e(sb.number)}</div>
+              <div class="sb-title">${e(sb.title)}</div>
             </div>
             <div class="phone">
               <div class="phone-island"></div>
@@ -1947,22 +1982,31 @@
               </div>
             </div>
             <div class="phone-nav">
-              <button class="phone-nav-btn" onclick="frameStep(${idx},-1)">‹</button>
+              <button class="phone-nav-btn" data-frame-step="-1" data-sb-idx="${idx}">‹</button>
               <span class="phone-nav-counter">
-                <span id="counter-${idx}">01 / 0${sb.beats.length}</span>
-                <span class="beat-name" id="beatname-${idx}">${sb.beats[0].name}</span>
+                <span id="counter-${idx}">01 / ${String(beats.length).padStart(2, "0")}</span>
+                <span class="beat-name" id="beatname-${idx}">${e(firstBeatName)}</span>
               </span>
-              <button class="phone-nav-btn" onclick="frameStep(${idx},1)">›</button>
+              <button class="phone-nav-btn" data-frame-step="1" data-sb-idx="${idx}">›</button>
             </div>
           </div>
         `;
       }
 
       function paintStoryboards() {
-        document.getElementById("storyboards").innerHTML = STORYBOARDS.map((sb, i) =>
+        const root = document.getElementById("storyboards");
+        root.innerHTML = STORYBOARDS.map((sb, i) =>
           renderStoryboard(sb, i)
         ).join("");
         frameState = STORYBOARDS.map((sb) => ({ idx: 0, total: (sb.beats || []).length || 1 }));
+        // Delegated handler replaces the old inline onclick="frameStep(...)"
+        root.addEventListener("click", function (ev) {
+          const btn = ev.target.closest("[data-frame-step]");
+          if (!btn) return;
+          const dir = parseInt(btn.getAttribute("data-frame-step"), 10);
+          const idx = parseInt(btn.getAttribute("data-sb-idx"), 10);
+          if (Number.isFinite(dir) && Number.isFinite(idx)) frameStep(idx, dir);
+        });
         attachStoryboardListeners();
         setFrames();
       }

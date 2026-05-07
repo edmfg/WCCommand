@@ -1,3 +1,5 @@
+const { verifyToken, readCookie, signingSecret } = require("./_gate-shared");
+
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
@@ -6,6 +8,18 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
 const MAX_BODY_BYTES = 256 * 1024;
 const RATE_LIMIT_WINDOW_SEC = 60;
 const RATE_LIMIT_MAX = 20;
+
+// Browsers must present a valid wcc_gate or wcc_mfg_gate cookie before
+// burning Gemini quota. Server-to-server callers bypass via SERVER_API_SECRET.
+function browserGateOk(req) {
+  const secret = signingSecret();
+  if (!secret) return false;
+  const a = readCookie(req, "wcc_gate");
+  if (a && verifyToken(a, secret)) return true;
+  const b = readCookie(req, "wcc_mfg_gate");
+  if (b && verifyToken(b, secret)) return true;
+  return false;
+}
 
 // In-memory fallback (used when UPSTASH_* env vars aren't configured).
 // Keyed by user-token (cookie) when available, else IP.
@@ -130,8 +144,13 @@ module.exports = async function handler(req, res) {
   }
 
   const isServer = serverAuthorized(req);
-  if (!isServer && !originAllowed(req)) {
-    return res.status(403).json({ error: "Origin not allowed" });
+  if (!isServer) {
+    if (!originAllowed(req)) {
+      return res.status(403).json({ error: "Origin not allowed" });
+    }
+    if (!browserGateOk(req)) {
+      return res.status(401).json({ error: "Gate cookie required" });
+    }
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

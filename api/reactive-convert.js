@@ -10,10 +10,21 @@
 //   429 { error }            → rate-limited
 //   502 { error }            → upstream Gemini error
 
+const { verifyToken, readCookie, signingSecret } = require("./_gate-shared");
+
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+// Reactive-convert is an MFG-only flow; require the wcc_mfg_gate cookie.
+// (wcc_gate dashboard cookie isn't sufficient since this writes to publish.)
+function mfgGateOk(req) {
+  const secret = signingSecret();
+  if (!secret) return false;
+  const t = readCookie(req, "wcc_mfg_gate");
+  return !!(t && verifyToken(t, secret));
+}
 
 const MAX_BODY_BYTES = 512 * 1024;
 const MAX_INPUT_CHARS = 24_000;
@@ -287,6 +298,10 @@ export default async function handler(req, res) {
     res.status(403).json({ error: "Origin not allowed" });
     return;
   }
+  if (!mfgGateOk(req)) {
+    res.status(401).json({ error: "MFG gate cookie required" });
+    return;
+  }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -328,11 +343,13 @@ export default async function handler(req, res) {
   let upstream;
   try {
     upstream = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
-        encodeURIComponent(apiKey),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         signal: ac.signal,
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: buildPrompt(raw, market, liveDate) }] }],

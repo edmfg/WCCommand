@@ -21,7 +21,12 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
+      integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <!-- Vercel Web Analytics -->
     <script>
       window.va =
@@ -3458,6 +3463,30 @@
           console.warn("Supabase init failed, using localStorage fallback.", e);
         }
 
+        // ── sbWrite: server-side write proxy ──
+        // Anonymous Supabase writes are blocked by RLS after the hardening
+        // migration. Mutations go through /api/sb-write, which verifies the
+        // wcc_mfg_gate cookie before using the service role on the database.
+        // Returns { data, error } in the same shape supabase-js callers expect.
+        async function sbWrite(table, op, payload) {
+          try {
+            const res = await fetch("/api/sb-write", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify(Object.assign({ table, op }, payload || {})),
+            });
+            const j = await res.json().catch(() => ({}));
+            if (!res.ok || !j.ok) {
+              return { data: null, error: { message: (j && j.error) || ("HTTP " + res.status) } };
+            }
+            return { data: j.data, error: null };
+          } catch (e) {
+            return { data: null, error: { message: String((e && e.message) || e) } };
+          }
+        }
+        window.__mfgSbWrite = sbWrite;
+
         // --- Password Gate ---
         const gate = document.getElementById("gate");
         const marketGate = document.getElementById("marketGate");
@@ -3628,19 +3657,18 @@
           }
         });
 
-        // Skip the gate if a valid cookie is already present. No localhost
-        // bypass — MFG mode always requires a real password submission.
-        (async function preauth() {
+        // Always require a fresh password submission on every visit to
+        // mfg.html. The wcc_mfg_gate cookie still gets set on successful
+        // login so the /api/sb-write proxy can authorize this session's
+        // mutations, but the UX never auto-skips the prompt.
+        (async function clearStaleSession() {
           try {
-            const res = await fetch("/api/mfg-gate", {
+            await fetch("/api/mfg-gate", {
+              method: "DELETE",
               credentials: "same-origin",
             });
-            const data = await res.json().catch(() => ({}));
-            if (data && data.ok) {
-              if (currentMarket && currentUserLabel) showApp();
-              else showMarketGate();
-            }
           } catch (e) {}
+          gateInput && gateInput.focus();
         })();
 
         // --- Global Triage (Supabase synced, MFG-shared) ---
@@ -3741,9 +3769,10 @@
                 data: triage,
                 updated_at: new Date().toISOString(),
               };
-              const { error } = await supabase
-                .from(TRIAGE_TABLE)
-                .upsert(payload, { onConflict: "id" });
+              const { error } = await sbWrite(TRIAGE_TABLE, "upsert", {
+                values: payload,
+                onConflict: "id",
+              });
               if (error) {
                 console.error("triage cloudSave error:", error);
                 setSyncStatus(
@@ -5109,9 +5138,10 @@
           const date = triage.date || todayIso();
           const note = AUTO_SNAPSHOT_NOTE_PREFIX + new Date().toLocaleString();
           try {
-            const { error } = await supabase
-              .from(TRIAGE_SNAPSHOTS_TABLE)
-              .insert({ snapshot_date: date, data: triage, note: note });
+            const { error } = await sbWrite(TRIAGE_SNAPSHOTS_TABLE, "insert", {
+              values: { snapshot_date: date, data: triage, note: note },
+              returnRows: false,
+            });
             if (error) {
               console.warn(
                 "[triage] auto-save failed:",
@@ -5157,14 +5187,17 @@
             saveSnapBtn.disabled = true;
             saveSnapBtn.textContent = "Saving…";
             try {
-              const { data: inserted, error } = await supabase
-                .from(TRIAGE_SNAPSHOTS_TABLE)
-                .insert({
-                  snapshot_date: date,
-                  data: triage,
-                  note: note || null,
-                })
-                .select();
+              const { data: inserted, error } = await sbWrite(
+                TRIAGE_SNAPSHOTS_TABLE,
+                "insert",
+                {
+                  values: {
+                    snapshot_date: date,
+                    data: triage,
+                    note: note || null,
+                  },
+                },
+              );
               if (error) {
                 console.error("[triage] snapshot save failed:", error);
                 const msg =
@@ -5449,10 +5482,11 @@
                 snapArmed = null;
                 clearTimeout(snapArmedTimer);
                 try {
-                  const { error: e2 } = await supabase
-                    .from(TRIAGE_SNAPSHOTS_TABLE)
-                    .delete()
-                    .eq("id", snap.id);
+                  const { error: e2 } = await sbWrite(
+                    TRIAGE_SNAPSHOTS_TABLE,
+                    "delete",
+                    { match: { id: snap.id }, returnRows: false },
+                  );
                   if (e2) {
                     triageToast("Delete failed");
                     return;
@@ -5921,20 +5955,23 @@
             submitBtn.disabled = true;
             submitBtn.textContent = "Publishing…";
             try {
-              const { error } = await sb.from("creative_assets").insert({
-                headline: title || headlineFallback,
-                market: markets.join(","),
-                format: "Drive",
-                status: "Live",
-                deploy_date: startDate,
-                live_end_date: endDate,
-                channel: channel,
-                bento: bento,
-                subtab: "engine",
-                kind: "drive",
-                drive_url: driveUrl,
-                drive_file_id: fileId,
-                uploaded_by: "MFG",
+              const { error } = await window.__mfgSbWrite("creative_assets", "insert", {
+                values: {
+                  headline: title || headlineFallback,
+                  market: markets.join(","),
+                  format: "Drive",
+                  status: "Live",
+                  deploy_date: startDate,
+                  live_end_date: endDate,
+                  channel: channel,
+                  bento: bento,
+                  subtab: "engine",
+                  kind: "drive",
+                  drive_url: driveUrl,
+                  drive_file_id: fileId,
+                  uploaded_by: "MFG",
+                },
+                returnRows: false,
               });
               if (error) throw error;
               showToast(
@@ -6069,11 +6106,11 @@
                 btn.disabled = true;
                 btn.textContent = "…";
                 try {
-                  const sb2 = getCreativeSb();
-                  const { error: delErr } = await sb2
-                    .from("creative_assets")
-                    .delete()
-                    .eq("id", id);
+                  const { error: delErr } = await window.__mfgSbWrite(
+                    "creative_assets",
+                    "delete",
+                    { match: { id }, returnRows: false },
+                  );
                   if (delErr) throw delErr;
                   // Remove the matching card from BOTH lists if present.
                   document
@@ -6613,12 +6650,15 @@
           const liveDate = e.reactiveLiveDate.value || null;
           e.reactivePublishBtn.disabled = true;
           setReactiveStatus("Publishing…");
-          const { error } = await sb.from("today_reactive").insert({
-            market,
-            payload: reactivePayload,
-            raw_input: getRawInput().slice(0, 40000),
-            uploaded_by: id.user || "MFG",
-            live_date: liveDate,
+          const { error } = await window.__mfgSbWrite("today_reactive", "insert", {
+            values: {
+              market,
+              payload: reactivePayload,
+              raw_input: getRawInput().slice(0, 40000),
+              uploaded_by: id.user || "MFG",
+              live_date: liveDate,
+            },
+            returnRows: false,
           });
           e.reactivePublishBtn.disabled = false;
           if (error) {

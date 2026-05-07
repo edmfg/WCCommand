@@ -1,116 +1,45 @@
-// Second-factor gate for the public Creative tab. Same HMAC-cookie pattern
-// as api/gate.js. Now keyed off the same GATE_PASSWORD as the dashboard
-// gate (consolidated single password), but uses a separate cookie name so
-// the two sessions stay independent.
-//
-// POST /api/creative-gate    body: { password, remember }    → on match, sets cookie.
-// GET  /api/creative-gate                                    → returns { ok }.
-// DELETE /api/creative-gate                                  → clears cookie.
+// Creative-tab view gate. Same shape as api/gate.js. Cookie
+// wcc_creative_view, 12-hour or 7-day TTL.
 
-const crypto = require("crypto");
+const {
+  GATE_RL_MAX,
+  GATE_RL_LOCK_SEC,
+  timingSafeEqual,
+  makeToken,
+  verifyToken,
+  readCookie,
+  readJson,
+  clientIp,
+  recordFailure,
+  isLockedOut,
+  setLockout,
+  clearFailures,
+  signingSecret,
+} = require("./_gate-shared");
 
 const COOKIE_NAME = "wcc_creative_view";
-const SESSION_MS = 12 * 60 * 60 * 1000; // 12 hours
-const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-function b64url(buf) {
-  return Buffer.from(buf)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-function b64urlDecode(str) {
-  const pad = str.length % 4 === 0 ? "" : "=".repeat(4 - (str.length % 4));
-  return Buffer.from(str.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
-}
-
-function sign(expiryMs, secret) {
-  const h = crypto.createHmac("sha256", secret);
-  h.update(String(expiryMs));
-  return h.digest();
-}
-
-function timingSafeEqual(a, b) {
-  if (!Buffer.isBuffer(a)) a = Buffer.from(a || "");
-  if (!Buffer.isBuffer(b)) b = Buffer.from(b || "");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
-
-function makeToken(secret, ttlMs) {
-  const expiry = Date.now() + ttlMs;
-  const sig = sign(expiry, secret);
-  return b64url(String(expiry)) + "." + b64url(sig);
-}
-
-function verifyToken(token, secret) {
-  if (!token || typeof token !== "string") return false;
-  const dot = token.indexOf(".");
-  if (dot < 0) return false;
-  const expiryB64 = token.slice(0, dot);
-  const sigB64 = token.slice(dot + 1);
-  let expiry, sig;
-  try {
-    expiry = parseInt(b64urlDecode(expiryB64).toString("utf8"), 10);
-    sig = b64urlDecode(sigB64);
-  } catch (e) {
-    return false;
-  }
-  if (!Number.isFinite(expiry) || expiry < Date.now()) return false;
-  const expected = sign(expiry, secret);
-  return timingSafeEqual(expected, sig);
-}
-
-function readCookie(req, name) {
-  const header = req.headers.cookie || "";
-  for (const part of header.split(";")) {
-    const [k, ...rest] = part.trim().split("=");
-    if (k === name) return rest.join("=");
-  }
-  return null;
-}
+const SCOPE = "creative";
+const SESSION_MS = 12 * 60 * 60 * 1000;       // 12 hours
+const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000;  // 7 days
 
 function setCookie(res, value, maxAgeMs) {
-  const parts = [
-    COOKIE_NAME + "=" + value,
-    "Path=/",
-    "HttpOnly",
-    "Secure",
-    "SameSite=Lax",
-    "Max-Age=" + Math.floor(maxAgeMs / 1000),
-  ];
-  res.setHeader("Set-Cookie", parts.join("; "));
+  res.setHeader(
+    "Set-Cookie",
+    [
+      COOKIE_NAME + "=" + value,
+      "Path=/",
+      "HttpOnly",
+      "Secure",
+      "SameSite=Lax",
+      "Max-Age=" + Math.floor(maxAgeMs / 1000),
+    ].join("; "),
+  );
 }
-
 function clearCookie(res) {
   res.setHeader(
     "Set-Cookie",
     COOKIE_NAME + "=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
   );
-}
-
-async function readJson(req) {
-  return new Promise((resolve, reject) => {
-    let raw = "";
-    req.on("data", (c) => {
-      raw += c;
-      if (raw.length > 4096) {
-        req.destroy();
-        reject(new Error("payload too large"));
-      }
-    });
-    req.on("end", () => {
-      if (!raw) return resolve({});
-      try {
-        resolve(JSON.parse(raw));
-      } catch (e) {
-        reject(e);
-      }
-    });
-    req.on("error", reject);
-  });
 }
 
 module.exports = async function handler(req, res) {
@@ -121,7 +50,7 @@ module.exports = async function handler(req, res) {
       .status(500)
       .json({ error: "GATE_PASSWORD env var not configured" });
   }
-  const secret = password;
+  const secret = signingSecret();
 
   if (req.method === "GET") {
     const token = readCookie(req, COOKIE_NAME);
@@ -129,6 +58,13 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    const ip = clientIp(req);
+    if (await isLockedOut(SCOPE, ip)) {
+      res.setHeader("Retry-After", String(GATE_RL_LOCK_SEC));
+      return res
+        .status(429)
+        .json({ ok: false, error: "Too many attempts — try again later." });
+    }
     let body;
     try {
       body = await readJson(req);
@@ -143,8 +79,11 @@ module.exports = async function handler(req, res) {
       submittedBuf.length === expectedBuf.length &&
       timingSafeEqual(submittedBuf, expectedBuf);
     if (!ok) {
+      const count = await recordFailure(SCOPE, ip);
+      if (count >= GATE_RL_MAX) await setLockout(SCOPE, ip);
       return res.status(401).json({ ok: false, error: "wrong password" });
     }
+    await clearFailures(SCOPE, ip);
     const ttl = remember ? REMEMBER_MS : SESSION_MS;
     setCookie(res, makeToken(secret, ttl), ttl);
     return res.status(200).json({ ok: true, ttl_ms: ttl });

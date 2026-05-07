@@ -1,65 +1,25 @@
-// MFG mode gate. Same HMAC-cookie pattern as api/gate.js. Keyed off the
-// same GATE_PASSWORD as the dashboard gate (consolidated single password),
-// but uses a separate cookie name (`wcc_mfg_gate`) so MFG-mode sessions
-// are independent. 7-day TTL.
-//
-// POST /api/mfg-gate    body: { password }    → on match, sets cookie.
-// GET  /api/mfg-gate                          → returns { ok }.
-// DELETE /api/mfg-gate                        → clears the cookie.
+// MFG-mode gate. Same shape as api/gate.js. Cookie wcc_mfg_gate, 7-day TTL.
 
-const crypto = require("crypto");
+const {
+  GATE_RL_MAX,
+  GATE_RL_LOCK_SEC,
+  timingSafeEqual,
+  makeToken,
+  verifyToken,
+  readCookie,
+  readJson,
+  clientIp,
+  recordFailure,
+  isLockedOut,
+  setLockout,
+  clearFailures,
+  signingSecret,
+} = require("./_gate-shared");
 
 const COOKIE_NAME = "wcc_mfg_gate";
+const SCOPE = "mfg";
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 
-function b64url(buf) {
-  return Buffer.from(buf)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-function b64urlDecode(str) {
-  const pad = str.length % 4 === 0 ? "" : "=".repeat(4 - (str.length % 4));
-  return Buffer.from(str.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
-}
-function sign(expiryMs, secret) {
-  const h = crypto.createHmac("sha256", secret);
-  h.update(String(expiryMs));
-  return h.digest();
-}
-function timingSafeEqual(a, b) {
-  if (!Buffer.isBuffer(a)) a = Buffer.from(a || "");
-  if (!Buffer.isBuffer(b)) b = Buffer.from(b || "");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
-function makeToken(secret) {
-  const expiry = Date.now() + SESSION_MS;
-  return b64url(String(expiry)) + "." + b64url(sign(expiry, secret));
-}
-function verifyToken(token, secret) {
-  if (!token || typeof token !== "string") return false;
-  const dot = token.indexOf(".");
-  if (dot < 0) return false;
-  let expiry, sig;
-  try {
-    expiry = parseInt(b64urlDecode(token.slice(0, dot)).toString("utf8"), 10);
-    sig = b64urlDecode(token.slice(dot + 1));
-  } catch (e) {
-    return false;
-  }
-  if (!Number.isFinite(expiry) || expiry < Date.now()) return false;
-  return timingSafeEqual(sign(expiry, secret), sig);
-}
-function readCookie(req, name) {
-  const header = req.headers.cookie || "";
-  for (const part of header.split(";")) {
-    const [k, ...rest] = part.trim().split("=");
-    if (k === name) return rest.join("=");
-  }
-  return null;
-}
 function setCookie(res, value) {
   res.setHeader(
     "Set-Cookie",
@@ -79,27 +39,6 @@ function clearCookie(res) {
     COOKIE_NAME + "=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
   );
 }
-async function readJson(req) {
-  return new Promise((resolve, reject) => {
-    let raw = "";
-    req.on("data", (c) => {
-      raw += c;
-      if (raw.length > 4096) {
-        req.destroy();
-        reject(new Error("payload too large"));
-      }
-    });
-    req.on("end", () => {
-      if (!raw) return resolve({});
-      try {
-        resolve(JSON.parse(raw));
-      } catch (e) {
-        reject(e);
-      }
-    });
-    req.on("error", reject);
-  });
-}
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -109,13 +48,21 @@ module.exports = async function handler(req, res) {
       .status(500)
       .json({ error: "GATE_PASSWORD env var not configured" });
   }
+  const secret = signingSecret();
 
   if (req.method === "GET") {
     const token = readCookie(req, COOKIE_NAME);
-    return res.status(200).json({ ok: verifyToken(token, password) });
+    return res.status(200).json({ ok: verifyToken(token, secret) });
   }
 
   if (req.method === "POST") {
+    const ip = clientIp(req);
+    if (await isLockedOut(SCOPE, ip)) {
+      res.setHeader("Retry-After", String(GATE_RL_LOCK_SEC));
+      return res
+        .status(429)
+        .json({ ok: false, error: "Too many attempts — try again later." });
+    }
     let body;
     try {
       body = await readJson(req);
@@ -129,9 +76,12 @@ module.exports = async function handler(req, res) {
       submittedBuf.length === expectedBuf.length &&
       timingSafeEqual(submittedBuf, expectedBuf);
     if (!ok) {
+      const count = await recordFailure(SCOPE, ip);
+      if (count >= GATE_RL_MAX) await setLockout(SCOPE, ip);
       return res.status(401).json({ ok: false, error: "wrong password" });
     }
-    setCookie(res, makeToken(password));
+    await clearFailures(SCOPE, ip);
+    setCookie(res, makeToken(secret, SESSION_MS));
     return res.status(200).json({ ok: true });
   }
 

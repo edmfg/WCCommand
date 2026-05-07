@@ -60,7 +60,12 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
+      integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <!-- Vercel Web Analytics -->
     <script>
       window.va =
@@ -2849,6 +2854,78 @@
       body.light .card-modal {
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
+      }
+      .reactive-market-modal { max-width: 560px; }
+      .reactive-market-title {
+        margin: 0 0 6px;
+        font-family: 'Oswald', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-size: 22px;
+      }
+      .reactive-market-sub {
+        margin: 0 0 20px;
+        font-size: 13px;
+        color: var(--text-dim);
+      }
+      .reactive-market-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .market-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 22px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        cursor: pointer;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        font: inherit;
+      }
+      body.light .market-card {
+        background: rgba(0, 0, 0, 0.03);
+      }
+      .market-card:hover:not(.disabled) {
+        transform: translateY(-2px);
+        border-color: rgba(220, 38, 38, 0.55);
+        background: rgba(220, 38, 38, 0.08);
+      }
+      .market-card.disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .market-flag {
+        font-size: 36px;
+        line-height: 1;
+      }
+      .market-name {
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.4px;
+      }
+      .market-meta {
+        font-size: 11px;
+        color: #22c55e;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .market-tag {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-dim);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px 8px;
       }
       .card-modal h3 {
         font-family:
@@ -6287,6 +6364,44 @@
       </div>
     </div>
 
+    <!-- Today's Reactive market chooser. Opens before the iframe loads so
+         the user picks Canada / UK / Germany / USA. Only Canada is wired
+         up today; the others are visible but disabled. -->
+    <div class="card-modal-overlay" id="reactiveMarketOverlay">
+      <div
+        class="card-modal reactive-market-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reactiveMarketTitle"
+      >
+        <button class="card-modal-close" id="reactiveMarketClose" aria-label="Close">×</button>
+        <h2 id="reactiveMarketTitle" class="reactive-market-title">Today's Reactive</h2>
+        <p class="reactive-market-sub">Choose a market to load today's briefing.</p>
+        <div class="reactive-market-grid">
+          <button class="market-card" data-market="ca" type="button">
+            <span class="market-flag" aria-hidden="true">🇨🇦</span>
+            <span class="market-name">Canada</span>
+            <span class="market-meta">Live</span>
+          </button>
+          <button class="market-card disabled" data-market="uk" type="button" disabled aria-disabled="true">
+            <span class="market-flag" aria-hidden="true">🇬🇧</span>
+            <span class="market-name">United Kingdom</span>
+            <span class="market-tag">Soon</span>
+          </button>
+          <button class="market-card disabled" data-market="de" type="button" disabled aria-disabled="true">
+            <span class="market-flag" aria-hidden="true">🇩🇪</span>
+            <span class="market-name">Germany</span>
+            <span class="market-tag">Soon</span>
+          </button>
+          <button class="market-card disabled" data-market="usa" type="button" disabled aria-disabled="true">
+            <span class="market-flag" aria-hidden="true">🇺🇸</span>
+            <span class="market-name">USA</span>
+            <span class="market-tag">Soon</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="card-modal-overlay" id="creativeViewGateOverlay">
       <div
         class="card-modal creative-unlock-modal"
@@ -8170,13 +8285,13 @@
         const localId = btn.dataset.assetId;
         if (!confirm("Remove this asset?")) return;
         if (sharedId) {
-          const sb = getCreativeSb();
-          if (sb) {
-            try {
-              await sb.from("creative_assets").delete().eq("id", sharedId);
-            } catch (e) {
-              console.warn("remote delete failed", e);
-            }
+          try {
+            await sbWriteProxy("creative_assets", "delete", {
+              match: { id: sharedId },
+              returnRows: false,
+            });
+          } catch (e) {
+            console.warn("remote delete failed", e);
           }
           SHARED_CREATIVE_ASSETS = SHARED_CREATIVE_ASSETS.filter(
             (a) => a.sharedId !== sharedId,
@@ -8449,20 +8564,25 @@
                   .getPublicUrl(path);
                 imageUrl = urlData?.publicUrl || null;
               }
-              const { error: insErr } = await sb
-                .from("creative_assets")
-                .insert({
-                  headline: title,
-                  market: market || null,
-                  format: format || null,
-                  status: status || null,
-                  deploy_date: deployDate || null,
-                  subtab,
-                  kind: ytUrl ? "youtube" : "image",
-                  youtube_url: ytUrl || null,
-                  image_url: imageUrl,
-                  uploaded_by: uploader,
-                });
+              const { error: insErr } = await sbWriteProxy(
+                "creative_assets",
+                "insert",
+                {
+                  values: {
+                    headline: title,
+                    market: market || null,
+                    format: format || null,
+                    status: status || null,
+                    deploy_date: deployDate || null,
+                    subtab,
+                    kind: ytUrl ? "youtube" : "image",
+                    youtube_url: ytUrl || null,
+                    image_url: imageUrl,
+                    uploaded_by: uploader,
+                  },
+                  returnRows: false,
+                },
+              );
               if (insErr) throw insErr;
               savedRemote = true;
             } catch (err) {
@@ -8526,11 +8646,62 @@
       function setupTabs() {
         const btns = document.querySelectorAll(".tab-btn");
         btns.forEach((btn) => {
-          btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+          btn.addEventListener("click", () => {
+            // Today's Reactive: pop the market chooser before activating
+            // the tab. Once a market is chosen the iframe is loaded with
+            // ?market=<key> and the tab activates normally on subsequent
+            // clicks.
+            if (btn.dataset.tab === "reactive" && !window._reactiveMarket) {
+              openReactiveMarketChooser();
+              return;
+            }
+            switchTab(btn.dataset.tab);
+          });
         });
         setupCreativeViewGate();
+        setupReactiveMarketChooser();
         renderWhatsNewBadges();
         renderBookmarksBar();
+      }
+
+      // ── Today's Reactive market chooser ──
+      function openReactiveMarketChooser() {
+        const overlay = document.getElementById("reactiveMarketOverlay");
+        if (!overlay) return;
+        overlay.classList.add("open");
+      }
+      function closeReactiveMarketChooser() {
+        const overlay = document.getElementById("reactiveMarketOverlay");
+        if (overlay) overlay.classList.remove("open");
+      }
+      function setupReactiveMarketChooser() {
+        const overlay = document.getElementById("reactiveMarketOverlay");
+        if (!overlay) return;
+        overlay.addEventListener("click", (ev) => {
+          if (ev.target === overlay) closeReactiveMarketChooser();
+        });
+        const closeBtn = document.getElementById("reactiveMarketClose");
+        if (closeBtn)
+          closeBtn.addEventListener("click", closeReactiveMarketChooser);
+        document.addEventListener("keydown", (ev) => {
+          if (ev.key === "Escape" && overlay.classList.contains("open"))
+            closeReactiveMarketChooser();
+        });
+        overlay.querySelectorAll(".market-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            if (card.classList.contains("disabled") || card.disabled) return;
+            const key = card.dataset.market;
+            if (!key) return;
+            window._reactiveMarket = key;
+            const fr = document.getElementById("reactiveFrame");
+            if (fr) {
+              fr.src = "social.html?embed=1&market=" + encodeURIComponent(key);
+              window._reactiveLoaded = true;
+            }
+            closeReactiveMarketChooser();
+            switchTab("reactive");
+          });
+        });
       }
 
       // ── "What's new since last visit" badges ──
@@ -8704,11 +8875,20 @@
           }
           window._matchesRendered = true;
         }
-        // Lazy-load the Today's Reactive iframe on first activation so a
-        // 65KB embedded page doesn't hit the network until the user asks.
+        // Lazy-load the Today's Reactive iframe on first activation. The
+        // market chooser sets _reactiveMarket + _reactiveLoaded before
+        // calling switchTab; if neither is set we bounce to Live so the
+        // iframe never loads without a chosen market.
         if (tab === "reactive" && !window._reactiveLoaded) {
+          if (!window._reactiveMarket) {
+            openReactiveMarketChooser();
+            return;
+          }
           const fr = document.getElementById("reactiveFrame");
-          if (fr) fr.src = "social.html?embed=1&market=ca";
+          if (fr)
+            fr.src =
+              "social.html?embed=1&market=" +
+              encodeURIComponent(window._reactiveMarket);
           window._reactiveLoaded = true;
         }
         // Mark this tab as visited and clear its "what's new" badge.
@@ -8836,6 +9016,29 @@
           switchTab(hash, { suppressGate: true });
       }
       window.addEventListener("hashchange", handleHash);
+
+      // ── Server-side write proxy ──
+      // Anon Supabase writes are blocked by RLS. Mutations go through
+      // /api/sb-write, which checks the wcc_mfg_gate / wcc_gate cookie and
+      // uses the service role on the database side.
+      async function sbWriteProxy(table, op, payload) {
+        try {
+          const res = await fetch("/api/sb-write", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify(Object.assign({ table, op }, payload || {})),
+          });
+          const j = await res.json().catch(() => ({}));
+          if (!res.ok || !j.ok) {
+            return { data: null, error: { message: (j && j.error) || ("HTTP " + res.status) } };
+          }
+          return { data: j.data, error: null };
+        } catch (e) {
+          return { data: null, error: { message: String((e && e.message) || e) } };
+        }
+      }
+      window.__dashSbWrite = sbWriteProxy;
 
       // ── #7: MFG Mode auto-refresh ──
       const MFG_SUPABASE_URL = "https://ypisjfefbccgtxesteja.supabase.co";
