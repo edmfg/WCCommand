@@ -1440,13 +1440,13 @@
       //  DAILY DATA — replace these four blocks each morning. Layout is fixed.
       // ============================================================================
 
-      const FORMATION = {
+      let FORMATION = {
         date: "May 6, 2026",
         market: "Canada",
         window: "Last 24h"
       };
 
-      const CULTURAL_BRIEFING = {
+      let CULTURAL_BRIEFING = {
         agentName: "Cultural Conversation Reader",
         agentId: "ccr",
         flag: "🇨🇦",
@@ -1527,7 +1527,7 @@
         ]
       };
 
-      const MATCH_BRIEFING = {
+      let MATCH_BRIEFING = {
         agentName: "Match Event Reader",
         agentId: "mer",
         flag: "🇨🇦",
@@ -1611,7 +1611,7 @@
         ]
       };
 
-      const STORYBOARDS = [
+      let STORYBOARDS = [
         {
           number: "01",
           title: "The Art of Pride",
@@ -1723,9 +1723,13 @@
       //  RENDER
       // ============================================================================
 
-      document.getElementById("hero-date").textContent = FORMATION.date;
-      document.getElementById("hero-market").textContent = FORMATION.market;
-      document.getElementById("hero-window").textContent = FORMATION.window;
+      let frameState = [];
+      function paintHero() {
+        document.getElementById("hero-date").textContent = FORMATION.date;
+        document.getElementById("hero-market").textContent = FORMATION.market;
+        document.getElementById("hero-window").textContent = FORMATION.window;
+      }
+      paintHero();
 
       function renderBriefing(b, tone) {
         const spikesHTML = b.spikes
@@ -1794,9 +1798,12 @@
         `;
       }
 
-      document.getElementById("briefings").innerHTML =
-        renderBriefing(CULTURAL_BRIEFING, "cultural") +
-        renderBriefing(MATCH_BRIEFING, "match");
+      function paintBriefings() {
+        document.getElementById("briefings").innerHTML =
+          renderBriefing(CULTURAL_BRIEFING, "cultural") +
+          renderBriefing(MATCH_BRIEFING, "match");
+      }
+      paintBriefings();
 
       function openModal(agentId, idx) {
         const b = agentId === "ccr" ? CULTURAL_BRIEFING : MATCH_BRIEFING;
@@ -1951,11 +1958,14 @@
         `;
       }
 
-      document.getElementById("storyboards").innerHTML = STORYBOARDS.map((sb, i) =>
-        renderStoryboard(sb, i)
-      ).join("");
-
-      const frameState = STORYBOARDS.map((sb) => ({ idx: 0, total: sb.beats.length }));
+      function paintStoryboards() {
+        document.getElementById("storyboards").innerHTML = STORYBOARDS.map((sb, i) =>
+          renderStoryboard(sb, i)
+        ).join("");
+        frameState = STORYBOARDS.map((sb) => ({ idx: 0, total: (sb.beats || []).length || 1 }));
+        attachStoryboardListeners();
+        setFrames();
+      }
 
       function setFrames() {
         document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
@@ -1982,27 +1992,89 @@
         setFrames();
       }
 
-      document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
-        const screen = sbEl.querySelector(".phone-screen");
-        screen.addEventListener("click", (e) => {
-          if (e.target.closest(".reels-rail, .reels-meta")) return;
-          const rect = screen.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          if (x > rect.width / 2) frameStep(i, 1);
-          else frameStep(i, -1);
-        });
-      });
-
       let lastHovered = 0;
-      document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
-        sbEl.addEventListener("mouseenter", () => (lastHovered = i));
-      });
+      function attachStoryboardListeners() {
+        document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
+          const screen = sbEl.querySelector(".phone-screen");
+          if (!screen) return;
+          screen.addEventListener("click", (e) => {
+            if (e.target.closest(".reels-rail, .reels-meta")) return;
+            const rect = screen.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            if (x > rect.width / 2) frameStep(i, 1);
+            else frameStep(i, -1);
+          });
+          sbEl.addEventListener("mouseenter", () => (lastHovered = i));
+        });
+      }
+      // Keydown is attached once — independent of paint cycles.
       document.addEventListener("keydown", (e) => {
         if (e.key === "ArrowRight") frameStep(lastHovered, 1);
         if (e.key === "ArrowLeft") frameStep(lastHovered, -1);
       });
 
-      setFrames();
+      paintStoryboards();
+
+      // ============================================================================
+      //  Live data override — fetch latest today_reactive row for the active
+      //  market from Supabase and re-paint if found. The bundled defaults above
+      //  are the fallback so the page is never blank during the fetch round-trip.
+      // ============================================================================
+      (function () {
+        const SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
+        const SB_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
+        const params = new URLSearchParams(window.location.search);
+        const marketParam = (params.get("market") || "").toLowerCase();
+        const MARKET_MAP = {
+          ca: "Canada",
+          uk: "UK",
+          de: "Germany",
+          usa: "USA",
+          us: "USA",
+          global: "Global",
+          canada: "Canada",
+          germany: "Germany",
+        };
+        const market = MARKET_MAP[marketParam] || "Canada";
+
+        async function fetchLatest() {
+          const url =
+            SB_URL +
+            "/rest/v1/today_reactive?select=payload,uploaded_by,live_date,created_at&market=eq." +
+            encodeURIComponent(market) +
+            "&order=created_at.desc&limit=1";
+          try {
+            const res = await fetch(url, {
+              headers: {
+                apikey: SB_KEY,
+                Authorization: "Bearer " + SB_KEY,
+              },
+            });
+            if (!res.ok) return null;
+            const rows = await res.json();
+            return Array.isArray(rows) && rows[0] ? rows[0] : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function applyPayload(payload) {
+          if (!payload || typeof payload !== "object") return;
+          if (payload.formation) FORMATION = payload.formation;
+          if (payload.cultural) CULTURAL_BRIEFING = payload.cultural;
+          if (payload.match) MATCH_BRIEFING = payload.match;
+          if (Array.isArray(payload.storyboards) && payload.storyboards.length) {
+            STORYBOARDS = payload.storyboards;
+          }
+          paintHero();
+          paintBriefings();
+          paintStoryboards();
+        }
+
+        fetchLatest().then((row) => {
+          if (row && row.payload) applyPayload(row.payload);
+        });
+      })();
     </script>
   </body>
 </html>

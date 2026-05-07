@@ -389,6 +389,355 @@
         display: block;
       }
 
+      /* ─── Reactive Upload tab ─── */
+      .reactive-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      @media (max-width: 760px) {
+        .reactive-row { grid-template-columns: 1fr; }
+      }
+      .reactive-field label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .reactive-field-help {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+      .reactive-mode-toggle {
+        display: inline-flex;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        padding: 4px;
+        margin-bottom: 10px;
+      }
+      .reactive-mode {
+        background: transparent;
+        border: 0;
+        color: var(--text-muted);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .reactive-mode:hover {
+        color: var(--text);
+      }
+      .reactive-mode.active {
+        background: linear-gradient(180deg, rgba(204, 0, 0, 0.45), rgba(204, 0, 0, 0.18));
+        color: #fff;
+      }
+      .reactive-input-wrap {
+        margin-bottom: 14px;
+      }
+      .reactive-input-wrap label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .reactive-counter {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      #reactivePaste {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        font-family: "JetBrains Mono", "Inter", monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        padding: 14px;
+        border-radius: 10px;
+        resize: vertical;
+        min-height: 240px;
+      }
+      #reactivePaste:focus {
+        outline: none;
+        border-color: rgba(204, 0, 0, 0.45);
+        box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.12);
+      }
+      #reactiveFile {
+        display: block;
+        margin-top: 6px;
+        color: var(--text-muted);
+      }
+      .reactive-file-status {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
+        min-height: 18px;
+      }
+      .reactive-file-status.ok {
+        color: var(--green, #4ade80);
+      }
+      .reactive-file-status.err {
+        color: #f87171;
+      }
+      .reactive-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 8px;
+      }
+      .reactive-status {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .reactive-status.ok {
+        color: var(--green, #4ade80);
+      }
+      .reactive-status.err {
+        color: #f87171;
+      }
+      .reactive-btn-secondary {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        color: var(--text) !important;
+      }
+      .reactive-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+      .reactive-preview-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .reactive-preview-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .reactive-preview-meta {
+        display: block;
+        font-family: "Inter", sans-serif;
+        font-weight: 400;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: none;
+        letter-spacing: 0;
+        margin-top: 4px;
+      }
+      .reactive-preview-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .reactive-preview-section {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      }
+      .reactive-preview-section h4 {
+        font-family: "Oswald", sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--gold, #ffd700);
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      .reactive-preview-spike {
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+      }
+      .reactive-preview-spike .pv-title {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      .reactive-preview-spike .pv-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .reactive-preview-spike .pv-body {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-mid, #b8bcc8);
+      }
+      .reactive-preview-storyboard {
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        background: rgba(180, 142, 245, 0.06);
+        border: 1px solid rgba(180, 142, 245, 0.18);
+        border-radius: 10px;
+      }
+      .reactive-preview-storyboard .pv-num {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        color: rgba(180, 142, 245, 0.85);
+        margin-bottom: 4px;
+      }
+      .reactive-preview-storyboard .pv-prompt {
+        font-size: 13px;
+        line-height: 1.45;
+        margin-top: 6px;
+      }
+      .reactive-history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .reactive-history-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 13px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+      }
+      .reactive-history-row .h-flag {
+        font-size: 18px;
+      }
+      .reactive-history-row .h-meta {
+        flex: 1;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .reactive-history-empty {
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      /* ─── Audit Log tab ─── */
+      .audit-toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .audit-filters {
+        display: flex;
+        gap: 4px;
+      }
+      .audit-chip {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-muted);
+        font: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .audit-chip:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .audit-chip.active {
+        color: #fff;
+        background: linear-gradient(135deg, var(--red, #cc0000), #ff3333);
+        border-color: rgba(204, 0, 0, 0.7);
+      }
+      .audit-search {
+        flex: 1;
+        min-width: 200px;
+      }
+      .audit-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .audit-empty {
+        color: var(--text-muted);
+        font-size: 13px;
+        padding: 20px;
+        text-align: center;
+      }
+      .audit-row {
+        display: grid;
+        grid-template-columns: 110px 80px 90px 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        font-size: 12px;
+      }
+      @media (max-width: 760px) {
+        .audit-row { grid-template-columns: 1fr; gap: 4px; }
+      }
+      .audit-row .a-time {
+        color: var(--text-muted);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+      }
+      .audit-row .a-source {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+        text-align: center;
+      }
+      .audit-row .a-source.creative {
+        background: rgba(180, 142, 245, 0.16);
+        color: rgba(180, 142, 245, 0.95);
+      }
+      .audit-row .a-source.triage {
+        background: rgba(74, 222, 128, 0.14);
+        color: rgba(74, 222, 128, 0.95);
+      }
+      .audit-row .a-source.reactive {
+        background: rgba(255, 215, 0, 0.14);
+        color: rgba(255, 215, 0, 0.95);
+      }
+      .audit-row .a-market {
+        font-size: 12px;
+        color: var(--text-mid, #b8bcc8);
+      }
+      .audit-row .a-summary {
+        color: var(--text);
+      }
+      .audit-row .a-who {
+        color: var(--text-mid, #b8bcc8);
+        font-weight: 500;
+      }
+
       /* Creative Uploads — chip selector + recent list */
       .creative-market-chips {
         display: flex;
@@ -2217,8 +2566,14 @@
           <button class="tab-btn active" type="button" data-mfg-tab="triage">
             🧯 Global Triage
           </button>
+          <button class="tab-btn" type="button" data-mfg-tab="reactive">
+            🔥 Today's Reactive
+          </button>
           <button class="tab-btn" type="button" data-mfg-tab="creative">
             🎬 Creative Uploads
+          </button>
+          <button class="tab-btn" type="button" data-mfg-tab="audit">
+            📋 Audit Log
           </button>
         </nav>
 
@@ -2879,6 +3234,210 @@
               gap: 10px;
             "
           ></div>
+        </div>
+
+        <!-- ─────── REACTIVE UPLOAD PANEL ─────── -->
+        <div class="tab-panel" id="panel-reactive">
+          <div class="section-title">🔥 Today's Reactive</div>
+          <p
+            class="reactive-help"
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            Paste a brief or upload a strategist's notes (.txt, .md, .pdf, or
+            .docx). Pick the market it's for, hit
+            <strong>Execute</strong>, and Gemini converts the raw text into the
+            structured Today's Reactive briefing for the public surface. Review
+            the conversion, then <strong>Publish</strong> to push it live.
+          </p>
+
+          <div class="form-card glass" id="reactiveStep1">
+            <div class="reactive-row">
+              <div class="reactive-field">
+                <label for="reactiveMarketSelect">Market</label>
+                <select id="reactiveMarketSelect" class="gate-input">
+                  <option value="">— Pick a market —</option>
+                  <option value="Canada">🇨🇦 Canada</option>
+                  <option value="UK">🇬🇧 UK</option>
+                  <option value="Germany">🇩🇪 Germany</option>
+                  <option value="USA">🇺🇸 USA</option>
+                  <option value="Global">🌍 Global</option>
+                </select>
+                <div class="reactive-field-help">
+                  Defaults to your MFG-mode market. Switch here to publish for a
+                  different market.
+                </div>
+              </div>
+              <div class="reactive-field">
+                <label for="reactiveLiveDate">Live date</label>
+                <input
+                  type="date"
+                  id="reactiveLiveDate"
+                  class="gate-input"
+                />
+              </div>
+            </div>
+
+            <div class="reactive-mode-toggle" id="reactiveModeToggle">
+              <button
+                type="button"
+                class="reactive-mode active"
+                data-mode="paste"
+              >
+                📝 Paste text
+              </button>
+              <button type="button" class="reactive-mode" data-mode="upload">
+                📁 Upload file
+              </button>
+            </div>
+
+            <div id="reactivePasteWrap" class="reactive-input-wrap">
+              <label for="reactivePaste"
+                >Raw brief
+                <span class="reactive-counter" id="reactiveCounter"
+                  >0 chars</span
+                ></label
+              >
+              <textarea
+                id="reactivePaste"
+                rows="14"
+                placeholder="Paste your strategist's brief, news article, or notes here. Aim for at least 200 chars of signal — Gemini will distill it into the structured cultural + match + storyboard layout."
+              ></textarea>
+            </div>
+
+            <div
+              id="reactiveUploadWrap"
+              class="reactive-input-wrap"
+              hidden
+            >
+              <label for="reactiveFile">Upload a brief</label>
+              <input
+                type="file"
+                id="reactiveFile"
+                accept=".txt,.md,.pdf,.docx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              />
+              <div class="reactive-field-help">
+                Accepted: <code>.txt</code>, <code>.md</code>,
+                <code>.pdf</code>, <code>.docx</code>. Files are parsed in your
+                browser; the extracted text is what goes to Gemini.
+              </div>
+              <div class="reactive-file-status" id="reactiveFileStatus"></div>
+            </div>
+
+            <div class="reactive-actions">
+              <button class="gate-btn" id="reactiveExecuteBtn" type="button">
+                ⚡ Execute
+              </button>
+              <span
+                class="reactive-status"
+                id="reactiveStatus"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+
+          <div class="form-card glass" id="reactiveStep2" hidden>
+            <div class="reactive-preview-head">
+              <div class="reactive-preview-title">
+                Conversion preview
+                <span
+                  class="reactive-preview-meta"
+                  id="reactivePreviewMeta"
+                ></span>
+              </div>
+              <div class="reactive-preview-actions">
+                <button
+                  class="gate-btn reactive-btn-secondary"
+                  id="reactiveCancelBtn"
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  class="gate-btn reactive-btn-secondary"
+                  id="reactiveRerunBtn"
+                  type="button"
+                >
+                  Re-run conversion
+                </button>
+                <button
+                  class="gate-btn"
+                  id="reactivePublishBtn"
+                  type="button"
+                >
+                  ✅ Publish to dashboard
+                </button>
+              </div>
+            </div>
+            <div id="reactivePreviewBody"></div>
+          </div>
+
+          <div class="form-card glass" id="reactiveHistory">
+            <div
+              class="section-title"
+              style="font-size: 13px; margin-bottom: 8px"
+            >
+              Recent publishes
+            </div>
+            <div id="reactiveHistoryList" class="reactive-history-list">
+              <div class="reactive-history-empty">
+                Nothing published yet.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── AUDIT LOG PANEL ─────── -->
+        <div class="tab-panel" id="panel-audit">
+          <div class="section-title">📋 Audit Log</div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            Chronological feed of every publish action across Creative Uploads,
+            Triage snapshots, and Today's Reactive. Newest first.
+          </p>
+
+          <div class="form-card glass">
+            <div class="audit-toolbar">
+              <div class="audit-filters" id="auditFilters">
+                <button class="audit-chip active" data-audit-filter="all">
+                  All
+                </button>
+                <button class="audit-chip" data-audit-filter="creative">
+                  Creative
+                </button>
+                <button class="audit-chip" data-audit-filter="triage">
+                  Triage
+                </button>
+                <button class="audit-chip" data-audit-filter="reactive">
+                  Reactive
+                </button>
+              </div>
+              <input
+                type="search"
+                id="auditSearch"
+                class="gate-input audit-search"
+                placeholder="Search who / what / market…"
+              />
+              <button
+                class="gate-btn reactive-btn-secondary"
+                id="auditRefreshBtn"
+                type="button"
+              >
+                ↻ Refresh
+              </button>
+            </div>
+            <div id="auditFeed" class="audit-feed">
+              <div class="audit-empty">Loading…</div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -5140,15 +5699,19 @@
         // Tab switching ----------------------------------------------------
         const tabNav = document.getElementById("mfgTabNav");
         if (!tabNav) return;
+        const TAB_TO_PANEL = {
+          triage: "panel-triage",
+          reactive: "panel-reactive",
+          creative: "panel-creative",
+          audit: "panel-audit",
+        };
         function activateTab(name) {
+          if (!TAB_TO_PANEL[name]) name = "triage";
           tabNav.querySelectorAll(".tab-btn").forEach((b) => {
             b.classList.toggle("active", b.dataset.mfgTab === name);
           });
           document.querySelectorAll("#app .tab-panel").forEach((p) => {
-            const matches =
-              (name === "triage" && p.id === "panel-triage") ||
-              (name === "creative" && p.id === "panel-creative");
-            p.classList.toggle("active", matches);
+            p.classList.toggle("active", p.id === TAB_TO_PANEL[name]);
           });
           try {
             history.replaceState(null, "", "#mfg-" + name);
@@ -5156,13 +5719,23 @@
           if (name === "creative") {
             loadRecentCreativeUploads();
           }
+          if (name === "reactive" && typeof initReactiveTab === "function") {
+            initReactiveTab();
+          }
+          if (name === "audit" && typeof loadAuditLog === "function") {
+            loadAuditLog();
+          }
         }
+        // Expose for buttons inside other panels (e.g. an "Open Audit Log"
+        // shortcut on the Reactive success state).
+        window.__mfgActivateTab = activateTab;
         tabNav.addEventListener("click", function (e) {
           const btn = e.target.closest(".tab-btn");
           if (!btn) return;
           activateTab(btn.dataset.mfgTab);
         });
-        if (location.hash === "#mfg-creative") activateTab("creative");
+        const _hashTab = (location.hash || "").replace(/^#mfg-/, "");
+        if (_hashTab && TAB_TO_PANEL[_hashTab]) activateTab(_hashTab);
 
         // Creative Uploads form -------------------------------------------
         const SUPABASE_URL = "https://ypisjfefbccgtxesteja.supabase.co";
@@ -5612,6 +6185,636 @@
               escapeHtml(err.message || String(err)) +
               "</p>";
           }
+        }
+      })();
+
+      // ── REACTIVE UPLOAD + AUDIT LOG ──
+      (function () {
+        const SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
+        const SB_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
+        let _sb = null;
+        function getSb() {
+          if (_sb) return _sb;
+          if (window.supabase && window.supabase.createClient) {
+            _sb = window.supabase.createClient(SB_URL, SB_KEY);
+          }
+          return _sb;
+        }
+        function escHtml(s) {
+          return String(s == null ? "" : s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+        function fmtTime(ts) {
+          if (!ts) return "";
+          try {
+            const d = new Date(ts);
+            const now = new Date();
+            const sameDay =
+              d.toDateString() === now.toDateString();
+            if (sameDay) {
+              return d.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              });
+            }
+            return d.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            }) + " · " + d.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            });
+          } catch (e) {
+            return "";
+          }
+        }
+        const FLAG = {
+          Canada: "🇨🇦",
+          UK: "🇬🇧",
+          Germany: "🇩🇪",
+          USA: "🇺🇸",
+          Global: "🌍",
+        };
+        function readIdentity() {
+          let m = "", u = "";
+          try {
+            m =
+              localStorage.getItem("mfg_market") ||
+              sessionStorage.getItem("mfg_market") ||
+              "";
+            u =
+              localStorage.getItem("mfg_user_label") ||
+              sessionStorage.getItem("mfg_user_label") ||
+              "";
+          } catch (e) {}
+          return { market: m, user: u };
+        }
+
+        // ── File parsing (text / md / pdf / docx) ──
+        let _pdfjsP = null;
+        let _mammothP = null;
+        function loadScriptOnce(url) {
+          return new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = url;
+            s.async = true;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load " + url));
+            document.head.appendChild(s);
+          });
+        }
+        async function ensurePdfJs() {
+          if (window.pdfjsLib) return window.pdfjsLib;
+          if (!_pdfjsP) {
+            _pdfjsP = loadScriptOnce(
+              "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+            ).then(() => {
+              if (window.pdfjsLib) {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+              }
+              return window.pdfjsLib;
+            });
+          }
+          return _pdfjsP;
+        }
+        async function ensureMammoth() {
+          if (window.mammoth) return window.mammoth;
+          if (!_mammothP) {
+            _mammothP = loadScriptOnce(
+              "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
+            ).then(() => window.mammoth);
+          }
+          return _mammothP;
+        }
+        async function parseUploadedFile(file) {
+          const name = (file.name || "").toLowerCase();
+          if (name.endsWith(".pdf") || file.type === "application/pdf") {
+            const pdfjsLib = await ensurePdfJs();
+            const buf = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+            const out = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const tc = await page.getTextContent();
+              out.push(tc.items.map((it) => it.str).join(" "));
+            }
+            return out.join("\n\n");
+          }
+          if (
+            name.endsWith(".docx") ||
+            file.type ===
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ) {
+            const mammoth = await ensureMammoth();
+            const buf = await file.arrayBuffer();
+            const r = await mammoth.extractRawText({ arrayBuffer: buf });
+            return r.value || "";
+          }
+          // .txt / .md / unknown text — read as text
+          return await file.text();
+        }
+
+        // ── Reactive tab ──
+        const reactiveEls = {};
+        let reactiveBooted = false;
+        let reactivePayload = null;
+        let reactiveRawInput = "";
+
+        function getReactiveEls() {
+          if (Object.keys(reactiveEls).length) return reactiveEls;
+          [
+            "reactiveStep1",
+            "reactiveStep2",
+            "reactiveMarketSelect",
+            "reactiveLiveDate",
+            "reactiveModeToggle",
+            "reactivePasteWrap",
+            "reactiveUploadWrap",
+            "reactivePaste",
+            "reactiveCounter",
+            "reactiveFile",
+            "reactiveFileStatus",
+            "reactiveExecuteBtn",
+            "reactiveStatus",
+            "reactivePreviewMeta",
+            "reactivePreviewBody",
+            "reactivePublishBtn",
+            "reactiveRerunBtn",
+            "reactiveCancelBtn",
+            "reactiveHistoryList",
+          ].forEach((id) => {
+            reactiveEls[id] = document.getElementById(id);
+          });
+          return reactiveEls;
+        }
+
+        function setReactiveStatus(msg, kind) {
+          const el = reactiveEls.reactiveStatus;
+          if (!el) return;
+          el.textContent = msg || "";
+          el.classList.toggle("ok", kind === "ok");
+          el.classList.toggle("err", kind === "err");
+        }
+        function setFileStatus(msg, kind) {
+          const el = reactiveEls.reactiveFileStatus;
+          if (!el) return;
+          el.textContent = msg || "";
+          el.classList.toggle("ok", kind === "ok");
+          el.classList.toggle("err", kind === "err");
+        }
+        function getRawInput() {
+          if (reactiveRawInput) return reactiveRawInput;
+          return (reactiveEls.reactivePaste &&
+            reactiveEls.reactivePaste.value) ||
+            "";
+        }
+
+        async function loadReactiveHistory() {
+          const list = reactiveEls.reactiveHistoryList;
+          if (!list) return;
+          const sb = getSb();
+          if (!sb) {
+            list.innerHTML =
+              '<div class="reactive-history-empty">Supabase not initialized.</div>';
+            return;
+          }
+          const { data, error } = await sb
+            .from("today_reactive")
+            .select("id,market,uploaded_by,live_date,created_at")
+            .order("created_at", { ascending: false })
+            .limit(8);
+          if (error) {
+            list.innerHTML =
+              '<div class="reactive-history-empty">Failed to load history: ' +
+              escHtml(error.message) +
+              "</div>";
+            return;
+          }
+          if (!data || !data.length) {
+            list.innerHTML =
+              '<div class="reactive-history-empty">Nothing published yet.</div>';
+            return;
+          }
+          list.innerHTML = data
+            .map(
+              (r) =>
+                '<div class="reactive-history-row">' +
+                '<span class="h-flag">' +
+                (FLAG[r.market] || "🌐") +
+                "</span>" +
+                '<div><div>' +
+                escHtml(r.market) +
+                " · live " +
+                escHtml(r.live_date || "") +
+                "</div>" +
+                '<div class="h-meta">' +
+                fmtTime(r.created_at) +
+                " · " +
+                escHtml(r.uploaded_by || "—") +
+                "</div></div>" +
+                "</div>",
+            )
+            .join("");
+        }
+
+        function bindReactiveTab() {
+          const e = getReactiveEls();
+          if (!e.reactiveStep1) return;
+
+          // Default market = MFG identity market
+          const id = readIdentity();
+          if (id.market && e.reactiveMarketSelect) {
+            e.reactiveMarketSelect.value = id.market;
+          }
+          if (e.reactiveLiveDate && !e.reactiveLiveDate.value) {
+            const d = new Date();
+            const iso = d.toISOString().slice(0, 10);
+            e.reactiveLiveDate.value = iso;
+          }
+
+          // Mode toggle
+          e.reactiveModeToggle.addEventListener("click", (ev) => {
+            const btn = ev.target.closest("[data-mode]");
+            if (!btn) return;
+            const mode = btn.dataset.mode;
+            e.reactiveModeToggle
+              .querySelectorAll(".reactive-mode")
+              .forEach((b) =>
+                b.classList.toggle("active", b.dataset.mode === mode),
+              );
+            e.reactivePasteWrap.hidden = mode !== "paste";
+            e.reactiveUploadWrap.hidden = mode !== "upload";
+          });
+
+          // Paste counter
+          e.reactivePaste.addEventListener("input", () => {
+            const n = e.reactivePaste.value.length;
+            e.reactiveCounter.textContent = n + " chars";
+            reactiveRawInput = ""; // user typed → forget any cached file text
+          });
+
+          // File picker
+          e.reactiveFile.addEventListener("change", async () => {
+            const file = e.reactiveFile.files && e.reactiveFile.files[0];
+            if (!file) {
+              setFileStatus("");
+              reactiveRawInput = "";
+              return;
+            }
+            setFileStatus("Parsing " + file.name + "…");
+            try {
+              const text = await parseUploadedFile(file);
+              reactiveRawInput = String(text || "").trim();
+              setFileStatus(
+                "Parsed " + file.name + " · " + reactiveRawInput.length + " chars",
+                "ok",
+              );
+            } catch (err) {
+              reactiveRawInput = "";
+              setFileStatus(
+                "Failed to parse: " + (err && err.message ? err.message : err),
+                "err",
+              );
+            }
+          });
+
+          // Execute
+          e.reactiveExecuteBtn.addEventListener("click", executeReactive);
+          e.reactiveCancelBtn.addEventListener("click", () => {
+            reactivePayload = null;
+            e.reactiveStep2.hidden = true;
+            setReactiveStatus("");
+          });
+          e.reactiveRerunBtn.addEventListener("click", executeReactive);
+          e.reactivePublishBtn.addEventListener("click", publishReactive);
+        }
+
+        async function executeReactive() {
+          const e = getReactiveEls();
+          const market = e.reactiveMarketSelect.value;
+          const liveDate = e.reactiveLiveDate.value || "";
+          const raw = getRawInput().trim();
+          if (!market) {
+            setReactiveStatus("Pick a market first.", "err");
+            return;
+          }
+          if (raw.length < 40) {
+            setReactiveStatus(
+              "Need at least 40 characters of input to convert.",
+              "err",
+            );
+            return;
+          }
+          e.reactiveExecuteBtn.disabled = true;
+          setReactiveStatus("Converting via Gemini…");
+          try {
+            const res = await fetch("/api/reactive-convert", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                rawInput: raw,
+                market,
+                liveDate,
+              }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.payload) {
+              setReactiveStatus(
+                "Conversion failed: " + (data.error || res.status),
+                "err",
+              );
+              return;
+            }
+            reactivePayload = data.payload;
+            setReactiveStatus("Conversion ready — review below.", "ok");
+            renderReactivePreview(reactivePayload);
+            e.reactiveStep2.hidden = false;
+            e.reactiveStep2.scrollIntoView({ behavior: "smooth", block: "start" });
+          } catch (err) {
+            setReactiveStatus(
+              "Network error: " + (err && err.message ? err.message : err),
+              "err",
+            );
+          } finally {
+            e.reactiveExecuteBtn.disabled = false;
+          }
+        }
+
+        function renderReactivePreview(p) {
+          const e = getReactiveEls();
+          if (!p) return;
+          e.reactivePreviewMeta.innerHTML =
+            (FLAG[p.formation.market] || "🌐") +
+            " " +
+            escHtml(p.formation.market) +
+            " · " +
+            escHtml(p.formation.date) +
+            " · " +
+            escHtml(p.formation.window);
+          function spikeHtml(s) {
+            return (
+              '<div class="reactive-preview-spike">' +
+              '<div class="pv-title">' + escHtml(s.title) + "</div>" +
+              '<div class="pv-meta">' +
+              escHtml(s.type) +
+              " · vol " +
+              s.volume +
+              "</div>" +
+              '<div class="pv-body">' + escHtml(s.signal) + "</div>" +
+              (s.context
+                ? '<div class="pv-body" style="margin-top:6px">' + escHtml(s.context) + "</div>"
+                : "") +
+              (s.voice
+                ? '<div class="pv-body" style="margin-top:6px;font-style:italic">"' + escHtml(s.voice) + '"</div>'
+                : "") +
+              "</div>"
+            );
+          }
+          function briefHtml(b) {
+            return (
+              '<div style="font-weight:600;font-size:13px;margin-bottom:8px">' +
+              escHtml(b.headline) +
+              "</div>" +
+              (b.spikes || []).map(spikeHtml).join("")
+            );
+          }
+          function storyHtml(s) {
+            return (
+              '<div class="reactive-preview-storyboard">' +
+              '<div class="pv-num">STORYBOARD ' + escHtml(s.number) + "</div>" +
+              '<div style="font-weight:600;font-size:14px">' + escHtml(s.title) + "</div>" +
+              '<div class="pv-prompt">' + escHtml(s.prompt) + "</div>" +
+              '<div class="pv-body" style="margin-top:6px;font-size:11px;color:var(--text-muted)">' +
+              escHtml(s.sourceSignal) +
+              " · " +
+              escHtml(s.audienceCut) +
+              " · " +
+              escHtml(s.bucket) +
+              "</div>" +
+              (s.whyPrompt
+                ? '<div class="pv-body" style="margin-top:8px">' + escHtml(s.whyPrompt) + "</div>"
+                : "") +
+              "</div>"
+            );
+          }
+          e.reactivePreviewBody.innerHTML =
+            '<div class="reactive-preview-section"><h4>Cultural briefing</h4>' +
+            briefHtml(p.cultural) +
+            "</div>" +
+            '<div class="reactive-preview-section"><h4>Match briefing</h4>' +
+            briefHtml(p.match) +
+            "</div>" +
+            '<div class="reactive-preview-section"><h4>Storyboards (' +
+            (p.storyboards || []).length +
+            ")</h4>" +
+            (p.storyboards || []).map(storyHtml).join("") +
+            "</div>";
+        }
+
+        async function publishReactive() {
+          const e = getReactiveEls();
+          if (!reactivePayload) {
+            setReactiveStatus("Nothing to publish — run Execute first.", "err");
+            return;
+          }
+          const sb = getSb();
+          if (!sb) {
+            setReactiveStatus("Supabase not initialized.", "err");
+            return;
+          }
+          const id = readIdentity();
+          const market = e.reactiveMarketSelect.value;
+          const liveDate = e.reactiveLiveDate.value || null;
+          e.reactivePublishBtn.disabled = true;
+          setReactiveStatus("Publishing…");
+          const { error } = await sb.from("today_reactive").insert({
+            market,
+            payload: reactivePayload,
+            raw_input: getRawInput().slice(0, 40000),
+            uploaded_by: id.user || "MFG",
+            live_date: liveDate,
+          });
+          e.reactivePublishBtn.disabled = false;
+          if (error) {
+            setReactiveStatus("Publish failed: " + error.message, "err");
+            return;
+          }
+          setReactiveStatus(
+            "Published. Live at /#reactive on the public dashboard.",
+            "ok",
+          );
+          reactivePayload = null;
+          reactiveRawInput = "";
+          e.reactiveStep2.hidden = true;
+          if (e.reactivePaste) {
+            e.reactivePaste.value = "";
+            e.reactiveCounter.textContent = "0 chars";
+          }
+          if (e.reactiveFile) e.reactiveFile.value = "";
+          setFileStatus("");
+          loadReactiveHistory();
+        }
+
+        window.initReactiveTab = function () {
+          if (!reactiveBooted) {
+            reactiveBooted = true;
+            bindReactiveTab();
+          }
+          loadReactiveHistory();
+        };
+
+        // ── Audit Log ──
+        let auditFilter = "all";
+        let auditQuery = "";
+        let auditCache = [];
+
+        async function fetchAuditRows() {
+          const sb = getSb();
+          if (!sb) return [];
+          const out = [];
+          try {
+            const r1 = await sb
+              .from("creative_assets")
+              .select("id,headline,market,uploaded_by,created_at")
+              .order("created_at", { ascending: false })
+              .limit(120);
+            (r1.data || []).forEach((r) =>
+              out.push({
+                source: "creative",
+                time: r.created_at,
+                who: r.uploaded_by || "—",
+                market: r.market || "",
+                summary: r.headline || "(untitled creative)",
+                ref: "creative:" + r.id,
+              }),
+            );
+          } catch (e) {}
+          try {
+            const r2 = await sb
+              .from("today_reactive")
+              .select("id,market,uploaded_by,live_date,created_at")
+              .order("created_at", { ascending: false })
+              .limit(120);
+            (r2.data || []).forEach((r) =>
+              out.push({
+                source: "reactive",
+                time: r.created_at,
+                who: r.uploaded_by || "—",
+                market: r.market || "",
+                summary:
+                  "Today's Reactive published — live " + (r.live_date || ""),
+                ref: "reactive:" + r.id,
+              }),
+            );
+          } catch (e) {}
+          try {
+            const r3 = await sb
+              .from("mfg_triage_snapshots")
+              .select("id,name,updated_by,created_at")
+              .order("created_at", { ascending: false })
+              .limit(120);
+            (r3.data || []).forEach((r) =>
+              out.push({
+                source: "triage",
+                time: r.created_at,
+                who: r.updated_by || "—",
+                market: "",
+                summary: "Triage snapshot — " + (r.name || "(unnamed)"),
+                ref: "triage:" + r.id,
+              }),
+            );
+          } catch (e) {}
+          out.sort((a, b) => (a.time < b.time ? 1 : a.time > b.time ? -1 : 0));
+          return out;
+        }
+        function renderAudit() {
+          const feed = document.getElementById("auditFeed");
+          if (!feed) return;
+          let rows = auditCache;
+          if (auditFilter !== "all") {
+            rows = rows.filter((r) => r.source === auditFilter);
+          }
+          if (auditQuery) {
+            const q = auditQuery.toLowerCase();
+            rows = rows.filter((r) =>
+              [r.who, r.market, r.summary, r.source]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(q),
+            );
+          }
+          if (!rows.length) {
+            feed.innerHTML =
+              '<div class="audit-empty">No matching events.</div>';
+            return;
+          }
+          feed.innerHTML = rows
+            .map((r) => {
+              const flag = FLAG[r.market] || (r.market ? "🌐" : "");
+              return (
+                '<div class="audit-row">' +
+                '<div class="a-time">' + escHtml(fmtTime(r.time)) + "</div>" +
+                '<div class="a-source ' + escHtml(r.source) + '">' +
+                escHtml(r.source) +
+                "</div>" +
+                '<div class="a-market">' +
+                (flag ? flag + " " : "") +
+                escHtml(r.market || "—") +
+                "</div>" +
+                '<div class="a-summary"><span class="a-who">' +
+                escHtml(r.who) +
+                "</span> · " +
+                escHtml(r.summary) +
+                "</div>" +
+                "</div>"
+              );
+            })
+            .join("");
+        }
+        async function loadAuditLogImpl() {
+          const feed = document.getElementById("auditFeed");
+          if (feed) feed.innerHTML = '<div class="audit-empty">Loading…</div>';
+          auditCache = await fetchAuditRows();
+          renderAudit();
+        }
+        window.loadAuditLog = loadAuditLogImpl;
+
+        // Wire audit filters/search/refresh once on script load
+        document.addEventListener("click", (e) => {
+          const chip = e.target.closest(".audit-chip");
+          if (!chip) return;
+          auditFilter = chip.dataset.auditFilter || "all";
+          document
+            .querySelectorAll(".audit-chip")
+            .forEach((b) =>
+              b.classList.toggle(
+                "active",
+                b.dataset.auditFilter === auditFilter,
+              ),
+            );
+          renderAudit();
+        });
+        const auditSearch = document.getElementById("auditSearch");
+        if (auditSearch) {
+          let t;
+          auditSearch.addEventListener("input", () => {
+            clearTimeout(t);
+            t = setTimeout(() => {
+              auditQuery = auditSearch.value.trim();
+              renderAudit();
+            }, 150);
+          });
+        }
+        const auditRefresh = document.getElementById("auditRefreshBtn");
+        if (auditRefresh) {
+          auditRefresh.addEventListener("click", loadAuditLogImpl);
         }
       })();
     </script>
