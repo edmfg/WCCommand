@@ -42,11 +42,15 @@ function clearCookie(res) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  const password = process.env.GATE_PASSWORD;
+  // MFG mode has its own password (MFG_MODE_PASSWORD) so the dashboard +
+  // creative gate password and the MFG-mode password can rotate
+  // independently. Falls back to GATE_PASSWORD if the dedicated env var
+  // isn't set, preserving the consolidated-password behavior.
+  const password = process.env.MFG_MODE_PASSWORD || process.env.GATE_PASSWORD;
   if (!password) {
     return res
       .status(500)
-      .json({ error: "GATE_PASSWORD env var not configured" });
+      .json({ error: "MFG_MODE_PASSWORD / GATE_PASSWORD not configured" });
   }
   const secret = signingSecret();
 
