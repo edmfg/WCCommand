@@ -2454,6 +2454,249 @@
         background: rgba(255, 195, 0, 0.18);
       }
 
+      /* ── Today's Reactive pill (links to Daily Formation surface) ── */
+      .reactive-pill {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 14px 22px;
+        margin-bottom: 16px;
+        font-family: "Oswald", "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #fff;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 45%),
+          linear-gradient(135deg, #ff1a1a 0%, #cc0000 50%, #990000 100%);
+        border: 1px solid rgba(255, 215, 0, 0.45);
+        border-radius: 999px;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow:
+          0 8px 24px rgba(204, 0, 0, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.25),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .reactive-pill:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 12px 32px rgba(204, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+      }
+      .reactive-pill:active {
+        transform: translateY(0);
+      }
+      .reactive-pill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(
+          110deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.45) 50%,
+          transparent 100%
+        );
+        transform: skewX(-20deg);
+        animation: reactiveShine 3.6s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes reactiveShine {
+        0% { left: -60%; }
+        60% { left: 120%; }
+        100% { left: 120%; }
+      }
+      .reactive-pill .bolt {
+        font-size: 16px;
+        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.85));
+        animation: reactivePulse 1.8s ease-in-out infinite;
+      }
+      @keyframes reactivePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.18); }
+      }
+      .reactive-pill .arrow {
+        font-size: 18px;
+        opacity: 0.85;
+        transition: transform 0.2s ease;
+      }
+      .reactive-pill:hover .arrow {
+        transform: translateX(4px);
+      }
+      body.light .reactive-pill {
+        color: #fff;
+      }
+
+      /* ── Market chooser modal ── */
+      .market-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(5, 7, 12, 0.72);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .market-modal-overlay.open {
+        display: flex;
+        animation: marketFade 0.2s ease;
+      }
+      @keyframes marketFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .market-modal {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        background: linear-gradient(180deg, #14181f, #0d1018);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 20px;
+        padding: 32px 28px 28px;
+        animation: marketRise 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .market-modal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #cc0000, transparent 80%);
+        border-radius: 20px 20px 0 0;
+      }
+      @keyframes marketRise {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .market-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: #b8bcc8;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .market-modal-close:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .market-modal-tag {
+        font-family: "Oswald", "Inter", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #ffd700;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .market-modal-title {
+        font-family: "Oswald", "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 26px;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 6px;
+      }
+      .market-modal-sub {
+        font-size: 13px;
+        color: #8a8fa0;
+        margin-bottom: 22px;
+      }
+      .market-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .market-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+        font-family: inherit;
+        color: #fff;
+      }
+      .market-card:hover:not(.disabled) {
+        transform: translateY(-2px);
+        border-color: rgba(204, 0, 0, 0.5);
+        background: rgba(204, 0, 0, 0.08);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+      .market-card.disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+      .market-card-flag {
+        font-size: 30px;
+        line-height: 1;
+        width: 46px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+      .market-card-name {
+        font-family: "Oswald", "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #fff;
+        margin-bottom: 2px;
+      }
+      .market-card-meta {
+        font-size: 11px;
+        color: #8a8fa0;
+        letter-spacing: 0.04em;
+      }
+      .market-card-soon {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        font-family: "Oswald", "Inter", sans-serif;
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #ffd700;
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        padding: 3px 7px;
+        border-radius: 4px;
+      }
+
       /* ── Bookmarks bar (pinned cards) ── */
       .bookmarks-bar {
         background: rgba(255, 215, 0, 0.06);
@@ -5747,6 +5990,19 @@
 
       <!-- LIVE -->
       <div class="tab-panel active" id="panel-live">
+        <!-- Today's Reactive (links to Daily Formation surface) -->
+        <button
+          type="button"
+          class="reactive-pill"
+          id="reactivePill"
+          onclick="openMarketChooser()"
+          aria-haspopup="dialog"
+        >
+          <span class="bolt" aria-hidden="true">⚡</span>
+          <span>Today's Reactive</span>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
+
         <!-- Pinned cards strip (shows whatever the user has starred) -->
         <div id="bookmarksBar" class="bookmarks-bar" hidden>
           <div class="bookmarks-bar-head">
@@ -9642,6 +9898,110 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         bootDashboard();
       }
     </script>
+    <!-- Market chooser modal (Today's Reactive pill → market picker → formation.html) -->
+    <div
+      class="market-modal-overlay"
+      id="marketModalOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="marketModalTitle"
+      onclick="marketModalOnBg(event)"
+    >
+      <div class="market-modal" id="marketModal">
+        <button
+          type="button"
+          class="market-modal-close"
+          onclick="closeMarketChooser()"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <div class="market-modal-tag">Today's Reactive</div>
+        <h2 class="market-modal-title" id="marketModalTitle">
+          Pick a market
+        </h2>
+        <p class="market-modal-sub">
+          Reader-agent briefings + storyboard plays for today.
+        </p>
+        <div class="market-grid">
+          <button
+            type="button"
+            class="market-card"
+            onclick="pickMarket('ca')"
+            data-market="ca"
+          >
+            <span class="market-card-flag">🇨🇦</span>
+            <span>
+              <span class="market-card-name">Canada</span>
+              <span class="market-card-meta">Cultural + Match · Today</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            class="market-card disabled"
+            disabled
+            aria-disabled="true"
+            data-market="uk"
+          >
+            <span class="market-card-flag">🇬🇧</span>
+            <span>
+              <span class="market-card-name">United Kingdom</span>
+              <span class="market-card-meta">Reader agents booting</span>
+            </span>
+            <span class="market-card-soon">Soon</span>
+          </button>
+          <button
+            type="button"
+            class="market-card disabled"
+            disabled
+            aria-disabled="true"
+            data-market="de"
+          >
+            <span class="market-card-flag">🇩🇪</span>
+            <span>
+              <span class="market-card-name">Germany</span>
+              <span class="market-card-meta">Reader agents booting</span>
+            </span>
+            <span class="market-card-soon">Soon</span>
+          </button>
+          <button
+            type="button"
+            class="market-card disabled"
+            disabled
+            aria-disabled="true"
+            data-market="usa"
+          >
+            <span class="market-card-flag">🇺🇸</span>
+            <span>
+              <span class="market-card-name">USA</span>
+              <span class="market-card-meta">Reader agents booting</span>
+            </span>
+            <span class="market-card-soon">Soon</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      function openMarketChooser() {
+        document.getElementById("marketModalOverlay").classList.add("open");
+      }
+      function closeMarketChooser() {
+        document.getElementById("marketModalOverlay").classList.remove("open");
+      }
+      function marketModalOnBg(e) {
+        if (e.target.id === "marketModalOverlay") closeMarketChooser();
+      }
+      function pickMarket(market) {
+        if (market !== "ca") return;
+        window.location.href = "formation.html?market=" + encodeURIComponent(market);
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        var overlay = document.getElementById("marketModalOverlay");
+        if (overlay && overlay.classList.contains("open")) closeMarketChooser();
+      });
+    </script>
+
     <script src="countdown.js" defer></script>
     <script src="gemini-assistant.js" defer></script>
   </body>
