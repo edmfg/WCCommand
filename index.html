@@ -6723,8 +6723,17 @@
         // "All" clears everything else.
         if (id === "all") {
           liveFilters = new Set(["all"]);
+        } else if (id === "24h") {
+          // Recent is exclusive — can't be co-selected with any other pill.
+          if (liveFilters.has("24h") && liveFilters.size === 1) {
+            liveFilters = new Set(["all"]);
+          } else {
+            liveFilters = new Set(["24h"]);
+          }
         } else {
           liveFilters.delete("all");
+          // Selecting any other pill clears Recent (mutual exclusion).
+          liveFilters.delete("24h");
           if (liveFilters.has(id)) {
             liveFilters.delete(id);
           } else {
