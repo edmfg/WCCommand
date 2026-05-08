@@ -107,7 +107,6 @@
         min-height: 100vh;
         overflow-x: hidden;
         line-height: 1.5;
-        padding-bottom: 38px;
       }
       ::-webkit-scrollbar {
         width: 6px;
@@ -4302,71 +4301,6 @@
         transform: translateY(-1px);
       }
 
-      /* ── FUN FACTS BOTTOM TICKER ── */
-      .fact-bar {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 38px;
-        z-index: 8000;
-        display: flex;
-        align-items: center;
-        background: linear-gradient(90deg, #0a1628, #1a3a6b, #0a1628);
-        border-top: 1px solid rgba(255, 215, 0, 0.4);
-        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
-        overflow: hidden;
-      }
-      .fact-label {
-        flex-shrink: 0;
-        padding: 0 16px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        font-family:
-          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
-          "Twemoji Mozilla", sans-serif;
-        font-weight: 800;
-        font-size: 0.7rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: #1a1a2e;
-        background: linear-gradient(135deg, var(--gold), #ffae00);
-        clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-        z-index: 2;
-        box-shadow: 2px 0 12px rgba(255, 215, 0, 0.3);
-      }
-      .fact-track {
-        display: flex;
-        animation: fact-marquee var(--fact-duration, 460s) linear infinite;
-        white-space: nowrap;
-        flex: 1;
-      }
-      .fact-bar:hover .fact-track {
-        animation-play-state: paused;
-      }
-      .fact-item {
-        font-family: "Inter", sans-serif;
-        font-weight: 500;
-        font-size: 0.78rem;
-        color: #fff;
-        padding: 0 28px;
-        white-space: nowrap;
-        opacity: 0.92;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      @keyframes fact-marquee {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(-50%);
-        }
-      }
-      body.light .fact-bar {
-        background: linear-gradient(90deg, #1a3a6b, #0a1628, #1a3a6b);
-      }
-
       /* ── BETA BADGE ── */
       .beta-badge {
         display: inline-block;
@@ -4915,20 +4849,6 @@
         .ticker-item {
           font-size: 0.72rem;
           padding: 0 22px;
-        }
-        .fact-bar {
-          height: 32px;
-        }
-        .fact-label {
-          padding: 0 12px;
-          font-size: 0.6rem;
-        }
-        .fact-item {
-          font-size: 0.7rem;
-          padding: 0 18px;
-        }
-        body {
-          padding-bottom: 32px;
         }
         .heatmap-grid {
           grid-template-columns: 70px repeat(3, 1fr);
@@ -6478,11 +6398,6 @@
     </div>
 
 
-    <div class="fact-bar" id="factBar">
-      <div class="fact-label">⚽ Fun Fact</div>
-      <div class="fact-track" id="factTrack"></div>
-    </div>
-
     <button
       class="gemini-toggle"
       id="geminiToggle"
@@ -6583,7 +6498,6 @@
           return;
         }
         renderTicker();
-        renderFactTicker();
         renderTimestamp();
         renderCountdown();
         renderLiveFilters();
@@ -6631,112 +6545,6 @@
           .map((t) => `<span class="ticker-item">${escapeHtml(t)}</span>`)
           .join("");
         track.innerHTML = items + items;
-      }
-
-      const WC_FUN_FACTS = [
-        "⚽ The first ever World Cup goal was scored by France's Lucien Laurent on July 13, 1930.",
-        "🇧🇷 Brazil is the only nation to appear at every single World Cup since 1930.",
-        "🏆 Brazil has won the most World Cups — 5 titles (1958, 1962, 1970, 1994, 2002).",
-        "🎯 Miroslav Klose holds the all-time WC scoring record with 16 goals across 4 tournaments.",
-        "🚀 Just Fontaine scored 13 goals in a SINGLE tournament for France in 1958 — still untouched.",
-        "🟥 Uruguay's José Batista was sent off after just 56 seconds vs Scotland in 1986 — fastest red card ever.",
-        "⚡ László Kiss scored a hat-trick in 7 minutes 42 seconds for Hungary vs El Salvador in 1982.",
-        "👴 Egypt's Essam El Hadary was 45 years 161 days old at Russia 2018 — oldest WC player in history.",
-        "🐆 Cameroon's Roger Milla scored at 42 years 39 days — the only player over 40 to score at a WC.",
-        "👶 Pelé scored at 17 years 239 days in 1958 — the youngest goalscorer in World Cup history.",
-        "🥅 Austria 7-5 Switzerland in 1954 — the highest-scoring WC match ever, 12 total goals.",
-        "📺 Nearly 3.2 billion people watched at least one minute of the 2010 World Cup — 46% of humanity.",
-        "🎩 Mario Zagallo was the first man to win the World Cup as both a player and as a manager.",
-        "🇺🇾 Uruguay won the very first World Cup in 1930 on home soil — and again 20 years later.",
-        "🇩🇪 Germany 7-1 Brazil at Brazil 2014 is the most shocking semifinal scoreline in WC history.",
-        "🏟️ The 1950 Maracanã Final drew an estimated 199,854 fans — the largest WC crowd ever.",
-        "🎽 The 1930 Final used TWO different balls — one chosen by each team for each half.",
-        "⏱️ Hakan Şükür scored after 11 seconds vs South Korea in 2002 — the fastest WC goal ever.",
-        "🐕 The original Jules Rimet trophy was stolen in 1966 and recovered by a dog named Pickles.",
-        "🏆 The 2026 World Cup is the FIRST to feature 48 teams and the first hosted by 3 nations.",
-        "🛡️ Walter Zenga (Italy 1990) didn't concede for 517 minutes — the longest WC clean-sheet streak.",
-        "❄️ Iceland (population ~330,000) became the smallest country ever to qualify, at Russia 2018.",
-        "🏆 The original Jules Rimet Trophy was permanently kept by Brazil after their 3rd win in 1970 — then stolen for good in 1983.",
-        "🇺🇸 The USA beat England 1-0 in 1950 — Joe Gaetjens, Haitian-born, scored the winner. One of football's biggest upsets.",
-        "🦷 Geoff Hurst's 'Wembley goal' off the bar in the 1966 Final is still debated 60 years later.",
-        "📜 The official WC ball has been redesigned for every tournament since the Telstar in 1970.",
-        "🇦🇷 Diego Maradona scored 5 of Argentina's 14 goals at Mexico 1986 en route to the title.",
-        "🎮 Norman Whiteside (N. Ireland, 1982) is the youngest player ever at a WC — 17 years 41 days old.",
-        "🇨🇲 Cameroon's run to the 1990 quarterfinals is still the deepest by an African nation.",
-        "🐐 Pelé is the only player to win 3 World Cups — 1958, 1962 (squad), and 1970.",
-        "🎯 Geoff Hurst's hat-trick in the 1966 Final is the ONLY hat-trick in a World Cup Final.",
-        "💸 Qatar 2022 was the most expensive WC ever — estimated total cost: $220 billion.",
-        "🌡️ The 1994 USA WC matches were the hottest on record — Dallas hit 105°F at kickoff.",
-        "🏠 Host nations have won 6 of 22 World Cups — Uruguay 1930, Italy 1934, England 1966, Argentina 1978, France 1998.",
-        "🇰🇷 South Korea's run to the 2002 semifinals is the deepest by any Asian team.",
-        "🇮🇹 Italy is the only team to win consecutive World Cups outside Brazil — 1934 and 1938.",
-        "🥇 Pelé is the only player to score in 4 different World Cups (1958, 1962, 1966, 1970).",
-        "🇫🇷 France 1998 was the first WC where the host nation also lifted the trophy in 30+ years.",
-        "🇰🇷🇯🇵 The 2002 World Cup was the FIRST hosted in Asia — co-hosted by South Korea and Japan.",
-        "🇨🇮 32 teams expanded to 48 for 2026 — the largest field in WC history, with 104 total matches.",
-        "📐 The 1950 World Cup had no Final — Brazil-Uruguay was a final-round group game that decided the title.",
-        "💔 Maracanazo: Uruguay's 1950 win over Brazil at the Maracanã is still called Brazil's national tragedy.",
-        "🦵 Diego Maradona's 'Hand of God' AND his 'Goal of the Century' came in the same match — vs England, 1986.",
-        "🎂 Pelé played his first WC at 17 and won. His last at 29. His career WC record: 14 games, 12 goals.",
-        "🐊 The Crocodile is one of FIFA's earliest WC mascots — 'World Cup Willie' in 1966 was the first ever.",
-        "🌎 The 1950 WC was the only one with no actual final match — and the only one Brazil hosted before 2014.",
-        "⚖️ A WC squad limit of 26 (vs the previous 23) was first allowed at Qatar 2022 and continues for 2026.",
-        "🦁 England has only won the World Cup ONCE — in 1966, on home soil.",
-        "🌟 Lionel Messi finally won the WC in Qatar 2022 at age 35 — his 5th attempt.",
-        "🇸🇦 Saudi Arabia stunned eventual champions Argentina 2-1 in their opening 2022 group game — biggest upset of the modern era.",
-        // ── CULTURAL TRIVIA ──
-        "📯 Vuvuzelas turned South Africa 2010 into the loudest WC ever — FIFA briefly considered banning them.",
-        "🎶 Shakira's 'Waka Waka' (2010) is the best-selling World Cup song of all time — over 10M copies sold.",
-        "🎤 Ricky Martin's 'La Copa de la Vida' (1998 France) launched Latin pop globally and is still the gold-standard WC anthem.",
-        "🐙 Paul the Octopus correctly predicted 7 of 7 matches at South Africa 2010 — including Spain lifting the trophy.",
-        "📚 Panini sticker albums have been a WC ritual since Mexico 1970 — Qatar 2022's album had 670 stickers and broke resale records.",
-        "🧹 Japanese fans famously stay behind to clean their stadium section after every WC match — a tradition since France 1998.",
-        "💃 Bebeto's baby-cradle goal celebration (USA 1994) is the most copied celebration in football history.",
-        "🦁 Mascots have evolved from World Cup Willie (1966) to Naranjito the orange (Spain 1982) to La'eeb the headscarf (Qatar 2022).",
-        "🎵 Argentina's fan anthem 'Muchachos' became a global phenomenon during their 2022 title run — written by a Racing Club fan.",
-        "🇫🇷 France 1998's 'Black-Blanc-Beur' squad is still cited as a turning point in how Europe talks about national identity.",
-        "🌹 Iran vs USA at France 1998 — Iranian players gave white roses to American players before kickoff. One of sport's most loaded handshakes.",
-        "🥁 Brazil's torcida brings full samba bands into the stands — the only national fan group that travels with live percussion.",
-        "🏛️ The Maracanã in Rio is called the 'Cathedral of Football' — every visiting national team trains there at least once.",
-        "🇸🇳 Senegal's 2002 squad celebrated every goal with a coordinated dance — sparked a wave of choreographed celebrations across Africa.",
-        "🇭🇷 Croatia's red-and-white checkered šahovnica kit is one of the most recognizable in world sport — rooted in 9th-century Croatian heraldry.",
-        "🎙️ 'Goooooooool' — the elongated Spanish-language goal call was popularized by Argentine commentator Andrés Cantor at USA 1994.",
-        "🥖 Host nations traditionally serve tournament-themed cuisine — Qatar 2022 introduced 6M visitors to machboos, harees, and karak chai.",
-        "🎺 The Iceland Viking Thunderclap, born at Euro 2016, has since spread to WC qualifiers across Europe.",
-        "🇰🇷 South Korea's 'Be the Reds!' chant from 2002 became the country's unofficial second national anthem.",
-        "👕 Diego Maradona's #10 has been retired by Argentina's youth teams and Napoli — but FIFA refuses to retire it from the senior squad.",
-        "🦅 Mexico's iconic green home shirt is the longest unchanged primary kit color in WC history — green since 1930.",
-        "📺 BBC's 1970 WC theme by Barry Stoller is still used at every England match — the longest-running sports theme on British TV.",
-        "🎨 The official WC poster is commissioned from a different artist every cycle — Mexico 70's poster by Lance Wyman is in MoMA's permanent collection.",
-        "🇩🇪 Germany's 'Sommermärchen' (summer fairy tale) of 2006 is credited with rehabilitating post-war German flag-waving as joyful, not nationalistic.",
-        "🎭 Nigeria's 1994 and 2018 kits are the most-copied jerseys in WC merch history — the 2018 design sold out in 3 minutes online.",
-      ];
-
-      function renderFactTicker() {
-        const track = document.getElementById("factTrack");
-        if (!track) return;
-        // Shuffle for variety on each load
-        const shuffled = [...WC_FUN_FACTS].sort(() => Math.random() - 0.5);
-        const items = shuffled
-          .map((f) => `<span class="fact-item">${f}</span>`)
-          .join("");
-        track.innerHTML = items + items; // double for seamless loop
-        // Match the breaking-news ticker's scroll speed (px/sec)
-        requestAnimationFrame(() => {
-          const breakingTrack = document.getElementById("tickerTrack");
-          if (!breakingTrack) return;
-          // Breaking ticker animation: 728s for translateX(-50%) of doubled content
-          const breakingHalfWidth = breakingTrack.scrollWidth / 2;
-          const breakingPxPerSec = breakingHalfWidth / 728;
-          const factHalfWidth = track.scrollWidth / 2;
-          if (breakingPxPerSec > 0 && factHalfWidth > 0) {
-            const factDuration = factHalfWidth / breakingPxPerSec;
-            track.style.setProperty(
-              "--fact-duration",
-              factDuration.toFixed(1) + "s",
-            );
-          }
-        });
       }
 
       function renderTimestamp() {

@@ -51,7 +51,7 @@ A single-file HTML/JS app. Everything below lives inside it unless noted.
 - **Social Trends carousel** — `DASHBOARD_DATA.social[]`. Each item has `id, topic, category, volume, sentiment, summary, sampleQuote, quotes[], platforms[], sourceUrl`. `category` is one of `game / food / music / fashion / fandom / memes`.
 - **Auto-link entities** — known coach / player / team / venue mentions inside news headlines + summaries and social topics + summaries are wrapped in clickable `.entity-link` spans. Click → drops the entity into the global search box, applies the filter across all surfaces, and switches to Live. Keyboard-accessible (Enter / Space on focus). The list lives in `ENTITY_LIST` in `index.html`.
 - **Tab badges (`.whats-new-badge`)** — small gold-red pills next to the tab labels showing items added since the user last visited that tab (per-tab last-visit timestamps in localStorage `wcc_last_tab_visit_v1`). Clearing by clicking the tab.
-- **Breaking News ticker** at top + **Fun Fact ticker** at bottom. Items live in `DASHBOARD_DATA.ticker[]` plus the most recent news headlines. Both scroll at the same px/sec (the fact ticker derives its duration from the breaking ticker).
+- **Breaking News ticker** at top. Items live in `DASHBOARD_DATA.ticker[]` plus the most recent news headlines.
 
 **Fixtures tab (lazy-loaded)**
 
