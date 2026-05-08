@@ -2,8 +2,18 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-07T16:30:00.000Z",
+  lastUpdated: "2026-05-08T18:00:00.000Z",
         ticker: [
+          "🇺🇸 Trump on $1,000 group-stage seats: 'I wouldn't pay it either, to be honest' — splits with Infantino (May 8)",
+          "💸 ESPN: FIFA triples best-available Final ticket to $33,000 as new Cat-1 inventory drops (May 8)",
+          "🎶 Shakira teases 'Dai Dai' with Burna Boy at Maracaná — official WC2026 anthem out May 14 (May 7)",
+          "🏛️ Rep. Pallone sends sharp letter to Infantino over WC ticket pricing — Congress now in the chat (May 7)",
+          "📋 Preliminary 35–55 squad lists due Monday May 11 — final 26-man rosters by June 1",
+          "📺 Peacock launches 'Visión de Campo' (Pitchside Live) — all 104 matches in Spanish, Dolby Atmos (May 6)",
+          "🇨🇦 Vancouver Fan Festival at Hastings Park gets a 10,000-cap amphitheatre — free GA all tournament",
+          "🦁 Branthwaite OUT — severe thigh injury rules Everton CB out of England's WC squad",
+          "🇧🇷 Estêvão in race vs the clock — severe hamstring injury threatens Chelsea wonderkid's WC debut",
+          "🍔 Michelob Ultra unveils 'Superior Player of the Match' MVP trophy — fan-voted, every match",
           "🇨🇦 Toronto WC tickets now capped at face value on FIFA Marketplace — Ontario resale ban forces FIFA's hand (May 7)",
           "🌭 Infantino laughs off $2M Final ticket reports — promises to 'personally deliver a hot dog' to anyone who pays (May 6)",
           "💸 FIFA pushes Final ceiling from $6,730 to $10,990 — fresh Cat-1 inventory drops (May 6)",
@@ -42,6 +52,127 @@ window.DASHBOARD_DATA = {
           "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
         ],
         news: [
+          {
+            id: "n106",
+            headline:
+              "🇺🇸 Trump Breaks With Infantino — 'I Wouldn't Pay $1,000 Either'",
+            source: "Al Jazeera",
+            timestamp: "2026-05-08T14:00:00Z",
+            summary:
+              "President Trump told the New York Post he 'wouldn't pay it either' when asked about the $1,000+ group-stage seats USMNT fans are facing in Southern California. The break with FIFA president Infantino — who days earlier defended pricing as 'US market rate' — is the sharpest public split between the two and lands one day after Rep. Pallone sent a formal pricing-complaint letter from Congress 🏛️",
+            url: "https://www.aljazeera.com/sports/2026/5/8/trump-says-he-would-not-pay-1000-to-watch-us-at-world-cup",
+            tag: "USA",
+          },
+          {
+            id: "n107",
+            headline:
+              "💸 ESPN: FIFA Triples Best-Available Final Ticket to $33,000",
+            source: "ESPN",
+            timestamp: "2026-05-08T13:00:00Z",
+            summary:
+              "FIFA released fresh Final inventory at $33,000 a seat — roughly triple the previously available high — as the Marketplace continues to absorb pricing backlash. Pricing remains the dominant narrative two months from kickoff and is now drawing both presidential and congressional attention 📈",
+            url: "https://www.espn.com/soccer/story/_/id/48707727/fifa-triples-best-available-world-cup-final-ticket-33k",
+            tag: "Global",
+          },
+          {
+            id: "n108",
+            headline:
+              "🎶 Shakira x Burna Boy 'Dai Dai' — Official WC2026 Anthem Drops May 14",
+            source: "Billboard",
+            timestamp: "2026-05-07T20:00:00Z",
+            summary:
+              "Shakira teased 'Dai Dai' (lit. 'Go Go') with Burna Boy at the Maracanã — a reggaetón-meets-Afrobeats stadium track and her second official WC anthem after 'Waka Waka' (2010). Full release May 14. Early social reaction is overwhelmingly positive — fans calling the Burna pairing 'a stroke of genius' and the closest the tournament has come to recreating Waka Waka 🎤⚽",
+            url: "https://www.billboard.com/music/latin/shakira-dai-dai-2026-fifa-world-cup-song-burna-boy-teaser-1236241647/",
+            tag: "Global",
+          },
+          {
+            id: "n109",
+            headline:
+              "🏛️ Rep. Pallone Sends Formal Letter to Infantino Over WC Ticket Pricing",
+            source: "U.S. House (pou.house.gov)",
+            timestamp: "2026-05-07T17:00:00Z",
+            summary:
+              "Rep. Frank Pallone (D-NJ), ranking member of Energy & Commerce, sent a formal letter to FIFA president Gianni Infantino on May 7 demanding answers on dynamic pricing, the resale market, and accessibility for ordinary fans. Congressional pressure now stacks on top of presidential criticism — pricing is no longer just a sponsor / fan-discourse problem 📜",
+            url: "https://pou.house.gov/sites/evo-subsites/pou.house.gov/files/evo-media-document/pou-pallone-fifa-ticket-pricing-letter-5-7-2026.pdf",
+            tag: "USA",
+          },
+          {
+            id: "n110",
+            headline:
+              "📋 Preliminary 35–55 Squad Lists Due Monday May 11 — First Big Drop",
+            source: "Al Jazeera",
+            timestamp: "2026-05-08T11:00:00Z",
+            summary:
+              "All 48 nations must submit their preliminary 35–55 player lists (incl. 4 GKs) by Monday May 11. Final 26-man squads lock by June 1 and are official June 2. England's reveal is set, USA's is May 26 at Pier 17, Germany's May 21. Expect a 72h surge in 'who's in / who's out' content from every market 📋",
+            url: "https://www.aljazeera.com/sports/2026/5/8/world-cup-2026-squad-deadlines-key-dates-team-lists-final-announcements",
+            tag: "Macro",
+          },
+          {
+            id: "n111",
+            headline:
+              "🦁 Jarrad Branthwaite OUT — Thigh Injury Ends England WC Hopes",
+            source: "Sports Mole",
+            timestamp: "2026-05-07T09:00:00Z",
+            summary:
+              "Everton centre-back Jarrad Branthwaite suffered a severe thigh injury at the end of April and will not be available for England at the World Cup. Tuchel's CB depth chart now leans heavier on Stones and Konsa, with Guéhi a near-lock. The fourth England starter to fall out of contention since March 🩼",
+            url: "https://www.sportsmole.co.uk/football/england/world-cup/feature/world-cup-injury-list-absent-players-and-doubts_597036.html",
+            tag: "UK",
+          },
+          {
+            id: "n112",
+            headline:
+              "📺 Peacock Launches 'Visión de Campo' — All 104 Matches in Spanish, Dolby Atmos",
+            source: "Sports Video Group",
+            timestamp: "2026-05-06T16:00:00Z",
+            summary:
+              "Peacock will stream all 104 matches of Telemundo's exclusive Spanish-language coverage with Dolby Atmos sound and a new 'Pitchside Live' (Visión de Campo) interactive feature. Move targets the 60M+ Hispanic-US audience that Telemundo has built into the dominant US WC voice. Big implication for Spanish-first reactive content windows 🎙️",
+            url: "https://www.sportsvideo.org/2026/05/06/fifa-world-cup-2026-peacock-launches-vision-de-campo-aka-pitchside-live-will-stream-all-104-matches-in-spanish/",
+            tag: "USA",
+          },
+          {
+            id: "n113",
+            headline:
+              "🇨🇦 Vancouver Fan Festival Confirms 10,000-Cap Amphitheatre at Hastings Park",
+            source: "FIFA",
+            timestamp: "2026-05-06T18:00:00Z",
+            summary:
+              "Vancouver's official Fan Festival will run out of Hastings Park with a brand-new 10,000-capacity amphitheatre, free GA for the duration of the tournament. BC Place hosts seven matches incl. Canada vs Qatar (Jun 18) and Canada vs Switzerland (Jun 24). Toronto's fan zone sits at The Bentway near Fort York 🏟️",
+            url: "https://vanfc26.com/schedule",
+            tag: "Canada",
+          },
+          {
+            id: "n114",
+            headline:
+              "🇧🇷 Estêvão's WC in Doubt — Severe Hamstring vs Chelsea Run-In",
+            source: "Sports Mole",
+            timestamp: "2026-05-06T13:00:00Z",
+            summary:
+              "Chelsea wonderkid Estêvão Willian is in a race vs the clock to make Brazil's final 26 after a severe hamstring injury — third Brazil starter (after Rodrygo and Militão) whose tournament is now uncertain. Ancelotti's wide-attacker shortlist tightens around Vinícius, Raphinha, Endrick, Antony 🇧🇷",
+            url: "https://www.sportsmole.co.uk/football/england/world-cup/feature/world-cup-injury-list-absent-players-and-doubts_597036.html",
+            tag: "Macro",
+          },
+          {
+            id: "n115",
+            headline:
+              "🍔 Michelob Ultra Unveils 'Superior Player of the Match' MVP Trophy",
+            source: "Brand Innovators",
+            timestamp: "2026-05-06T11:00:00Z",
+            summary:
+              "Michelob Ultra (Official Beer Sponsor) has revealed a redesigned MVP trophy — 'Superior Player of the Match' — awarded after every WC2026 match by fan vote. Sits alongside Coca-Cola 'Uncanned Emotions', Budweiser 'Let It Pour' (Haaland + Klopp), and Lay's 'No Lay's, No Game' as the dominant May sponsor-content wave 🍻",
+            url: "https://brand-innovators.com/brand-innovators-fifa-world-cup-ad-tracker-2026/",
+            tag: "Global",
+          },
+          {
+            id: "n116",
+            headline:
+              "🏨 Travel & Tour World: Kansas City Hotels 85–90% Below Forecasts, Miami Outperforming",
+            source: "Travel & Tour World",
+            timestamp: "2026-05-08T09:00:00Z",
+            summary:
+              "Refresh of the host-city hotel-pace data: Kansas City reports 85–90% of operators tracking below FIFA forecasts, NYC seeing scaled-back inbound from Canada / England / Germany / Brazil, while Miami is the breakout — ~55% of hoteliers ahead of both expectations and typical-summer benchmarks. Boston / Mexico City / Vancouver also outperforming 🏨",
+            url: "https://www.travelandtourworld.com/news/article/world-cup-2026-travel-surge-in-the-us-why-only-certain-cities-will-cash-in-on-the-economic-windfall/",
+            tag: "USA",
+          },
           {
             id: "n096",
             headline:
@@ -2717,6 +2848,161 @@ window.DASHBOARD_DATA = {
           },
         ],
         social: [
+          {
+            id: "s100",
+            topic: "🎶 'Dai Dai' Is the New 'Waka Waka' — Burna Boy Pairing Lands",
+            category: "music",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Shakira's Maracanã teaser of 'Dai Dai' with Burna Boy detonated globally inside 12h. Reggaetón-meets-Afrobeats. Comments are in three buckets: (1) 'closest thing to Waka Waka 2.0', (2) Burna pairing being called 'a stroke of genius' for African + diaspora reach, (3) 'finally a real WC anthem' relief vs the lingering anti-anthem sentiment. Brand opportunity: this is the first WC2026 cultural moment people actually like — surf it cleanly 🌊",
+            sampleQuote:
+              '"Burna Boy on the official anthem is exactly what this tournament needed. Lightning twice."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "Dai dai dai dai dai 🇨🇴🇳🇬 the duets are gonna be UNREAL",
+              },
+              {
+                platform: "X",
+                text: "Burna Boy on the World Cup anthem is the most 2026 thing FIFA has ever done. Genuinely cooked.",
+              },
+              {
+                platform: "Reddit",
+                text: "r/popheads + r/soccer overlap is rare but here we are. Anthem is actually GOOD?",
+              },
+              {
+                platform: "IG",
+                text: "Maracanã teaser shot looking like the most expensive opening credits ever filmed 🎬",
+              },
+            ],
+            platforms: ["TikTok", "X", "Reddit", "IG"],
+            sourceUrl:
+              "https://www.billboard.com/music/latin/shakira-dai-dai-2026-fifa-world-cup-song-burna-boy-teaser-1236241647/",
+            timestamp: "2026-05-08T12:00:00Z",
+          },
+          {
+            id: "s101",
+            topic: "🇺🇸 Trump vs Infantino — Ticket-Price Beef Goes Meme",
+            category: "memes",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "Trump's 'I wouldn't pay it either' line splits across X / TikTok in <6h: 'rare W' takes from soccer fans, 'why is HE the populist on this' takes from everyone else, plus a new meme template — Trump and Infantino as buddy-cop partners who suddenly stopped speaking. Pricing has crossed from sports-discourse into political-discourse. Brand-safety: stay away from picking a side, but the Infantino-cool / Trump-spicy contrast is fair game 🎭",
+            sampleQuote:
+              '"never thought I\'d agree with the President about anything but $1,000 to watch us play Paraguay is robbery."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Trump dropping the 'I wouldn't pay either' line is the rare moment soccer Twitter and political Twitter finally agree. Sport unites!",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: Infantino's group chat with Trump goes radio silent for 24 hrs 📵",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccer megathread: 'when the President is your most accessible ticket-price advocate, you have failed.'",
+              },
+              {
+                platform: "IG",
+                text: "Buddy-cop poster of Trump + Infantino captioned 'they were partners. now they're not.' is undefeated.",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit", "IG"],
+            sourceUrl:
+              "https://fortune.com/2026/05/07/trump-world-cup-tickets-too-expensive/",
+            timestamp: "2026-05-08T15:00:00Z",
+          },
+          {
+            id: "s102",
+            topic: "📋 'Squad Watch Megathread' — r/soccer Spins Up for May 11",
+            category: "fandom",
+            volume: "🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "r/soccer, r/USSoccer, r/USMNT, r/Bundesliga, and r/ThreeLions all running parallel 'Squad Watch' megathreads ahead of Monday's May 11 preliminary deadline. Scoreboard is the dominant format — players moved into 'lock', 'bubble', 'cooked'. Strong window for tactical-debate creative, especially diaspora ('which of my dual-nationals are we calling up') 📋",
+            sampleQuote:
+              '"Bubble watch is back and so is my anxiety. Refreshing every federation Twitter at 3am."',
+            quotes: [
+              {
+                platform: "Reddit",
+                text: "r/USMNT's Pochettino tier-list thread already at 4k upvotes and we're 18 days out from the reveal. We are SO back.",
+              },
+              {
+                platform: "X",
+                text: "May 11 is the new transfer deadline day for international football. Squad-Watch X is in full swing.",
+              },
+              {
+                platform: "TikTok",
+                text: "Lock / Bubble / Cooked tier list format eating right now. Every nation has 200 of them already 📊",
+              },
+            ],
+            platforms: ["Reddit", "X", "TikTok"],
+            sourceUrl: "https://www.reddit.com/r/soccer/",
+            timestamp: "2026-05-08T10:00:00Z",
+          },
+          {
+            id: "s103",
+            topic: "🍔 Lay's WhatsApp Watch Party — Messi/Beckham/Putellas Cast",
+            category: "food",
+            volume: "🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Lay's 'No Lay's, No Game' is leaning into a celebrity WhatsApp group-chat creative — Messi, Beckham, Alexia Putellas, more — reacting in-thread during matches. Format is being shared on Reddit + X as 'this is how brands SHOULD do it'. Watch-party / group-chat format is the dominant social format-of-the-month, fits naturally for any market. Easy to lift the format (not the IP) 📲",
+            sampleQuote:
+              '"A celebrity WhatsApp group chat as a campaign? Lay\'s actually cooked here."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Lay's WhatsApp group chat with Messi + Putellas + Beckham is genuinely the best WC sponsor activation I've seen.",
+              },
+              {
+                platform: "TikTok",
+                text: "Group-chat format hits because it's how all of us actually watch. Brands FINALLY catching up 📱",
+              },
+              {
+                platform: "Reddit",
+                text: "r/AdvertisingAndMarketing: this format will be copied by 30 brands by July, screencap this.",
+              },
+              {
+                platform: "IG",
+                text: "Beckham + Putellas in the same chat thread is the WC2026 photoshop I didn't know I needed.",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit", "IG"],
+            sourceUrl:
+              "https://brand-innovators.com/brand-innovators-fifa-world-cup-ad-tracker-2026/",
+            timestamp: "2026-05-07T22:00:00Z",
+          },
+          {
+            id: "s104",
+            topic: "🇨🇦 Vancouver Hastings Park Reveal — 'Best Fan Zone in NA'",
+            category: "fandom",
+            volume: "🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Vancouver's official Fan Festival reveal at Hastings Park — 10,000-cap free amphitheatre on the harbour — is being received as the cleanest host-city activation announcement so far. r/vancouver and r/canadasoccer love it ('finally a fan-zone that isn't a parking lot'). Pairs nicely with Toronto's Bentway story: Canadian host-city content is winning vs US host-city content right now 🏟️",
+            sampleQuote:
+              '"Canada showing up host-city wise. Hastings Park amphitheatre is going to be the prettiest fan zone of the tournament."',
+            quotes: [
+              {
+                platform: "Reddit",
+                text: "r/vancouver: 'free, on the water, 10k cap.' We are so unserious-pilled we forgot Canada actually does public space well.",
+              },
+              {
+                platform: "X",
+                text: "The Bentway in Toronto + Hastings Park in Vancouver. Canada is smoking the US on fan-zone vibes.",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: you live in Vancouver and your free fan zone is on the harbour 🚢🇨🇦",
+              },
+            ],
+            platforms: ["Reddit", "X", "TikTok"],
+            sourceUrl: "https://vanfc26.com/schedule",
+            timestamp: "2026-05-06T19:00:00Z",
+          },
           {
             id: "s094",
             topic: "🌭 'Hot Dog' Becomes the WC2026 Meme Template",
