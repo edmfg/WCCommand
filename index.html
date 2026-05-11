@@ -1611,6 +1611,29 @@
       .date-group {
         margin-bottom: 28px;
       }
+      /* Rest-day rows in the By-Date timeline — explicit, compact, no
+         match list, easy to scan past while still preserving the day. */
+      .date-group.date-rest {
+        margin-bottom: 12px;
+        opacity: 0.55;
+      }
+      .date-group.date-rest .date-header {
+        font-size: 0.72rem;
+        letter-spacing: 1.5px;
+        padding: 4px 0;
+        margin-bottom: 0;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+        background: none;
+        -webkit-text-fill-color: currentColor;
+        color: var(--text-dim);
+      }
+      .date-group.date-rest .rest-label {
+        color: var(--text-dim);
+        font-style: italic;
+      }
+      .date-group.is-past .date-header {
+        opacity: 0.75;
+      }
       .date-header {
         font-family:
           "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
@@ -7725,26 +7748,70 @@
         }
 
         if (fixtureView === "date") {
-          // Group by date (ESPN-style)
+          // Group by date (ESPN-style), but render EVERY day in the filtered
+          // range so the user can see rest days (otherwise the view jumps
+          // e.g. Jun 11 → Jun 18 with no indication of what's in between).
           const byDate = {};
           matches.forEach((m) => {
             if (!byDate[m.date]) byDate[m.date] = [];
             byDate[m.date].push(m);
           });
           const todayIso = new Date().toISOString().slice(0, 10);
-          container.innerHTML = Object.entries(byDate)
-            .map(([date, games]) => {
-              const dateStr = new Date(date + "T12:00:00").toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                },
-              );
+          const dateKeys = Object.keys(byDate).sort();
+          if (!dateKeys.length) {
+            container.innerHTML =
+              '<p style="color:var(--text-dim);font-size:0.85rem;padding:40px;text-align:center">No matches match this filter.</p>';
+            return;
+          }
+          // Anchor the timeline: tournament starts June 11 (or earliest match,
+          // whichever is earlier) and runs to the latest match in the set.
+          const TOURN_START = "2026-06-11";
+          const start = dateKeys[0] < TOURN_START ? dateKeys[0] : TOURN_START;
+          const end = dateKeys[dateKeys.length - 1];
+          const allDays = [];
+          {
+            const cur = new Date(start + "T12:00:00Z");
+            const stop = new Date(end + "T12:00:00Z");
+            while (cur <= stop) {
+              allDays.push(cur.toISOString().slice(0, 10));
+              cur.setUTCDate(cur.getUTCDate() + 1);
+            }
+          }
+          // Sort each day's matches by kickoff so they read top-to-bottom in
+          // local time order.
+          dateKeys.forEach((d) =>
+            byDate[d].sort((a, b) =>
+              (a.kickoff || "").localeCompare(b.kickoff || ""),
+            ),
+          );
+          container.innerHTML = allDays
+            .map((date) => {
+              const games = byDate[date] || [];
+              const dateStr = new Date(
+                date + "T12:00:00",
+              ).toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              });
               const isToday = date === todayIso;
-              return `<div class="date-group${isToday ? " is-today" : ""}">
+              const isPast = date < todayIso;
+              const isFuture = date > todayIso;
+              const stateClass = isToday
+                ? " is-today"
+                : isPast
+                ? " is-past"
+                : isFuture
+                ? " is-future"
+                : "";
+              if (!games.length) {
+                // Rest day — clearly labelled so the timeline reads continuous.
+                return `<div class="date-group date-rest${stateClass}">
+        <div class="date-header">${escapeHtml(dateStr)}${isToday ? ' <span class="today-badge">TODAY</span>' : ""} <span class="match-count rest-label">Rest day · no matches</span></div>
+      </div>`;
+              }
+              return `<div class="date-group${stateClass}">
         <div class="date-header">${escapeHtml(dateStr)}${isToday ? ' <span class="today-badge">TODAY</span>' : ""} <span class="match-count">${games.length} match${games.length > 1 ? "es" : ""}</span></div>
         <div class="matches-list">${games.map(renderMatchRow).join("")}</div>
       </div>`;
