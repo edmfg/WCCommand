@@ -33,6 +33,11 @@ window.CALENDAR_DATA = {
     lastUpdated: "2026-05-11T22:30:00Z",
     dateStart: "2026-06-04",
     dateEnd: "2026-07-19",
+    matches: [
+      { date: "2026-06-12", label: "🇨🇦 vs 🇧🇦 Bosnia", venue: "BMO Field, Toronto" },
+      { date: "2026-06-18", label: "🇨🇦 vs 🇶🇦 Qatar", venue: "BC Place, Vancouver" },
+      { date: "2026-06-24", label: "🇨🇦 vs 🇨🇭 Switzerland", venue: "BC Place, Vancouver" }
+    ],
     phases: [
       { name: "Lead Up Phase", start: "2026-06-04", end: "2026-06-10", key: "lead-up" },
       { name: "Group Stage Phase", start: "2026-06-11", end: "2026-06-27", key: "group" },

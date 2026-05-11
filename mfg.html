@@ -2690,12 +2690,17 @@
         line-height: 1.2;
         font-weight: 600;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         cursor: pointer;
         border: 1px solid rgba(0, 0, 0, 0.18);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      .cal-entry > span:not(.cal-warn):not(.cal-status-dot) {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .cal-entry:hover {
         transform: translateY(-1px);
@@ -2794,6 +2799,224 @@
       }
       .cal-detail-close:hover {
         background: rgba(255, 255, 255, 0.12);
+      }
+      .cal-detail-save {
+        background: #2563eb;
+        color: #fff;
+        border: 1px solid #1d4ed8;
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+      .cal-detail-save:hover { background: #1d4ed8; }
+      .cal-edit-input {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: inherit;
+        line-height: 1.45;
+        resize: vertical;
+        min-height: 80px;
+        margin-bottom: 12px;
+      }
+      .cal-edit-input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.35);
+      }
+      .cal-edit-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin: -6px 0 10px;
+      }
+
+      /* Today line */
+      .cal-today-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #ef4444;
+        z-index: 4;
+        pointer-events: none;
+      }
+      .cal-today-line::before {
+        content: "TODAY";
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+
+      /* Match-day markers (small pip on the date column) */
+      .cal-match-pip {
+        display: inline-block;
+        font-size: 10px;
+        margin-top: 1px;
+        line-height: 1;
+        color: #ef4444;
+        font-weight: 700;
+      }
+      .cal-date-row .cal-cell.cal-match-day {
+        background: linear-gradient(180deg, rgba(239,68,68,0.12), rgba(0,0,0,0.28));
+        border-bottom: 2px solid #ef4444;
+        color: #fff;
+      }
+
+      /* Filter chips */
+      .cal-filter-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        font-size: 11px;
+      }
+      .cal-filter-label {
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 10px;
+        margin-right: 4px;
+      }
+      .cal-chip {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .cal-chip:hover { background: rgba(255, 255, 255, 0.12); }
+      .cal-chip.active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+        font-weight: 600;
+      }
+      .cal-jump-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        font-size: 11px;
+      }
+      .cal-jump-btn {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .cal-jump-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+      .cal-print-btn,
+      .cal-overlay-btn {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: inherit;
+        margin-left: 6px;
+      }
+      .cal-print-btn:hover, .cal-overlay-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .cal-overlay-btn.active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+      }
+      .cal-overlay-note {
+        font-size: 11px;
+        color: #d4a85a;
+        margin-bottom: 8px;
+        display: none;
+      }
+      .cal-overlay-note.shown { display: block; }
+
+      /* Status badges (corner dots on entry bars) */
+      .cal-entry { position: absolute; }
+      .cal-entry .cal-status-dot {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+      }
+      .cal-status-locked  { background: #22c55e; }   /* green */
+      .cal-status-drafted { background: #facc15; }   /* yellow */
+      .cal-status-live    { background: #ef4444; }   /* red */
+      .cal-status-tbd     { background: #94a3b8; }   /* slate */
+
+      /* Filter dimming */
+      .cal-entry.cal-dim { opacity: 0.18; filter: grayscale(0.7); }
+
+      /* Faded overlay rows (from non-primary markets) */
+      .cal-entry.cal-overlay { opacity: 0.4; border-style: dashed; }
+
+      /* Conflict warning marker on bars */
+      .cal-entry .cal-warn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #ef4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 800;
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        flex-shrink: 0;
+        margin-right: 5px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+      }
+
+      /* Print stylesheet — landscape, no UI chrome, full grid */
+      @media print {
+        body { background: #fff !important; color: #000 !important; }
+        .gemini-toggle-shared,
+        .countdown-pill,
+        #marketGate,
+        #gate,
+        .tab-nav,
+        .cal-toolbar .cal-back-btn,
+        .cal-zoom-controls,
+        .cal-print-btn,
+        .cal-overlay-btn,
+        .cal-jump-row,
+        .cal-filter-row { display: none !important; }
+        .cal-scroll { overflow: visible !important; cursor: auto !important; }
+        .cal-wrap { border: 1px solid #999; background: #fff !important; }
+        .cal-channel-cell { background: #f3f4f6 !important; color: #000 !important; }
+        .cal-detail { display: none !important; }
       }
     </style>
     <script>
@@ -7384,56 +7607,164 @@
             .replace(/'/g, "&#39;");
         }
 
+        // ── Per-market local overrides (inline edit) ──
+        const overridesKey = (mk) => "wcc_cal_overrides_" + mk;
+        function loadOverrides(mk) {
+          try { return JSON.parse(localStorage.getItem(overridesKey(mk)) || "{}"); }
+          catch (_) { return {}; }
+        }
+        function saveOverrides(mk, obj) {
+          try { localStorage.setItem(overridesKey(mk), JSON.stringify(obj)); }
+          catch (_) {}
+        }
+
+        // ── Inferred status: locked / drafted / live / tbd ──
+        function entryStatus(entry, hasEdit, todayIso) {
+          if (entry.tbd && !hasEdit) return "tbd";
+          if (hasEdit) return "drafted";
+          // live if today falls within range
+          if (todayIso >= entry.start && todayIso <= entry.end) return "live";
+          return "locked";
+        }
+
+        // ── Detect overlapping bars on the same channel + CA-match lead time ──
+        function detectConflicts(rows, matches) {
+          const warnings = {}; // "row:entry" -> array of strings
+          rows.forEach((row, ri) => {
+            row.entries.forEach((a, ai) => {
+              row.entries.forEach((b, bi) => {
+                if (bi <= ai) return;
+                if (a.start <= b.end && b.start <= a.end) {
+                  const key = ri + ":" + ai;
+                  warnings[key] = warnings[key] || [];
+                  warnings[key].push("Overlaps with another entry on the same channel");
+                }
+              });
+              // CA-match lead-time check
+              if (a.label && /match in CA/i.test(a.label) && matches) {
+                matches.forEach((m) => {
+                  if (!a.label.toLowerCase().includes("ca") &&
+                      !a.label.toLowerCase().includes("canada") &&
+                      !a.label.toLowerCase().includes("bosnia") &&
+                      !a.label.toLowerCase().includes("qatar") &&
+                      !a.label.toLowerCase().includes("switzerland")) return;
+                  const lead = dayDiff(a.start, m.date);
+                  if (lead >= 0 && lead < 2 && a.end >= m.date) {
+                    const key = ri + ":" + ai;
+                    warnings[key] = warnings[key] || [];
+                    warnings[key].push("Launches < 2 days before " + m.label + " — under target lead time");
+                  }
+                });
+              }
+            });
+          });
+          return warnings;
+        }
+
         function renderCalendar(data) {
+          const overrides = loadOverrides(data.market);
+          const todayIso = new Date().toISOString().slice(0, 10);
           const totalDays = dayDiff(data.dateStart, data.dateEnd) + 1;
           const dates = [];
           for (let i = 0; i < totalDays; i++) {
             dates.push(addDays(data.dateStart, i));
           }
+          const matchDates = new Set((data.matches || []).map((m) => m.date));
+          const matchByDate = {};
+          (data.matches || []).forEach((m) => { matchByDate[m.date] = m; });
+          const conflicts = detectConflicts(data.rows, data.matches);
 
           // Phase header — one cell per phase, spanning its days.
           const phaseHeader = data.phases
             .map((p) => {
               const span = dayDiff(p.start, p.end) + 1;
-              const startCol = dayDiff(data.dateStart, p.start) + 2; // +1 for channel col, +1 because grid is 1-indexed
+              const startCol = dayDiff(data.dateStart, p.start) + 2;
               return `<div class="cal-cell cal-phase-${p.key}" style="grid-column: ${startCol} / span ${span};">${escapeHtml(p.name)}</div>`;
             })
             .join("");
 
-          // Date columns.
+          // Date columns — match days get a pip.
           const dateHeader = dates
             .map((iso) => {
               const dow = dowShort(iso);
               const isWeekend = dow === "Sat" || dow === "Sun";
-              return `<div class="cal-cell ${isWeekend ? "cal-weekend" : ""}"><span class="cal-date-dow">${dow}</span>${fmtShort(iso)}</div>`;
+              const m = matchByDate[iso];
+              const matchClass = m ? "cal-match-day" : "";
+              const pip = m ? `<span class="cal-match-pip" title="${escapeHtml(m.label + " — " + m.venue)}">${escapeHtml(m.label.split(" ")[0])}</span>` : "";
+              return `<div class="cal-cell ${isWeekend ? "cal-weekend" : ""} ${matchClass}"><span class="cal-date-dow">${dow}</span>${fmtShort(iso)}${pip}</div>`;
             })
             .join("");
 
           // Channel rows.
           const rowsHtml = data.rows
             .map((row, rowIdx) => {
-              const rowStartGridCol = 1;
               const channelCell = `<div class="cal-cell cal-channel-cell">${escapeHtml(row.channel)}</div>`;
               const entryBars = row.entries
                 .map((e, entryIdx) => {
+                  const overrideKey = rowIdx + ":" + entryIdx;
+                  const editedPrompt = overrides[overrideKey];
+                  const promptText = editedPrompt != null ? editedPrompt : e.prompt;
+                  const status = entryStatus(e, editedPrompt != null, todayIso);
                   const startOffset = dayDiff(data.dateStart, e.start);
                   const span = dayDiff(e.start, e.end) + 1;
                   const left = `calc(${startOffset} * var(--cal-col-w))`;
                   const width = `calc(${span} * var(--cal-col-w) - 4px)`;
                   const phaseClass = `cal-entry-${e.phase || "group"}`;
-                  const tbdClass = e.tbd ? "cal-tbd" : "";
-                  const prompt = e.tbd ? "" : `<span class="cal-entry-prompt">— ${escapeHtml(e.prompt)}</span>`;
+                  const tbdClass = (e.tbd && editedPrompt == null) ? "cal-tbd" : "";
+                  const showPrompt = !(e.tbd && editedPrompt == null);
+                  const prompt = showPrompt
+                    ? `<span class="cal-entry-prompt">— ${escapeHtml(promptText)}</span>`
+                    : "";
+                  const types = [e.type || "fandom"];
+                  if ((e.type || "") === "either") types.push("cultural-through","fandom");
+                  const typeAttr = types.join(",");
+                  const warn = conflicts[overrideKey];
+                  const warnHtml = warn ? `<span class="cal-warn" title="${escapeHtml(warn.join(' • '))}">!</span>` : "";
                   return `<div class="cal-entry ${phaseClass} ${tbdClass}"
                           style="left:${left}; width:${width};"
                           data-row="${rowIdx}" data-entry="${entryIdx}"
-                          title="${escapeHtml(e.label)} — ${escapeHtml(e.prompt)}">
-                    ${escapeHtml(e.label)}${prompt}
+                          data-types="${typeAttr}"
+                          data-status="${status}"
+                          title="${escapeHtml(e.label)} — ${escapeHtml(promptText)}">
+                    ${warnHtml}
+                    <span>${escapeHtml(e.label)}${prompt}</span>
+                    <span class="cal-status-dot cal-status-${status}" title="status: ${status}"></span>
                   </div>`;
                 })
                 .join("");
               return `${channelCell}<div class="cal-row-track">${entryBars}</div>`;
             })
             .join("");
+
+          // Today line if today is within range.
+          const todayOffset = (todayIso >= data.dateStart && todayIso <= data.dateEnd)
+            ? dayDiff(data.dateStart, todayIso) : -1;
+
+          // Filter chip + jump-button rows.
+          const filters = [
+            { key: "all", label: "All" },
+            { key: "fandom", label: "Fandom" },
+            { key: "cultural-match", label: "Cultural — match in CA" },
+            { key: "cultural-through", label: "Cultural — made it through" },
+            { key: "reactive", label: "Reactive" },
+            { key: "game-altering", label: "Game altering" },
+            { key: "dooh", label: "DOOH" }
+          ];
+          const filterChips = filters
+            .map((f) => `<button class="cal-chip ${f.key === "all" ? "active" : ""}" type="button" data-cal-filter="${f.key}">${escapeHtml(f.label)}</button>`)
+            .join("");
+
+          const jumpButtons = data.phases
+            .filter((p) => p.key !== "rest")
+            .map((p) => `<button class="cal-jump-btn" type="button" data-cal-jump="${escapeHtml(p.start)}">${escapeHtml(p.name)}</button>`)
+            .join("");
+
+          const statusLegend = `
+            <span class="cal-legend-item"><span class="cal-legend-swatch cal-status-locked" style="border-radius:999px;"></span>Locked</span>
+            <span class="cal-legend-item"><span class="cal-legend-swatch cal-status-drafted" style="border-radius:999px;"></span>Drafted</span>
+            <span class="cal-legend-item"><span class="cal-legend-swatch cal-status-live" style="border-radius:999px;"></span>Live</span>
+            <span class="cal-legend-item"><span class="cal-legend-swatch cal-status-tbd" style="border-radius:999px;"></span>TBD</span>
+          `;
 
           const html = `
             <div class="cal-wrap">
@@ -7457,19 +7788,33 @@
                   <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-qf"></span>QF</span>
                   <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-sf"></span>SF</span>
                   <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-final"></span>Final</span>
+                  <span style="opacity:0.5; padding:0 4px;">·</span>
+                  ${statusLegend}
                 </div>
-                <button class="cal-back-btn" type="button" id="calBackBtn">← Change market</button>
+                <div>
+                  <button class="cal-overlay-btn" type="button" id="calOverlayBtn" title="Overlay other markets">⊕ Overlay</button>
+                  <button class="cal-print-btn" type="button" id="calPrintBtn" title="Print / export to PDF">🖨 Print</button>
+                  <button class="cal-back-btn" type="button" id="calBackBtn">← Change market</button>
+                </div>
               </div>
+              <div class="cal-jump-row">
+                <span class="cal-filter-label">Jump to</span>
+                <button class="cal-jump-btn" type="button" data-cal-jump-today="1">⏺ Today</button>
+                ${jumpButtons}
+              </div>
+              <div class="cal-filter-row">
+                <span class="cal-filter-label">Filter</span>
+                ${filterChips}
+              </div>
+              <div class="cal-overlay-note" id="calOverlayNote">Overlay: no other markets have calendar data yet — USA / UK / Germany TBD.</div>
               <div class="cal-scroll">
                 <div class="cal-grid" style="grid-template-columns: var(--cal-channel-w) repeat(${totalDays}, var(--cal-col-w));">
-                  <!-- Phase row -->
                   <div class="cal-cell cal-channel-cell cal-channel-head" style="grid-column: 1; grid-row: 1;">Phase</div>
                   <div class="cal-phase-row" style="display: contents;">${phaseHeader}</div>
-                  <!-- Date row -->
                   <div class="cal-cell cal-channel-cell cal-channel-head" style="grid-column: 1;">Date</div>
                   <div class="cal-date-row" style="display: contents;">${dateHeader}</div>
-                  <!-- Channel rows -->
                   ${rowsHtml}
+                  ${todayOffset >= 0 ? `<div class="cal-today-line" id="calTodayLine" style="left: calc(var(--cal-channel-w) + ${todayOffset} * var(--cal-col-w)); grid-column: 1 / -1; grid-row: 1 / -1;"></div>` : ""}
                 </div>
               </div>
             </div>
@@ -7486,6 +7831,61 @@
             calView.style.display = "none";
             calView.innerHTML = "";
             calPicker.style.display = "";
+          });
+
+          // Print button.
+          document.getElementById("calPrintBtn").addEventListener("click", () => {
+            window.print();
+          });
+
+          // Overlay toggle (USA/UK/DE currently have no data → show note).
+          const overlayBtn = document.getElementById("calOverlayBtn");
+          const overlayNote = document.getElementById("calOverlayNote");
+          overlayBtn.addEventListener("click", () => {
+            const on = !overlayBtn.classList.contains("active");
+            overlayBtn.classList.toggle("active", on);
+            overlayNote.classList.toggle("shown", on);
+            // When real overlay data exists, render extra rows with class "cal-overlay" here.
+          });
+
+          // Filter chips.
+          const filterChipEls = calView.querySelectorAll("[data-cal-filter]");
+          filterChipEls.forEach((chip) => {
+            chip.addEventListener("click", () => {
+              filterChipEls.forEach((c) => c.classList.toggle("active", c === chip));
+              const f = chip.dataset.calFilter;
+              calView.querySelectorAll(".cal-entry").forEach((bar) => {
+                if (f === "all") {
+                  bar.classList.remove("cal-dim");
+                  return;
+                }
+                const types = (bar.dataset.types || "").split(",");
+                bar.classList.toggle("cal-dim", !types.includes(f));
+              });
+            });
+          });
+
+          // Jump-to-phase / today.
+          const scrollerEarly = calView.querySelector(".cal-scroll");
+          calView.querySelectorAll("[data-cal-jump]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const iso = btn.dataset.calJump;
+              const offset = dayDiff(data.dateStart, iso);
+              scrollerEarly.scrollTo({
+                left: offset * (parseFloat(getComputedStyle(scrollerEarly.querySelector(".cal-grid")).getPropertyValue("--cal-col-w")) || 44),
+                behavior: "smooth"
+              });
+            });
+          });
+          calView.querySelectorAll("[data-cal-jump-today]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              if (todayOffset < 0) return;
+              const colW = parseFloat(getComputedStyle(scrollerEarly.querySelector(".cal-grid")).getPropertyValue("--cal-col-w")) || 44;
+              scrollerEarly.scrollTo({
+                left: Math.max(0, todayOffset * colW - scrollerEarly.clientWidth / 2),
+                behavior: "smooth"
+              });
+            });
           });
 
           // ── Drag-to-pan + pinch / wheel / button zoom ──
@@ -7631,33 +8031,77 @@
             });
           });
 
-          // Entry detail modal.
+          // Entry detail modal with inline edit.
           const detail = document.getElementById("calDetail");
           const detailBox = detail.querySelector(".cal-detail-box");
           calView.addEventListener("click", (e) => {
             const bar = e.target.closest(".cal-entry");
             if (!bar) return;
-            const row = data.rows[+bar.dataset.row];
-            const entry = row.entries[+bar.dataset.entry];
+            const rowIdx = +bar.dataset.row;
+            const entryIdx = +bar.dataset.entry;
+            const row = data.rows[rowIdx];
+            const entry = row.entries[entryIdx];
+            const ovKey = rowIdx + ":" + entryIdx;
+            const editedPrompt = overrides[ovKey];
+            const currentPrompt = editedPrompt != null ? editedPrompt : entry.prompt;
+            const status = entryStatus(entry, editedPrompt != null, todayIso);
+
             const noteHtml = entry.note
               ? `<div class="cal-detail-note">${escapeHtml(entry.note)}</div>`
               : "";
+            const canEdit = entry.tbd; // TBD entries are editable
+            const editBlock = canEdit
+              ? `<div class="cal-edit-hint">This is a TBD slot — fill in once results are known. Saved locally only.</div>
+                 <textarea class="cal-edit-input" id="calEditInput" placeholder="Enter the prompt…">${escapeHtml(currentPrompt === "TBD as results change" ? "" : currentPrompt)}</textarea>`
+              : `<div class="cal-detail-prompt">${escapeHtml(currentPrompt)}</div>`;
+            const buttons = canEdit
+              ? `<button class="cal-detail-save" type="button" id="calEditSave">💾 Save</button>
+                 ${editedPrompt != null ? '<button class="cal-detail-close" type="button" id="calEditClear">↺ Reset to TBD</button>' : ""}
+                 <button class="cal-detail-close" type="button">Close</button>`
+              : `<button class="cal-detail-close" type="button">Close</button>`;
+
             detailBox.innerHTML = `
               <div class="cal-detail-label">${escapeHtml(row.channel)}</div>
               <div class="cal-detail-title">${escapeHtml(entry.label)}</div>
-              <div class="cal-detail-prompt">${escapeHtml(entry.prompt)}</div>
+              ${editBlock}
               <div class="cal-detail-meta">
                 <span>📅 ${fmtShort(entry.start)} → ${fmtShort(entry.end)}</span>
                 <span>${escapeHtml(entry.phase || "")}</span>
-                ${entry.tbd ? "<span>· status: TBD</span>" : ""}
+                <span>· status: ${status}</span>
               </div>
               ${noteHtml}
-              <button class="cal-detail-close" type="button">Close</button>
+              ${conflicts[ovKey] ? `<div class="cal-detail-note" style="border-left-color:#ef4444;color:#fca5a5;">⚠ ${conflicts[ovKey].map(escapeHtml).join(' · ')}</div>` : ""}
+              <div>${buttons}</div>
             `;
             detail.classList.add("shown");
-            detailBox.querySelector(".cal-detail-close").addEventListener("click", () => {
-              detail.classList.remove("shown");
+
+            detailBox.querySelectorAll(".cal-detail-close").forEach((b) => {
+              if (b.id === "calEditClear") {
+                b.addEventListener("click", () => {
+                  delete overrides[ovKey];
+                  saveOverrides(data.market, overrides);
+                  detail.classList.remove("shown");
+                  renderCalendar(data);
+                });
+              } else {
+                b.addEventListener("click", () => detail.classList.remove("shown"));
+              }
             });
+
+            const saveBtn = detailBox.querySelector("#calEditSave");
+            if (saveBtn) {
+              saveBtn.addEventListener("click", () => {
+                const txt = (document.getElementById("calEditInput").value || "").trim();
+                if (!txt) {
+                  delete overrides[ovKey];
+                } else {
+                  overrides[ovKey] = txt;
+                }
+                saveOverrides(data.market, overrides);
+                detail.classList.remove("shown");
+                renderCalendar(data);
+              });
+            }
           });
           detail.addEventListener("click", (e) => {
             if (e.target === detail) detail.classList.remove("shown");
