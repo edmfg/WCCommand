@@ -3110,7 +3110,7 @@ window.DASHBOARD_DATA = {
             topic: "🩼 'Pulisic Bubble Watch' Hits r/USMNT Panic Levels",
             category: "fandom",
             volume: "🔥🔥🔥🔥",
-            sentiment: "caution",
+            sentiment: "mixed",
             summary:
               "Pulisic's gluteal strain landed mid-morning ET and within 6h r/USMNT, r/MLS, and X soccer Twitter pivoted hard into Bubble Watch / 'we're cooked' / 'is Reyna the answer' mode. Tone is panicked but darkly funny — the captain-of-the-host-nation injury 31 days from kickoff is the worst-case scenario USMNT fans had been quietly pricing in since Milan's first-half of the season. Reactive opening: 'Captain Health Check' content + protect-the-talisman jokes are clean. Stay away from medical-prediction takes — federation will police hard 🚑",
             sampleQuote:

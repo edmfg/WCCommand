@@ -7288,7 +7288,11 @@
 
         DASHBOARD_DATA.social.forEach((s) => {
           const m = classifySocialMarket(s);
-          const sent = s.sentiment || "mixed";
+          let sent = s.sentiment || "mixed";
+          // Heatmap only knows positive / mixed / negative.
+          // Bucket anything else into "mixed" so a stray label can't crash the
+          // renderer (which would also kill the Social Trends carousel).
+          if (sent !== "positive" && sent !== "negative") sent = "mixed";
           const w = volumeWeight(s.volume);
           grid[m][sent] += w;
           grid[m].items[sent].push(s.topic);
