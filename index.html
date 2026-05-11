@@ -56,6 +56,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+    <link rel="preconnect" href="https://img.youtube.com" />
+    <link rel="dns-prefetch" href="https://drive.google.com" />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -65,6 +69,7 @@
       integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
+      defer
     ></script>
     <!-- Vercel Web Analytics -->
     <script>
@@ -6506,9 +6511,14 @@
         // Fixtures rendering is heavy (104 matches + standings). Defer it
         // until the user actually opens the Fixtures tab — switchTab handles
         // the lazy first paint.
-        renderAssets();
-        renderSubtabAssets("genius");
-        renderSubtabAssets("s2");
+        // Creative tab is gated + behind a click — defer its (heavy) asset
+        // grid into idle time so it doesn't block first paint.
+        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+        idle(() => {
+          renderAssets();
+          renderSubtabAssets("genius");
+          renderSubtabAssets("s2");
+        });
         setupTabs();
         setupGemini();
         setupKeyboard();
@@ -6881,8 +6891,26 @@
           resetTimer();
         });
 
-        return { next, prev, goTo, setCards };
+        function pause() { if (timer) { clearInterval(timer); timer = null; } }
+        function resume() { resetTimer(); }
+        return { next, prev, goTo, setCards, pause, resume };
       }
+
+      // Pause carousel timers when the page is backgrounded — saves CPU and
+      // stops the animation queue from piling up while the user is in another
+      // tab. Both carousels are paused together; resume on visibilitychange.
+      document.addEventListener("visibilitychange", () => {
+        const paused = document.hidden;
+        try {
+          if (paused) {
+            newsCarousel && newsCarousel.pause && newsCarousel.pause();
+            socialCarousel && socialCarousel.pause && socialCarousel.pause();
+          } else {
+            newsCarousel && newsCarousel.resume && newsCarousel.resume();
+            socialCarousel && socialCarousel.resume && socialCarousel.resume();
+          }
+        } catch (e) {}
+      });
 
       let newsCarousel = createCarousel("newsCards", "newsDots", 2800);
       let socialCarousel = createCarousel("socialCards", "socialDots", 3200);
@@ -8006,16 +8034,16 @@
         const remoteImg = safeUrl(a.imageUrl);
         let thumb;
         if (a.kind === "image" && localImg) {
-          thumb = `<img src="${escapeHtml(localImg)}" alt="" />`;
+          thumb = `<img src="${escapeHtml(localImg)}" alt="" loading="lazy" decoding="async" />`;
         } else if (a.kind === "image" && remoteImg) {
-          thumb = `<img src="${remoteImg}" alt="" />`;
+          thumb = `<img src="${remoteImg}" alt="" loading="lazy" decoding="async" />`;
         } else if (ytId) {
-          thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" /><div class="yt-play-badge">\u25b6</div>`;
+          thumb = `<img src="https://img.youtube.com/vi/${escapeHtml(ytId)}/hqdefault.jpg" alt="" loading="lazy" decoding="async" /><div class="yt-play-badge">\u25b6</div>`;
         } else if (a.driveFileId) {
           const fidEsc = escapeHtml(a.driveFileId);
           // Try lh3 first; on error swap to legacy /thumbnail; on second
           // error hide the broken img and reveal the play-icon fallback.
-          thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" referrerpolicy="no-referrer" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${escapeHtml(driveThumbnailFallback(a.driveFileId, 400))}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="fallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,0.55)">▶</div>`;
+          thumb = `<img src="${escapeHtml(driveThumbnail(a.driveFileId, 400))}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${escapeHtml(driveThumbnailFallback(a.driveFileId, 400))}';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}" /><div class="fallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,0.55)">▶</div>`;
         } else {
           thumb = `<div class="fallback" style="display:flex;position:absolute;inset:0">${formatEsc}</div>`;
         }
