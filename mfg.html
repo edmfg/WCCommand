@@ -2950,11 +2950,14 @@
 
       <main class="main">
         <nav class="tab-nav" id="mfgTabNav" aria-label="MFG sections">
-          <button class="tab-btn active" type="button" data-mfg-tab="triage">
-            🧯 Global Triage
-          </button>
-          <button class="tab-btn" type="button" data-mfg-tab="reactive">
+          <button class="tab-btn active" type="button" data-mfg-tab="reactive">
             🔥 Today's Reactive
+          </button>
+          <button class="tab-btn" type="button" data-mfg-tab="calendar">
+            📅 Content Calendar
+          </button>
+          <button class="tab-btn" type="button" data-mfg-tab="triage">
+            🧯 Global Triage
           </button>
           <button class="tab-btn" type="button" data-mfg-tab="creative">
             🎬 Creative Uploads
@@ -2962,12 +2965,9 @@
           <button class="tab-btn" type="button" data-mfg-tab="audit">
             📋 Audit Log
           </button>
-          <button class="tab-btn" type="button" data-mfg-tab="calendar">
-            📅 Content Calendar
-          </button>
         </nav>
 
-        <div class="tab-panel active" id="panel-triage">
+        <div class="tab-panel" id="panel-triage">
           <div class="section-title">&#129517; Global Triage</div>
           <p
             style="
@@ -3627,7 +3627,7 @@
         </div>
 
         <!-- ─────── REACTIVE UPLOAD PANEL ─────── -->
-        <div class="tab-panel" id="panel-reactive">
+        <div class="tab-panel active" id="panel-reactive">
           <div class="section-title">🔥 Today's Reactive</div>
           <p
             class="reactive-help"
@@ -6178,7 +6178,7 @@
           calendar: "panel-calendar",
         };
         function activateTab(name) {
-          if (!TAB_TO_PANEL[name]) name = "triage";
+          if (!TAB_TO_PANEL[name]) name = "reactive";
           tabNav.querySelectorAll(".tab-btn").forEach((b) => {
             b.classList.toggle("active", b.dataset.mfgTab === name);
           });
