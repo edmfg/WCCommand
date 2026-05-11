@@ -146,6 +146,51 @@
         gap: 10px;
         align-items: center;
       }
+      .market-switcher {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 4px 10px 4px 12px;
+        border-radius: 99px;
+        cursor: pointer;
+        transition: border-color 0.18s ease, background 0.18s ease;
+      }
+      .market-switcher:hover {
+        border-color: var(--border-2);
+        background: var(--surface-2);
+      }
+      .market-switcher-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        color: var(--text-muted, #94a3b8);
+      }
+      .market-switcher select {
+        background: transparent;
+        border: none;
+        color: inherit;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 4px 4px 0;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 18px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23999' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 2px center;
+      }
+      .market-switcher select option[data-tbd] {
+        color: #94a3b8;
+      }
+      @media (max-width: 720px) {
+        .market-switcher-label { display: none; }
+      }
       .live-pill {
         font-size: 10px;
         text-transform: uppercase;
@@ -1157,6 +1202,15 @@
         </a>
         <a class="header-back" href="index.html">‹ Back to dashboard</a>
         <div class="header-actions">
+          <label class="market-switcher" for="marketSwitcher">
+            <span class="market-switcher-label">Market</span>
+            <select id="marketSwitcher" aria-label="Switch market">
+              <option value="ca">🇨🇦 Canada</option>
+              <option value="usa" data-tbd="1">🇺🇸 USA — Soon</option>
+              <option value="uk"  data-tbd="1">🦁 UK — Soon</option>
+              <option value="de"  data-tbd="1">🇩🇪 Germany — Soon</option>
+            </select>
+          </label>
           <span class="live-pill"><span class="live-dot"></span> Agents Live</span>
         </div>
       </div>
@@ -1244,6 +1298,30 @@
         return "ca";
       }
 
+      function wireMarketSwitcher(currentKey) {
+        const sel = document.getElementById("marketSwitcher");
+        if (!sel) return;
+        sel.value = currentKey;
+        // Mark options as enabled/disabled based on whether FORMATION_DATA has them.
+        const data = window.FORMATION_DATA || {};
+        Array.from(sel.options).forEach((opt) => {
+          const has = !!data[opt.value];
+          opt.disabled = !has && opt.value !== currentKey;
+        });
+        sel.addEventListener("change", () => {
+          const next = sel.value;
+          if (next === currentKey) return;
+          if (!data[next]) {
+            // Soft revert if the user managed to pick a TBD one anyway.
+            sel.value = currentKey;
+            return;
+          }
+          const u = new URL(window.location.href);
+          u.searchParams.set("market", next);
+          window.location.href = u.toString();
+        });
+      }
+
       function boot() {
         const key = getMarketKey();
         const market = (window.FORMATION_DATA || {})[key];
@@ -1252,6 +1330,7 @@
           window.location.href = "index.html";
           return;
         }
+        wireMarketSwitcher(key);
 
         const FORMATION = market.formation;
         const CULTURAL_BRIEFING = market.cultural;
