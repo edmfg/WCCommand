@@ -2,8 +2,16 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-08T18:00:00.000Z",
+  lastUpdated: "2026-05-11T18:00:00.000Z",
         ticker: [
+          "🇺🇸 Pulisic gluteal strain — race vs clock to May 27 USMNT camp open (May 11)",
+          "🇺🇸 Cardoso ankle sprain at Atlético — Pochettino's MF depth chart cracks, Aidan Morris (Boro) into the frame (May 11)",
+          "🇨🇦 Alphonso Davies cleared by Bayern — fit for Canada's June 12 opener vs Bosnia at BMO (May 11)",
+          "🛂 Trump's $15K 'visa bond' now hits 5 WC qualifiers — Algeria, Cabo Verde, CIV, Senegal, Tunisia (May 10)",
+          "🦁 Tuchel locks May 22 for England's 26-man reveal — first drop via England app (May 10)",
+          "💸 Resale market cracks — Group-Stage median down 28% Feb→May ($1,291 → $928), TicketNews (May 10)",
+          "🎤 Coldplay confirmed for Final halftime at MetLife — Super Bowl-style spectacle on July 19 (May 9)",
+          "🌮 Mexico City opening ceremony lineup: Maná, J Balvin, Tyla, Belinda, Los Ángeles Azules, Alejandro Fernández (May 9)",
           "🇺🇸 Trump on $1,000 group-stage seats: 'I wouldn't pay it either, to be honest' — splits with Infantino (May 8)",
           "💸 ESPN: FIFA triples best-available Final ticket to $33,000 as new Cat-1 inventory drops (May 8)",
           "🎶 Shakira teases 'Dai Dai' with Burna Boy at Maracaná — official WC2026 anthem out May 14 (May 7)",
@@ -52,6 +60,94 @@ window.DASHBOARD_DATA = {
           "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
         ],
         news: [
+          {
+            id: "n119",
+            headline:
+              "🇺🇸 Pulisic Gluteal Strain — Race vs Clock to USMNT Camp Open May 27",
+            source: "Yahoo Sports",
+            timestamp: "2026-05-11T14:00:00Z",
+            summary:
+              "Christian Pulisic has been ruled out with a gluteal muscle strain and it's unclear whether he'll return for AC Milan's last two Serie A matches before the USMNT camp opens May 27. With Pulisic the focal point of every Pochettino attack and the May 26 roster reveal at Pier 17 only 15 days out, this is the single biggest USMNT injury cloud heading into the home tournament 🩼",
+            url: "https://sports.yahoo.com/soccer/article/usmnt-roster-watch-christian-pulisics-gluteal-strain-is-latest-setback-as-world-cup-camp-approaches-032632239.html",
+            tag: "USA",
+          },
+          {
+            id: "n120",
+            headline:
+              "🇺🇸 Cardoso Ankle Sprain — USMNT Midfield Depth Chart Cracks",
+            source: "FOX Sports",
+            timestamp: "2026-05-11T11:00:00Z",
+            summary:
+              "Atlético Madrid confirmed Johnny Cardoso suffered a high-grade ankle sprain in training with no return timetable. Cardoso was the #3 central midfielder on ESPN's latest USMNT Big Board — Middlesbrough's Aidan Morris becomes the most likely beneficiary. Two losses (Belgium/Portugal in March) plus Pulisic and Cardoso doubts mean Pochettino's 'spine of the team' is suddenly very fluid 18 days before reveal day 📋",
+            url: "https://www.foxsports.com/stories/soccer/usmnt-world-cup-roster-stock-watch-johnny-cardoso-injury",
+            tag: "USA",
+          },
+          {
+            id: "n121",
+            headline:
+              "🛂 Trump's $15K 'Visa Bond' Now Hits 5 WC Qualifiers",
+            source: "American Immigration Council",
+            timestamp: "2026-05-10T17:00:00Z",
+            summary:
+              "As of April 2, the US State Department's expanded Visa Bond Program requires citizens of 50 countries — incl. five WC qualifiers (Algeria, Cabo Verde, Côte d'Ivoire, Senegal, Tunisia) — to post a bond of up to $15,000 before temporary US travel. Stacked with the existing travel ban on Iran / Haiti / Senegal / CIV nationals and 120+ civil-rights orgs co-signing a US travel warning, the visa friction story has metastasised from a side-bar into a tournament-wide one 🛂",
+            url: "https://www.americanimmigrationcouncil.org/blog/world-cup-travel-bans-ice-iran-50-days/",
+            tag: "Macro",
+          },
+          {
+            id: "n122",
+            headline:
+              "🦁 Tuchel Locks May 22 for England's 26-Man Reveal",
+            source: "England Football",
+            timestamp: "2026-05-10T09:00:00Z",
+            summary:
+              "Thomas Tuchel will name his final 26-man England squad on Friday May 22, with the first release dropping via the official England app. England open the tournament vs Croatia on June 17. With Branthwaite already ruled out and four CBs in the doubt window, defensive selection is the headline subplot. Tuchel's first tournament squad — everything is news 🦁",
+            url: "https://www.englandfootball.com/articles/2026/May/08/england-mens-world-cup-squad-announcement-date-revealed-20260805",
+            tag: "UK",
+          },
+          {
+            id: "n123",
+            headline:
+              "💸 Resale Market Cracks — Group-Stage Median Down 28% Since February",
+            source: "TicketNews",
+            timestamp: "2026-05-10T16:00:00Z",
+            summary:
+              "First hard sign of the FIFA pricing backlash hitting the secondary market: Group-Stage median listing prices have fallen 28% Feb → May ($1,291 → $928), per TicketNews. The 'dystopian dynamic pricing' narrative (Infantino, Pallone, Trump all in the same news cycle) appears to be peeling demand off the resale top. Phase 4 last-minute sales remain live with 80+ group-stage games still on FIFA.com 📉",
+            url: "https://www.ticketnews.com/2026/05/world-cup-ticket-backlash-grows-as-resale-market-shows-signs-of-softening/",
+            tag: "Global",
+          },
+          {
+            id: "n124",
+            headline:
+              "🇨🇦 Alphonso Davies Cleared — Fit for Canada's June 12 Opener vs Bosnia",
+            source: "Sports Illustrated",
+            timestamp: "2026-05-11T15:00:00Z",
+            summary:
+              "Bayern Munich have cleared Alphonso Davies for the summer — Marsch's talisman will be available for Canada's opener vs Bosnia & Herzegovina at BMO Field on June 12 despite playing just twice for his country in 2025. Promise David's recovery timeline is tighter; Canada Soccer has sent a club physio to Nice to help Bombito. Marsch sticks with 4-4-2 through the tournament 🍁",
+            url: "https://www.si.com/soccer/predicting-canada-2026-world-cup-roster-50-days-from-kickoff",
+            tag: "Canada",
+          },
+          {
+            id: "n125",
+            headline:
+              "🎤 Coldplay Locked for Final Halftime — MetLife July 19 Super Bowl-Style Show",
+            source: "FIFA",
+            timestamp: "2026-05-09T20:00:00Z",
+            summary:
+              "Coldplay confirmed as creative leads for the July 19 Final halftime production at MetLife Stadium, inspired by the NFL Super Bowl format — a first for a FIFA World Cup final. The play is to lift the closing 90 minutes into mass-market entertainment, mirroring how Fan Festival programming is built around culture, not just football. Expect the lineup beyond Coldplay to drop in late May / early June 🎬",
+            url: "https://inside.fifa.com/media-releases/world-cup-2026-opening-ceremony-mexico-city",
+            tag: "Global",
+          },
+          {
+            id: "n126",
+            headline:
+              "🌮 Mexico City Opening Ceremony Cast Confirmed — Maná, J Balvin, Tyla, Belinda Headline",
+            source: "FIFA",
+            timestamp: "2026-05-09T18:00:00Z",
+            summary:
+              "FIFA confirmed the June 11 opening ceremony lineup at Estadio Azteca: Alejandro Fernández, Belinda, Danny Ocean, J Balvin, Lila Downs, Los Ángeles Azules, Maná and Tyla. Mexico vs South Africa kicks off immediately after. Latin pop + cumbia + Afropop is a deliberate echo of the tri-nation, 48-team format — and the cast skews more LatAm-heavy than any opening ceremony in WC history 🎺",
+            url: "https://inside.fifa.com/media-releases/world-cup-2026-opening-ceremony-mexico-city",
+            tag: "Global",
+          },
           {
             id: "n106",
             headline:
@@ -2848,6 +2944,159 @@ window.DASHBOARD_DATA = {
           },
         ],
         social: [
+          {
+            id: "s115",
+            topic: "🩼 'Pulisic Bubble Watch' Hits r/USMNT Panic Levels",
+            category: "fandom",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "caution",
+            summary:
+              "Pulisic's gluteal strain landed mid-morning ET and within 6h r/USMNT, r/MLS, and X soccer Twitter pivoted hard into Bubble Watch / 'we're cooked' / 'is Reyna the answer' mode. Tone is panicked but darkly funny — the captain-of-the-host-nation injury 31 days from kickoff is the worst-case scenario USMNT fans had been quietly pricing in since Milan's first-half of the season. Reactive opening: 'Captain Health Check' content + protect-the-talisman jokes are clean. Stay away from medical-prediction takes — federation will police hard 🚑",
+            sampleQuote:
+              '"31 days out. Pulisic\'s glute. I\'m not eating. I\'m not sleeping. I\'m refreshing Fabrizio."',
+            quotes: [
+              {
+                platform: "Reddit",
+                text: "r/USMNT megathread is already 2k deep — fans calling it 'the moment we stopped pretending we weren't worried'",
+              },
+              {
+                platform: "X",
+                text: "Capt America's glute trending above two domestic political stories is so distinctly 2026 World Cup it hurts",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: it's May 11 and Pulisic's left butt cheek is the most-watched body part in American sports 📊",
+              },
+              {
+                platform: "IG",
+                text: "Reyna stans posting 'our time has come' edits within 90 mins. The depth chart wars are LIVE.",
+              },
+            ],
+            platforms: ["Reddit", "X", "TikTok", "IG"],
+            sourceUrl:
+              "https://sports.yahoo.com/soccer/article/usmnt-roster-watch-christian-pulisics-gluteal-strain-is-latest-setback-as-world-cup-camp-approaches-032632239.html",
+            timestamp: "2026-05-11T16:00:00Z",
+          },
+          {
+            id: "s116",
+            topic: "🛂 '$15K to See My Country Play' — Visa Bond Backlash Goes Global",
+            category: "memes",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "negative",
+            summary:
+              "Trump's $15K visa-bond expansion to five WC qualifiers (Algeria, Cabo Verde, CIV, Senegal, Tunisia) is metastasising fast on X and TikTok — and Senegalese and Algerian creators are leading. Tone is angry-funny: 'Pay $15K just to maybe get in to see us lose to Brazil', 'this is the most expensive group stage exit in history', etc. The story stacks on top of the existing travel-ban-on-CIV/Haiti/Iran/Senegal narrative and the $1K group-stage seats. For brands: this is the third leg of the access-cost story — touch with extreme care; the diaspora content is where the conversation lives, not the political angle 🛂",
+            sampleQuote:
+              '"$15,000 visa bond plus $1,000 ticket plus a flight plus a hotel plus the food. The math is the punchline."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Senegalese diaspora group chat: 'Just send me the goals. I\'ll watch from Paris.' This is the actual outcome.",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: you saved 4 years for the World Cup and now your government is the new opponent 😭",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccer top thread: 'FIFA is going to look very small if a quarter of the qualified nations can't bring fans.'",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit"],
+            sourceUrl:
+              "https://www.americanimmigrationcouncil.org/blog/world-cup-travel-bans-ice-iran-50-days/",
+            timestamp: "2026-05-10T19:00:00Z",
+          },
+          {
+            id: "s117",
+            topic: "📉 'FIFA Finally Blinks' — Resale Crash Memes",
+            category: "memes",
+            volume: "🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "TicketNews resale data (Group-Stage median -28% Feb→May) hit X / r/soccer same afternoon and the tone has flipped from rage to schadenfreude. Format-of-the-day: side-by-side 'Infantino in February vs Infantino now' edits + 'imagine paying $2M for a final ticket 8 weeks ago' jokes. Couples nicely with the n104 Infantino hot-dog promise from last week. Reactive angle: 'Patience pays' / 'Last-minute hero' content for Phase 4 sales is suddenly on-message instead of cynical 🌭",
+            sampleQuote:
+              '"Bought my Mexico-South Africa ticket today for less than my Spotify Premium for a year. We are SO back."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Group-Stage median down 28%. The free-market just clipped FIFA's wings without a regulator in sight.",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccer: 'this is the first piece of WC ticket news that doesn't make me want to fistfight a Swiss man'",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: refreshing fifa.com daily for 3 months and finally seeing the number go down 📉🥳",
+              },
+            ],
+            platforms: ["X", "Reddit", "TikTok"],
+            sourceUrl:
+              "https://www.ticketnews.com/2026/05/world-cup-ticket-backlash-grows-as-resale-market-shows-signs-of-softening/",
+            timestamp: "2026-05-10T20:00:00Z",
+          },
+          {
+            id: "s118",
+            topic: "🍁 'Phonzie's Back' — Canadian Soccer Twitter Lifts Off",
+            category: "fandom",
+            volume: "🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Bayern's clearance for Alphonso Davies to play the full summer touched off the most positive 24h on Canadian soccer X/Reddit since the squad qualified. He's played twice for Canada in 2025 — fans had quietly written off a half-fit Davies as the realistic ceiling. 4-4-2 with a healthy Phonzie down the left changes the team's actual ceiling vs Bosnia/Qatar/Switzerland. r/CanadaSoccer's 'Group F survival' tier list is now 'Group F MEDAL' tier list, half ironically 🍁",
+            sampleQuote:
+              '"A healthy Phonzie + BMO Field + opening match vibes. I am NOT okay (positively)."',
+            quotes: [
+              {
+                platform: "Reddit",
+                text: "r/CanadaSoccer top thread: 'We were preparing for the worst. Marsch quietly cooked.'",
+              },
+              {
+                platform: "X",
+                text: "Phonzie + Buchanan + David at full speed in front of 30k at BMO. I haven't been this calm-excited in a decade.",
+              },
+              {
+                platform: "TikTok",
+                text: "Canada soccer fans on May 11 vs Canada soccer fans on May 10. Same person. Two completely different humans.",
+              },
+            ],
+            platforms: ["Reddit", "X", "TikTok"],
+            sourceUrl:
+              "https://www.si.com/soccer/predicting-canada-2026-world-cup-roster-50-days-from-kickoff",
+            timestamp: "2026-05-11T15:30:00Z",
+          },
+          {
+            id: "s119",
+            topic: "🎤 'Coldplay at the Final?' — Halftime Show Polarises",
+            category: "music",
+            volume: "🔥🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "Coldplay-at-the-Final lands as a love-it-or-roast-it moment: TikTok skews positive (parents-friendly stadium pop, 'Fix You' for the losing team is the obvious joke template), X soccer Twitter skews skeptical ('Coldplay for the most-watched event of the decade?'), Latin Twitter is mixed because the opening ceremony has Maná + J Balvin and the Final has… Coldplay. Brand opportunity: the Mexico City opening cast (Maná, J Balvin, Tyla, Belinda) is the safer cultural surf 🎺",
+            sampleQuote:
+              '"Coldplay halftime is the most NFL thing FIFA has ever done. And honestly? I don\'t hate it."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Mexico City opens with Maná and J Balvin. Final has Coldplay. Tell me FIFA didn't workshop this for 'broad appeal'",
+              },
+              {
+                platform: "TikTok",
+                text: "If Coldplay plays 'Fix You' as the losing team walks off I will weep openly. They will. They will.",
+              },
+              {
+                platform: "Reddit",
+                text: "r/popheads thread on Coldplay being a 'safe globally legible' pick is going way harder than I expected",
+              },
+              {
+                platform: "IG",
+                text: "Behind-the-scenes Coldplay Q&A on FIFA's IG already 1.4M views in 6h. The mainstream brain is locked in.",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit", "IG"],
+            sourceUrl:
+              "https://inside.fifa.com/media-releases/world-cup-2026-opening-ceremony-mexico-city",
+            timestamp: "2026-05-09T22:00:00Z",
+          },
           {
             id: "s100",
             topic: "🎶 'Dai Dai' Is the New 'Waka Waka' — Burna Boy Pairing Lands",
