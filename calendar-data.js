@@ -30,6 +30,7 @@ window.CALENDAR_DATA = {
   ca: {
     market: "Canada",
     flag: "🇨🇦",
+    lastUpdated: "2026-05-11T22:30:00Z",
     dateStart: "2026-06-04",
     dateEnd: "2026-07-19",
     phases: [

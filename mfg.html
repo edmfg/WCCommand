@@ -2561,6 +2561,43 @@
         overflow-x: auto;
         overflow-y: hidden;
         border-radius: 10px;
+        cursor: grab;
+        touch-action: pan-x pinch-zoom;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .cal-scroll.cal-dragging {
+        cursor: grabbing;
+      }
+      .cal-zoom-controls {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2px 4px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .cal-zoom-btn {
+        background: transparent;
+        color: var(--text);
+        border: none;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 999px;
+        font-family: inherit;
+      }
+      .cal-zoom-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .cal-zoom-readout {
+        font-size: 11px;
+        color: var(--text-muted);
+        min-width: 38px;
+        text-align: center;
       }
       .cal-grid {
         --cal-col-w: 44px;
@@ -7317,6 +7354,17 @@
           const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
           return d.getUTCDate() + " " + months[d.getUTCMonth()];
         }
+        function formatUpdated(iso) {
+          try {
+            const d = new Date(iso);
+            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const hh = String(d.getHours()).padStart(2, "0");
+            const mm = String(d.getMinutes()).padStart(2, "0");
+            return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${hh}:${mm}`;
+          } catch (e) {
+            return iso;
+          }
+        }
         function dowShort(iso) {
           const d = new Date(
             Date.UTC(
@@ -7393,6 +7441,13 @@
                 <div class="cal-toolbar-left">
                   <span class="cal-market-flag">${escapeHtml(data.flag)}</span>
                   <span>${escapeHtml(data.market)} — Content Calendar</span>
+                  ${data.lastUpdated ? `<span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px;">· Updated ${escapeHtml(formatUpdated(data.lastUpdated))}</span>` : ""}
+                  <span class="cal-zoom-controls" title="Zoom — ⌘/Ctrl-scroll, pinch, or use buttons">
+                    <button class="cal-zoom-btn" type="button" data-cal-zoom="out" aria-label="Zoom out">−</button>
+                    <span class="cal-zoom-readout" id="calZoomReadout">100%</span>
+                    <button class="cal-zoom-btn" type="button" data-cal-zoom="in" aria-label="Zoom in">+</button>
+                    <button class="cal-zoom-btn" type="button" data-cal-zoom="reset" aria-label="Reset zoom" title="Reset">⤢</button>
+                  </span>
                 </div>
                 <div class="cal-legend">
                   <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-lead-up"></span>Lead Up</span>
@@ -7431,6 +7486,149 @@
             calView.style.display = "none";
             calView.innerHTML = "";
             calPicker.style.display = "";
+          });
+
+          // ── Drag-to-pan + pinch / wheel / button zoom ──
+          const scroller = calView.querySelector(".cal-scroll");
+          const grid = scroller.querySelector(".cal-grid");
+          const zoomReadout = document.getElementById("calZoomReadout");
+          const BASE_COL_W = 44;
+          const MIN_COL_W = 18;
+          const MAX_COL_W = 120;
+          let colW = BASE_COL_W;
+
+          function applyZoom(newW, anchorClientX) {
+            const clamped = Math.max(MIN_COL_W, Math.min(MAX_COL_W, newW));
+            if (clamped === colW) return;
+            // Keep the date under the cursor stable while zooming.
+            const rect = scroller.getBoundingClientRect();
+            const anchor = anchorClientX == null
+              ? rect.left + rect.width / 2
+              : anchorClientX;
+            const offsetIn = anchor - rect.left + scroller.scrollLeft;
+            const channelW = parseFloat(
+              getComputedStyle(grid).getPropertyValue("--cal-channel-w")
+            ) || 200;
+            const dayUnderAnchor = (offsetIn - channelW) / colW;
+            colW = clamped;
+            grid.style.setProperty("--cal-col-w", colW + "px");
+            // Resize entry bars (their width is computed in px when rendered).
+            calView.querySelectorAll(".cal-entry").forEach((bar) => {
+              const start = +bar.dataset.calStart;
+              const span = +bar.dataset.calSpan;
+              if (!Number.isFinite(start) || !Number.isFinite(span)) return;
+              bar.style.left = (start * colW) + "px";
+              bar.style.width = (span * colW - 4) + "px";
+            });
+            const newOffsetIn = channelW + dayUnderAnchor * colW;
+            scroller.scrollLeft = newOffsetIn - (anchor - rect.left);
+            zoomReadout.textContent = Math.round((colW / BASE_COL_W) * 100) + "%";
+          }
+
+          // Pre-stamp each entry with its day-offset so applyZoom can resize cleanly.
+          calView.querySelectorAll(".cal-entry").forEach((bar) => {
+            const rowIdx = +bar.dataset.row;
+            const entryIdx = +bar.dataset.entry;
+            const e = data.rows[rowIdx].entries[entryIdx];
+            const start = dayDiff(data.dateStart, e.start);
+            const span = dayDiff(e.start, e.end) + 1;
+            bar.dataset.calStart = start;
+            bar.dataset.calSpan = span;
+          });
+
+          // Drag-to-pan with mouse / pen. Touch pans natively via overflow.
+          let dragging = false;
+          let dragStartX = 0;
+          let dragStartScroll = 0;
+          let dragMoved = false;
+          scroller.addEventListener("pointerdown", (e) => {
+            if (e.pointerType === "touch") return; // let pinch + native pan handle touch
+            if (e.target.closest(".cal-entry")) return; // don't hijack entry clicks
+            dragging = true;
+            dragMoved = false;
+            dragStartX = e.clientX;
+            dragStartScroll = scroller.scrollLeft;
+            scroller.classList.add("cal-dragging");
+            scroller.setPointerCapture(e.pointerId);
+          });
+          scroller.addEventListener("pointermove", (e) => {
+            if (!dragging) return;
+            const dx = e.clientX - dragStartX;
+            if (Math.abs(dx) > 3) dragMoved = true;
+            scroller.scrollLeft = dragStartScroll - dx;
+          });
+          function endDrag(e) {
+            if (!dragging) return;
+            dragging = false;
+            scroller.classList.remove("cal-dragging");
+            try { scroller.releasePointerCapture(e.pointerId); } catch (_) {}
+          }
+          scroller.addEventListener("pointerup", endDrag);
+          scroller.addEventListener("pointercancel", endDrag);
+          // Suppress entry-click after a drag.
+          scroller.addEventListener("click", (e) => {
+            if (dragMoved) {
+              e.stopPropagation();
+              e.preventDefault();
+              dragMoved = false;
+            }
+          }, true);
+
+          // Ctrl/⌘ + wheel = zoom; plain wheel = horizontal scroll.
+          scroller.addEventListener("wheel", (e) => {
+            if (e.ctrlKey || e.metaKey) {
+              e.preventDefault();
+              const factor = Math.exp(-e.deltaY * 0.0035);
+              applyZoom(colW * factor, e.clientX);
+            } else if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+              // shift→horizontal scroll convenience for trackpads/mice without horizontal
+              if (e.shiftKey) {
+                e.preventDefault();
+                scroller.scrollLeft += e.deltaY;
+              }
+            }
+          }, { passive: false });
+
+          // Pinch-zoom (two-finger) on touch.
+          const activePtrs = new Map();
+          let pinchStartDist = 0;
+          let pinchStartColW = colW;
+          scroller.addEventListener("pointerdown", (e) => {
+            if (e.pointerType !== "touch") return;
+            activePtrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            if (activePtrs.size === 2) {
+              const [a, b] = Array.from(activePtrs.values());
+              pinchStartDist = Math.hypot(b.x - a.x, b.y - a.y);
+              pinchStartColW = colW;
+            }
+          });
+          scroller.addEventListener("pointermove", (e) => {
+            if (e.pointerType !== "touch") return;
+            if (!activePtrs.has(e.pointerId)) return;
+            activePtrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            if (activePtrs.size === 2 && pinchStartDist > 0) {
+              const [a, b] = Array.from(activePtrs.values());
+              const dist = Math.hypot(b.x - a.x, b.y - a.y);
+              const anchorX = (a.x + b.x) / 2;
+              applyZoom(pinchStartColW * (dist / pinchStartDist), anchorX);
+            }
+          });
+          function endTouch(e) {
+            if (e.pointerType !== "touch") return;
+            activePtrs.delete(e.pointerId);
+            if (activePtrs.size < 2) pinchStartDist = 0;
+          }
+          scroller.addEventListener("pointerup", endTouch);
+          scroller.addEventListener("pointercancel", endTouch);
+
+          // Zoom buttons.
+          calView.querySelectorAll("[data-cal-zoom]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const action = btn.dataset.calZoom;
+              if (action === "in") applyZoom(colW * 1.25);
+              else if (action === "out") applyZoom(colW * 0.8);
+              else if (action === "reset") applyZoom(BASE_COL_W);
+            });
           });
 
           // Entry detail modal.
