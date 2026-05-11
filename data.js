@@ -2,7 +2,7 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-11T18:00:00.000Z",
+  lastUpdated: "2026-05-11T23:00:00.000Z",
         ticker: [
           "🇺🇸 Pulisic gluteal strain — race vs clock to May 27 USMNT camp open (May 11)",
           "🇺🇸 Cardoso ankle sprain at Atlético — Pochettino's MF depth chart cracks, Aidan Morris (Boro) into the frame (May 11)",
@@ -2944,6 +2944,167 @@ window.DASHBOARD_DATA = {
           },
         ],
         social: [
+          {
+            id: "s120",
+            topic: "👕 Kit Drop Mania — 2026 Jerseys Are Eating TikTok",
+            category: "fashion",
+            volume: "🔥🔥🔥🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "Jersey discourse is the #1 WC2026 content category on TikTok and IG right now — and the volume is bigger than the anthem cycle. Three threads are running: (1) Brazil U-turn after Nike's red Jordan home-kit leak got fan-revolted into a yellow restoration; (2) Portugal's 'Black Panther' all-black away kit as a Eusébio tribute eating Lisbon FYPs; (3) PUMA's underdog narrative (Czechia, Switzerland, Serbia kits) earning a 'PUMA cooked' meta-take. USMNT home/away leaks are now everywhere too. Brand opportunity: every team has a 5–10 day window of pure kit FOMO before the next federation drops 👕",
+            sampleQuote:
+              '"I will buy a Portugal away shirt and I am not even Portuguese. The black is THAT serious."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "Side-by-side: Nike\'s red Brazil leak vs the actual yellow they shipped. The fans WON for once 🇧🇷",
+              },
+              {
+                platform: "X",
+                text: "Brazil yellow restoration is the most important fan victory in jersey history. Pin this.",
+              },
+              {
+                platform: "IG",
+                text: "Portugal Black Panther kit campaign shot in front of a Eusébio mural? Genuinely chef\'s kiss.",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccerjerseys top all-time week: PUMA Switzerland is the sleeper of the tournament, debate me",
+              },
+            ],
+            platforms: ["TikTok", "X", "IG", "Reddit"],
+            sourceUrl:
+              "https://www.espn.com/soccer/story/_/id/48352807/world-cup-2026-kit-ranking-canada-mexico-united-states-argentina-australia-brazil-england-france-germany-portugal-spain",
+            timestamp: "2026-05-11T20:00:00Z",
+          },
+          {
+            id: "s121",
+            topic: "🐐 'Messi's Last Dance' — Argentina vs Zambia Becomes Cry Night",
+            category: "fandom",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Argentina vs Zambia tonight is Messi's farewell to home fans before the WC, and the build-up is fully nostalgia-coded. Every Argentine creator is running 'Last Dance' edits, El Monumental crowd panoramas, and 'three goals to break Klose' countdown content. r/soccer megathread already 12k upvotes pre-kickoff. Diaspora plus Latin Twitter is fully unified — even MLS-leaning USMNT accounts are RT'ing. Brand opportunity: GOAT-coded creative without naming a competitor brand is open territory until the AFA's commercial partners lock it. The 'sixth World Cup' narrative is huge with parents-and-kids reach 🐐",
+            sampleQuote:
+              '"Whatever happens at the actual tournament, tonight is the lap of honour we owe him."',
+            quotes: [
+              {
+                platform: "X",
+                text: "Messi on his sixth World Cup. Read that again and try not to feel small.",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: you are in El Monumental tonight and Messi waves at the crowd. We are NOT okay 😭",
+              },
+              {
+                platform: "Reddit",
+                text: "r/soccer farewell-megathread is the rare wholesome top thread — even the Brazil fans are showing up clean",
+              },
+              {
+                platform: "IG",
+                text: "Argentina federation's 'Gracias Capitán' carousel hit 4M likes in 90 mins. The wave is huge.",
+              },
+            ],
+            platforms: ["X", "TikTok", "Reddit", "IG"],
+            sourceUrl:
+              "https://www.goal.com/en/lists/argentina-plan-fitting-finale-to-lionel-messi-s-world-cup-story-as-nicolas-tagliafico-targets-another-title-for-the-goat/bltdb838f831ef5cd08",
+            timestamp: "2026-05-11T19:00:00Z",
+          },
+          {
+            id: "s122",
+            topic: "📋 May 11 = Squad Drop Day — Federations Light Up the Timeline",
+            category: "fandom",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "All 48 nations had to submit their preliminary 35–55 player lists today, and federations are racing each other to drop the visual reveal — France, Spain, Mexico, Brazil, Nigeria already out at the time of writing, USA / England / Germany holding for their later announcement dates. Per-team subreddits and X spaces are running parallel 'reaction live streams'. 'Locked / Bubble / Cooked' tier-list format is the dominant creative on TikTok. This is one of those cultural-calendar days where reactive content beats prepared content — fast bubble reactions outperform polished edits 📋",
+            sampleQuote:
+              '"Federation X just dropped their 55 and Twitter became a giant group chat for 90 mins. Beautiful."',
+            quotes: [
+              {
+                platform: "Reddit",
+                text: "r/soccer megathread #4 of the day already at 8k upvotes. We are tracking 48 simultaneous federation news cycles.",
+              },
+              {
+                platform: "X",
+                text: "France's preliminary 55 dropped with cinematic 16x9 reveal video. EVERY other federation is suddenly upping production.",
+              },
+              {
+                platform: "TikTok",
+                text: "Lock / Bubble / Cooked tier list trend has officially scaled past 50k uses today alone 📊",
+              },
+              {
+                platform: "IG",
+                text: "AFA dropping Messi's name FIRST in the reveal carousel is the single most-watched IG post of the day",
+              },
+            ],
+            platforms: ["Reddit", "X", "TikTok", "IG"],
+            sourceUrl:
+              "https://www.aljazeera.com/sports/2026/5/8/world-cup-2026-squad-deadlines-key-dates-team-lists-final-announcements",
+            timestamp: "2026-05-11T18:00:00Z",
+          },
+          {
+            id: "s123",
+            topic: "⚽ 'It's Called Soccer' Discourse Reboots — But With a 2026 Twist",
+            category: "memes",
+            volume: "🔥🔥🔥",
+            sentiment: "mixed",
+            summary:
+              "The eternal soccer-vs-football discourse hit a new gear this week as the tournament approaches: Brits dunking on 'Mexico hosting the opener at Estadio Azteca' while calling it 'soccer'; Americans hitting back with 'we invented the modern naming AND we're hosting 78 of the 104 matches'; Mexico Twitter dropping 'fútbol' as the actual neutral term. The Dimers piece making the rounds traces the etymology back to 1880s Oxford English. For brand creative: it's a culture-war the host nations can lean into playfully, not a third rail — anti-US framing falls flat with the 60% of fans who'll be watching in NA timezones ⚽",
+            sampleQuote:
+              '"Half the world calls it soccer, half calls it football. Both halves are coming to North America. Cope."',
+            quotes: [
+              {
+                platform: "X",
+                text: "British soccer-vs-football discourse hitting fever pitch 31 days from the US hosting 78 matches is sending me 🤝",
+              },
+              {
+                platform: "Reddit",
+                text: "r/AskHistorians 'soccer' etymology thread is the rare megathread that actually has answers 📚",
+              },
+              {
+                platform: "TikTok",
+                text: "POV: a Brit, an American, and a Mexican have to call the same game three different names for an hour 🎙️",
+              },
+            ],
+            platforms: ["X", "Reddit", "TikTok"],
+            sourceUrl:
+              "https://www.dimers.com/news/world-cup-2026-why-its-called-soccer-is-more-than-just-a-meme",
+            timestamp: "2026-05-11T17:00:00Z",
+          },
+          {
+            id: "s124",
+            topic: "🎟️ Fan Fest Reveal Wave — Centennial Park Hits 30, Lemon Hill Goes Concert-Mode",
+            category: "fandom",
+            volume: "🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "Programming details for the 16 official FIFA Fan Festivals dropped this week and the response is the most positive thing happening in the WC2026 cycle right now: Atlanta's Centennial Olympic Park doing a 1996-Olympics 30-year anniversary tie-in; Philadelphia's Lemon Hill running all 39 tournament days with ticketed concerts on non-match days; KC's National WWI Museum running the Fan Fest as 'the region's largest free summer festival'; Vancouver building a brand-new 10k-cap amphitheatre at PNE. Free + family-friendly is the headline angle — a deliberate counter to the ticket-price discourse. Strong window for 'where will you watch' creative across all markets 🎉",
+            sampleQuote:
+              '"Free concerts every non-match day at Lemon Hill for 39 days. THIS is the WC2026 experience I was promised."',
+            quotes: [
+              {
+                platform: "TikTok",
+                text: "Atlanta tying Fan Fest to the Centennial Park 30-year anniversary is BRILLIANT placemaking",
+              },
+              {
+                platform: "Reddit",
+                text: "r/Philadelphia megathread: 'Lemon Hill for 39 days will be the best summer Philly has had since the 76ers playoffs'",
+              },
+              {
+                platform: "X",
+                text: "Free + family is finally beating $1000-seat discourse in the WC2026 algorithm. Fan Fest content is winning.",
+              },
+              {
+                platform: "IG",
+                text: "Vancouver's Hastings Park amphitheatre construction time-lapse already 600k views. Mountains-as-backdrop is undefeated.",
+              },
+            ],
+            platforms: ["TikTok", "Reddit", "X", "IG"],
+            sourceUrl:
+              "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/fifa-fan-festival",
+            timestamp: "2026-05-11T16:30:00Z",
+          },
           {
             id: "s115",
             topic: "🩼 'Pulisic Bubble Watch' Hits r/USMNT Panic Levels",
