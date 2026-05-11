@@ -2437,6 +2437,327 @@
           padding: 10px 12px;
         }
       }
+
+      /* ─────── CONTENT CALENDAR ─────── */
+      .cal-market-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .cal-market-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 22px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-family: inherit;
+      }
+      .cal-market-card:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.18);
+        transform: translateY(-2px);
+      }
+      .cal-market-card:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .cal-market-flag {
+        font-size: 32px;
+        line-height: 1;
+      }
+      .cal-market-name {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .cal-market-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .cal-market-sub.cal-soon {
+        color: #d4a85a;
+      }
+
+      /* Calendar grid wrapper */
+      .cal-wrap {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 14px;
+        overflow: hidden;
+      }
+      .cal-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .cal-toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .cal-toolbar-left .cal-market-flag {
+        font-size: 22px;
+      }
+      .cal-back-btn {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .cal-back-btn:hover {
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      .cal-legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .cal-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .cal-legend-swatch {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+      }
+
+      /* Phase color palette — matches the PDF banding */
+      .cal-phase-lead-up   { background: #f9c5c1; color: #4d1a16; }
+      .cal-phase-group     { background: #f6a96b; color: #3d1c00; }
+      .cal-phase-r32       { background: #c8e6e8; color: #0d4044; }
+      .cal-phase-r16       { background: #9ed4d8; color: #082f33; }
+      .cal-phase-rest      { background: #d4d4d8; color: #1f1f23; }
+      .cal-phase-qf        { background: #7cc2c8; color: #062528; }
+      .cal-phase-sf        { background: #5eaeb5; color: #051f22; }
+      .cal-phase-final     { background: #fcd34d; color: #422a00; }
+
+      /* Scrollable grid */
+      .cal-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-radius: 10px;
+      }
+      .cal-grid {
+        --cal-col-w: 44px;
+        --cal-row-h: 38px;
+        --cal-channel-w: 200px;
+        display: grid;
+        grid-template-columns: var(--cal-channel-w) repeat(46, var(--cal-col-w));
+        position: relative;
+      }
+      .cal-cell {
+        border-right: 1px solid rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        height: var(--cal-row-h);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+      }
+      .cal-channel-cell {
+        background: rgba(0, 0, 0, 0.25);
+        font-weight: 600;
+        font-size: 12px;
+        padding: 0 12px;
+        justify-content: flex-start;
+        position: sticky;
+        left: 0;
+        z-index: 3;
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .cal-channel-cell.cal-channel-head {
+        background: rgba(0, 0, 0, 0.4);
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        height: auto;
+        padding: 8px 12px;
+      }
+      .cal-phase-row .cal-cell {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        height: 28px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .cal-date-row .cal-cell {
+        height: 36px;
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text-muted);
+        font-size: 10px;
+        flex-direction: column;
+        gap: 1px;
+        line-height: 1.05;
+      }
+      .cal-date-row .cal-date-dow {
+        opacity: 0.6;
+        font-size: 9px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .cal-date-row .cal-cell.cal-weekend {
+        color: #b3b3b3;
+        background: rgba(0, 0, 0, 0.28);
+      }
+      .cal-row-track {
+        position: relative;
+        grid-column: 2 / -1;
+        height: var(--cal-row-h);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        background-image: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px
+        );
+        background-size: var(--cal-col-w) 100%;
+      }
+
+      /* Entry bars */
+      .cal-entry {
+        position: absolute;
+        top: 4px;
+        bottom: 4px;
+        border-radius: 6px;
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        font-size: 11px;
+        line-height: 1.2;
+        font-weight: 600;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      .cal-entry:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+        z-index: 5;
+      }
+      .cal-entry.cal-tbd { opacity: 0.78; }
+      .cal-entry.cal-tbd::after {
+        content: " — TBD";
+        font-weight: 500;
+        opacity: 0.75;
+        margin-left: 4px;
+      }
+
+      /* Entry color by phase (mirrors banding) */
+      .cal-entry-lead-up { background: #f9c5c1; color: #3d1410; }
+      .cal-entry-group   { background: #f6a96b; color: #321600; }
+      .cal-entry-r32     { background: #c8e6e8; color: #082f33; }
+      .cal-entry-r16     { background: #9ed4d8; color: #062528; }
+      .cal-entry-qf      { background: #7cc2c8; color: #052022; }
+      .cal-entry-sf      { background: #5eaeb5; color: #04181b; }
+      .cal-entry-final   { background: #fcd34d; color: #3a2400; }
+      .cal-entry-rest    { background: #d4d4d8; color: #1f1f23; }
+
+      .cal-entry-prompt {
+        font-weight: 400;
+        opacity: 0.85;
+        margin-left: 6px;
+      }
+
+      /* Detail tooltip / modal */
+      .cal-detail {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
+      .cal-detail.shown { display: flex; }
+      .cal-detail-box {
+        background: rgba(20, 22, 28, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px;
+        padding: 22px 24px;
+        max-width: 520px;
+        width: calc(100% - 32px);
+        color: var(--text);
+      }
+      .cal-detail-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .cal-detail-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .cal-detail-prompt {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        margin-bottom: 14px;
+        white-space: pre-wrap;
+      }
+      .cal-detail-meta {
+        display: flex;
+        gap: 14px;
+        font-size: 12px;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .cal-detail-note {
+        font-size: 12px;
+        color: var(--text-muted);
+        border-left: 2px solid #d4a85a;
+        padding-left: 10px;
+        margin-bottom: 14px;
+      }
+      .cal-detail-close {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+      }
+      .cal-detail-close:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
     </style>
     <script>
       (function () {
@@ -2603,6 +2924,9 @@
           </button>
           <button class="tab-btn" type="button" data-mfg-tab="audit">
             📋 Audit Log
+          </button>
+          <button class="tab-btn" type="button" data-mfg-tab="calendar">
+            📅 Content Calendar
           </button>
         </nav>
 
@@ -3467,6 +3791,78 @@
               <div class="audit-empty">Loading…</div>
             </div>
           </div>
+        </div>
+
+        <!-- ─────── CONTENT CALENDAR PANEL ─────── -->
+        <div class="tab-panel" id="panel-calendar">
+          <div class="section-title">📅 Content Calendar</div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            Per-market production calendar — Social, Reactive, and Digital OOH
+            slots across Lead Up → Group Stage → Knockouts → Final. Pick a market
+            to load.
+          </p>
+
+          <!-- Step 1: market picker -->
+          <div class="form-card glass" id="calendarPicker">
+            <div
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-muted);
+                margin-bottom: 10px;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+              "
+            >
+              Select market
+            </div>
+            <div class="cal-market-grid">
+              <button class="cal-market-card" type="button" data-cal-market="ca">
+                <span class="cal-market-flag">🇨🇦</span>
+                <span class="cal-market-name">Canada</span>
+                <span class="cal-market-sub">Lead Up → Final</span>
+              </button>
+              <button
+                class="cal-market-card"
+                type="button"
+                data-cal-market="usa"
+                disabled
+              >
+                <span class="cal-market-flag">🇺🇸</span>
+                <span class="cal-market-name">USA</span>
+                <span class="cal-market-sub cal-soon">Soon</span>
+              </button>
+              <button
+                class="cal-market-card"
+                type="button"
+                data-cal-market="uk"
+                disabled
+              >
+                <span class="cal-market-flag">🦁</span>
+                <span class="cal-market-name">UK</span>
+                <span class="cal-market-sub cal-soon">Soon</span>
+              </button>
+              <button
+                class="cal-market-card"
+                type="button"
+                data-cal-market="de"
+                disabled
+              >
+                <span class="cal-market-flag">🇩🇪</span>
+                <span class="cal-market-name">Germany</span>
+                <span class="cal-market-sub cal-soon">Soon</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: rendered calendar (populated by JS) -->
+          <div id="calendarView" style="display: none"></div>
         </div>
       </main>
     </div>
@@ -5742,6 +6138,7 @@
           reactive: "panel-reactive",
           creative: "panel-creative",
           audit: "panel-audit",
+          calendar: "panel-calendar",
         };
         function activateTab(name) {
           if (!TAB_TO_PANEL[name]) name = "triage";
@@ -5762,6 +6159,9 @@
           }
           if (name === "audit" && typeof loadAuditLog === "function") {
             loadAuditLog();
+          }
+          if (name === "calendar" && typeof initCalendarTab === "function") {
+            initCalendarTab();
           }
         }
         // Expose for buttons inside other panels (e.g. an "Open Audit Log"
@@ -6860,8 +7260,214 @@
         if (auditRefresh) {
           auditRefresh.addEventListener("click", loadAuditLogImpl);
         }
+
+        // ── Content Calendar ──
+        const calPicker = document.getElementById("calendarPicker");
+        const calView = document.getElementById("calendarView");
+        let calInited = false;
+
+        function initCalendarTab() {
+          if (calInited) return;
+          calInited = true;
+          if (!calPicker) return;
+          calPicker.addEventListener("click", function (e) {
+            const btn = e.target.closest("[data-cal-market]");
+            if (!btn || btn.disabled) return;
+            const key = btn.dataset.calMarket;
+            const data = (window.CALENDAR_DATA || {})[key];
+            if (!data) return;
+            renderCalendar(data);
+          });
+        }
+        window.initCalendarTab = initCalendarTab;
+
+        function dayDiff(a, b) {
+          // Whole-day diff, ignoring DST drift (UTC math).
+          const da = Date.UTC(
+            +a.slice(0, 4),
+            +a.slice(5, 7) - 1,
+            +a.slice(8, 10)
+          );
+          const db = Date.UTC(
+            +b.slice(0, 4),
+            +b.slice(5, 7) - 1,
+            +b.slice(8, 10)
+          );
+          return Math.round((db - da) / 86400000);
+        }
+        function addDays(iso, n) {
+          const d = new Date(
+            Date.UTC(
+              +iso.slice(0, 4),
+              +iso.slice(5, 7) - 1,
+              +iso.slice(8, 10)
+            )
+          );
+          d.setUTCDate(d.getUTCDate() + n);
+          return d.toISOString().slice(0, 10);
+        }
+        function fmtShort(iso) {
+          const d = new Date(
+            Date.UTC(
+              +iso.slice(0, 4),
+              +iso.slice(5, 7) - 1,
+              +iso.slice(8, 10)
+            )
+          );
+          const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          return d.getUTCDate() + " " + months[d.getUTCMonth()];
+        }
+        function dowShort(iso) {
+          const d = new Date(
+            Date.UTC(
+              +iso.slice(0, 4),
+              +iso.slice(5, 7) - 1,
+              +iso.slice(8, 10)
+            )
+          );
+          return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getUTCDay()];
+        }
+        function escapeHtml(s) {
+          return String(s == null ? "" : s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function renderCalendar(data) {
+          const totalDays = dayDiff(data.dateStart, data.dateEnd) + 1;
+          const dates = [];
+          for (let i = 0; i < totalDays; i++) {
+            dates.push(addDays(data.dateStart, i));
+          }
+
+          // Phase header — one cell per phase, spanning its days.
+          const phaseHeader = data.phases
+            .map((p) => {
+              const span = dayDiff(p.start, p.end) + 1;
+              const startCol = dayDiff(data.dateStart, p.start) + 2; // +1 for channel col, +1 because grid is 1-indexed
+              return `<div class="cal-cell cal-phase-${p.key}" style="grid-column: ${startCol} / span ${span};">${escapeHtml(p.name)}</div>`;
+            })
+            .join("");
+
+          // Date columns.
+          const dateHeader = dates
+            .map((iso) => {
+              const dow = dowShort(iso);
+              const isWeekend = dow === "Sat" || dow === "Sun";
+              return `<div class="cal-cell ${isWeekend ? "cal-weekend" : ""}"><span class="cal-date-dow">${dow}</span>${fmtShort(iso)}</div>`;
+            })
+            .join("");
+
+          // Channel rows.
+          const rowsHtml = data.rows
+            .map((row, rowIdx) => {
+              const rowStartGridCol = 1;
+              const channelCell = `<div class="cal-cell cal-channel-cell">${escapeHtml(row.channel)}</div>`;
+              const entryBars = row.entries
+                .map((e, entryIdx) => {
+                  const startOffset = dayDiff(data.dateStart, e.start);
+                  const span = dayDiff(e.start, e.end) + 1;
+                  const left = `calc(${startOffset} * var(--cal-col-w))`;
+                  const width = `calc(${span} * var(--cal-col-w) - 4px)`;
+                  const phaseClass = `cal-entry-${e.phase || "group"}`;
+                  const tbdClass = e.tbd ? "cal-tbd" : "";
+                  const prompt = e.tbd ? "" : `<span class="cal-entry-prompt">— ${escapeHtml(e.prompt)}</span>`;
+                  return `<div class="cal-entry ${phaseClass} ${tbdClass}"
+                          style="left:${left}; width:${width};"
+                          data-row="${rowIdx}" data-entry="${entryIdx}"
+                          title="${escapeHtml(e.label)} — ${escapeHtml(e.prompt)}">
+                    ${escapeHtml(e.label)}${prompt}
+                  </div>`;
+                })
+                .join("");
+              return `${channelCell}<div class="cal-row-track">${entryBars}</div>`;
+            })
+            .join("");
+
+          const html = `
+            <div class="cal-wrap">
+              <div class="cal-toolbar">
+                <div class="cal-toolbar-left">
+                  <span class="cal-market-flag">${escapeHtml(data.flag)}</span>
+                  <span>${escapeHtml(data.market)} — Content Calendar</span>
+                </div>
+                <div class="cal-legend">
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-lead-up"></span>Lead Up</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-group"></span>Group Stage</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-r32"></span>R32</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-r16"></span>R16</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-qf"></span>QF</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-sf"></span>SF</span>
+                  <span class="cal-legend-item"><span class="cal-legend-swatch cal-phase-final"></span>Final</span>
+                </div>
+                <button class="cal-back-btn" type="button" id="calBackBtn">← Change market</button>
+              </div>
+              <div class="cal-scroll">
+                <div class="cal-grid" style="grid-template-columns: var(--cal-channel-w) repeat(${totalDays}, var(--cal-col-w));">
+                  <!-- Phase row -->
+                  <div class="cal-cell cal-channel-cell cal-channel-head" style="grid-column: 1; grid-row: 1;">Phase</div>
+                  <div class="cal-phase-row" style="display: contents;">${phaseHeader}</div>
+                  <!-- Date row -->
+                  <div class="cal-cell cal-channel-cell cal-channel-head" style="grid-column: 1;">Date</div>
+                  <div class="cal-date-row" style="display: contents;">${dateHeader}</div>
+                  <!-- Channel rows -->
+                  ${rowsHtml}
+                </div>
+              </div>
+            </div>
+            <div class="cal-detail" id="calDetail">
+              <div class="cal-detail-box"></div>
+            </div>
+          `;
+          calView.innerHTML = html;
+          calView.style.display = "block";
+          calPicker.style.display = "none";
+
+          // Back button.
+          document.getElementById("calBackBtn").addEventListener("click", () => {
+            calView.style.display = "none";
+            calView.innerHTML = "";
+            calPicker.style.display = "";
+          });
+
+          // Entry detail modal.
+          const detail = document.getElementById("calDetail");
+          const detailBox = detail.querySelector(".cal-detail-box");
+          calView.addEventListener("click", (e) => {
+            const bar = e.target.closest(".cal-entry");
+            if (!bar) return;
+            const row = data.rows[+bar.dataset.row];
+            const entry = row.entries[+bar.dataset.entry];
+            const noteHtml = entry.note
+              ? `<div class="cal-detail-note">${escapeHtml(entry.note)}</div>`
+              : "";
+            detailBox.innerHTML = `
+              <div class="cal-detail-label">${escapeHtml(row.channel)}</div>
+              <div class="cal-detail-title">${escapeHtml(entry.label)}</div>
+              <div class="cal-detail-prompt">${escapeHtml(entry.prompt)}</div>
+              <div class="cal-detail-meta">
+                <span>📅 ${fmtShort(entry.start)} → ${fmtShort(entry.end)}</span>
+                <span>${escapeHtml(entry.phase || "")}</span>
+                ${entry.tbd ? "<span>· status: TBD</span>" : ""}
+              </div>
+              ${noteHtml}
+              <button class="cal-detail-close" type="button">Close</button>
+            `;
+            detail.classList.add("shown");
+            detailBox.querySelector(".cal-detail-close").addEventListener("click", () => {
+              detail.classList.remove("shown");
+            });
+          });
+          detail.addEventListener("click", (e) => {
+            if (e.target === detail) detail.classList.remove("shown");
+          });
+        }
       })();
     </script>
+    <script src="calendar-data.js"></script>
     <script src="countdown.js" defer></script>
     <script src="gemini-assistant.js" defer></script>
   </body>
