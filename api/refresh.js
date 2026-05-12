@@ -29,12 +29,30 @@ function buildPrompt() {
     "(June 11 – July 19, 2026; hosts Canada / Mexico / USA).",
     "Today is " + niceDate + " (" + isoDate + ").",
     "",
-    "Use Google Search to find the latest WC2026 stories from the LAST 24–48 HOURS.",
-    "Cover BOTH on-pitch news (squads, injuries, friendlies, manager moves) AND",
-    "off-pitch culture / business (tickets, fan-fest news, sponsor activations,",
-    "music / anthem / opening ceremony, kits, broadcast deals, visa & travel).",
-    "Where Google has indexed Reddit threads, X posts, or TikTok chatter, surface",
-    "what fans are saying — that goes in the social[] array.",
+    "Use Google Search aggressively. Run AT LEAST 12 distinct search queries",
+    "before drafting your output. Mix categories — do not over-index on one.",
+    "Cover ALL of these angles with at least one query each:",
+    "  1.  Squad / preliminary list announcements (USA, Canada, England, Germany,",
+    "      Argentina, Brazil, France, Spain, Portugal, Netherlands, Mexico, etc.)",
+    "  2.  Player injuries and recovery timelines (last 48h)",
+    "  3.  Friendly results + tactical takeaways from May 2026 friendlies",
+    "  4.  Ticket pricing, resale market, FIFA pricing controversy",
+    "  5.  Host-city updates: Fan Festivals, fan-zone tickets (Toronto, Vancouver,",
+    "      LA, NY, Atlanta, Philly, Dallas, Houston, KC, Miami, CDMX, GDL, MTY)",
+    "  6.  Music / anthem / opening + halftime ceremony lineups",
+    "  7.  Kits, sponsor activations, brand campaigns (PUMA, Nike, adidas, Coke,",
+    "      Visa, McDonald's, Michelob, Hisense, BYD, Mondelez)",
+    "  8.  Broadcast / streaming deals (Fox, Telemundo, Peacock, ITV, BBC, CCTV)",
+    "  9.  Visa & travel friction (US travel ban, $15K bond, Iran, Mexico cartel)",
+    "  10. Reddit / X / TikTok chatter (search 'site:reddit.com r/soccer WC2026',",
+    "      'site:reddit.com r/worldcup', 'site:reddit.com r/USMNT',",
+    "      'site:reddit.com r/MLS', 'site:reddit.com r/3lions',",
+    "      'site:reddit.com r/MexicoSoccer', 'site:reddit.com r/Canada')",
+    "  11. Memes, fan culture, Panini stickers, fashion / kit drops",
+    "  12. Politics / regulatory / Congress coverage of the tournament",
+    "",
+    "Prioritise stories from the LAST 24–48 HOURS. If a result is older than",
+    "72 hours, skip it unless it just had a major update today.",
     "",
     "Return ONLY a single JSON object (no prose, no markdown, no code fences)",
     "matching this exact schema:",
@@ -66,9 +84,10 @@ function buildPrompt() {
     "  ]",
     "}",
     "",
-    "Counts: 6–10 news, 3–6 social, 6–10 ticker. Skip generic / stale items.",
+    "Counts: 12–18 news, 6–10 social, 10–15 ticker. Skip generic / stale items.",
     "Every news item MUST have a working URL. Every social item MUST have a",
     "non-empty platforms array. Do not invent quotes; only use ones Google found.",
+    "Spread `tag` across all six values — do not let any one market dominate.",
   ].join("\n");
 }
 
@@ -113,8 +132,8 @@ module.exports = async function handler(req, res) {
     contents: [{ role: "user", parts: [{ text: buildPrompt() }] }],
     tools: [{ google_search: {} }],
     generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 8192,
+      temperature: 0.5,
+      maxOutputTokens: 24576,
     },
   };
 
@@ -158,12 +177,29 @@ module.exports = async function handler(req, res) {
       (data.candidates && data.candidates[0] &&
         data.candidates[0].groundingMetadata) || null;
 
+    // Flatten groundingChunks into a UI-friendly array of { uri, title, domain }.
+    const chunks = (groundingMeta && groundingMeta.groundingChunks) || [];
+    const sources = chunks
+      .map((c) => {
+        const w = c && c.web;
+        if (!w || !w.uri) return null;
+        let domain = "";
+        try {
+          domain = new URL(w.uri).hostname.replace(/^www\./, "");
+        } catch (e) {}
+        return { uri: w.uri, title: w.title || "", domain: domain };
+      })
+      .filter(Boolean);
+
+    const queries =
+      (groundingMeta && groundingMeta.webSearchQueries) || [];
+
     return res.status(200).json({
       ok: true,
       payload: payload,
-      groundingChunks: groundingMeta && groundingMeta.groundingChunks
-        ? groundingMeta.groundingChunks.length
-        : 0,
+      sources: sources,
+      queries: queries,
+      sourceCount: sources.length,
     });
   } catch (e) {
     console.error("refresh exception", e);

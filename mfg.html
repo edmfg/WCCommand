@@ -408,16 +408,7 @@
         border-color: var(--red);
       }
 
-      /* Refresh-content button — gold/Gemini accent so it reads as action, not tab */
-      .refresh-content-btn {
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(155, 92, 255, 0.18));
-        border-color: rgba(255, 215, 0, 0.55);
-        color: var(--gold);
-      }
-      .refresh-content-btn:hover {
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.32), rgba(155, 92, 255, 0.32));
-        color: #fff;
-      }
+      /* Refresh-content button — matches default tab styling; spin only while busy */
       .refresh-content-btn.is-busy {
         pointer-events: none;
         opacity: 0.85;
@@ -567,6 +558,61 @@
         transition: width 0.5s ease;
         border-radius: 999px;
       }
+      /* Live activity feed — what Gemini is searching / finding / publishing */
+      .refresh-feed {
+        height: 168px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin-bottom: 14px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.55;
+        color: var(--text-muted);
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 215, 0, 0.4) transparent;
+      }
+      .refresh-feed::-webkit-scrollbar {
+        width: 6px;
+      }
+      .refresh-feed::-webkit-scrollbar-thumb {
+        background: rgba(255, 215, 0, 0.4);
+        border-radius: 3px;
+      }
+      .refresh-feed-line {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        animation: feed-in 0.25s ease-out;
+      }
+      .refresh-feed-line + .refresh-feed-line {
+        margin-top: 4px;
+      }
+      .refresh-feed-line .icon {
+        flex-shrink: 0;
+        width: 16px;
+        text-align: center;
+      }
+      .refresh-feed-line.search { color: #c2cbe0; }
+      .refresh-feed-line.source { color: #9bcbff; }
+      .refresh-feed-line.social { color: #c8a3ff; }
+      .refresh-feed-line.publish { color: #79e9b0; }
+      .refresh-feed-line.warn { color: #ffb86b; }
+      .refresh-feed-line .domain {
+        color: var(--gold);
+        margin-right: 6px;
+      }
+      .refresh-feed-line .text {
+        word-break: break-word;
+        flex: 1 1 auto;
+      }
+      @keyframes feed-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
       .refresh-result {
         font-size: 13px;
         color: var(--text);
@@ -3369,6 +3415,7 @@
           </li>
         </ul>
         <div class="refresh-progress"><div class="refresh-progress-bar" id="refreshBar"></div></div>
+        <div class="refresh-feed" id="refreshFeed" aria-live="polite"></div>
         <div class="refresh-result" id="refreshResult"></div>
         <div class="refresh-actions">
           <button type="button" id="refreshCancel">Cancel</button>
@@ -7155,9 +7202,77 @@
         const stepsEl = document.getElementById("refreshSteps");
         const barEl = document.getElementById("refreshBar");
         const resultEl = document.getElementById("refreshResult");
+        const feedEl = document.getElementById("refreshFeed");
         const cancelBtn = document.getElementById("refreshCancel");
         const closeBtn = document.getElementById("refreshClose");
         const subEl = document.getElementById("refreshSub");
+
+        // ── Live activity feed ────────────────────────────────────────────
+        function feedLog(kind, html) {
+          if (!feedEl) return;
+          const line = document.createElement("div");
+          line.className = "refresh-feed-line " + (kind || "");
+          let icon = "›";
+          if (kind === "search") icon = "🔍";
+          else if (kind === "source") icon = "🌐";
+          else if (kind === "social") icon = "💬";
+          else if (kind === "publish") icon = "✓";
+          else if (kind === "warn") icon = "⚠";
+          line.innerHTML =
+            '<span class="icon">' + icon + '</span><span class="text">' + html + "</span>";
+          feedEl.appendChild(line);
+          feedEl.scrollTop = feedEl.scrollHeight;
+        }
+        function feedClear() {
+          if (feedEl) feedEl.innerHTML = "";
+        }
+
+        // The queries below mirror what the prompt instructs Gemini to run.
+        // Shown live during the wait so the user sees activity even though
+        // the server response is a single (~15–30s) blob.
+        const SIM_QUERIES = [
+          "WC2026 squad announcements last 48h",
+          "USMNT preliminary 55-man roster May 2026",
+          "England Tuchel 26-man reveal May 22",
+          "Argentina Scaloni 55-man list Messi Dybala",
+          "Brazil Ancelotti 55 Neymar Estêvão",
+          "Germany Nagelsmann squad delay",
+          "Canada Marsch World Cup roster",
+          "World Cup 2026 ticket pricing FIFA backlash",
+          "site:reddit.com r/soccer WC2026",
+          "site:reddit.com r/worldcup ticket prices",
+          "site:reddit.com r/USMNT injury news",
+          "site:reddit.com r/3lions Tuchel squad",
+          "FIFA 2026 opening ceremony lineup CDMX LA Toronto",
+          "Shakira Burna Boy Dai Dai anthem",
+          "Coldplay World Cup Final halftime",
+          "host city fan festival tickets Toronto Vancouver",
+          "PUMA Nike adidas WC2026 kit reveal",
+          "Mexico Aguirre squad Liga MX",
+          "FIFA broadcast deal CCTV India",
+          "WC2026 visa travel ban Iran",
+          "Panini WC2026 stickers viral",
+          "WC2026 Fan Festival Dallas Houston KC Atlanta",
+          "Pulisic Cardoso injury USMNT update",
+          "Alphonso Davies Bayern Canada fitness",
+        ];
+        let _simTimer = null;
+        let _simIdx = 0;
+        function startSimulatedQueries() {
+          _simIdx = 0;
+          // Shuffle so each refresh feels different.
+          const list = SIM_QUERIES.slice().sort(() => Math.random() - 0.5);
+          function tick() {
+            if (_simIdx >= list.length) return;
+            feedLog("search", "Searching: <em>" + list[_simIdx] + "</em>");
+            _simIdx++;
+          }
+          tick();
+          _simTimer = setInterval(tick, 700);
+        }
+        function stopSimulatedQueries() {
+          if (_simTimer) { clearInterval(_simTimer); _simTimer = null; }
+        }
 
         const STEP_ORDER = ["search-news", "search-social", "structure", "publish"];
         const STEP_PROGRESS = { "search-news": 25, "search-social": 50, structure: 80, publish: 100 };
@@ -7216,6 +7331,7 @@
           resultEl.style.display = "none";
           resultEl.classList.remove("error");
           resultEl.textContent = "";
+          feedClear();
           subEl.textContent =
             "Gemini is scanning the web and social chatter for the latest WC2026 stories.";
           cancelBtn.textContent = "Cancel";
@@ -7228,6 +7344,7 @@
         }
         function closeOverlay() {
           overlay.classList.remove("open");
+          stopSimulatedQueries();
           if (_abort) { try { _abort.abort(); } catch (e) {} _abort = null; }
           _busy = false;
           btn.classList.remove("is-busy");
@@ -7301,7 +7418,9 @@
 
           try {
             markActive("search-news");
-            await new Promise((r) => setTimeout(r, 400));
+            feedLog("", "Asking Gemini to run 12+ Google Search queries…");
+            startSimulatedQueries();
+            await new Promise((r) => setTimeout(r, 600));
             markActive("search-social");
 
             const resp = await fetch("/api/refresh", {
@@ -7310,6 +7429,7 @@
               signal: _abort.signal,
               body: JSON.stringify({}),
             });
+            stopSimulatedQueries();
             if (!resp.ok) {
               const txt = await resp.text().catch(() => "");
               throw new Error("Server " + resp.status + ": " + txt.slice(0, 200));
@@ -7317,7 +7437,32 @@
             const data = await resp.json();
             if (!data || !data.payload) throw new Error("Empty Gemini response");
 
+            // Reveal actual Google Search queries Gemini ran, then the sources.
+            const realQueries = Array.isArray(data.queries) ? data.queries : [];
+            if (realQueries.length) {
+              feedLog("", "Gemini ran " + realQueries.length + " live Google Search queries:");
+              for (let i = 0; i < realQueries.length && i < 25; i++) {
+                feedLog("search", "<em>" + realQueries[i] + "</em>");
+                await new Promise((r) => setTimeout(r, 60));
+              }
+            }
+            const sources = Array.isArray(data.sources) ? data.sources : [];
+            if (sources.length) {
+              feedLog("", "Pulled " + sources.length + " source pages:");
+              for (let i = 0; i < sources.length && i < 40; i++) {
+                const s = sources[i];
+                const isSocial = /reddit|x\.com|twitter|tiktok|instagram/i.test(s.domain || "");
+                feedLog(
+                  isSocial ? "social" : "source",
+                  '<span class="domain">' + (s.domain || "source") + "</span>" +
+                    (s.title ? s.title.replace(/</g, "&lt;").slice(0, 120) : s.uri.slice(0, 120)),
+                );
+                await new Promise((r) => setTimeout(r, 40));
+              }
+            }
+
             markActive("structure");
+            feedLog("", "Structuring + deduping…");
             const rawNews = Array.isArray(data.payload.news) ? data.payload.news : [];
             const rawSocial = Array.isArray(data.payload.social) ? data.payload.social : [];
             const rawTicker = Array.isArray(data.payload.ticker) ? data.payload.ticker : [];
@@ -7334,15 +7479,22 @@
             if (!sb) throw new Error("Supabase client unavailable");
 
             const rows = [];
-            news.forEach((n) => rows.push({ id: n.id, kind: "news", payload: n }));
-            social.forEach((s) => rows.push({ id: s.id, kind: "social", payload: s }));
-            ticker.forEach((t) =>
+            news.forEach((n) => {
+              rows.push({ id: n.id, kind: "news", payload: n });
+              feedLog("publish", "News: " + n.headline.replace(/</g, "&lt;"));
+            });
+            social.forEach((s) => {
+              rows.push({ id: s.id, kind: "social", payload: s });
+              feedLog("publish", "Social: " + s.topic.replace(/</g, "&lt;"));
+            });
+            ticker.forEach((t) => {
               rows.push({
                 id: "ai-t-" + now + "-" + Math.random().toString(36).slice(2, 8),
                 kind: "ticker",
                 payload: { text: t },
-              }),
-            );
+              });
+              feedLog("publish", "Ticker: " + t.replace(/</g, "&lt;"));
+            });
 
             const { error } = await sb.from("live_updates").insert(rows);
             if (error) {
@@ -7356,12 +7508,15 @@
 
             markSuccess({ news: news.length, social: social.length, ticker: ticker.length });
           } catch (err) {
+            stopSimulatedQueries();
             if (err && err.name === "AbortError") return;
             const activeKey =
               stepsEl.querySelector(".refresh-step.active")?.dataset.step || "search-news";
+            feedLog("warn", (err.message || String(err)).replace(/</g, "&lt;"));
             markAllFailed(activeKey, err.message || String(err));
             console.error("refresh content failed", err);
           } finally {
+            stopSimulatedQueries();
             _busy = false;
             btn.classList.remove("is-busy");
             btn.innerHTML = "🔄 Refresh Content";
