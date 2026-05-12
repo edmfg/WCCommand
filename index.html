@@ -9044,16 +9044,19 @@
             fetchMfgLatest(false);
             fetchMarketContent(true);
             fetchSharedAssets(true);
+            fetchLiveUpdates(true);
           });
         fetchMfgLatest(true);
         fetchMarketContent(true);
         fetchSharedAssets(true);
+        fetchLiveUpdates(true);
         if (mfgPollTimer) clearInterval(mfgPollTimer);
         mfgPollTimer = setInterval(
           () => {
             fetchMfgLatest(true);
             fetchMarketContent(true);
             fetchSharedAssets(true);
+            fetchLiveUpdates(true);
           },
           5 * 60 * 1000,
         );
@@ -9111,6 +9114,84 @@
           if (typeof renderTicker === "function") renderTicker();
         } catch (e) {
           if (!silent) console.warn("market content fetch failed", e);
+        }
+      }
+
+      // ── Live updates (AI-fetched news / social / ticker rows) ──
+      // Written by mfg.html's "Refresh Content" button. Prepended to
+      // DASHBOARD_DATA arrays on every poll. Older than 14 days is filtered out.
+      const LIVE_UPDATE_MAX_AGE_DAYS = 14;
+      let _liveAppliedIds = new Set();
+      async function fetchLiveUpdates(silent = false) {
+        try {
+          if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
+            mfgSyncSb = window.supabase.createClient(
+              MFG_SUPABASE_URL,
+              MFG_SUPABASE_KEY,
+            );
+          }
+          if (!mfgSyncSb) return;
+          const cutoff = new Date(
+            Date.now() - LIVE_UPDATE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
+          ).toISOString();
+          const { data, error } = await mfgSyncSb
+            .from("live_updates")
+            .select("id, kind, payload, created_at")
+            .gte("created_at", cutoff)
+            .order("created_at", { ascending: false })
+            .limit(200);
+          if (error) {
+            // Table may not exist yet (pre-migration). Stay quiet.
+            return;
+          }
+          if (!data || !data.length) return;
+
+          const newsItems = [];
+          const socialItems = [];
+          const tickerItems = [];
+          data.forEach((row) => {
+            if (_liveAppliedIds.has(row.id)) return;
+            if (row.kind === "news" && row.payload) newsItems.push(row.payload);
+            else if (row.kind === "social" && row.payload)
+              socialItems.push(row.payload);
+            else if (row.kind === "ticker" && row.payload && row.payload.text)
+              tickerItems.push(row.payload.text);
+            _liveAppliedIds.add(row.id);
+          });
+
+          let changed = false;
+          if (newsItems.length) {
+            const existingIds = new Set(DASHBOARD_DATA.news.map((n) => n.id));
+            const fresh = newsItems.filter((n) => !existingIds.has(n.id));
+            if (fresh.length) {
+              DASHBOARD_DATA.news = [...fresh, ...DASHBOARD_DATA.news];
+              changed = true;
+            }
+          }
+          if (socialItems.length) {
+            const existingIds = new Set(DASHBOARD_DATA.social.map((s) => s.id));
+            const fresh = socialItems.filter((s) => !existingIds.has(s.id));
+            if (fresh.length) {
+              DASHBOARD_DATA.social = [...fresh, ...DASHBOARD_DATA.social];
+              changed = true;
+            }
+          }
+          if (tickerItems.length) {
+            const existing = new Set(DASHBOARD_DATA.ticker || []);
+            const fresh = tickerItems.filter((t) => !existing.has(t));
+            if (fresh.length) {
+              DASHBOARD_DATA.ticker = [...fresh, ...(DASHBOARD_DATA.ticker || [])];
+              changed = true;
+            }
+          }
+
+          if (changed) {
+            if (typeof renderNews === "function") renderNews();
+            if (typeof renderSocial === "function") renderSocial();
+            if (typeof renderTicker === "function") renderTicker();
+          }
+        } catch (e) {
+          if (!silent) console.warn("live updates fetch failed", e);
         }
       }
 

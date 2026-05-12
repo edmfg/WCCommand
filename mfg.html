@@ -408,6 +408,203 @@
         border-color: var(--red);
       }
 
+      /* Refresh-content button — gold/Gemini accent so it reads as action, not tab */
+      .refresh-content-btn {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(155, 92, 255, 0.18));
+        border-color: rgba(255, 215, 0, 0.55);
+        color: var(--gold);
+        margin-left: auto;
+      }
+      .refresh-content-btn:hover {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.32), rgba(155, 92, 255, 0.32));
+        color: #fff;
+      }
+      .refresh-content-btn.is-busy {
+        pointer-events: none;
+        opacity: 0.85;
+      }
+      .refresh-content-btn .spin {
+        display: inline-block;
+        animation: refresh-spin 1.1s linear infinite;
+      }
+      @keyframes refresh-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+
+      /* Refresh overlay — progress card while Gemini scrapes */
+      .refresh-overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        background: rgba(5, 8, 14, 0.78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .refresh-overlay.open {
+        display: flex;
+      }
+      .refresh-card {
+        width: min(520px, 92vw);
+        background: linear-gradient(135deg, rgba(20, 26, 38, 0.96), rgba(28, 22, 48, 0.96));
+        border: 1px solid rgba(255, 215, 0, 0.35);
+        border-radius: 14px;
+        padding: 28px 28px 22px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        position: relative;
+      }
+      .refresh-card-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin: 0 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .refresh-card-title .gem-orb {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, #ffd700, #ff5252, #9b5cff, #29b6ff, #ffd700);
+        animation: refresh-spin 2.4s linear infinite;
+        box-shadow: 0 0 22px rgba(155, 92, 255, 0.55);
+        flex-shrink: 0;
+      }
+      .refresh-card-sub {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin: 0 0 18px;
+      }
+      .refresh-steps {
+        list-style: none;
+        margin: 0 0 18px;
+        padding: 0;
+      }
+      .refresh-step {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        font-size: 14px;
+        color: var(--text-muted);
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+        transition: color 0.3s;
+      }
+      .refresh-step:last-child {
+        border-bottom: none;
+      }
+      .refresh-step .dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        flex-shrink: 0;
+        position: relative;
+      }
+      .refresh-step.active {
+        color: var(--gold);
+      }
+      .refresh-step.active .dot {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.12);
+        animation: refresh-pulse 1.2s ease-in-out infinite;
+      }
+      .refresh-step.done {
+        color: #59e2a0;
+      }
+      .refresh-step.done .dot {
+        border-color: #59e2a0;
+        background: #59e2a0;
+      }
+      .refresh-step.done .dot::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: #0a1018;
+        font-weight: 700;
+      }
+      .refresh-step.failed {
+        color: #ff7a7a;
+      }
+      .refresh-step.failed .dot {
+        border-color: #ff7a7a;
+        background: #ff7a7a;
+      }
+      .refresh-step.failed .dot::after {
+        content: "!";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #1a0808;
+        font-weight: 800;
+      }
+      @keyframes refresh-pulse {
+        0%, 100% { box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.12); }
+        50%      { box-shadow: 0 0 0 9px rgba(255, 215, 0, 0.04); }
+      }
+      .refresh-progress {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .refresh-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #ffd700, #9b5cff);
+        transition: width 0.5s ease;
+        border-radius: 999px;
+      }
+      .refresh-result {
+        font-size: 13px;
+        color: var(--text);
+        background: rgba(89, 226, 160, 0.08);
+        border: 1px solid rgba(89, 226, 160, 0.25);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        display: none;
+      }
+      .refresh-result.error {
+        background: rgba(255, 122, 122, 0.08);
+        border-color: rgba(255, 122, 122, 0.3);
+      }
+      .refresh-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .refresh-actions button {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text);
+        padding: 8px 18px;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: var(--font-display);
+        letter-spacing: 0.5px;
+      }
+      .refresh-actions button.primary {
+        background: var(--gold);
+        color: #0a1018;
+        border-color: var(--gold);
+        font-weight: 700;
+      }
+
       /* Tab panels */
       .tab-panel {
         display: none;
@@ -3061,6 +3258,11 @@
           <a href="mailto:ed.tsue@mediafuturesgroup.com">ed.tsue@mediafuturesgroup.com</a>
           for password.
         </p>
+        <p class="gate-help" style="margin-top: 14px">
+          <a href="index.html" style="color: var(--gold); text-decoration: none">
+            &larr; Back to public dashboard
+          </a>
+        </p>
       </div>
     </div>
 
@@ -3143,6 +3345,39 @@
     </div>
 
 
+    <!-- Refresh Content overlay -->
+    <div id="refreshOverlay" class="refresh-overlay" role="dialog" aria-modal="true" aria-labelledby="refreshTitle">
+      <div class="refresh-card">
+        <h2 id="refreshTitle" class="refresh-card-title">
+          <span class="gem-orb" aria-hidden="true"></span>
+          Refreshing live content
+        </h2>
+        <p class="refresh-card-sub" id="refreshSub">
+          Gemini is scanning the web and social chatter for the latest WC2026 stories.
+        </p>
+        <ul class="refresh-steps" id="refreshSteps">
+          <li class="refresh-step" data-step="search-news">
+            <span class="dot"></span><span>Searching news (BBC, ESPN, Athletic, FIFA)…</span>
+          </li>
+          <li class="refresh-step" data-step="search-social">
+            <span class="dot"></span><span>Scanning Reddit & social chatter…</span>
+          </li>
+          <li class="refresh-step" data-step="structure">
+            <span class="dot"></span><span>Structuring & deduping…</span>
+          </li>
+          <li class="refresh-step" data-step="publish">
+            <span class="dot"></span><span>Publishing to dashboard…</span>
+          </li>
+        </ul>
+        <div class="refresh-progress"><div class="refresh-progress-bar" id="refreshBar"></div></div>
+        <div class="refresh-result" id="refreshResult"></div>
+        <div class="refresh-actions">
+          <button type="button" id="refreshCancel">Cancel</button>
+          <button type="button" id="refreshClose" class="primary" style="display: none">Done</button>
+        </div>
+      </div>
+    </div>
+
     <!-- App -->
     <div id="app">
       <header class="header">
@@ -3178,6 +3413,14 @@
         <nav class="tab-nav" id="mfgTabNav" aria-label="MFG sections">
           <button class="tab-btn active" type="button" data-mfg-tab="reactive">
             🔥 Today's Reactive
+          </button>
+          <button
+            class="tab-btn refresh-content-btn"
+            type="button"
+            id="refreshContentBtn"
+            title="Pull the latest WC2026 news, culture & social chatter via Gemini"
+          >
+            🔄 Refresh Content
           </button>
           <button class="tab-btn" type="button" data-mfg-tab="calendar">
             📅 Content Calendar
@@ -6433,6 +6676,7 @@
         tabNav.addEventListener("click", function (e) {
           const btn = e.target.closest(".tab-btn");
           if (!btn) return;
+          if (!btn.dataset.mfgTab) return; // action buttons (e.g. Refresh Content) handle their own clicks
           activateTab(btn.dataset.mfgTab);
         });
         const _hashTab = (location.hash || "").replace(/^#mfg-/, "");
@@ -6890,6 +7134,246 @@
               "</p>";
           }
         }
+      })();
+
+      // ── REFRESH CONTENT (Gemini → Supabase live_updates) ──
+      (function () {
+        const btn = document.getElementById("refreshContentBtn");
+        const overlay = document.getElementById("refreshOverlay");
+        if (!btn || !overlay) return;
+
+        const SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
+        const SB_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
+        let _sb = null;
+        function getSb() {
+          if (_sb) return _sb;
+          if (window.supabase && window.supabase.createClient) {
+            _sb = window.supabase.createClient(SB_URL, SB_KEY);
+          }
+          return _sb;
+        }
+
+        const stepsEl = document.getElementById("refreshSteps");
+        const barEl = document.getElementById("refreshBar");
+        const resultEl = document.getElementById("refreshResult");
+        const cancelBtn = document.getElementById("refreshCancel");
+        const closeBtn = document.getElementById("refreshClose");
+        const subEl = document.getElementById("refreshSub");
+
+        const STEP_ORDER = ["search-news", "search-social", "structure", "publish"];
+        const STEP_PROGRESS = { "search-news": 25, "search-social": 50, structure: 80, publish: 100 };
+        let _abort = null;
+        let _busy = false;
+
+        function setStep(key, state) {
+          const node = stepsEl.querySelector('[data-step="' + key + '"]');
+          if (!node) return;
+          node.classList.remove("active", "done", "failed");
+          if (state) node.classList.add(state);
+        }
+        function markActive(key) {
+          STEP_ORDER.forEach((k) => {
+            const node = stepsEl.querySelector('[data-step="' + k + '"]');
+            if (!node) return;
+            if (k === key) {
+              node.classList.remove("done", "failed");
+              node.classList.add("active");
+            } else if (STEP_ORDER.indexOf(k) < STEP_ORDER.indexOf(key)) {
+              node.classList.remove("active", "failed");
+              node.classList.add("done");
+            }
+          });
+          barEl.style.width = STEP_PROGRESS[key] + "%";
+        }
+        function markAllFailed(activeKey, msg) {
+          const node = stepsEl.querySelector('[data-step="' + activeKey + '"]');
+          if (node) {
+            node.classList.remove("active", "done");
+            node.classList.add("failed");
+          }
+          resultEl.style.display = "block";
+          resultEl.classList.add("error");
+          resultEl.textContent = msg || "Something went wrong. Try again in a minute.";
+          cancelBtn.textContent = "Close";
+          closeBtn.style.display = "none";
+        }
+        function markSuccess(counts) {
+          STEP_ORDER.forEach((k) => setStep(k, "done"));
+          barEl.style.width = "100%";
+          subEl.textContent = "Live content updated.";
+          resultEl.style.display = "block";
+          resultEl.classList.remove("error");
+          resultEl.innerHTML =
+            "Published <strong>" + counts.news + "</strong> news, <strong>" +
+            counts.social + "</strong> social, <strong>" + counts.ticker +
+            "</strong> ticker item" + (counts.ticker === 1 ? "" : "s") +
+            ". Reload the dashboard to see them.";
+          cancelBtn.style.display = "none";
+          closeBtn.style.display = "";
+        }
+        function resetUI() {
+          STEP_ORDER.forEach((k) => setStep(k, null));
+          barEl.style.width = "0%";
+          resultEl.style.display = "none";
+          resultEl.classList.remove("error");
+          resultEl.textContent = "";
+          subEl.textContent =
+            "Gemini is scanning the web and social chatter for the latest WC2026 stories.";
+          cancelBtn.textContent = "Cancel";
+          cancelBtn.style.display = "";
+          closeBtn.style.display = "none";
+        }
+        function openOverlay() {
+          resetUI();
+          overlay.classList.add("open");
+        }
+        function closeOverlay() {
+          overlay.classList.remove("open");
+          if (_abort) { try { _abort.abort(); } catch (e) {} _abort = null; }
+          _busy = false;
+          btn.classList.remove("is-busy");
+          btn.innerHTML = "🔄 Refresh Content";
+        }
+
+        cancelBtn.addEventListener("click", closeOverlay);
+        closeBtn.addEventListener("click", closeOverlay);
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && overlay.classList.contains("open") && !_busy) closeOverlay();
+        });
+
+        function normalizeNews(it, now) {
+          if (!it || typeof it !== "object") return null;
+          const validTags = ["Canada", "USA", "Germany", "UK", "Macro", "Global"];
+          const tag = validTags.indexOf(it.tag) >= 0 ? it.tag : "Global";
+          if (!it.headline || !it.summary) return null;
+          return {
+            id: "ai-n-" + now + "-" + Math.random().toString(36).slice(2, 8),
+            headline: String(it.headline).slice(0, 160),
+            source: String(it.source || "AI").slice(0, 80),
+            timestamp: new Date().toISOString(),
+            summary: String(it.summary).slice(0, 900),
+            url: String(it.url || "").slice(0, 500),
+            tag: tag,
+          };
+        }
+        function normalizeSocial(it, now) {
+          if (!it || typeof it !== "object") return null;
+          const validCats = ["game", "food", "music", "fashion", "fandom", "memes"];
+          const cat = validCats.indexOf(it.category) >= 0 ? it.category : "fandom";
+          const validSent = ["positive", "negative", "mixed", "caution", "neutral"];
+          const sentiment = validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
+          const validPlatforms = ["X", "TikTok", "IG", "Reddit", "YouTube"];
+          let platforms = Array.isArray(it.platforms)
+            ? it.platforms.filter((p) => validPlatforms.indexOf(p) >= 0)
+            : [];
+          if (platforms.length === 0) platforms = ["Reddit", "X"];
+          if (!it.topic || !it.summary) return null;
+          const quotes = Array.isArray(it.quotes)
+            ? it.quotes.filter((q) => q && q.platform && q.text).slice(0, 6)
+            : [];
+          return {
+            id: "ai-s-" + now + "-" + Math.random().toString(36).slice(2, 8),
+            topic: String(it.topic).slice(0, 160),
+            category: cat,
+            volume: typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
+            sentiment: sentiment,
+            summary: String(it.summary).slice(0, 900),
+            sampleQuote: String(it.sampleQuote || "").slice(0, 280),
+            quotes: quotes,
+            platforms: platforms,
+            sourceUrl: String(it.sourceUrl || it.url || "").slice(0, 500),
+            timestamp: new Date().toISOString(),
+          };
+        }
+        function normalizeTicker(it) {
+          if (typeof it !== "string") return null;
+          const trimmed = it.trim();
+          if (!trimmed) return null;
+          return trimmed.slice(0, 200);
+        }
+
+        async function runRefresh() {
+          _busy = true;
+          btn.classList.add("is-busy");
+          btn.innerHTML = '<span class="spin">🔄</span> Refreshing…';
+          openOverlay();
+          _abort = new AbortController();
+          const now = Date.now();
+
+          try {
+            markActive("search-news");
+            await new Promise((r) => setTimeout(r, 400));
+            markActive("search-social");
+
+            const resp = await fetch("/api/refresh", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: _abort.signal,
+              body: JSON.stringify({}),
+            });
+            if (!resp.ok) {
+              const txt = await resp.text().catch(() => "");
+              throw new Error("Server " + resp.status + ": " + txt.slice(0, 200));
+            }
+            const data = await resp.json();
+            if (!data || !data.payload) throw new Error("Empty Gemini response");
+
+            markActive("structure");
+            const rawNews = Array.isArray(data.payload.news) ? data.payload.news : [];
+            const rawSocial = Array.isArray(data.payload.social) ? data.payload.social : [];
+            const rawTicker = Array.isArray(data.payload.ticker) ? data.payload.ticker : [];
+            const news = rawNews.map((it) => normalizeNews(it, now)).filter(Boolean);
+            const social = rawSocial.map((it) => normalizeSocial(it, now)).filter(Boolean);
+            const ticker = rawTicker.map(normalizeTicker).filter(Boolean);
+
+            if (news.length + social.length + ticker.length === 0) {
+              throw new Error("Gemini returned no usable items");
+            }
+
+            markActive("publish");
+            const sb = getSb();
+            if (!sb) throw new Error("Supabase client unavailable");
+
+            const rows = [];
+            news.forEach((n) => rows.push({ id: n.id, kind: "news", payload: n }));
+            social.forEach((s) => rows.push({ id: s.id, kind: "social", payload: s }));
+            ticker.forEach((t) =>
+              rows.push({
+                id: "ai-t-" + now + "-" + Math.random().toString(36).slice(2, 8),
+                kind: "ticker",
+                payload: { text: t },
+              }),
+            );
+
+            const { error } = await sb.from("live_updates").insert(rows);
+            if (error) {
+              if (String(error.message || "").toLowerCase().indexOf("does not exist") >= 0) {
+                throw new Error(
+                  "Supabase table 'live_updates' missing. Run supabase-live-updates.sql in the SQL editor first.",
+                );
+              }
+              throw new Error("Supabase insert failed: " + (error.message || JSON.stringify(error)));
+            }
+
+            markSuccess({ news: news.length, social: social.length, ticker: ticker.length });
+          } catch (err) {
+            if (err && err.name === "AbortError") return;
+            const activeKey =
+              stepsEl.querySelector(".refresh-step.active")?.dataset.step || "search-news";
+            markAllFailed(activeKey, err.message || String(err));
+            console.error("refresh content failed", err);
+          } finally {
+            _busy = false;
+            btn.classList.remove("is-busy");
+            btn.innerHTML = "🔄 Refresh Content";
+            _abort = null;
+          }
+        }
+
+        btn.addEventListener("click", function () {
+          if (_busy) return;
+          runRefresh();
+        });
       })();
 
       // ── REACTIVE UPLOAD + AUDIT LOG ──
