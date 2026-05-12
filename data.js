@@ -2,8 +2,18 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-11T23:00:00.000Z",
+  lastUpdated: "2026-05-12T18:00:00.000Z",
         ticker: [
+          "🇧🇦 Bosnia first to announce full 26 — Dzeko, 40, leads the Dragons back to the WC (May 11)",
+          "🇦🇷 Scaloni's 55 named: Messi in, Di María and Dybala OUT — r/soccer in flames (May 11)",
+          "🇧🇷 Ancelotti recalls Neymar to Brazil's 55; Estêvão ruled out injured (May 11)",
+          "🇩🇪 Nagelsmann postpones Germany's final-26 reveal from May 12 to May 21 (May 12)",
+          "🇨🇦 Canada Soccer keeps preliminary list secret; Davies hamstring race continues (May 11)",
+          "🇨🇳 FIFA-CCTV deal still dead 5 weeks out — China blackout looms over 2B+ fans (May 11)",
+          "🇨🇦 Toronto Fan Fest drops next 220K free GA tickets Friday May 15 at 10am ET (May 12)",
+          "👕 $375 host-city kits trigger backlash as Panini sticker swap mania hits peak (May 11)",
+          "🎉 Three opening ceremonies confirmed: Maná (CDMX), Katy Perry (LA), Bublé (TO) (May 11)",
+          "🇮🇷 Iran's 10-point ultimatum hardens — zero US visas issued, Turkey camp May 15 (May 11)",
           "🇺🇸 Pulisic gluteal strain — race vs clock to May 27 USMNT camp open (May 11)",
           "🇺🇸 Cardoso ankle sprain at Atlético — Pochettino's MF depth chart cracks, Aidan Morris (Boro) into the frame (May 11)",
           "🇨🇦 Alphonso Davies cleared by Bayern — fit for Canada's June 12 opener vs Bosnia at BMO (May 11)",
@@ -60,6 +70,105 @@ window.DASHBOARD_DATA = {
           "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
         ],
         news: [
+          {
+            id: "n127",
+            headline:
+              "🇧🇦 Bosnia First to Reveal Final 26 — Dzeko, 40, Leads Dragons to First WC Since 2014",
+            source: "beIN Sports",
+            timestamp: "2026-05-11T18:00:00Z",
+            summary:
+              "Sergej Barbarez became the first manager to publicly announce his full 26 for WC2026, naming 40-year-old Edin Džeko and 32-year-old Sead Kolašinac as the spine of a Bosnia side back at a World Cup for the first time in 12 years. Dragons open vs Canada at BMO on June 12 — the early reveal hands every other federation a free benchmark and gives Marsch's analysts a fully-named opening-day opponent 🇧🇦",
+            url: "https://www.beinsports.com/en-us/soccer/fifa-world-cup-2026/articles/sergej-barbarez-s-official-bosnia-and-herzegovina-squad-for-the-2026-fifa-world-cup-2026-05-11",
+            tag: "Global",
+          },
+          {
+            id: "n128",
+            headline:
+              "🇦🇷 Scaloni's Argentina 55 Drops — Messi In, Di María & Dybala Snubbed",
+            source: "Al Jazeera",
+            timestamp: "2026-05-12T09:00:00Z",
+            summary:
+              "Argentina's 55-man preliminary list is headlined by Messi (sixth WC) and Lautaro, but the bombshells are the omissions: Ángel Di María, Paulo Dybala, Joaquín Correa and Valentín Castellanos all left off. Roma fans flooded r/soccer with the Dybala line; Argentine creators are running 'Last Dance' nostalgia content. Final 26 around May 30; Messi vs Zambia at El Monumental tonight is being filmed as a home-soil farewell 🐐",
+            url: "https://www.aljazeera.com/sports/2026/5/12/will-messi-play-argentina-answer-fan-queries-in-55-man-world-cup-squad",
+            tag: "Global",
+          },
+          {
+            id: "n129",
+            headline:
+              "🇧🇷 Ancelotti's Brazil 55: Neymar In, Estêvão Out — First Call-Up Under New Boss",
+            source: "Tribuna",
+            timestamp: "2026-05-11T20:00:00Z",
+            summary:
+              "Carlo Ancelotti finalised his 55-man Brazil preliminary list with Neymar back in the national team for the first time under the Italian — and roughly three years after the Uruguay ACL injury that derailed his career. Chelsea wonderkid Estêvão is dropped after the hamstring tear; final 26 lands May 18. Vinícius / Rodrygo / Raphinha all named. Latam social is fully back on Brazil-Argentina meme rotation 🇧🇷",
+            url: "https://tribuna.com/en/news/2026-05-11-carlo-ancelotti-finalises-55man-list-for-brazil-national-football-team-including-neymar-a/",
+            tag: "Global",
+          },
+          {
+            id: "n130",
+            headline:
+              "🇩🇪 Nagelsmann Postpones Germany's Final 26 Reveal to May 21",
+            source: "Foot Africa",
+            timestamp: "2026-05-12T08:00:00Z",
+            summary:
+              "Germany's final 26-man squad announcement, originally pencilled for today May 12 in Frankfurt, has been pushed back to May 21 with the camp gathering moving to May 27. Adductor concerns around Serge Gnabry have already cost him a spot. The delay puts Germany behind England (May 22 reveal) and ahead of the June 1 FIFA deadline — but flips the comms order Nagelsmann had built around 🦅",
+            url: "https://foot-africa.com/en/news/world-cup-2026-nagelsmann-postpones-squad-announcement-1184711/",
+            tag: "Germany",
+          },
+          {
+            id: "n131",
+            headline:
+              "🇨🇦 Canada Soccer Keeps Preliminary 55 Secret — Marsch Refuses Public List",
+            source: "Canadian Soccer Daily",
+            timestamp: "2026-05-11T22:00:00Z",
+            summary:
+              "Canada filed its 55-man preliminary list with FIFA but, unlike Bosnia / Argentina / Brazil, will not make it public. Marsch's reasoning is competitive — fewer leaks, less chatter — but it lands awkwardly on a home-tournament narrative built around access. Public reveal possibly comes only with the final 26. Davies hamstring race continues; Bombito at Nice still working with a Canada-sent physio 🍁",
+            url: "https://canadiansoccerdaily.com/2026/05/11/canada-not-releasing-world-cup-preliminary-squad-who-might-be-in-the-mix",
+            tag: "Canada",
+          },
+          {
+            id: "n132",
+            headline:
+              "🇨🇳 FIFA–CCTV Deal Still Deadlocked 30 Days Out — China Blackout Looms",
+            source: "Vision Times",
+            timestamp: "2026-05-11T12:00:00Z",
+            summary:
+              "FIFA has dropped its rights ask from $250–300M to $120–150M; CCTV is still parked at $60–80M. India's broadcast deal is also unsigned. With 30 days to kickoff that's a realistic path to 2B+ people having no legal way to watch a single match. The on-the-ground knock-on: Chinese sponsor activations (Wanda, Hisense, BYD) and Asia-Pacific media-buy decks all get rewritten in the next two weeks 📺",
+            url: "https://www.visiontimes.com/2026/05/10/china-2026-world-cup-blackout.html",
+            tag: "Macro",
+          },
+          {
+            id: "n133",
+            headline:
+              "🇨🇦 Toronto Fan Fest Releases Next 220K Free GA Tickets Friday May 15",
+            source: "CP24",
+            timestamp: "2026-05-12T14:00:00Z",
+            summary:
+              "Toronto marked the 30-day countdown with a rally at Fort York and confirmed the next free Fan Fest ticket drop: 220,000 GA spots at Hastings Park / downtown sites release Friday May 15 at 10am ET on the city's portal. First batch sold out in hours back in March. With Vancouver and Toronto running the only two Canadian fan fests, this is the biggest free-tickets news in Canada since the qualifying draw 🎟️",
+            url: "https://www.cp24.com/local/toronto/2026/05/12/dream-of-a-lifetime-fans-mark-one-month-countdown-to-first-fifa-world-cup-match-in-toronto/",
+            tag: "Canada",
+          },
+          {
+            id: "n134",
+            headline:
+              "🎉 Three Opening Ceremonies Confirmed — Maná, Katy Perry, Bublé Headline",
+            source: "Parade",
+            timestamp: "2026-05-11T16:00:00Z",
+            summary:
+              "FIFA confirmed full opening-ceremony lineups for all three host nations — a WC first. CDMX (June 11): Maná, J Balvin, Alejandro Fernández, Belinda, Tyla, Lila Downs, Los Ángeles Azules, Danny Ocean. LA (June 12): Katy Perry, Future, LISA, Anitta, Rema, Tyla. Toronto (June 13): Michael Bublé, Alanis Morissette, Alessia Cara, Jessie Reyez, Elyanna, William Prince, Nora Fatehi, Sanjoy, Vegedream. Three different cultural codes, three different audience cuts, three different IG-cutdown opportunities 🎬",
+            url: "https://parade.com/entertainment/fifa-world-cup-2026-us-opening-ceremony-performers-katy-perry-lisa-anitta",
+            tag: "Global",
+          },
+          {
+            id: "n135",
+            headline:
+              "🇮🇷 Iran Escalates 10-Point Ultimatum — Zero US Visas Issued, Turkey Camp May 15",
+            source: "Goal",
+            timestamp: "2026-05-11T10:00:00Z",
+            summary:
+              "Mehdi Taj publicly hardened Iran's 10-point ultimatum with zero US entry visas issued for the federation, players or staff. Squad departs for the Turkey training camp on May 15 with the IRGC-veteran visa demand (covering Taremi and Hajsafi) still unresolved. Taj's 'different decision' line is the strongest public hint yet that Iran could pull. Trump's 39-nation travel ban frames every angle of this story 🛂",
+            url: "https://www.goal.com/en-us/lists/iran-10-point-ultimatum-2026-world-cup-participation-visa-security-dispute-ffiri/blt7d299200764ea052",
+            tag: "Macro",
+          },
           {
             id: "n119",
             headline:
@@ -2944,6 +3053,106 @@ window.DASHBOARD_DATA = {
           },
         ],
         social: [
+          {
+            id: "s125",
+            topic: "🃏 'Got Got Need' — Panini Sticker Swap Mania Eats Every FYP",
+            category: "fandom",
+            volume: "🔥🔥🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "The 980-sticker Panini WC2026 album (largest in history) has gone viral as a social meta-event in its own right. #GotGotNeed is the hashtag; WhatsApp + Discord swap groups, IRL pub meetups, and pack-rip TikToks are everywhere. The genuinely shiny — Yamal, Bellingham, Davies — are 1-in-200 odds and now trading at $40-80 on eBay. Brand opportunity: collectible-coded creative around 'completing the set' is hitting hardest with millennials who collected '94/'98 albums. Mums-tax memes are the dark horse 🃏",
+            sampleQuote:
+              "\"Wife filed for divorce, all I got is one Lamine Yamal shiny. Worth it.\"",
+            quotes: [
+              { platform: "TikTok", text: "Opened 30 packs and got 4 Lukas Klostermanns. Panini I will see you in court." },
+              { platform: "Reddit", text: "r/paninistickers swap megathread has 11k comments in 3 days, it's the wild west out there" },
+              { platform: "X", text: "The fact 'got got need' is back in 2026 is the only good thing about being old" },
+              { platform: "IG", text: "Local pub doing Panini swap nights is the best community-building idea of the decade" },
+            ],
+            platforms: ["TikTok", "Reddit", "X", "IG"],
+            sourceUrl:
+              "https://www.aljazeera.com/sports/2026/5/11/fan-festivals-panini-tickets-what-are-fifa-world-cup-fans-talking-about",
+            timestamp: "2026-05-12T08:00:00Z",
+          },
+          {
+            id: "s126",
+            topic: "💸 $375 Host-City Kits Trigger 'Tax on Loving Your Team' Revolt",
+            category: "fashion",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "negative",
+            summary:
+              "FIFA's limited-edition host-city collectible shirts dropped at $375 and the backlash on r/soccer and Twitter is sharper than the Final-ticket price story. The cut: 'You already paid $500+ for the match, $80+ for parking, $14 for a beer. The kit is the final insult.' LA, NYC, Toronto and Atlanta versions are leading the rage cycle; the Mexico City one is — paradoxically — selling out fastest. Brand counter-play: anti-status, sub-$50 fan-made merch is having a moment 👕",
+            sampleQuote:
+              "\"FIFA: pay $375 for a polyester shirt that says LA on it. Me: I have rent.\"",
+            quotes: [
+              { platform: "Reddit", text: "These aren't kits, they're scarcity products dressed up as kits. Bryant Park art-drop pricing." },
+              { platform: "X", text: "$375 host city kit. $33,000 final ticket. The Infantino price-anchor strategy is genuinely impressive evil." },
+              { platform: "TikTok", text: "POV: you spent your rent on a Toronto host city shirt and now have to ghost your landlord" },
+            ],
+            platforms: ["Reddit", "X", "TikTok"],
+            sourceUrl:
+              "https://www.aljazeera.com/sports/2026/5/11/fan-festivals-panini-tickets-what-are-fifa-world-cup-fans-talking-about",
+            timestamp: "2026-05-11T22:00:00Z",
+          },
+          {
+            id: "s127",
+            topic: "🎤 Shakira × Burna Boy 'Dai Dai' Teaser Drops — Nostalgia + Hype Compound",
+            category: "music",
+            volume: "🔥🔥🔥🔥🔥",
+            sentiment: "positive",
+            summary:
+              "The one-minute 'Dai Dai' teaser, shot at Rio's Maracanã with Shakira and Burna Boy, has hit 40M+ views across IG/TikTok inside 36h and is being read as a direct rebuttal to the Coldplay-Final-halftime grumble. English/Spanish bilingual, Afrobeats production, full track May 14. The 'Shakira hasn't aged, the World Cup has aged' meta-meme is sweeping TikTok. Brand opportunity: a Shakira-coded edit is a guaranteed reach unit through May 14 release week 💃",
+            sampleQuote:
+              "\"Shakira hasn't aged, the World Cup has aged. This is who Coldplay wishes they were.\"",
+            quotes: [
+              { platform: "TikTok", text: "Waka Waka 2010 → Dai Dai 2026. I am simply not built for this much nostalgia in one lifetime." },
+              { platform: "IG", text: "Burna Boy on the Maracanã pitch is wild. Africa just colonised the World Cup anthem." },
+              { platform: "X", text: "Shakira gets us hyped, Coldplay puts us to sleep. FIFA you can't pick both vibes." },
+            ],
+            platforms: ["TikTok", "IG", "X"],
+            sourceUrl:
+              "https://www.espn.com/soccer/story/_/id/48710188/shakira-unveils-teaser-official-world-cup-anthem-burna-boy",
+            timestamp: "2026-05-11T19:00:00Z",
+          },
+          {
+            id: "s128",
+            topic: "💔 Dybala Snub Reaction — r/soccer & Roma Twitter Lose It",
+            category: "game",
+            volume: "🔥🔥🔥🔥",
+            sentiment: "negative",
+            summary:
+              "Argentina's 55-man preliminary list dropped without Paulo Dybala and the reaction has been disproportionately big — partly because of Dybala's club popularity at Roma, partly because of the genuinely strange replacement choices (Castellanos got 6 MLS minutes recently). r/soccer mega-thread on the omission is the second-biggest squad thread of the cycle behind Argentina's '22 list. Brand opportunity for 'underdog' / 'snubbed' creative is wide open through the final 26 reveal late May 💔",
+            sampleQuote:
+              "\"Scaloni preferred a guy off six MLS minutes over Dybala. Defend that to me. I'll wait.\"",
+            quotes: [
+              { platform: "Reddit", text: "Imagine being a 40-cap Joya and getting cut for a guy your manager has barely seen play. Brutal." },
+              { platform: "X", text: "Dybala will play in the Champions League next year. Argentina, enjoy not having him in the locker room." },
+              { platform: "TikTok", text: "Roma fans crying compilation is going to be a genre by itself this week" },
+            ],
+            platforms: ["Reddit", "X", "TikTok"],
+            sourceUrl:
+              "https://www.aljazeera.com/sports/2026/5/12/will-messi-play-argentina-answer-fan-queries-in-55-man-world-cup-squad",
+            timestamp: "2026-05-12T11:00:00Z",
+          },
+          {
+            id: "s129",
+            topic: "🦠 'Mencho Retaliation' Fan-Trip Cancellation Discourse Spreads",
+            category: "fandom",
+            volume: "🔥🔥🔥",
+            sentiment: "caution",
+            summary:
+              "Following CNN's 'one month to go' feature flagging cartel anxiety in Guadalajara, r/soccer and r/worldcup are quietly running 'should I cancel my trip?' threads. Specifically Guadalajara (Group B venue) and Monterrey. Combined with the Iran visa story and the ICE-truce rumour, a fan-safety meta-narrative is forming. Brand call: avoid this lane entirely on owned channels — but be aware that creators reading the room will start covering it 🛂",
+            sampleQuote:
+              "\"Booked Guadalajara last summer for $2K. Now reading 'El Mencho retaliation' headlines. Brilliant timing.\"",
+            quotes: [
+              { platform: "Reddit", text: "r/solotravel WC2026 megathread: 60% of posts in last 48h are 'is GDL safe' — that's a shift" },
+              { platform: "X", text: "FIFA's worst nightmare isn't the final ticket price, it's a single bad-headline week in a host city" },
+              { platform: "Reddit", text: "ICE truce rumour for during the tournament is wild. Whether it's real or not, the meme has reach." },
+            ],
+            platforms: ["Reddit", "X"],
+            sourceUrl: "https://www.cnn.com/2026/05/11/sport/5-things-world-cup-month-to-go",
+            timestamp: "2026-05-11T23:00:00Z",
+          },
           {
             id: "s120",
             topic: "👕 Kit Drop Mania — 2026 Jerseys Are Eating TikTok",
