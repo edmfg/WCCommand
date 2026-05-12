@@ -241,6 +241,102 @@
       }
       @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+      /* ===== floating export menu ===== */
+      .export-wrap {
+        position: fixed;
+        top: 14px;
+        right: 18px;
+        z-index: 60;
+      }
+      body.embed .export-wrap {
+        top: 12px;
+        right: 16px;
+      }
+      .export-btn {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        color: #e2e8f0;
+        background: rgba(20, 25, 40, 0.78);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        padding: 8px 14px;
+        border-radius: 99px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+        font-family: inherit;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      }
+      .export-btn:hover {
+        border-color: rgba(255, 215, 0, 0.55);
+        background: rgba(28, 32, 50, 0.88);
+      }
+      .export-btn[disabled] { opacity: 0.6; cursor: progress; }
+      .export-btn .caret { font-size: 9px; opacity: 0.7; }
+      .export-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 6px);
+        background: rgba(20, 25, 40, 0.96);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 10px;
+        padding: 6px;
+        min-width: 184px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+      .export-menu.open { display: block; }
+      .export-menu button {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        color: #e2e8f0;
+        font: inherit;
+        font-size: 13px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .export-menu button:hover { background: rgba(255, 255, 255, 0.06); }
+      .export-menu .kbd {
+        margin-left: auto;
+        font-size: 10px;
+        color: #94a3b8;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .export-toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: rgba(20, 25, 40, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #e2e8f0;
+        font-size: 13px;
+        padding: 10px 16px;
+        border-radius: 99px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 70;
+      }
+      .export-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      .export-toast.error { border-color: rgba(248, 113, 113, 0.55); }
+      body.exporting .export-wrap,
+      body.exporting .modal-overlay { visibility: hidden !important; }
+
       /* ===== layout ===== */
       main {
         position: relative;
@@ -1381,6 +1477,28 @@
       </section>
     </main>
 
+    <div class="export-wrap">
+      <button
+        id="exportBtn"
+        class="export-btn"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        title="Export this report as PDF or JPG"
+      >
+        ⤓ Export <span class="caret">▾</span>
+      </button>
+      <div class="export-menu" id="exportMenu" role="menu">
+        <button type="button" data-export="pdf" role="menuitem">
+          📄 <span>One-page PDF</span><span class="kbd">.pdf</span>
+        </button>
+        <button type="button" data-export="jpg" role="menuitem">
+          🖼 <span>JPG image</span><span class="kbd">.jpg</span>
+        </button>
+      </div>
+    </div>
+    <div class="export-toast" id="exportToast" role="status" aria-live="polite"></div>
+
     <footer>
       <span>Today's Reactive</span>
       <span class="dot">·</span>
@@ -2117,6 +2235,185 @@
 
         fetchLatest().then((row) => {
           if (row && row.payload) applyPayload(row.payload);
+        });
+      })();
+    </script>
+
+    <script>
+      // =========================================================================
+      //  Export Today's Reactive as a one-page PDF or JPG (html2canvas + jsPDF)
+      //  Lazy-loads from jsdelivr (already on the CSP allowlist) on first click.
+      // =========================================================================
+      (function setupExport() {
+        const btn = document.getElementById("exportBtn");
+        const menu = document.getElementById("exportMenu");
+        const toast = document.getElementById("exportToast");
+        if (!btn || !menu) return;
+
+        const CDN_HTML2CANVAS =
+          "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+        const CDN_JSPDF =
+          "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+
+        function loadScript(src) {
+          return new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-src="' + src + '"]');
+            if (existing) {
+              if (existing.dataset.loaded === "1") return resolve();
+              existing.addEventListener("load", () => resolve());
+              existing.addEventListener("error", () => reject(new Error("load failed: " + src)));
+              return;
+            }
+            const s = document.createElement("script");
+            s.src = src;
+            s.async = true;
+            s.dataset.src = src;
+            s.onload = () => { s.dataset.loaded = "1"; resolve(); };
+            s.onerror = () => reject(new Error("load failed: " + src));
+            document.head.appendChild(s);
+          });
+        }
+
+        function openMenu() { menu.classList.add("open"); btn.setAttribute("aria-expanded", "true"); }
+        function closeMenu() { menu.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (menu.classList.contains("open")) closeMenu(); else openMenu();
+        });
+        document.addEventListener("click", (e) => {
+          if (!menu.contains(e.target) && e.target !== btn) closeMenu();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && menu.classList.contains("open")) closeMenu();
+        });
+
+        let _toastTimer = null;
+        function showToast(msg, kind) {
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.classList.toggle("error", kind === "error");
+          toast.classList.add("show");
+          if (_toastTimer) clearTimeout(_toastTimer);
+          _toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+        }
+
+        function fileStem() {
+          let market = "ca";
+          try {
+            const p = new URLSearchParams(window.location.search);
+            market = (p.get("market") || "ca").toLowerCase();
+          } catch (e) {}
+          const d = new Date();
+          const iso =
+            d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
+          return "todays-reactive-" + market + "-" + iso;
+        }
+
+        async function captureCanvas() {
+          if (!window.html2canvas) await loadScript(CDN_HTML2CANVAS);
+          if (!window.html2canvas) throw new Error("html2canvas failed to load");
+          if (typeof closeModal === "function") {
+            try { closeModal(); } catch (e) {}
+          }
+          document.body.classList.add("exporting");
+          await new Promise((r) => requestAnimationFrame(() => r()));
+          try {
+            const target = document.querySelector("main") || document.body;
+            const bg = getComputedStyle(document.body).backgroundColor || "#0a0c14";
+            const canvas = await window.html2canvas(target, {
+              backgroundColor: bg,
+              scale: Math.min(2, window.devicePixelRatio || 1.5),
+              useCORS: true,
+              logging: false,
+              windowWidth: document.documentElement.scrollWidth,
+              windowHeight: document.documentElement.scrollHeight,
+            });
+            return canvas;
+          } finally {
+            document.body.classList.remove("exporting");
+          }
+        }
+
+        function downloadDataUrl(dataUrl, filename) {
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+
+        async function exportJpg() {
+          btn.disabled = true;
+          btn.textContent = "Capturing…";
+          showToast("Capturing report…");
+          try {
+            const canvas = await captureCanvas();
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+            downloadDataUrl(dataUrl, fileStem() + ".jpg");
+            showToast("Downloaded JPG ✓");
+          } catch (err) {
+            console.error("export jpg failed", err);
+            showToast("Export failed: " + (err.message || err), "error");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = "⤓ Export <span class=\"caret\">▾</span>";
+          }
+        }
+
+        async function exportPdf() {
+          btn.disabled = true;
+          btn.textContent = "Building PDF…";
+          showToast("Building one-page PDF…");
+          try {
+            const canvas = await captureCanvas();
+            if (!window.jspdf || !window.jspdf.jsPDF) await loadScript(CDN_JSPDF);
+            const jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+            if (!jsPDFCtor) throw new Error("jsPDF failed to load");
+
+            const cw = canvas.width;
+            const ch = canvas.height;
+            const orientation = cw >= ch ? "landscape" : "portrait";
+            const pdf = new jsPDFCtor({
+              orientation: orientation,
+              unit: "pt",
+              format: "letter",
+              compress: true,
+            });
+            const pageW = pdf.internal.pageSize.getWidth();
+            const pageH = pdf.internal.pageSize.getHeight();
+            const margin = 18;
+            const innerW = pageW - margin * 2;
+            const innerH = pageH - margin * 2;
+            const scale = Math.min(innerW / cw, innerH / ch);
+            const drawW = cw * scale;
+            const drawH = ch * scale;
+            const x = (pageW - drawW) / 2;
+            const y = (pageH - drawH) / 2;
+
+            pdf.setFillColor(10, 12, 20);
+            pdf.rect(0, 0, pageW, pageH, "F");
+            const imgData = canvas.toDataURL("image/jpeg", 0.92);
+            pdf.addImage(imgData, "JPEG", x, y, drawW, drawH, undefined, "FAST");
+            pdf.save(fileStem() + ".pdf");
+            showToast("Downloaded PDF ✓");
+          } catch (err) {
+            console.error("export pdf failed", err);
+            showToast("Export failed: " + (err.message || err), "error");
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = "⤓ Export <span class=\"caret\">▾</span>";
+          }
+        }
+
+        menu.addEventListener("click", (e) => {
+          const target = e.target.closest("button[data-export]");
+          if (!target) return;
+          closeMenu();
+          if (target.dataset.export === "pdf") exportPdf();
+          else if (target.dataset.export === "jpg") exportJpg();
         });
       })();
     </script>
