@@ -413,7 +413,6 @@
         background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(155, 92, 255, 0.18));
         border-color: rgba(255, 215, 0, 0.55);
         color: var(--gold);
-        margin-left: auto;
       }
       .refresh-content-btn:hover {
         background: linear-gradient(135deg, rgba(255, 215, 0, 0.32), rgba(155, 92, 255, 0.32));
@@ -3411,9 +3410,6 @@
 
       <main class="main">
         <nav class="tab-nav" id="mfgTabNav" aria-label="MFG sections">
-          <button class="tab-btn active" type="button" data-mfg-tab="reactive">
-            🔥 Today's Reactive
-          </button>
           <button
             class="tab-btn refresh-content-btn"
             type="button"
@@ -3421,6 +3417,9 @@
             title="Pull the latest WC2026 news, culture & social chatter via Gemini"
           >
             🔄 Refresh Content
+          </button>
+          <button class="tab-btn active" type="button" data-mfg-tab="reactive">
+            🔥 Today's Reactive
           </button>
           <button class="tab-btn" type="button" data-mfg-tab="calendar">
             📅 Content Calendar
