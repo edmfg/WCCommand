@@ -7886,8 +7886,11 @@
             }
 
             markActive("publish");
-            const sb = getSb();
-            if (!sb) throw new Error("Supabase client unavailable");
+            // Route through the trusted /api/sb-write proxy (service-role key
+            // bypasses RLS). Direct anon inserts have silently failed in the
+            // past when RLS was tightened, leaving the dashboard frozen with
+            // no visible error. Going through the proxy makes any failure
+            // surface as a clear HTTP error from our own endpoint.
 
             const rows = [];
             const totalToPublish =
@@ -7917,15 +7920,33 @@
               bumpPublishPct();
             });
 
-            const { error } = await sb.from("live_updates").insert(rows);
+            if (!window.__mfgSbWrite) {
+              throw new Error(
+                "Write proxy unavailable — reload the page and try again.",
+              );
+            }
+            const { error } = await window.__mfgSbWrite(
+              "live_updates",
+              "insert",
+              { values: rows, returnRows: false },
+            );
             if (error) {
-              if (String(error.message || "").toLowerCase().indexOf("does not exist") >= 0) {
+              const msg = String(error.message || error || "");
+              if (msg.toLowerCase().indexOf("does not exist") >= 0) {
                 throw new Error(
                   "Supabase table 'live_updates' missing. Run supabase-live-updates.sql in the SQL editor first.",
                 );
               }
-              throw new Error("Supabase insert failed: " + (error.message || JSON.stringify(error)));
+              throw new Error(
+                "Supabase insert failed: " + (msg || JSON.stringify(error)),
+              );
             }
+            feedLog(
+              "",
+              "✅ Inserted " +
+                rows.length +
+                " rows into live_updates. Reload the public dashboard to see them.",
+            );
 
             markSuccess({ news: news.length, social: social.length, ticker: ticker.length });
           } catch (err) {

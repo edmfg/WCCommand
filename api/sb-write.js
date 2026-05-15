@@ -30,6 +30,7 @@ const ALLOWED_TABLES = new Set([
   "today_reactive",
   "dashboard_updates",
   "dashboard_content",
+  "live_updates",
 ]);
 
 // Per-table per-op allowlist. Stops a stolen cookie from doing things the
@@ -41,6 +42,9 @@ const ALLOWED_OPS = {
   today_reactive: new Set(["insert"]),
   dashboard_updates: new Set(["insert"]),
   dashboard_content: new Set(["insert", "update", "upsert"]),
+  // Refresh Content button writes a batch of news/social/ticker rows here.
+  // Service-role bypass means anon RLS can never silently block it.
+  live_updates: new Set(["insert"]),
 };
 
 const MAX_BODY_BYTES = 256 * 1024;
