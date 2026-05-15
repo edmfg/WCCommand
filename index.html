@@ -1019,9 +1019,43 @@
         background-clip: text;
       }
       .updated {
-        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
         color: var(--text-dim);
         margin-bottom: 24px;
+        padding: 4px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .updated::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #69f0ae;
+        box-shadow: 0 0 8px rgba(105, 240, 174, 0.6);
+        animation: refreshPulse 2.4s ease-in-out infinite;
+      }
+      .updated.stale::before {
+        background: #ffb74d;
+        box-shadow: 0 0 8px rgba(255, 183, 77, 0.5);
+      }
+      .updated.very-stale::before {
+        background: #ef5350;
+        box-shadow: 0 0 8px rgba(239, 83, 80, 0.55);
+      }
+      @keyframes refreshPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.55; transform: scale(0.85); }
+      }
+      .updated .updated-full {
+        color: var(--text-dim);
+        opacity: 0.7;
       }
 
       /* ── GLASS CARD (Apple-style) ── */
@@ -1963,6 +1997,25 @@
         box-shadow: 0 0 20px rgba(204, 0, 0, 0.1);
         border-color: rgba(255, 255, 255, 0.15);
       }
+      .match-row.match-live {
+        border-color: rgba(0, 200, 83, 0.55);
+        box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.5);
+        animation: matchLivePulse 2.2s ease-in-out infinite;
+        position: relative;
+      }
+      .match-row.match-live::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, transparent, #69f0ae 30%, #69f0ae 70%, transparent);
+      }
+      @keyframes matchLivePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.45); }
+        50% { box-shadow: 0 0 22px 2px rgba(0, 200, 83, 0.25); }
+      }
       .team {
         display: flex;
         align-items: center;
@@ -2416,6 +2469,55 @@
         gap: 6px;
         flex-wrap: wrap;
         align-items: center;
+      }
+      .asset-live-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji",
+          "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+        font-weight: 700;
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 3px 10px;
+        background: rgba(204, 0, 0, 0.22);
+        color: #ff8a8a;
+        border: 1px solid rgba(204, 0, 0, 0.55);
+        border-radius: 4px;
+        box-shadow: 0 0 8px rgba(204, 0, 0, 0.4);
+      }
+      .asset-live-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ff3030;
+        box-shadow: 0 0 6px #ff3030;
+        animation: liveDot 1.6s ease-in-out infinite;
+      }
+      .asset-expired-pill {
+        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji",
+          "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+        font-weight: 600;
+        font-size: 0.58rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 3px 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-dim);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+      }
+      .asset-card.is-expired {
+        opacity: 0.55;
+      }
+      .asset-card.is-expired:hover {
+        opacity: 0.85;
+      }
+      @keyframes liveDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.7); }
       }
       .asset-format {
         font-family:
@@ -2964,6 +3066,11 @@
         border: 1px solid var(--border);
         border-radius: 999px;
         padding: 2px 8px;
+      }
+      .market-tag.market-tag-live {
+        color: #69f0ae;
+        background: rgba(0, 200, 83, 0.15);
+        border-color: rgba(0, 200, 83, 0.45);
       }
       .card-modal h3 {
         font-family:
@@ -6581,9 +6688,34 @@
       }
 
       function renderTimestamp() {
+        const el = document.getElementById("lastUpdated");
+        if (!el) return;
         const d = new Date(DASHBOARD_DATA.lastUpdated);
-        document.getElementById("lastUpdated").textContent =
-          `Last updated: ${d.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`;
+        if (isNaN(d)) {
+          el.textContent = "Last updated: —";
+          return;
+        }
+        const ageMs = Date.now() - d.getTime();
+        const mins = Math.max(0, Math.floor(ageMs / 60000));
+        let rel;
+        if (mins < 1) rel = "just now";
+        else if (mins < 60) rel = mins + "m ago";
+        else if (mins < 60 * 24) rel = Math.floor(mins / 60) + "h ago";
+        else rel = Math.floor(mins / (60 * 24)) + "d ago";
+        el.classList.remove("stale", "very-stale");
+        if (mins >= 60 * 24) el.classList.add("very-stale");
+        else if (mins >= 60 * 6) el.classList.add("stale");
+        const fullStr =
+          d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
+          " · " +
+          d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+        el.innerHTML =
+          '<span>Refreshed ' + rel + '</span>' +
+          '<span class="updated-full">· ' + escapeHtml(fullStr) + '</span>';
+        el.title = d.toLocaleString();
+        if (!window._lastUpdatedTicker) {
+          window._lastUpdatedTicker = setInterval(renderTimestamp, 60000);
+        }
       }
 
       // ── Feature 1: Countdown to next match ──
@@ -7450,10 +7582,11 @@
         );
         const today = new Date().toISOString().slice(0, 10);
         const isToday = m.date === today;
+        const isLive = m.status === "live";
         const scoreOrTime = m.score
-          ? `<div class="score">${m.score.home} – ${m.score.away}</div><div class="group-tag">FT</div>`
+          ? `<div class="score">${m.score.home} – ${m.score.away}</div><div class="group-tag">${isLive ? "LIVE" : "FT"}</div>`
           : `<div class="kickoff">${m.kickoff}</div><div class="group-tag">${m.stage}</div>`;
-        return `<div class="match-row glass${isToday ? " match-today" : ""}"
+        return `<div class="match-row glass${isToday ? " match-today" : ""}${isLive ? " match-live" : ""}"
     <div class="team team-home">
       <div><div class="team-name">${m.home.name}</div><div class="team-code">${m.home.code}</div></div>
       <span class="team-flag">${m.home.flag}</span>
@@ -8143,6 +8276,20 @@
         if (startDate && endDate) dateStr = `${startDate} → ${endDate}`;
         else if (startDate) dateStr = `Live from ${startDate}`;
         else if (endDate) dateStr = `Live until ${endDate}`;
+        // Live-state classification: today vs deployDate/liveEndDate.
+        // Dates are stored as YYYY-MM-DD strings; compare in local timezone.
+        const todayIso = new Date().toISOString().slice(0, 10);
+        const hasStart = !!a.deployDate;
+        const hasEnd = !!a.liveEndDate;
+        const startedOrNoStart = !hasStart || a.deployDate <= todayIso;
+        const endedAlready = hasEnd && a.liveEndDate < todayIso;
+        const liveNow = (hasStart || hasEnd) && startedOrNoStart && !endedAlready;
+        const isExpired = endedAlready;
+        const liveBadge = liveNow
+          ? `<span class="asset-live-pill" title="Within the live window">Live</span>`
+          : isExpired
+            ? `<span class="asset-expired-pill" title="Live window ended">Ended</span>`
+            : "";
         const channelStr = a.channel
           ? `<span class="asset-format">${escapeHtml(a.channel)}</span>`
           : "";
@@ -8174,12 +8321,13 @@
         const playBadge = playable
           ? `<div class="creative-play-badge" aria-hidden="true">▶</div>`
           : "";
-        return `<div class="asset-card glass"${playableAttrs}>
+        return `<div class="asset-card glass${isExpired ? " is-expired" : ""}"${playableAttrs}>
     ${removeBtn}
     <div class="asset-thumb">${thumb}${playBadge}</div>
     <div class="asset-body">
       <h4>${escapeHtml(a.headline)}</h4>
       <div class="asset-meta">
+        ${liveBadge}
         ${marketPills}
         ${a.format ? `<span class="asset-format">${escapeHtml(a.format)}</span>` : ""}
         ${channelStr}
@@ -8628,6 +8776,65 @@
             closeReactiveMarketChooser();
             switchTab("reactive");
           });
+        });
+        // Auto-enable market cards whose `today_reactive` row exists in Supabase.
+        // Cached for the session so the modal opens snappily after the first check.
+        refreshReactiveMarketAvailability(overlay).catch((e) =>
+          console.warn("reactive market availability check failed", e),
+        );
+      }
+
+      // Map dataset.market key → today_reactive.market label (case-sensitive in the DB).
+      const REACTIVE_MARKET_LABEL = {
+        ca: "Canada",
+        uk: "UK",
+        de: "Germany",
+        usa: "USA",
+        global: "Global",
+      };
+      async function refreshReactiveMarketAvailability(overlay) {
+        if (window._reactiveAvailability) {
+          applyReactiveAvailability(overlay, window._reactiveAvailability);
+          return;
+        }
+        try {
+          const url =
+            MFG_SUPABASE_URL +
+            "/rest/v1/today_reactive?select=market&order=created_at.desc&limit=200";
+          const resp = await fetch(url, {
+            headers: { apikey: MFG_SUPABASE_KEY, Authorization: "Bearer " + MFG_SUPABASE_KEY },
+          });
+          if (!resp.ok) return;
+          const rows = await resp.json();
+          const present = new Set(
+            (rows || []).map((r) => String(r.market || "").trim()).filter(Boolean),
+          );
+          window._reactiveAvailability = present;
+          applyReactiveAvailability(overlay, present);
+        } catch (e) {
+          // Network failure: leave cards in their authored state. Safe fallback.
+        }
+      }
+      function applyReactiveAvailability(overlay, presentLabels) {
+        overlay.querySelectorAll(".market-card").forEach((card) => {
+          const key = card.dataset.market;
+          const label = REACTIVE_MARKET_LABEL[key];
+          if (!label) return;
+          if (presentLabels.has(label)) {
+            card.classList.remove("disabled");
+            card.disabled = false;
+            card.removeAttribute("aria-disabled");
+            const tag = card.querySelector(".market-tag");
+            if (tag) {
+              tag.textContent = "Live";
+              tag.classList.add("market-tag-live");
+            } else if (!card.querySelector(".market-meta")) {
+              const meta = document.createElement("span");
+              meta.className = "market-meta";
+              meta.textContent = "Live";
+              card.appendChild(meta);
+            }
+          }
         });
       }
 

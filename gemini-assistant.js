@@ -37,17 +37,30 @@
   };
 
   var CHIP_LIMIT = 3;
+  var CHIP_CACHE_KEY = "wcc_gemini_chips_v1";
   function chipsFor(mode) {
+    // Persist the chosen chip set across the same browser session keyed by mode,
+    // so a strategist re-opening the panel sees the same suggestions and builds
+    // muscle memory instead of chasing a re-randomized row.
+    try {
+      var cached = sessionStorage.getItem(CHIP_CACHE_KEY + ":" + mode);
+      if (cached) {
+        var parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      }
+    } catch (e) {}
     var pool = (PROMPTS[mode] || PROMPTS.dashboard).slice();
-    // Show CHIP_LIMIT at a time. Shuffle so different sessions see different
-    // prompts; if the pool is shorter than the limit, return everything.
     for (var i = pool.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = pool[i];
       pool[i] = pool[j];
       pool[j] = tmp;
     }
-    return pool.slice(0, CHIP_LIMIT);
+    var chosen = pool.slice(0, CHIP_LIMIT);
+    try {
+      sessionStorage.setItem(CHIP_CACHE_KEY + ":" + mode, JSON.stringify(chosen));
+    } catch (e) {}
+    return chosen;
   }
 
   function buildSystemInstruction(mode) {
