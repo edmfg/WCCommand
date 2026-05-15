@@ -351,6 +351,10 @@
         letter-spacing: 1.5px;
         text-transform: uppercase;
       }
+      #marketBadge {
+        font-size: 12px;
+        padding: 4px 12px;
+      }
 
       .header-back {
         margin-left: auto;
@@ -551,14 +555,36 @@
         background: rgba(255, 255, 255, 0.08);
         border-radius: 999px;
         overflow: hidden;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
       }
       .refresh-progress-bar {
         height: 100%;
         width: 0%;
         background: linear-gradient(90deg, #ffd700, #9b5cff);
-        transition: width 0.5s ease;
+        transition: width 0.35s ease;
         border-radius: 999px;
+      }
+      .refresh-progress-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+        letter-spacing: 0.3px;
+      }
+      .refresh-progress-pct {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--gold, #ffd700);
+        font-variant-numeric: tabular-nums;
+      }
+      .refresh-progress-pct.is-done {
+        color: #69f0ae;
+      }
+      .refresh-progress-pct.is-error {
+        color: #ef5350;
       }
       /* Live activity feed — what Gemini is searching / finding / publishing */
       .refresh-feed {
@@ -1935,6 +1961,33 @@
         align-self: flex-start;
         margin-top: 2px;
         transition: all 0.15s;
+      }
+      .triage-item-to-creative {
+        background: rgba(255, 215, 0, 0.08);
+        border: 1px solid rgba(255, 215, 0, 0.32);
+        color: rgba(255, 215, 0, 0.85);
+        cursor: pointer;
+        padding: 0 10px;
+        height: 26px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        border-radius: 999px;
+        align-self: center;
+        margin: 0 6px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s, background 0.15s, color 0.15s;
+      }
+      .triage-item:hover .triage-item-to-creative,
+      .triage-item-to-creative:focus-visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .triage-item-to-creative:hover {
+        background: rgba(255, 215, 0, 0.22);
+        color: #ffeb70;
       }
       .triage-item-delete:hover {
         background: rgba(255, 107, 107, 0.2);
@@ -3417,6 +3470,10 @@
           </li>
         </ul>
         <div class="refresh-progress"><div class="refresh-progress-bar" id="refreshBar"></div></div>
+        <div class="refresh-progress-row">
+          <span class="refresh-progress-pct" id="refreshPct">0%</span>
+          <span class="refresh-progress-step" id="refreshStepLabel">Starting…</span>
+        </div>
         <div class="refresh-feed" id="refreshFeed" aria-live="polite"></div>
         <div class="refresh-result" id="refreshResult"></div>
         <div class="refresh-actions">
@@ -4340,6 +4397,14 @@
               >
                 ↻ Refresh
               </button>
+              <button
+                class="gate-btn reactive-btn-secondary"
+                id="auditExportBtn"
+                type="button"
+                title="Download the currently filtered rows as CSV"
+              >
+                ⤓ Download CSV
+              </button>
             </div>
             <div id="auditFeed" class="audit-feed">
               <div class="audit-empty">Loading…</div>
@@ -5188,6 +5253,11 @@
                 (it.due || "") +
                 '" />' +
                 "</div>" +
+                '<button class="triage-item-to-creative" data-col="' +
+                ci +
+                '" data-item="' +
+                ii +
+                '" title="Send this item to the Creative Uploads form">&rarr; Creative</button>' +
                 '<button class="triage-item-delete' +
                 (itArmed ? " armed" : "") +
                 '" data-col="' +
@@ -5738,6 +5808,43 @@
               } else {
                 arm(id);
               }
+            } else if (
+              t.classList &&
+              t.classList.contains("triage-item-to-creative")
+            ) {
+              // Send the triage item to the Creative Uploads form: switch tabs,
+              // prefill the title with the item's text, pre-select the user's
+              // current MFG market, and focus the Drive URL input so they can
+              // paste the link and submit. The triage item stays put.
+              const ci = parseInt(t.dataset.col, 10);
+              const ii = parseInt(t.dataset.item, 10);
+              const item = triage.columns[ci] && triage.columns[ci].items[ii];
+              if (!item) return;
+              const tmp = document.createElement("div");
+              tmp.innerHTML = item.html != null ? item.html : escTriage(item.text || "");
+              const titleText = (tmp.textContent || "").trim().slice(0, 160);
+              try {
+                sessionStorage.setItem(
+                  "wcc_triage_to_creative_v1",
+                  JSON.stringify({
+                    title: titleText,
+                    due: item.due || null,
+                    market: currentMarket || null,
+                  }),
+                );
+              } catch (_) {}
+              // Switch to the Creative Uploads tab via the existing nav button.
+              const creativeTabBtn = document.querySelector(
+                '#mfgTabNav [data-mfg-tab="creative"]',
+              );
+              if (creativeTabBtn) creativeTabBtn.click();
+              // Apply prefill after the tab is in view. Defer until next tick so
+              // the panel has its display:block applied.
+              setTimeout(() => {
+                if (typeof window.applyTriageToCreativePrefill === "function") {
+                  window.applyTriageToCreativePrefill();
+                }
+              }, 60);
             } else if (
               t.classList &&
               t.classList.contains("triage-col-autogroup")
@@ -6755,6 +6862,84 @@
         const driveInput = document.getElementById("creativeDriveUrl");
         const submitBtn = document.getElementById("creativeUploadSubmit");
         const toastEl = document.getElementById("creativeUploadToast");
+
+        // Bi-directional date validation: live-from and live-until guard each other.
+        // Sets HTML5 min/max and a red border + inline message when invalid so the
+        // user catches the mistake before they submit.
+        function syncDateConstraints() {
+          if (!startInput || !endInput) return;
+          if (startInput.value) endInput.min = startInput.value;
+          else endInput.removeAttribute("min");
+          if (endInput.value) startInput.max = endInput.value;
+          else startInput.removeAttribute("max");
+          const invalid =
+            startInput.value &&
+            endInput.value &&
+            endInput.value < startInput.value;
+          [startInput, endInput].forEach((el) => {
+            el.style.borderColor = invalid
+              ? "rgba(239,83,80,0.8)"
+              : "var(--glass-border)";
+          });
+          if (invalid) {
+            showToast(
+              "Live-until is before Live-from — fix dates before publishing.",
+              true,
+            );
+          } else if (
+            toastEl &&
+            toastEl.textContent.indexOf("Live-until is before") === 0
+          ) {
+            toastEl.textContent = "";
+          }
+        }
+        if (startInput) startInput.addEventListener("change", syncDateConstraints);
+        if (endInput) endInput.addEventListener("change", syncDateConstraints);
+
+        // Triage → Creative handoff: pulls a payload set by the triage tab when
+        // the user clicked "→ Creative" on an item, prefills the form fields,
+        // and focuses the Drive URL input so they can paste and publish.
+        window.applyTriageToCreativePrefill = function () {
+          let payload = null;
+          try {
+            const raw = sessionStorage.getItem("wcc_triage_to_creative_v1");
+            if (raw) {
+              payload = JSON.parse(raw);
+              sessionStorage.removeItem("wcc_triage_to_creative_v1");
+            }
+          } catch (_) {}
+          if (!payload) return;
+          if (payload.title && titleInput && !titleInput.value) {
+            titleInput.value = payload.title;
+          }
+          if (payload.due && startInput && !startInput.value) {
+            startInput.value = payload.due;
+            syncDateConstraints();
+          }
+          if (payload.market && chipsBar) {
+            const chip = chipsBar.querySelector(
+              '.creative-chip[data-market="' +
+                String(payload.market).replace(/"/g, "") +
+                '"]',
+            );
+            if (chip && !chip.classList.contains("active")) {
+              chip.classList.add("active");
+            }
+          }
+          if (driveInput) driveInput.focus();
+          // Briefly highlight the form so it's obvious where the prefill went.
+          if (form) {
+            form.style.transition = "box-shadow 0.6s ease";
+            form.style.boxShadow = "0 0 0 2px rgba(255,215,0,0.55)";
+            setTimeout(() => {
+              form.style.boxShadow = "";
+            }, 1400);
+            try {
+              form.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (_) {}
+          }
+          showToast("Prefilled from triage — add the Drive link and publish.");
+        };
         const recentList = document.getElementById("creativeRecentList");
         const allList = document.getElementById("creativeAllList");
         const allCountEl = document.getElementById("creativeAllCount");
@@ -7054,6 +7239,78 @@
           );
         }
 
+        // Pending-delete state: when the user confirms a delete we hide the card
+        // optimistically and schedule the real Supabase DELETE for 5s later. If
+        // they hit Undo before then, we cancel the timer and re-show the card.
+        // (If they close the tab inside the 5s, the row survives — preferred
+        // failure mode is "data preserved", same logic as Triage soft-undo.)
+        const pendingDeletes = new Map(); // id → { timer, hiddenNodes[] }
+        function flushPendingDelete(id) {
+          const pd = pendingDeletes.get(id);
+          if (!pd) return Promise.resolve();
+          clearTimeout(pd.timer);
+          pendingDeletes.delete(id);
+          if (pd.undoToast) pd.undoToast.remove();
+          return (async () => {
+            try {
+              const { error: delErr } = await window.__mfgSbWrite(
+                "creative_assets",
+                "delete",
+                { match: { id }, returnRows: false },
+              );
+              if (delErr) throw delErr;
+              pd.hiddenNodes.forEach((c) => c.remove());
+              if (allCountEl) {
+                const n = parseInt(
+                  (allCountEl.textContent || "").replace(/\D/g, "") || "0",
+                  10,
+                );
+                if (n > 0) allCountEl.textContent = n - 1 + " total";
+              }
+            } catch (err) {
+              console.error("delete failed", err);
+              pd.hiddenNodes.forEach((c) => (c.style.display = ""));
+              showToast(
+                "Delete failed: " + (err.message || String(err)),
+                true,
+              );
+            }
+          })();
+        }
+        function undoPendingDelete(id) {
+          const pd = pendingDeletes.get(id);
+          if (!pd) return;
+          clearTimeout(pd.timer);
+          pendingDeletes.delete(id);
+          pd.hiddenNodes.forEach((c) => (c.style.display = ""));
+          if (pd.undoToast) pd.undoToast.remove();
+          showToast("Restored.");
+        }
+        function showUndoToast(id, label) {
+          const existing = document.getElementById("creativeUndoToast");
+          if (existing) existing.remove();
+          const wrap = document.createElement("div");
+          wrap.id = "creativeUndoToast";
+          wrap.style.cssText =
+            "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);" +
+            "background:rgba(20,20,20,0.96);color:#fff;border:1px solid rgba(255,255,255,0.18);" +
+            "border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:14px;" +
+            "font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.45);";
+          const text = document.createElement("span");
+          text.textContent = label || "Deleted.";
+          const undoBtn = document.createElement("button");
+          undoBtn.type = "button";
+          undoBtn.textContent = "Undo";
+          undoBtn.style.cssText =
+            "background:transparent;color:#ffd700;border:1px solid rgba(255,215,0,0.55);" +
+            "padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;";
+          undoBtn.addEventListener("click", () => undoPendingDelete(id));
+          wrap.appendChild(text);
+          wrap.appendChild(undoBtn);
+          document.body.appendChild(wrap);
+          return wrap;
+        }
+
         function wireDeleteButtons(container) {
           container
             .querySelectorAll(".creative-recent-delete")
@@ -7082,39 +7339,32 @@
                 const card = btn.closest(".creative-recent-card");
                 const id = card && card.dataset.assetId;
                 if (!id) return;
-                btn.disabled = true;
-                btn.textContent = "…";
-                try {
-                  const { error: delErr } = await window.__mfgSbWrite(
-                    "creative_assets",
-                    "delete",
-                    { match: { id }, returnRows: false },
-                  );
-                  if (delErr) throw delErr;
-                  // Remove the matching card from BOTH lists if present.
-                  document
-                    .querySelectorAll(
-                      '.creative-recent-card[data-asset-id="' + id + '"]',
-                    )
-                    .forEach((c) => c.remove());
-                  showToast("Deleted.");
-                  if (allCountEl) {
-                    const n = parseInt(
-                      (allCountEl.textContent || "").replace(/\D/g, "") || "0",
-                      10,
-                    );
-                    if (n > 0) allCountEl.textContent = n - 1 + " total";
-                  }
-                } catch (err) {
-                  console.error("delete failed", err);
-                  showToast(
-                    "Delete failed: " + (err.message || String(err)),
-                    true,
-                  );
-                  btn.disabled = false;
-                  btn.classList.remove("armed");
-                  btn.textContent = "×";
+                // Already pending? Fire it now (user clicked delete on a 2nd
+                // card before the first timer expired) and continue.
+                if (pendingDeletes.has(id)) {
+                  await flushPendingDelete(id);
                 }
+                // Optimistically hide ALL matching cards (recent + all grids).
+                const nodes = Array.from(
+                  document.querySelectorAll(
+                    '.creative-recent-card[data-asset-id="' + id + '"]',
+                  ),
+                );
+                nodes.forEach((c) => (c.style.display = "none"));
+                const headlineEl = card.querySelector(".creative-recent-headline, h4, h5, .headline");
+                const headline =
+                  (headlineEl && headlineEl.textContent.trim()) ||
+                  "Creative asset";
+                const undoToast = showUndoToast(
+                  id,
+                  "Deleted “" + headline.slice(0, 40) + "”.",
+                );
+                const timer = setTimeout(() => flushPendingDelete(id), 5000);
+                pendingDeletes.set(id, {
+                  timer,
+                  hiddenNodes: nodes,
+                  undoToast,
+                });
               });
             });
         }
@@ -7203,11 +7453,38 @@
 
         const stepsEl = document.getElementById("refreshSteps");
         const barEl = document.getElementById("refreshBar");
+        const pctEl = document.getElementById("refreshPct");
+        const stepLabelEl = document.getElementById("refreshStepLabel");
         const resultEl = document.getElementById("refreshResult");
         const feedEl = document.getElementById("refreshFeed");
         const cancelBtn = document.getElementById("refreshCancel");
         const closeBtn = document.getElementById("refreshClose");
         const subEl = document.getElementById("refreshSub");
+
+        const STEP_LABEL = {
+          "search-news": "Searching news",
+          "search-social": "Scanning Reddit + social",
+          structure: "Structuring + deduping",
+          publish: "Publishing to dashboard",
+        };
+        let _currentPct = 0;
+        function setPct(n, status) {
+          n = Math.max(0, Math.min(100, Math.round(n)));
+          // Never go backwards within a single run — guards against the
+          // simulated query ticker undercutting a real step jump.
+          if (status !== "reset" && n < _currentPct) n = _currentPct;
+          _currentPct = n;
+          if (barEl) barEl.style.width = n + "%";
+          if (pctEl) {
+            pctEl.textContent = n + "%";
+            pctEl.classList.remove("is-done", "is-error");
+            if (status === "done") pctEl.classList.add("is-done");
+            else if (status === "error") pctEl.classList.add("is-error");
+          }
+        }
+        function setStepLabel(text) {
+          if (stepLabelEl) stepLabelEl.textContent = text || "";
+        }
 
         // ── Live activity feed ────────────────────────────────────────────
         function feedLog(kind, html) {
@@ -7299,7 +7576,13 @@
               node.classList.add("done");
             }
           });
-          barEl.style.width = STEP_PROGRESS[key] + "%";
+          // STEP_PROGRESS values are the END of each step. Snap the bar to the
+          // START of the active step so finer-grained setPct() calls inside the
+          // step can drip it up to the END value.
+          const stepIdx = STEP_ORDER.indexOf(key);
+          const startPct = stepIdx <= 0 ? 0 : STEP_PROGRESS[STEP_ORDER[stepIdx - 1]];
+          setPct(startPct);
+          setStepLabel(STEP_LABEL[key] || "");
         }
         function markAllFailed(activeKey, msg) {
           const node = stepsEl.querySelector('[data-step="' + activeKey + '"]');
@@ -7310,12 +7593,15 @@
           resultEl.style.display = "block";
           resultEl.classList.add("error");
           resultEl.textContent = msg || "Something went wrong. Try again in a minute.";
+          setPct(_currentPct, "error");
+          setStepLabel("Failed at " + (STEP_LABEL[activeKey] || activeKey));
           cancelBtn.textContent = "Close";
           closeBtn.style.display = "none";
         }
         function markSuccess(counts) {
           STEP_ORDER.forEach((k) => setStep(k, "done"));
-          barEl.style.width = "100%";
+          setPct(100, "done");
+          setStepLabel("All done");
           subEl.textContent = "Live content updated.";
           resultEl.style.display = "block";
           resultEl.classList.remove("error");
@@ -7329,7 +7615,8 @@
         }
         function resetUI() {
           STEP_ORDER.forEach((k) => setStep(k, null));
-          barEl.style.width = "0%";
+          setPct(0, "reset");
+          setStepLabel("Starting…");
           resultEl.style.display = "none";
           resultEl.classList.remove("error");
           resultEl.textContent = "";
@@ -7440,18 +7727,24 @@
             if (!data || !data.payload) throw new Error("Empty Gemini response");
 
             // Reveal actual Google Search queries Gemini ran, then the sources.
+            // Interpolate % so the bar moves continuously instead of jumping
+            // between the four discrete steps.
             const realQueries = Array.isArray(data.queries) ? data.queries : [];
             if (realQueries.length) {
               feedLog("", "Gemini ran " + realQueries.length + " live Google Search queries:");
-              for (let i = 0; i < realQueries.length && i < 25; i++) {
+              const queryCap = Math.min(realQueries.length, 25);
+              for (let i = 0; i < queryCap; i++) {
                 feedLog("search", "<em>" + realQueries[i] + "</em>");
+                // Step 1 ends at 25%; drip 0 → 25 across the queries.
+                setPct(((i + 1) / queryCap) * 25);
                 await new Promise((r) => setTimeout(r, 60));
               }
             }
             const sources = Array.isArray(data.sources) ? data.sources : [];
             if (sources.length) {
               feedLog("", "Pulled " + sources.length + " source pages:");
-              for (let i = 0; i < sources.length && i < 40; i++) {
+              const srcCap = Math.min(sources.length, 40);
+              for (let i = 0; i < srcCap; i++) {
                 const s = sources[i];
                 const isSocial = /reddit|x\.com|twitter|tiktok|instagram/i.test(s.domain || "");
                 feedLog(
@@ -7459,6 +7752,8 @@
                   '<span class="domain">' + (s.domain || "source") + "</span>" +
                     (s.title ? s.title.replace(/</g, "&lt;").slice(0, 120) : s.uri.slice(0, 120)),
                 );
+                // Step 2 ends at 50%; drip 25 → 50 across the sources.
+                setPct(25 + ((i + 1) / srcCap) * 25);
                 await new Promise((r) => setTimeout(r, 40));
               }
             }
@@ -7481,13 +7776,22 @@
             if (!sb) throw new Error("Supabase client unavailable");
 
             const rows = [];
+            const totalToPublish =
+              news.length + social.length + ticker.length || 1;
+            let publishedCount = 0;
+            const bumpPublishPct = () => {
+              publishedCount += 1;
+              setPct(80 + (publishedCount / totalToPublish) * 18);
+            };
             news.forEach((n) => {
               rows.push({ id: n.id, kind: "news", payload: n });
               feedLog("publish", "News: " + n.headline.replace(/</g, "&lt;"));
+              bumpPublishPct();
             });
             social.forEach((s) => {
               rows.push({ id: s.id, kind: "social", payload: s });
               feedLog("publish", "Social: " + s.topic.replace(/</g, "&lt;"));
+              bumpPublishPct();
             });
             ticker.forEach((t) => {
               rows.push({
@@ -7496,6 +7800,7 @@
                 payload: { text: t },
               });
               feedLog("publish", "Ticker: " + t.replace(/</g, "&lt;"));
+              bumpPublishPct();
             });
 
             const { error } = await sb.from("live_updates").insert(rows);
@@ -8162,6 +8467,74 @@
         const auditRefresh = document.getElementById("auditRefreshBtn");
         if (auditRefresh) {
           auditRefresh.addEventListener("click", loadAuditLogImpl);
+        }
+        function getFilteredAuditRows() {
+          let rows = auditCache.slice();
+          if (auditFilter !== "all") {
+            rows = rows.filter((r) => r.source === auditFilter);
+          }
+          if (auditQuery) {
+            const q = auditQuery.toLowerCase();
+            rows = rows.filter((r) =>
+              [r.who, r.market, r.summary, r.source]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(q),
+            );
+          }
+          return rows;
+        }
+        function csvCell(v) {
+          const s = v == null ? "" : String(v);
+          // Quote when the cell contains a delimiter, quote, or newline.
+          // Doubled internal quotes are the CSV escape.
+          if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }
+        const auditExport = document.getElementById("auditExportBtn");
+        function flashAuditExportLabel(text, durationMs) {
+          if (!auditExport) return;
+          const original = auditExport.textContent;
+          auditExport.textContent = text;
+          setTimeout(() => {
+            auditExport.textContent = original;
+          }, durationMs || 1800);
+        }
+        if (auditExport) {
+          auditExport.addEventListener("click", function () {
+            const rows = getFilteredAuditRows();
+            if (!rows.length) {
+              flashAuditExportLabel("Nothing to export");
+              return;
+            }
+            const header = ["time_iso", "source", "market", "who", "summary", "ref"];
+            const lines = [header.join(",")];
+            rows.forEach((r) => {
+              lines.push(
+                [r.time, r.source, r.market, r.who, r.summary, r.ref]
+                  .map(csvCell)
+                  .join(","),
+              );
+            });
+            const csv = lines.join("\r\n");
+            const blob = new Blob([csv], {
+              type: "text/csv;charset=utf-8",
+            });
+            const today = new Date().toISOString().slice(0, 10);
+            const filterTag = auditFilter === "all" ? "all" : auditFilter;
+            const filename =
+              "wccommand-audit-" + filterTag + "-" + today + ".csv";
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            // Give the browser a tick to start the download before revoking.
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+          });
         }
 
         // ── Content Calendar ──
