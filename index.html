@@ -1057,6 +1057,17 @@
         color: var(--text-dim);
         opacity: 0.7;
       }
+      .updated .updated-fresh {
+        margin-left: 4px;
+        padding: 2px 8px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #69f0ae;
+        background: rgba(0, 200, 83, 0.18);
+        border: 1px solid rgba(0, 200, 83, 0.45);
+        border-radius: 999px;
+      }
 
       /* ── GLASS CARD (Apple-style) ── */
       .glass {
@@ -6709,9 +6720,20 @@
           d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
           " · " +
           d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+        const freshBadge =
+          typeof _liveFreshCount === "number" && _liveFreshCount > 0
+            ? '<span class="updated-fresh" title="Items pulled from Refresh Content this session">+' +
+              _liveFreshCount +
+              " fresh</span>"
+            : "";
         el.innerHTML =
-          '<span>Refreshed ' + rel + '</span>' +
-          '<span class="updated-full">· ' + escapeHtml(fullStr) + '</span>';
+          '<span>Refreshed ' +
+          rel +
+          "</span>" +
+          '<span class="updated-full">· ' +
+          escapeHtml(fullStr) +
+          "</span>" +
+          freshBadge;
         el.title = d.toLocaleString();
         if (!window._lastUpdatedTicker) {
           window._lastUpdatedTicker = setInterval(renderTimestamp, 60000);
@@ -9373,6 +9395,7 @@
         }
         return changed;
       }
+      let _liveFreshCount = 0; // items injected this session — surfaced on the chip
       async function fetchLiveUpdates(silent = false) {
         try {
           if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
@@ -9381,7 +9404,13 @@
               MFG_SUPABASE_KEY,
             );
           }
-          if (!mfgSyncSb) return;
+          if (!mfgSyncSb) {
+            if (!silent)
+              console.warn(
+                "live updates: supabase client unavailable (CDN blocked?)",
+              );
+            return;
+          }
           const cutoff = new Date(
             Date.now() - LIVE_UPDATE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
           ).toISOString();
@@ -9394,8 +9423,30 @@
           if (error) {
             // Table may not exist yet (pre-migration). Re-apply existing cache
             // so an error here doesn't drop already-cached items.
+            if (!silent)
+              console.warn(
+                "live updates: supabase select error — table missing or RLS blocking?",
+                error,
+              );
             applyLiveCache();
             return;
+          }
+          if (!silent)
+            console.log(
+              "live updates: fetched " + (data ? data.length : 0) + " rows",
+            );
+          // Bump DASHBOARD_DATA.lastUpdated to the freshest live row so the
+          // "Refreshed Xm ago" chip reflects Refresh-Content activity, not
+          // just data.js edits. Only bumps forward (never backwards) so a
+          // hand-edited data.js with a newer timestamp wins.
+          if (data && data.length) {
+            const newest = data[0].created_at; // already ordered desc
+            const cur = Date.parse(DASHBOARD_DATA.lastUpdated || 0) || 0;
+            const newTs = Date.parse(newest) || 0;
+            if (newTs > cur) {
+              DASHBOARD_DATA.lastUpdated = newest;
+              if (typeof renderTimestamp === "function") renderTimestamp();
+            }
           }
           if (data && data.length) {
             // Merge fresh rows into the session cache. Don't early-exit on
@@ -9410,16 +9461,25 @@
               _liveSeen.add(row.id);
               if (row.kind === "news" && row.payload) {
                 _liveCache.news.unshift(row.payload);
+                _liveFreshCount += 1;
               } else if (row.kind === "social" && row.payload) {
                 _liveCache.social.unshift(row.payload);
+                _liveFreshCount += 1;
               } else if (
                 row.kind === "ticker" &&
                 row.payload &&
                 row.payload.text
               ) {
                 _liveCache.ticker.unshift(row.payload.text);
+                _liveFreshCount += 1;
               }
             });
+            if (!silent && _liveFreshCount)
+              console.log(
+                "live updates: " +
+                  _liveFreshCount +
+                  " fresh items injected this session",
+              );
           }
           // Always apply + re-render, even when there are no new rows. Cheap
           // (dedupe is a Set lookup) and guarantees the dashboard reflects
