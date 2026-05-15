@@ -9316,6 +9316,11 @@
           DASHBOARD_DATA.news = mergeKind("news");
           DASHBOARD_DATA.social = mergeKind("social");
 
+          // Re-layer any Refresh-Content live updates on top of the rebuilt
+          // base + market overrides. Without this, the array replacements
+          // above wipe news/social rows that Refresh Content prepended.
+          applyLiveCache();
+
           if (typeof renderNews === "function") renderNews();
           if (typeof renderSocial === "function") renderSocial();
           if (typeof renderTicker === "function") renderTicker();
@@ -9325,10 +9330,49 @@
       }
 
       // ── Live updates (AI-fetched news / social / ticker rows) ──
-      // Written by mfg.html's "Refresh Content" button. Prepended to
-      // DASHBOARD_DATA arrays on every poll. Older than 14 days is filtered out.
+      // Written by mfg.html's "Refresh Content" button. Held in a session-wide
+      // cache so that fetchMarketContent's array-rebuild can re-layer them on
+      // top after wiping news/social. Without this cache, the live items
+      // appear on the first poll then disappear on the next fetchMarketContent
+      // call because the array gets replaced from DASHBOARD_BASE.
       const LIVE_UPDATE_MAX_AGE_DAYS = 14;
-      let _liveAppliedIds = new Set();
+      const _liveCache = { news: [], social: [], ticker: [] };
+      const _liveSeen = new Set();
+      function applyLiveCache() {
+        // Re-prepend any cached live items into DASHBOARD_DATA, deduping by id
+        // / by exact ticker string. Safe to call repeatedly — idempotent.
+        let changed = false;
+        if (_liveCache.news.length) {
+          const existingIds = new Set(DASHBOARD_DATA.news.map((n) => n.id));
+          const fresh = _liveCache.news.filter((n) => !existingIds.has(n.id));
+          if (fresh.length) {
+            DASHBOARD_DATA.news = [...fresh, ...DASHBOARD_DATA.news];
+            changed = true;
+          }
+        }
+        if (_liveCache.social.length) {
+          const existingIds = new Set(
+            DASHBOARD_DATA.social.map((s) => s.id),
+          );
+          const fresh = _liveCache.social.filter((s) => !existingIds.has(s.id));
+          if (fresh.length) {
+            DASHBOARD_DATA.social = [...fresh, ...DASHBOARD_DATA.social];
+            changed = true;
+          }
+        }
+        if (_liveCache.ticker.length) {
+          const existing = new Set(DASHBOARD_DATA.ticker || []);
+          const fresh = _liveCache.ticker.filter((t) => !existing.has(t));
+          if (fresh.length) {
+            DASHBOARD_DATA.ticker = [
+              ...fresh,
+              ...(DASHBOARD_DATA.ticker || []),
+            ];
+            changed = true;
+          }
+        }
+        return changed;
+      }
       async function fetchLiveUpdates(silent = false) {
         try {
           if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
@@ -9348,50 +9392,39 @@
             .order("created_at", { ascending: false })
             .limit(200);
           if (error) {
-            // Table may not exist yet (pre-migration). Stay quiet.
+            // Table may not exist yet (pre-migration). Re-apply existing cache
+            // so an error here doesn't drop already-cached items.
+            applyLiveCache();
             return;
           }
-          if (!data || !data.length) return;
-
-          const newsItems = [];
-          const socialItems = [];
-          const tickerItems = [];
-          data.forEach((row) => {
-            if (_liveAppliedIds.has(row.id)) return;
-            if (row.kind === "news" && row.payload) newsItems.push(row.payload);
-            else if (row.kind === "social" && row.payload)
-              socialItems.push(row.payload);
-            else if (row.kind === "ticker" && row.payload && row.payload.text)
-              tickerItems.push(row.payload.text);
-            _liveAppliedIds.add(row.id);
-          });
-
-          let changed = false;
-          if (newsItems.length) {
-            const existingIds = new Set(DASHBOARD_DATA.news.map((n) => n.id));
-            const fresh = newsItems.filter((n) => !existingIds.has(n.id));
-            if (fresh.length) {
-              DASHBOARD_DATA.news = [...fresh, ...DASHBOARD_DATA.news];
-              changed = true;
-            }
+          if (data && data.length) {
+            // Merge fresh rows into the session cache. Don't early-exit on
+            // already-seen IDs — we still need to re-apply the cache because
+            // fetchMarketContent may have wiped them since last poll.
+            // Reverse so the most-recent rows end up at the FRONT of the
+            // cache (Supabase returned us newest-first; pushing in that order
+            // would put oldest at front after the spread).
+            const fresh = data.slice().reverse();
+            fresh.forEach((row) => {
+              if (_liveSeen.has(row.id)) return;
+              _liveSeen.add(row.id);
+              if (row.kind === "news" && row.payload) {
+                _liveCache.news.unshift(row.payload);
+              } else if (row.kind === "social" && row.payload) {
+                _liveCache.social.unshift(row.payload);
+              } else if (
+                row.kind === "ticker" &&
+                row.payload &&
+                row.payload.text
+              ) {
+                _liveCache.ticker.unshift(row.payload.text);
+              }
+            });
           }
-          if (socialItems.length) {
-            const existingIds = new Set(DASHBOARD_DATA.social.map((s) => s.id));
-            const fresh = socialItems.filter((s) => !existingIds.has(s.id));
-            if (fresh.length) {
-              DASHBOARD_DATA.social = [...fresh, ...DASHBOARD_DATA.social];
-              changed = true;
-            }
-          }
-          if (tickerItems.length) {
-            const existing = new Set(DASHBOARD_DATA.ticker || []);
-            const fresh = tickerItems.filter((t) => !existing.has(t));
-            if (fresh.length) {
-              DASHBOARD_DATA.ticker = [...fresh, ...(DASHBOARD_DATA.ticker || [])];
-              changed = true;
-            }
-          }
-
+          // Always apply + re-render, even when there are no new rows. Cheap
+          // (dedupe is a Set lookup) and guarantees the dashboard reflects
+          // whatever Refresh Content most recently pushed.
+          const changed = applyLiveCache();
           if (changed) {
             if (typeof renderNews === "function") renderNews();
             if (typeof renderSocial === "function") renderSocial();
