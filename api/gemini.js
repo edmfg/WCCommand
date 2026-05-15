@@ -24,20 +24,40 @@ function browserGateOk(req) {
 // In-memory fallback (used when UPSTASH_* env vars aren't configured).
 // Keyed by user-token (cookie) when available, else IP.
 const memHits = new Map();
+// Hard cap on entries: if Upstash is missing and traffic spikes during the
+// tournament window, this prevents the Map from growing without bound and
+// OOM'ing the function. Tuned for a ~1000-active-user worst case.
+const MEM_HARD_CAP = 2000;
+let _memLastSweep = 0;
+
+function memSweep(now) {
+  // Drop anything outside the active rate-limit window, then if we're still
+  // over the cap, evict oldest entries until we fit.
+  for (const [k, v] of memHits) {
+    if (now - v.start > RATE_LIMIT_WINDOW_SEC * 1000) memHits.delete(k);
+  }
+  if (memHits.size > MEM_HARD_CAP) {
+    const sorted = [...memHits.entries()].sort((a, b) => a[1].start - b[1].start);
+    const toDrop = memHits.size - MEM_HARD_CAP;
+    for (let i = 0; i < toDrop; i++) memHits.delete(sorted[i][0]);
+  }
+}
 
 function memRateLimit(key) {
   const now = Date.now();
+  // Cheap periodic sweep (at most every 5s) keeps the Map honest even when
+  // no single request is large enough to trip the hard cap check below.
+  if (now - _memLastSweep > 5000) {
+    _memLastSweep = now;
+    memSweep(now);
+  }
   const entry = memHits.get(key);
   if (!entry || now - entry.start > RATE_LIMIT_WINDOW_SEC * 1000) {
     memHits.set(key, { start: now, count: 1 });
     return { ok: true, count: 1 };
   }
   entry.count += 1;
-  if (memHits.size > 5000) {
-    for (const [k, v] of memHits) {
-      if (now - v.start > RATE_LIMIT_WINDOW_SEC * 1000) memHits.delete(k);
-    }
-  }
+  if (memHits.size > MEM_HARD_CAP) memSweep(now);
   return { ok: entry.count <= RATE_LIMIT_MAX, count: entry.count };
 }
 
@@ -181,14 +201,6 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "Invalid request body" });
   }
 
-  // Streaming path — `?stream=1` query param activates SSE.
-  const wantStream =
-    typeof req.url === "string" && req.url.indexOf("stream=1") >= 0;
-
-  if (wantStream) {
-    return streamHandler(req, res, GEMINI_API_KEY);
-  }
-
   try {
     const upstream = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
@@ -222,101 +234,10 @@ module.exports = async function handler(req, res) {
   }
 };
 
-// SSE pass-through to Gemini's streamGenerateContent. We forward each chunk
-// as-is wrapped in `data:` lines so the client can read with EventSource.
-async function streamHandler(req, res, key) {
-  res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-  res.flushHeaders && res.flushHeaders();
-
-  function send(event, payload) {
-    if (event) res.write("event: " + event + "\n");
-    res.write("data: " + JSON.stringify(payload) + "\n\n");
-  }
-
-  try {
-    const upstream = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": key,
-        },
-        body: JSON.stringify(req.body),
-      },
-    );
-
-    if (!upstream.ok || !upstream.body) {
-      const errText = await upstream.text().catch(() => "");
-      send("error", {
-        status: upstream.status,
-        message: errText.slice(0, 500) || "upstream error",
-      });
-      res.end();
-      return;
-    }
-
-    const reader = upstream.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let aggregated = {
-      text: "",
-      finishReason: null,
-      groundingChunks: [],
-    };
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      // Gemini SSE chunks are separated by \n\n
-      let idx;
-      while ((idx = buffer.indexOf("\n\n")) >= 0) {
-        const raw = buffer.slice(0, idx);
-        buffer = buffer.slice(idx + 2);
-        const dataLine = raw
-          .split("\n")
-          .filter((l) => l.startsWith("data: "))
-          .map((l) => l.slice(6))
-          .join("");
-        if (!dataLine) continue;
-        try {
-          const obj = JSON.parse(dataLine);
-          const cand = obj.candidates && obj.candidates[0];
-          const parts = (cand && cand.content && cand.content.parts) || [];
-          const textDelta = parts
-            .map((p) => p.text || "")
-            .join("");
-          if (textDelta) {
-            aggregated.text += textDelta;
-            send("delta", { text: textDelta });
-          }
-          if (cand && cand.finishReason) {
-            aggregated.finishReason = cand.finishReason;
-          }
-          const gm = cand && cand.groundingMetadata;
-          if (gm && Array.isArray(gm.groundingChunks)) {
-            aggregated.groundingChunks = gm.groundingChunks;
-          }
-        } catch (e) {
-          // Skip malformed line, keep streaming.
-        }
-      }
-    }
-
-    send("done", aggregated);
-  } catch (e) {
-    try {
-      send("error", { message: String((e && e.message) || e) });
-    } catch (_) {}
-  } finally {
-    try {
-      res.end();
-    } catch (_) {}
-  }
-}
-
 module.exports.config = { maxDuration: 60 };
+
+// (The SSE pass-through to gemini-2.5-flash:streamGenerateContent that lived
+// here was never wired up on the client because Vercel's Node serverless
+// runtime buffers responses, breaking SSE. Removed in favor of the non-
+// streaming path above; bring it back behind Edge runtime if a real streaming
+// need shows up.)

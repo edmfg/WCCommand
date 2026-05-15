@@ -3686,6 +3686,25 @@
                 "
               ></span>
               <span id="triageSyncStatus">Loading…</span>
+              <span
+                id="triagePresencePill"
+                title="People viewing the Triage board live"
+                style="
+                  display: none;
+                  align-items: center;
+                  gap: 5px;
+                  margin-left: 10px;
+                  padding: 2px 9px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.4px;
+                  border: 1px solid rgba(34, 197, 94, 0.45);
+                  background: rgba(34, 197, 94, 0.12);
+                  color: #4ade80;
+                  border-radius: 999px;
+                  transition: transform 0.25s ease;
+                "
+              ></span>
             </div>
           </div>
 
@@ -4501,6 +4520,33 @@
         } catch (e) {
           console.warn("Supabase init failed, using localStorage fallback.", e);
         }
+        // Surface a persistent banner if Supabase didn't load (CDN blocked,
+        // network drop, ad-blocker, CSP regression). Strategists need to know
+        // the board is single-player and their edits aren't syncing.
+        if (!supabase) {
+          window.__sbOffline = true;
+          function showOfflineBanner() {
+            if (document.getElementById("sbOfflineBanner")) return;
+            const b = document.createElement("div");
+            b.id = "sbOfflineBanner";
+            b.setAttribute("role", "alert");
+            b.style.cssText =
+              "position:sticky;top:0;z-index:9000;background:#3b0000;color:#ffd1d1;" +
+              "border-bottom:1px solid #cc0000;padding:8px 16px;font-size:12.5px;" +
+              "font-weight:600;letter-spacing:0.3px;text-align:center;" +
+              "box-shadow:0 2px 8px rgba(0,0,0,0.35);";
+            b.innerHTML =
+              "⚠️ Supabase didn't load — Triage and Creative changes are " +
+              "<u>local only</u> and aren't syncing with teammates. " +
+              "Check network/firewall and reload.";
+            document.body.insertBefore(b, document.body.firstChild);
+          }
+          if (document.body) showOfflineBanner();
+          else
+            document.addEventListener("DOMContentLoaded", showOfflineBanner, {
+              once: true,
+            });
+        }
 
         // ── sbWrite: server-side write proxy ──
         // Anonymous Supabase writes are blocked by RLS after the hardening
@@ -4834,6 +4880,69 @@
 
         // --- Realtime sync via Supabase channels ---
         let realtimeChannel = null;
+        // Separate presence channel — tracks who's currently viewing the
+        // Triage board. Cheap to run alongside the postgres_changes channel
+        // and gives strategists obvious "I'm not alone in here" feedback.
+        let presenceChannel = null;
+        let _lastPresenceCount = 0;
+        function renderPresence(count) {
+          const pill = document.getElementById("triagePresencePill");
+          if (!pill) return;
+          if (!count || count < 1) {
+            pill.style.display = "none";
+            return;
+          }
+          pill.style.display = "inline-flex";
+          pill.textContent =
+            "🟢 " + count + (count === 1 ? " viewing" : " viewing");
+          if (count !== _lastPresenceCount) {
+            pill.style.transform = "scale(1.12)";
+            setTimeout(() => (pill.style.transform = ""), 220);
+          }
+          _lastPresenceCount = count;
+        }
+        function subscribePresence() {
+          if (!supabase || !supabase.channel) return;
+          if (presenceChannel) return;
+          try {
+            const me =
+              (typeof window.__mfgUser === "function" && window.__mfgUser()) ||
+              currentUserLabel ||
+              "Anonymous";
+            const presenceKey =
+              me + "-" + Math.random().toString(36).slice(2, 8);
+            presenceChannel = supabase.channel(
+              "mfg-triage-presence-" + TRIAGE_ROW_ID,
+              { config: { presence: { key: presenceKey } } },
+            );
+            const updateCount = () => {
+              try {
+                const state = presenceChannel.presenceState() || {};
+                const count = Object.keys(state).length;
+                renderPresence(count);
+              } catch (_) {}
+            };
+            presenceChannel
+              .on("presence", { event: "sync" }, updateCount)
+              .on("presence", { event: "join" }, updateCount)
+              .on("presence", { event: "leave" }, updateCount)
+              .subscribe(async (status) => {
+                if (status === "SUBSCRIBED") {
+                  try {
+                    await presenceChannel.track({
+                      user: me,
+                      market: currentMarket || "",
+                      joined_at: new Date().toISOString(),
+                    });
+                  } catch (e) {
+                    console.warn("triage presence track failed", e);
+                  }
+                }
+              });
+          } catch (e) {
+            console.warn("triage presence subscribe failed:", e);
+          }
+        }
         function subscribeRealtime() {
           if (!supabase || !supabase.channel) return;
           if (realtimeChannel) return;
@@ -6702,11 +6811,16 @@
           });
 
         renderTriage();
-        // Pull cloud state on first paint, then subscribe to live updates
+        // Pull cloud state on first paint, then subscribe to live updates +
+        // the presence channel so the connected-users pill lights up.
         refreshFromCloud(true)
-          .then(subscribeRealtime)
+          .then(() => {
+            subscribeRealtime();
+            subscribePresence();
+          })
           .catch(function () {
             subscribeRealtime();
+            subscribePresence();
           });
       })();
 
@@ -8281,6 +8395,62 @@
           const market = e.reactiveMarketSelect.value;
           const liveDate = e.reactiveLiveDate.value || null;
           e.reactivePublishBtn.disabled = true;
+          // Conflict guard: if another Reactive briefing already exists for
+          // this market + live_date, warn the publisher with who/when so they
+          // don't silently overwrite a teammate's work. last-write-wins is
+          // still the underlying behavior; this is just a confirmation gate.
+          if (market && liveDate) {
+            try {
+              setReactiveStatus("Checking for existing briefing…");
+              const { data: existing } = await sb
+                .from("today_reactive")
+                .select("uploaded_by, created_at")
+                .eq("market", market)
+                .eq("live_date", liveDate)
+                .order("created_at", { ascending: false })
+                .limit(1);
+              if (existing && existing.length) {
+                const row = existing[0];
+                const who = row.uploaded_by || "someone";
+                const created = row.created_at ? new Date(row.created_at) : null;
+                let when = "earlier";
+                if (created) {
+                  const ageMin = Math.max(
+                    0,
+                    Math.round((Date.now() - created.getTime()) / 60000),
+                  );
+                  when =
+                    ageMin < 1
+                      ? "moments ago"
+                      : ageMin < 60
+                        ? ageMin + "m ago"
+                        : ageMin < 60 * 24
+                          ? Math.round(ageMin / 60) + "h ago"
+                          : created.toLocaleString();
+                }
+                const ok = window.confirm(
+                  "A Reactive briefing for " +
+                    market +
+                    " on " +
+                    liveDate +
+                    " already exists (from " +
+                    who +
+                    ", " +
+                    when +
+                    ").\n\n" +
+                    "Publishing again will add a new row — the dashboard shows the newest one. Continue?",
+                );
+                if (!ok) {
+                  e.reactivePublishBtn.disabled = false;
+                  setReactiveStatus("Publish cancelled.", "");
+                  return;
+                }
+              }
+            } catch (err) {
+              // Pre-check failure shouldn't block publishing — log and proceed.
+              console.warn("reactive conflict pre-check failed", err);
+            }
+          }
           setReactiveStatus("Publishing…");
           const { error } = await window.__mfgSbWrite("today_reactive", "insert", {
             values: {
