@@ -559,7 +559,10 @@
         padding: 14px 28px 18px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
       }
       .intro-footer button {
         font-family: var(--font-display);
@@ -575,10 +578,25 @@
         cursor: pointer;
         transition: all 0.2s;
       }
-      .intro-footer button:hover {
+      .intro-footer button:hover:not(:disabled) {
         background: rgba(255, 215, 0, 0.2);
         color: #fff;
         box-shadow: 0 0 14px rgba(255, 215, 0, 0.35);
+      }
+      .intro-footer button:disabled {
+        opacity: 0.55;
+        cursor: progress;
+      }
+      .intro-footer .intro-footer-pdf {
+        color: #e6e8ec;
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+      .intro-footer .intro-footer-pdf:hover:not(:disabled) {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
       }
 
       /* Tab Navigation */
@@ -3814,6 +3832,14 @@
           </section>
         </div>
         <div class="intro-footer">
+          <button
+            type="button"
+            id="export101PdfBtn"
+            class="intro-footer-pdf"
+            title="Download this primer as a PDF"
+          >
+            ⤓ Export PDF
+          </button>
           <button type="button" id="close101FooterBtn">Got it</button>
         </div>
       </div>
@@ -7902,6 +7928,7 @@
         const overlay = document.getElementById("intro101Overlay");
         const closeBtn = document.getElementById("close101Btn");
         const footerBtn = document.getElementById("close101FooterBtn");
+        const exportBtn = document.getElementById("export101PdfBtn");
         if (!openBtn || !overlay) return;
 
         let lastFocus = null;
@@ -7933,6 +7960,230 @@
         document.addEventListener("keydown", function (e) {
           if (e.key === "Escape" && overlay.classList.contains("open")) close();
         });
+
+        // ── PDF EXPORT ──
+        // Walks the modal DOM and renders a clean, selectable, multi-page
+        // PDF with jsPDF. Native text (not html2canvas) — sharper, smaller,
+        // searchable. jsPDF lazy-loads from jsdelivr (already on the CSP
+        // allowlist, same CDN social.html uses for its Export → PDF).
+        const CDN_JSPDF =
+          "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+
+        function loadScript(src) {
+          return new Promise((resolve, reject) => {
+            const existing = document.querySelector(
+              'script[data-src="' + src + '"]',
+            );
+            if (existing) {
+              if (existing.dataset.loaded === "1") return resolve();
+              existing.addEventListener("load", () => resolve());
+              existing.addEventListener("error", () =>
+                reject(new Error("load failed: " + src)),
+              );
+              return;
+            }
+            const s = document.createElement("script");
+            s.src = src;
+            s.async = true;
+            s.dataset.src = src;
+            s.onload = () => {
+              s.dataset.loaded = "1";
+              resolve();
+            };
+            s.onerror = () => reject(new Error("load failed: " + src));
+            document.head.appendChild(s);
+          });
+        }
+
+        // Pull the modal's content as a structured tree so the PDF can
+        // mirror the heading + bullet hierarchy. textContent strips inline
+        // <strong>/<code>/<em> formatting, which is fine — the PDF stays
+        // readable in normal weight.
+        function collectSections() {
+          const body = overlay.querySelector(".intro-body");
+          if (!body) return [];
+          const sections = [];
+          body.querySelectorAll("section").forEach((sec) => {
+            const h3 = sec.querySelector("h3");
+            if (!h3) return;
+            const numEl = h3.querySelector(".intro-num");
+            const num = numEl ? numEl.textContent.trim() : "";
+            // Heading text minus the numeric badge.
+            let title = h3.textContent.trim();
+            if (num) title = title.replace(new RegExp("^" + num + "\\s*"), "");
+            const bullets = [];
+            // Top-level li under the section's main ul.
+            const topLis = sec.querySelectorAll(":scope > ul > li");
+            topLis.forEach((li) => {
+              // Capture only the li's own text (not its nested ul children).
+              let primary = "";
+              li.childNodes.forEach((n) => {
+                if (n.nodeType === Node.TEXT_NODE) primary += n.textContent;
+                else if (
+                  n.nodeType === Node.ELEMENT_NODE &&
+                  n.tagName.toLowerCase() !== "ul"
+                )
+                  primary += n.textContent;
+              });
+              primary = primary.replace(/\s+/g, " ").trim();
+              const subs = [];
+              li.querySelectorAll(":scope > ul > li").forEach((subLi) => {
+                subs.push(subLi.textContent.replace(/\s+/g, " ").trim());
+              });
+              if (primary) bullets.push({ text: primary, subs: subs });
+            });
+            sections.push({ num: num, title: title, bullets: bullets });
+          });
+          return sections;
+        }
+
+        async function exportPdf() {
+          if (!exportBtn) return;
+          const origLabel = exportBtn.innerHTML;
+          exportBtn.disabled = true;
+          exportBtn.textContent = "Building PDF…";
+          try {
+            if (!window.jspdf || !window.jspdf.jsPDF) await loadScript(CDN_JSPDF);
+            const jsPDFCtor =
+              (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+            if (!jsPDFCtor) throw new Error("jsPDF failed to load");
+
+            const sections = collectSections();
+            if (sections.length === 0) throw new Error("No content to export");
+
+            const pdf = new jsPDFCtor({
+              orientation: "portrait",
+              unit: "pt",
+              format: "letter",
+              compress: true,
+            });
+            const pageW = pdf.internal.pageSize.getWidth();
+            const pageH = pdf.internal.pageSize.getHeight();
+            const margin = 54; // 0.75"
+            const innerW = pageW - margin * 2;
+
+            const COL_GOLD = [201, 153, 0]; // matches --gold tone, print-safe
+            const COL_DARK = [20, 24, 32];
+            const COL_BODY = [40, 44, 56];
+            const COL_MUTED = [110, 116, 128];
+
+            let y = margin;
+
+            function ensureRoom(needed) {
+              if (y + needed > pageH - margin - 22) {
+                drawFooter();
+                pdf.addPage();
+                y = margin;
+              }
+            }
+
+            function drawFooter() {
+              const total = pdf.internal.getNumberOfPages();
+              const page = pdf.internal.getCurrentPageInfo().pageNumber;
+              pdf.setFont("helvetica", "normal");
+              pdf.setFontSize(8);
+              pdf.setTextColor(...COL_MUTED);
+              const d = new Date();
+              const iso =
+                d.getFullYear() +
+                "-" +
+                String(d.getMonth() + 1).padStart(2, "0") +
+                "-" +
+                String(d.getDate()).padStart(2, "0");
+              pdf.text(
+                "World Cup HQ — 101 · " + iso,
+                margin,
+                pageH - margin / 2,
+              );
+              pdf.text(
+                "Page " + page + " of " + total,
+                pageW - margin,
+                pageH - margin / 2,
+                { align: "right" },
+              );
+            }
+
+            // Cover header.
+            pdf.setFillColor(...COL_DARK);
+            pdf.rect(0, 0, pageW, 86, "F");
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(11);
+            pdf.setTextColor(...COL_GOLD);
+            pdf.text("WORLD CUP HQ", margin, 38);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(22);
+            pdf.setTextColor(255, 255, 255);
+            pdf.text("The 101 — how it all works", margin, 64);
+            y = 86 + 26;
+
+            pdf.setFont("helvetica", "italic");
+            pdf.setFontSize(10);
+            pdf.setTextColor(...COL_MUTED);
+            const subtitle =
+              "A plain-English tour of the public dashboard and the MFG cockpit.";
+            const subLines = pdf.splitTextToSize(subtitle, innerW);
+            pdf.text(subLines, margin, y);
+            y += subLines.length * 13 + 16;
+
+            sections.forEach((sec) => {
+              // Heading — keep heading + at least 2 lines of body together.
+              ensureRoom(60);
+              pdf.setDrawColor(...COL_GOLD);
+              pdf.setLineWidth(0.6);
+              pdf.line(margin, y - 2, margin + 24, y - 2);
+              y += 6;
+              pdf.setFont("helvetica", "bold");
+              pdf.setFontSize(13);
+              pdf.setTextColor(...COL_DARK);
+              const heading = (sec.num ? sec.num + ".  " : "") + sec.title;
+              pdf.text(heading, margin, y);
+              y += 18;
+
+              pdf.setFont("helvetica", "normal");
+              pdf.setFontSize(10.5);
+              pdf.setTextColor(...COL_BODY);
+              const bulletIndent = 14;
+              const subIndent = 28;
+
+              sec.bullets.forEach((b) => {
+                const lines = pdf.splitTextToSize(
+                  b.text,
+                  innerW - bulletIndent,
+                );
+                ensureRoom(lines.length * 13 + 4);
+                pdf.setTextColor(...COL_GOLD);
+                pdf.text("›", margin, y);
+                pdf.setTextColor(...COL_BODY);
+                pdf.text(lines, margin + bulletIndent, y);
+                y += lines.length * 13 + 2;
+                b.subs.forEach((sub) => {
+                  const sLines = pdf.splitTextToSize(
+                    sub,
+                    innerW - subIndent,
+                  );
+                  ensureRoom(sLines.length * 12 + 2);
+                  pdf.setTextColor(...COL_MUTED);
+                  pdf.text("·", margin + bulletIndent, y);
+                  pdf.setTextColor(...COL_BODY);
+                  pdf.text(sLines, margin + subIndent, y);
+                  y += sLines.length * 12 + 1;
+                });
+              });
+              y += 10;
+            });
+
+            drawFooter();
+            pdf.save("world-cup-hq-101.pdf");
+          } catch (err) {
+            console.error("101 PDF export failed", err);
+            alert("PDF export failed: " + (err.message || err));
+          } finally {
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = origLabel;
+          }
+        }
+
+        if (exportBtn) exportBtn.addEventListener("click", exportPdf);
       })();
 
       // ── REFRESH CONTENT (Gemini → Supabase live_updates) ──
