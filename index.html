@@ -4471,6 +4471,34 @@
           0 1px 0 rgba(255, 255, 255, 0.5) inset;
         animation: beta-pulse 2.5s ease-in-out infinite;
       }
+
+      /* ── LIMITED-TIME-ONLY BADGE ──
+         Sits between the brand text and the BETA pill. Red gradient to
+         read as urgency, distinct from the gold BETA tag so the two
+         don't visually merge. Same pulse cadence and sizing as BETA. */
+      .limited-badge {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 3px 9px;
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          "Twemoji Mozilla", sans-serif;
+        font-weight: 800;
+        font-size: 0.6rem;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(135deg, #ff3a3a, #c9002d);
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        -webkit-text-fill-color: #fff;
+        border-radius: 4px;
+        vertical-align: middle;
+        box-shadow:
+          0 0 12px rgba(255, 58, 58, 0.45),
+          0 1px 0 rgba(255, 255, 255, 0.25) inset;
+        animation: beta-pulse 2.5s ease-in-out infinite;
+      }
       @keyframes beta-pulse {
         0%,
         100% {
@@ -5916,6 +5944,7 @@
             alt="Media Futures Group"
             class="brand-logo"
           /><span>World Cup HQ</span
+          ><span class="limited-badge">*Limited Time Only*</span
           ><span class="beta-badge">BETA v3.7</span></a
         >
         <nav class="header-nav">
@@ -10193,12 +10222,14 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           title.offsetHeight;
 
           // Target the actual "World Cup HQ" text node inside the brand
-          // (the <span> sibling of .brand-logo and .beta-badge), not the
-          // .brand container — otherwise the title lands at the container's
-          // left edge, which sits behind the logo image.
+          // (the <span> sibling of .brand-logo, .beta-badge, and
+          // .limited-badge), not the .brand container — otherwise the
+          // title lands at the container's left edge, which sits behind
+          // the logo image.
           const brandText =
-            document.querySelector(".brand > span:not(.beta-badge)") ||
-            document.querySelector(".brand");
+            document.querySelector(
+              ".brand > span:not(.beta-badge):not(.limited-badge)",
+            ) || document.querySelector(".brand");
           const brandRect = brandText.getBoundingClientRect();
 
           // Match the brand's exact text style so glyph widths line up at
