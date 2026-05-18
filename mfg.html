@@ -3788,7 +3788,40 @@
           </section>
 
           <section>
-            <h3><span class="intro-num">4</span>How content flows</h3>
+            <h3><span class="intro-num">4</span>Markets — how each gets and uses its own data</h3>
+            <ul>
+              <li>World Cup HQ runs <strong>five markets in parallel</strong>: 🇨🇦 Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, and 🌍 Macro / Global (cross-market stories — FIFA news, pricing, broadcast, regulation).</li>
+              <li>Every piece of content is tagged with at least one market. The <strong>filter pills</strong> at the top of the Live tab flip the public dashboard to one or more markets at a time.</li>
+              <li><strong>What each market sees on the public dashboard:</strong>
+                <ul>
+                  <li><strong>News & social</strong> — filtered by tag (<code>Canada / USA / Germany / UK / Macro / Global</code>). A Canada-tagged article only shows under "All" or under the 🇨🇦 pill.</li>
+                  <li><strong>Creative assets</strong> — tagged with one OR many markets (comma-separated). A multi-market asset surfaces under <strong>each</strong> market's filter pill, not just the first one.</li>
+                  <li><strong>Today's Reactive</strong> — its own per-market briefing page reached via the red "Today's Reactive" pill on Live. Different Cultural read, Match read, and three storyboards for each market.</li>
+                  <li><strong>Content Calendar</strong> — its own per-market production schedule (Social, Reactive, Digital OOH slots across Lead Up → Group Stage → Knockouts → Final).</li>
+                  <li><strong>Fixtures, Standings, Ticker</strong> — shared across all markets (the matches don't belong to any one market).</li>
+                </ul>
+              </li>
+              <li><strong>How each market gets fed:</strong>
+                <ul>
+                  <li><strong>Auto-refresh (5am NY cron)</strong> — one Gemini sweep covers all five markets at once. The prompt explicitly instructs Gemini to spread items across Canada / USA / Germany / UK / Macro / Global so no one market dominates.</li>
+                  <li><strong>Manual Refresh Content button</strong> — same Gemini flow, run on demand from the cockpit. Fills every market in a single run.</li>
+                  <li><strong>Today's Reactive (cockpit)</strong> — done <strong>one market at a time</strong>. Pick the market, paste or upload the strategist's brief, hit Execute, Gemini converts it, then Publish. The result only shows on that market's Today's Reactive page.</li>
+                  <li><strong>Creative Uploads (cockpit)</strong> — the uploader <strong>multi-selects</strong> markets per asset. One upload can serve several markets if the creative is global, and the same row appears under each market's pill.</li>
+                  <li><strong>Manual "refresh everything" in chat</strong> — when Claude is asked to refresh in chat, it sweeps web + Reddit and edits <code>data.js</code> directly with new items already tagged by market.</li>
+                </ul>
+              </li>
+              <li><strong>Today's status by market:</strong>
+                <ul>
+                  <li>🇨🇦 <strong>Canada</strong> — fully live. Today's Reactive briefing + Content Calendar both populated.</li>
+                  <li>🇺🇸 <strong>USA</strong>, 🇬🇧 <strong>UK</strong>, 🇩🇪 <strong>Germany</strong> — exist as filter pills, receive News / Social / Creative items, but Today's Reactive and Content Calendar are marked "Soon" until the team produces those briefings.</li>
+                  <li>🌍 <strong>Macro / Global</strong> — cross-market stories (FIFA pricing, ticketing controversy, broadcast deals, regulatory). No dedicated Reactive page; Macro items surface on every market's Live feed.</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">5</span>How content flows</h3>
             <ul>
               <li><strong>Automatic, daily</strong> — a Vercel cron hits <code>/api/refresh</code> at <strong>5am New York</strong> every morning. Gemini runs 12+ live Google Search queries, structures the results, writes to Supabase <code>live_updates</code>. You wake up to a fresh dashboard.</li>
               <li><strong>Manual, on-demand</strong> — hit the <strong>🔄 Refresh Content</strong> button any time. Same flow, but you watch it run live (queries, sources, publish progress).</li>
@@ -3799,7 +3832,7 @@
           </section>
 
           <section>
-            <h3><span class="intro-num">5</span>Supporting cast (always-on)</h3>
+            <h3><span class="intro-num">6</span>Supporting cast (always-on)</h3>
             <ul>
               <li><strong>Gemini button</strong> — bottom-right on both pages. Brand-safe assistant, mode-aware (Dashboard vs MFG). Bullet answers, three prepopulated chips above the input. Hit <strong>G</strong> to open.</li>
               <li><strong>Countdown pill</strong> — floating, drag-to-reposition. Counts down days / hours / minutes to kickoff.</li>
@@ -3810,7 +3843,7 @@
           </section>
 
           <section>
-            <h3><span class="intro-num">6</span>Where the data lives</h3>
+            <h3><span class="intro-num">7</span>Where the data lives</h3>
             <ul>
               <li><strong>Supabase</strong> is the shared brain — <code>live_updates</code> (news / social / ticker), <code>creative_assets</code> (Drive links), <code>mfg_triage</code> + snapshots, <code>today_reactive</code>, audit / dashboard updates.</li>
               <li><strong>data.js</strong> is the codebase content fallback — fixtures, hardcoded ticker / news / social, hardcoded creative. Edited via PR / push; never edited live by the cockpit.</li>
@@ -3820,7 +3853,7 @@
           </section>
 
           <section>
-            <h3><span class="intro-num">7</span>Things to know (the small print)</h3>
+            <h3><span class="intro-num">8</span>Things to know (the small print)</h3>
             <ul>
               <li><strong>Refreshes are additive</strong> — they never delete existing rows. The public dashboard caps how many show; older items just roll off the bottom.</li>
               <li><strong>Creative uploads survive deploys</strong> — they're in Supabase, not the codebase. Pushing new code never wipes them. Only the × button on a card deletes.</li>
