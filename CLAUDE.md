@@ -243,9 +243,25 @@ Deployment Protection: previously enabled, **currently OFF on Production** (the 
 
 ---
 
-## The "refresh everything" workflow
+## Daily auto-refresh (Vercel Cron → `/api/refresh`)
 
-A scheduled remote agent was set up at one point to auto-refresh content via Gemini-via-Vercel-proxy. It's currently **disabled** because Vercel's edge consistently returned `403 host_not_allowed` for the Anthropic cloud agent's IP range. The owner does refreshes manually in chat instead.
+A Vercel Cron at **`0 9 * * *` UTC** (= 5am New York during EDT, which covers the whole WC window) calls `GET /api/refresh` with `Authorization: Bearer ${CRON_SECRET}`. The endpoint:
+
+1. Runs the same Gemini 2.5 Flash + Google Search grounding flow the manual button uses.
+2. **Server-side**, normalises the JSON payload (mirrors of `normalizeNews`/`normalizeSocial`/`normalizeTicker` from `mfg.html`) and inserts rows into Supabase `live_updates` using `SUPABASE_SERVICE_ROLE_KEY` (same RLS-bypass path as `/api/sb-write`).
+3. Tags every row's payload with `source_kind: "cron"` so cron vs manual inserts are distinguishable.
+
+The public dashboard already bumps `DASHBOARD_DATA.lastUpdated` from the freshest `live_updates.created_at` (commit `e99286e`), so the "Refreshed Xm ago" chip on `index.html` ticks forward automatically — no extra work on the client.
+
+**Required env var on Vercel:** `CRON_SECRET` — any high-entropy string. Vercel Cron sends it as `Authorization: Bearer …` to `/api/refresh`; the endpoint timing-safe compares.
+
+**Auth on `/api/refresh`:** accepts EITHER `wcc_mfg_gate` cookie (browser, manual button — returns the JSON payload for the client to write) OR `Authorization: Bearer ${CRON_SECRET}` (cron, writes server-side and returns a count summary).
+
+An earlier attempt at a scheduled **remote Claude agent** doing the refresh via the Vercel proxy was disabled because Vercel's edge returned `403 host_not_allowed` for Anthropic's IP range. That constraint does not apply to Vercel Cron, which originates inside Vercel itself.
+
+## The "refresh everything" chat workflow
+
+The cron above keeps `live_updates` fresh. The owner ALSO does manual refreshes in chat — these are higher-quality (Reddit + targeted web search by Claude, not just Gemini-grounded queries) and edit `data.js` directly.
 
 When the user types **"refresh everything"** (or "refresh content" / "do the daily" / "pull fresh news"):
 

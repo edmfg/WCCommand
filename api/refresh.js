@@ -1,9 +1,21 @@
-// POST /api/refresh — MFG-only. Calls Gemini 2.5 Flash with Google Search
-// grounding, asks for a strict JSON payload of fresh WC2026 news / social /
-// ticker items, parses it, returns to the client. The client then writes
-// the rows into the Supabase `live_updates` table using the existing
-// supabase-js init (RLS is permissive — auth lives in the gate cookie).
+// POST /api/refresh — Gemini 2.5 Flash with Google Search grounding.
+//
+// Two callers:
+//
+//   1. The MFG "Refresh Content" button (browser, wcc_mfg_gate cookie).
+//      Behaviour unchanged: parses Gemini's JSON, returns it, the client
+//      then writes rows into Supabase `live_updates` via /api/sb-write.
+//
+//   2. Vercel Cron (Authorization: Bearer ${CRON_SECRET}). No browser,
+//      no cookie, so the endpoint normalises the Gemini payload AND
+//      inserts rows into `live_updates` itself using the service-role
+//      key (same path /api/sb-write uses). Cron-sourced rows get
+//      payload.source = "cron" so the activity feed can distinguish them.
+//
+// Configured via vercel.json `crons` at 0 9 * * * (UTC) = 5am New York
+// during EDT, which covers the entire WC2026 window (Jun 11 – Jul 19).
 
+const crypto = require("crypto");
 const { verifyToken, readCookie, signingSecret } = require("./_gate-shared");
 
 const MODEL = "gemini-2.5-flash";
@@ -17,6 +29,18 @@ function mfgGateOk(req) {
   if (!secret) return false;
   const cookie = readCookie(req, "wcc_mfg_gate");
   return !!(cookie && verifyToken(cookie, secret));
+}
+
+function cronAuthOk(req) {
+  const expected = process.env.CRON_SECRET;
+  if (!expected) return false;
+  const header = req.headers["authorization"] || "";
+  if (!header.toLowerCase().startsWith("bearer ")) return false;
+  const provided = header.slice(7).trim();
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 
 function buildPrompt() {
@@ -115,12 +139,96 @@ function extractJson(text) {
   }
 }
 
+// Mirror of the client-side normalizers in mfg.html so the cron path
+// can produce identical row shapes without going through the browser.
+function normalizeNews(it, now) {
+  if (!it || typeof it !== "object") return null;
+  const validTags = ["Canada", "USA", "Germany", "UK", "Macro", "Global"];
+  const tag = validTags.indexOf(it.tag) >= 0 ? it.tag : "Global";
+  if (!it.headline || !it.summary) return null;
+  return {
+    id: "ai-n-" + now + "-" + Math.random().toString(36).slice(2, 8),
+    headline: String(it.headline).slice(0, 160),
+    source: String(it.source || "AI").slice(0, 80),
+    timestamp: new Date().toISOString(),
+    summary: String(it.summary).slice(0, 900),
+    url: String(it.url || "").slice(0, 500),
+    tag: tag,
+  };
+}
+function normalizeSocial(it, now) {
+  if (!it || typeof it !== "object") return null;
+  const validCats = ["game", "food", "music", "fashion", "fandom", "memes"];
+  const cat = validCats.indexOf(it.category) >= 0 ? it.category : "fandom";
+  const validSent = ["positive", "negative", "mixed", "caution", "neutral"];
+  const sentiment = validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
+  const validPlatforms = ["X", "TikTok", "IG", "Reddit", "YouTube"];
+  let platforms = Array.isArray(it.platforms)
+    ? it.platforms.filter((p) => validPlatforms.indexOf(p) >= 0)
+    : [];
+  if (platforms.length === 0) platforms = ["Reddit", "X"];
+  if (!it.topic || !it.summary) return null;
+  const quotes = Array.isArray(it.quotes)
+    ? it.quotes.filter((q) => q && q.platform && q.text).slice(0, 6)
+    : [];
+  return {
+    id: "ai-s-" + now + "-" + Math.random().toString(36).slice(2, 8),
+    topic: String(it.topic).slice(0, 160),
+    category: cat,
+    volume: typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
+    sentiment: sentiment,
+    summary: String(it.summary).slice(0, 900),
+    sampleQuote: String(it.sampleQuote || "").slice(0, 280),
+    quotes: quotes,
+    platforms: platforms,
+    sourceUrl: String(it.sourceUrl || it.url || "").slice(0, 500),
+    timestamp: new Date().toISOString(),
+  };
+}
+function normalizeTicker(it) {
+  if (typeof it !== "string") return null;
+  const trimmed = it.trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, 200);
+}
+
+// Server-side insert into Supabase live_updates using the service-role key.
+// Mirrors what /api/sb-write does for the manual button — same RLS bypass,
+// same payload shape — so cron-written rows render identically in the UI.
+async function insertLiveUpdates(rows) {
+  const SUPABASE_URL =
+    process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SERVICE_KEY) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY not configured");
+  }
+  const url = SUPABASE_URL + "/rest/v1/live_updates";
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: "Bearer " + SERVICE_KEY,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(rows),
+  });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(
+      "Supabase insert failed: " + resp.status + " " + text.slice(0, 300),
+    );
+  }
+}
+
 module.exports = async function handler(req, res) {
-  if (req.method !== "POST") {
+  // Vercel Cron invokes the path as GET; manual button uses POST. Accept both.
+  if (req.method !== "POST" && req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-  if (!mfgGateOk(req)) {
-    return res.status(401).json({ error: "MFG gate cookie required" });
+  const isCron = cronAuthOk(req);
+  if (!isCron && !mfgGateOk(req)) {
+    return res.status(401).json({ error: "MFG gate cookie or CRON_SECRET required" });
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -194,6 +302,69 @@ module.exports = async function handler(req, res) {
     const queries =
       (groundingMeta && groundingMeta.webSearchQueries) || [];
 
+    // Cron path: normalise + insert into live_updates ourselves, then
+    // return a compact summary. No browser is listening; the response
+    // body is only read by Vercel's cron log viewer.
+    if (isCron) {
+      const now = Date.now();
+      const rawNews = Array.isArray(payload.news) ? payload.news : [];
+      const rawSocial = Array.isArray(payload.social) ? payload.social : [];
+      const rawTicker = Array.isArray(payload.ticker) ? payload.ticker : [];
+      const news = rawNews.map((it) => normalizeNews(it, now)).filter(Boolean);
+      const social = rawSocial.map((it) => normalizeSocial(it, now)).filter(Boolean);
+      const ticker = rawTicker.map(normalizeTicker).filter(Boolean);
+
+      const rows = [];
+      news.forEach((n) => {
+        rows.push({ id: n.id, kind: "news", payload: { ...n, source_kind: "cron" } });
+      });
+      social.forEach((s) => {
+        rows.push({ id: s.id, kind: "social", payload: { ...s, source_kind: "cron" } });
+      });
+      ticker.forEach((t) => {
+        rows.push({
+          id: "ai-t-" + now + "-" + Math.random().toString(36).slice(2, 8),
+          kind: "ticker",
+          payload: { text: t, source_kind: "cron" },
+        });
+      });
+
+      if (rows.length === 0) {
+        console.warn("refresh cron: Gemini returned 0 usable rows");
+        return res.status(200).json({
+          ok: true,
+          mode: "cron",
+          inserted: 0,
+          news: 0,
+          social: 0,
+          ticker: 0,
+        });
+      }
+
+      try {
+        await insertLiveUpdates(rows);
+      } catch (e) {
+        console.error("refresh cron insert error", e);
+        return res.status(502).json({
+          ok: false,
+          mode: "cron",
+          error: e.message || "insert failed",
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        mode: "cron",
+        inserted: rows.length,
+        news: news.length,
+        social: social.length,
+        ticker: ticker.length,
+        sourceCount: sources.length,
+      });
+    }
+
+    // Manual button path: hand the parsed payload back to the browser,
+    // which writes to Supabase via /api/sb-write.
     return res.status(200).json({
       ok: true,
       payload: payload,

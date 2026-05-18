@@ -9,6 +9,9 @@
     { "source": "/api/sb-write", "destination": "/api/sb-write" },
     { "source": "/api/refresh", "destination": "/api/refresh" }
   ],
+  "crons": [
+    { "path": "/api/refresh", "schedule": "0 9 * * *" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
