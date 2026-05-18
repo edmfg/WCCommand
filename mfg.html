@@ -356,8 +356,13 @@
         padding: 4px 12px;
       }
 
-      .header-back {
+      .header-actions {
         margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-back {
         font-family: var(--font-display);
         font-weight: 600;
         font-size: 13px;
@@ -369,6 +374,7 @@
         border-radius: 6px;
         background: rgba(204, 0, 0, 0.06);
         transition: all 0.2s;
+        text-decoration: none;
       }
       .header-back:hover {
         color: #fff;
@@ -376,6 +382,203 @@
         background: rgba(204, 0, 0, 0.18);
         box-shadow: 0 0 12px rgba(204, 0, 0, 0.35);
         opacity: 1;
+      }
+      .header-101 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 1px;
+        color: var(--gold);
+        padding: 8px 14px;
+        border: 1.5px solid rgba(255, 215, 0, 0.55);
+        border-radius: 6px;
+        background: rgba(255, 215, 0, 0.06);
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .header-101:hover,
+      .header-101:focus-visible {
+        color: #fff;
+        border-color: var(--gold);
+        background: rgba(255, 215, 0, 0.18);
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+        outline: none;
+      }
+
+      /* ── 101 Modal ────────────────────────────────────────────────── */
+      .intro-overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2100;
+        background: rgba(5, 8, 14, 0.82);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 24px;
+        overflow-y: auto;
+      }
+      .intro-overlay.open {
+        display: flex;
+      }
+      .intro-card {
+        width: min(820px, 100%);
+        max-height: calc(100vh - 48px);
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, rgba(18, 24, 36, 0.97), rgba(28, 22, 48, 0.97));
+        border: 1px solid rgba(255, 215, 0, 0.4);
+        border-radius: 16px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+        position: relative;
+      }
+      .intro-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 22px 28px 16px;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.18);
+      }
+      .intro-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .intro-title .intro-101-badge {
+        font-family: var(--font-display);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        color: var(--gold);
+        background: rgba(255, 215, 0, 0.12);
+        border: 1px solid rgba(255, 215, 0, 0.45);
+        border-radius: 4px;
+        padding: 3px 8px;
+      }
+      .intro-subtitle {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin: 4px 0 0;
+      }
+      .intro-close {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--text-muted);
+        font-size: 18px;
+        line-height: 1;
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .intro-close:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .intro-body {
+        overflow-y: auto;
+        padding: 20px 28px 28px;
+        color: #e6e8ec;
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .intro-body section {
+        margin: 0 0 22px;
+      }
+      .intro-body section:last-child {
+        margin-bottom: 0;
+      }
+      .intro-body h3 {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        color: var(--gold);
+        text-transform: uppercase;
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .intro-body h3 .intro-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 215, 0, 0.14);
+        border: 1px solid rgba(255, 215, 0, 0.5);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gold);
+        font-family: var(--font-display);
+      }
+      .intro-body ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .intro-body li {
+        position: relative;
+        padding: 4px 0 4px 18px;
+      }
+      .intro-body li::before {
+        content: "›";
+        position: absolute;
+        left: 2px;
+        top: 4px;
+        color: var(--gold);
+        font-weight: 700;
+      }
+      .intro-body strong {
+        color: #fff;
+        font-weight: 700;
+      }
+      .intro-body code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12.5px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: #ffd166;
+      }
+      .intro-footer {
+        padding: 14px 28px 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: flex-end;
+      }
+      .intro-footer button {
+        font-family: var(--font-display);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--gold);
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid rgba(255, 215, 0, 0.45);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .intro-footer button:hover {
+        background: rgba(255, 215, 0, 0.2);
+        color: #fff;
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.35);
       }
 
       /* Tab Navigation */
@@ -3483,6 +3686,139 @@
       </div>
     </div>
 
+    <!-- 101 / How this works overlay -->
+    <div
+      id="intro101Overlay"
+      class="intro-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="intro101Title"
+      aria-hidden="true"
+    >
+      <div class="intro-card">
+        <div class="intro-header">
+          <div>
+            <h2 id="intro101Title" class="intro-title">
+              <span class="intro-101-badge">101</span>
+              World Cup HQ — how it all works
+            </h2>
+            <p class="intro-subtitle">
+              A plain-English tour of the public dashboard and the MFG cockpit. Skim it once, you'll be set.
+            </p>
+          </div>
+          <button
+            type="button"
+            id="close101Btn"
+            class="intro-close"
+            aria-label="Close primer"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="intro-body">
+          <section>
+            <h3><span class="intro-num">1</span>What this is</h3>
+            <ul>
+              <li><strong>World Cup HQ</strong> is MFG's command centre for the 2026 FIFA World Cup (Jun 11 – Jul 19, Canada / Mexico / USA).</li>
+              <li>It's a real-time intelligence + production tool. You read the world from it. You also make the work happen from it.</li>
+              <li>Two surfaces, one system:
+                <ul>
+                  <li><strong>Public Dashboard</strong> — what the wider team sees. News, social chatter, fixtures, creative work.</li>
+                  <li><strong>MFG Cockpit</strong> (you're here right now) — where the MFG team produces and ships the content that powers the public dashboard.</li>
+                </ul>
+              </li>
+              <li>Every surface is password-gated. The same password unlocks all three gates (dashboard, creative, MFG); each gate sets its own cookie so sessions stay separate.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">2</span>Public Dashboard — what's in it</h3>
+            <ul>
+              <li><strong>Live tab</strong> — the headline surface:
+                <ul>
+                  <li><strong>Breaking ticker</strong> across the top — short, flag-led one-liners.</li>
+                  <li><strong>Pinned bookmarks bar</strong> — chips for any card the user has starred. Click to scroll + flash; × to unpin.</li>
+                  <li><strong>Sentiment heatmap</strong> — volume × sentiment per market. Flashes open once on first load.</li>
+                  <li><strong>Filter pills</strong> — All / Recent (72h) / Canada / Germany / UK / USA / Game / Culture. Multi-select with OR.</li>
+                  <li><strong>News carousel</strong> — tagged Canada / USA / Germany / UK / Macro / Global. Each card links out.</li>
+                  <li><strong>Social Trends carousel</strong> — tagged game / food / music / fashion / fandom / memes, with platform pills (X / TikTok / IG / Reddit / YouTube), volume 🔥 dots, and sentiment.</li>
+                  <li><strong>Entity auto-linking</strong> — coach / player / team / venue mentions are clickable; clicking drops them into search and filters every surface.</li>
+                </ul>
+              </li>
+              <li><strong>Fixtures tab</strong> — all 104 matches.
+                <ul>
+                  <li>Three views: <strong>Calendar</strong>, <strong>By Date</strong>, <strong>Standings</strong> (live recompute from scores).</li>
+                  <li>Filter by stage; "<strong>⏱ Next 24h</strong>" toggle for what's kicking off soon.</li>
+                  <li>Today gets a TODAY badge + glowing left guide.</li>
+                </ul>
+              </li>
+              <li><strong>Creative tab</strong> — gated separately. Three sub-tabs: <strong>WC Engine</strong>, <strong>YT × Genius</strong>, <strong>Fox S2</strong>. Cards come from Supabase (live MFG uploads) merged with hardcoded assets. Sort + market filter pills. Drive videos play inline in an overlay.</li>
+              <li><strong>Today's Reactive</strong> — red pill at top of Live. Opens a market chooser → goes to a per-market briefing page with two intelligence reads (Cultural + Match) and three iPhone-style storyboards.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">3</span>MFG Cockpit — what's in here</h3>
+            <ul>
+              <li><strong>🔄 Refresh Content</strong> — runs a Gemini-grounded sweep of WC2026 news / Reddit / social and inserts fresh rows into the public dashboard's Live feed. Watch the overlay's progress bar; rows appear immediately on <code>index.html</code> after publishing.</li>
+              <li><strong>🔥 Today's Reactive</strong> — paste a strategist's brief (or upload .txt / .md / .pdf / .docx), pick the market, hit <strong>Execute</strong>. Gemini converts the raw brief into the structured briefing the public Today's Reactive surface renders. Review the conversion, then <strong>Publish</strong>.</li>
+              <li><strong>📅 Content Calendar</strong> — per-market production calendar across Lead Up → Group Stage → Knockouts → Final. Social / Reactive / Digital OOH slots. Canada is live; USA / UK / Germany on the way.</li>
+              <li><strong>🧯 Global Triage</strong> — drag-and-drop kanban for work across markets. Auto-groups by tag (creative / strategy / macro / activation / media / production / talent / partnerships / legal). Soft-delete with a 5-second Undo toast. Snapshots saved to Supabase.</li>
+              <li><strong>🎬 Creative Uploads</strong> — post Drive-hosted creative to the public Creative tab. Multi-select markets, optional Bento slot, optional Live-from / Live-until window. Files stay on Drive — only the link is stored. <strong>Drive files must be "Anyone with link"</strong> or the iframe preview breaks.</li>
+              <li><strong>📋 Audit Log</strong> — chronological feed of every publish across Creative / Triage / Reactive. Filter chips + search; CSV export.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">4</span>How content flows</h3>
+            <ul>
+              <li><strong>Automatic, daily</strong> — a Vercel cron hits <code>/api/refresh</code> at <strong>5am New York</strong> every morning. Gemini runs 12+ live Google Search queries, structures the results, writes to Supabase <code>live_updates</code>. You wake up to a fresh dashboard.</li>
+              <li><strong>Manual, on-demand</strong> — hit the <strong>🔄 Refresh Content</strong> button any time. Same flow, but you watch it run live (queries, sources, publish progress).</li>
+              <li><strong>Manual, curated</strong> — the owner can also ask Claude in chat to "refresh everything" — deeper Reddit + web sweep, edits <code>data.js</code> directly, pushes to main.</li>
+              <li><strong>The "Refreshed Xm ago" chip</strong> on the public dashboard always reflects the <strong>freshest</strong> Supabase row — auto / manual button / manual chat all bump it.</li>
+              <li><strong>During the tournament</strong> (Jun 11 – Jul 19) — match results, scores, and standings update from <code>data.js</code>; the refresh flow also patches match statuses where it sees fresh results.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">5</span>Supporting cast (always-on)</h3>
+            <ul>
+              <li><strong>Gemini button</strong> — bottom-right on both pages. Brand-safe assistant, mode-aware (Dashboard vs MFG). Bullet answers, three prepopulated chips above the input. Hit <strong>G</strong> to open.</li>
+              <li><strong>Countdown pill</strong> — floating, drag-to-reposition. Counts down days / hours / minutes to kickoff.</li>
+              <li><strong>Global search</strong> (Cmd + K) — searches news / social / matches / assets. Press <strong>?</strong> for the full keyboard shortcuts overlay (1 / 2 / 3 for tabs, G for Gemini, Esc to close).</li>
+              <li><strong>Tab "what's new" badges</strong> — gold-red pills on tab labels show items added since your last visit to that tab.</li>
+              <li><strong>Theme toggle</strong> — light / dark. Persists across sessions.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">6</span>Where the data lives</h3>
+            <ul>
+              <li><strong>Supabase</strong> is the shared brain — <code>live_updates</code> (news / social / ticker), <code>creative_assets</code> (Drive links), <code>mfg_triage</code> + snapshots, <code>today_reactive</code>, audit / dashboard updates.</li>
+              <li><strong>data.js</strong> is the codebase content fallback — fixtures, hardcoded ticker / news / social, hardcoded creative. Edited via PR / push; never edited live by the cockpit.</li>
+              <li><strong>Vercel</strong> hosts the static pages + the API functions (gates, Gemini proxy, refresh, sb-write). No build step — push to main and it's live in seconds.</li>
+              <li><strong>Gemini 2.5 Flash + Google Search grounding</strong> powers Refresh Content and the Today's Reactive converter. Output is grounded — sources are surfaced in the refresh overlay.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3><span class="intro-num">7</span>Things to know (the small print)</h3>
+            <ul>
+              <li><strong>Refreshes are additive</strong> — they never delete existing rows. The public dashboard caps how many show; older items just roll off the bottom.</li>
+              <li><strong>Creative uploads survive deploys</strong> — they're in Supabase, not the codebase. Pushing new code never wipes them. Only the × button on a card deletes.</li>
+              <li><strong>Drive sharing</strong> — every uploaded Drive asset must be set to "Anyone with the link can view" or thumbnails / inline playback break.</li>
+              <li><strong>Multi-market assets</strong> — pick more than one market; the card surfaces under each market's filter pill.</li>
+              <li><strong>The MFG gate cookie</strong> lasts 7 days. The Creative-view gate is 12 hours. The Dashboard gate is 8 hours (or 7 days with "remember me").</li>
+              <li><strong>If something looks stale</strong> — check the "Refreshed Xm ago" chip on the public dashboard, then the Audit Log here. The two together tell you exactly what shipped and when.</li>
+            </ul>
+          </section>
+        </div>
+        <div class="intro-footer">
+          <button type="button" id="close101FooterBtn">Got it</button>
+        </div>
+      </div>
+    </div>
+
     <!-- App -->
     <div id="app">
       <header class="header">
@@ -3511,7 +3847,19 @@
             Switch Market
           </button>
         </div>
-        <a href="index.html" class="header-back">&larr; Dashboard</a>
+        <div class="header-actions">
+          <button
+            type="button"
+            id="open101Btn"
+            class="header-101"
+            aria-haspopup="dialog"
+            aria-controls="intro101Overlay"
+            title="How this dashboard works — quick primer"
+          >
+            101
+          </button>
+          <a href="index.html" class="header-back">&larr; Dashboard</a>
+        </div>
       </header>
 
       <main class="main">
@@ -7546,6 +7894,45 @@
               "</p>";
           }
         }
+      })();
+
+      // ── 101 MODAL (how the system works) ──
+      (function () {
+        const openBtn = document.getElementById("open101Btn");
+        const overlay = document.getElementById("intro101Overlay");
+        const closeBtn = document.getElementById("close101Btn");
+        const footerBtn = document.getElementById("close101FooterBtn");
+        if (!openBtn || !overlay) return;
+
+        let lastFocus = null;
+
+        function open() {
+          lastFocus = document.activeElement;
+          overlay.classList.add("open");
+          overlay.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          // Focus the close button so Esc/Enter is immediately useful.
+          if (closeBtn) closeBtn.focus();
+        }
+        function close() {
+          overlay.classList.remove("open");
+          overlay.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "";
+          if (lastFocus && typeof lastFocus.focus === "function") {
+            try { lastFocus.focus(); } catch (e) {}
+          }
+        }
+
+        openBtn.addEventListener("click", open);
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        if (footerBtn) footerBtn.addEventListener("click", close);
+        // Backdrop click closes; clicks inside the card do not.
+        overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) close();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && overlay.classList.contains("open")) close();
+        });
       })();
 
       // ── REFRESH CONTENT (Gemini → Supabase live_updates) ──
