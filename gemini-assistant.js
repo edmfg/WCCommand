@@ -26,11 +26,14 @@
       "Summarize the dominant macro narratives",
       "Which markets need our attention?",
       "What story should we lead with tomorrow?",
+      "How do I use this dashboard?",
     ],
     mfg: [
+      "How do I upload new creative?",
+      "How do I refresh the dashboard with fresh news?",
+      "How do I publish a Today's Reactive briefing?",
       "Help me draft a triage card from this brief",
       "Group my open triage items by tag and suggest priorities",
-      "What's missing from the Production Tracker?",
       "Draft a daily content update from this week's news",
       "Suggest 3 reactive prompt ideas for the team to test",
     ],
@@ -66,6 +69,63 @@
     return chosen;
   }
 
+  // Distilled "101" — the same primer the MFG team sees in the in-app overlay.
+  // Lets Gemini answer "how do I upload new creative", "how do I refresh news",
+  // "what's in the cockpit", etc. without the user having to crack open the modal.
+  var HOW_TO_GUIDE =
+    "## How World Cup HQ works (use this to answer 'how do I…' questions)\n" +
+    "World Cup HQ is MFG's command centre for the 2026 FIFA World Cup (Jun 11 – Jul 19, hosts Canada / Mexico / USA). Two surfaces, one system, one password (separate cookies per gate).\n\n" +
+    "### Public Dashboard (index.html)\n" +
+    "- **Live tab**: breaking ticker, pinned bookmarks bar, sentiment heatmap (volume × sentiment per market), multi-select filter pills (All / Recent 72h / Canada / Germany / UK / USA / Game / Culture), News carousel (tags Canada/USA/Germany/UK/Macro/Global), Social Trends carousel (categories game/food/music/fashion/fandom/memes with platform pills X/TikTok/IG/Reddit/YouTube + volume/sentiment), entity auto-linking (clicking a player/coach/team filters every surface).\n" +
+    "- **Fixtures tab**: Calendar / By Date / Standings (live recompute), stage filter + ⏱ Next 24h toggle, TODAY badge.\n" +
+    "- **Creative tab** (gated separately, 12h cookie): WC Engine / YT × Genius / Fox S2 sub-tabs. Cards from Supabase + hardcoded. Sort + market filter pills. Drive videos play inline.\n" +
+    "- **Today's Reactive**: red pill on Live → market chooser → per-market briefing (Cultural read + Match read + 3 iPhone storyboards). Canada is live; USA/UK/Germany show 'Soon'.\n" +
+    "- **Floating**: Gemini button (G to open), countdown pill (drag), Cmd+K global search, ? for shortcuts.\n\n" +
+    "### MFG Cockpit (mfg.html) — production tools\n" +
+    "- 🔄 **Refresh Content** — Gemini sweeps WC2026 news/Reddit/social, writes to Supabase live_updates. Public dashboard's 'Refreshed Xm ago' chip ticks forward automatically. Also runs daily at 5am NY via Vercel cron.\n" +
+    "- 🔥 **Today's Reactive** — paste a strategist's brief (or upload .txt/.md/.pdf/.docx), pick the market, hit Execute → Gemini converts to structured briefing → review → Publish.\n" +
+    "- 📅 **Content Calendar** — per-market production calendar (Lead Up → Group Stage → Knockouts → Final), Social/Reactive/Digital OOH slots. Canada live.\n" +
+    "- 🧯 **Global Triage** — drag-and-drop kanban auto-grouped by tag (creative/strategy/macro/activation/media/production/talent/partnerships/legal). Soft delete with 5-second Undo toast. Snapshots to Supabase.\n" +
+    "- 🎬 **Creative Uploads** — post Drive-hosted creative to the public Creative tab.\n" +
+    "- 📋 **Audit Log** — chronological feed of every Creative / Triage / Reactive publish. Filter + search + CSV export.\n\n" +
+    "### How to upload new creative (step-by-step)\n" +
+    "1. Open mfg.html, unlock with the MFG password (same as the dashboard password).\n" +
+    "2. Click the 🎬 Creative Uploads tab.\n" +
+    "3. Pick one or more **Markets** (Canada / USA / Germany / UK / Global) — multi-select.\n" +
+    "4. Optional: pick a **Bento** slot (BENTO 1 Long/Results/16, BENTO 2 Query/Result/Query/23, BENTO 3 Query/Query/16, or ELSE).\n" +
+    "5. Optional: **Title** (auto-generated as 'Creative — <markets>' if blank).\n" +
+    "6. Optional: **Live-from** and **Live-until** dates.\n" +
+    "7. Optional: **Channel** (defaults IG; choices IG/TT/YT/FB/X/DOOH/ELSE).\n" +
+    "8. Paste the **Drive link** (required). Drive file MUST be set to 'Anyone with the link can view' or thumbnails/inline playback break.\n" +
+    "9. Submit. The asset is live immediately on the public Creative tab; it appears under each market's filter pill.\n" +
+    "10. To remove: hover the card → click ×, then click again within 3 seconds to confirm. Hard delete from Supabase.\n\n" +
+    "### How to refresh the dashboard with fresh news\n" +
+    "- **Automatic**: nothing to do — Vercel cron at 5am NY runs Gemini + Google Search and inserts rows.\n" +
+    "- **Manual button**: in MFG cockpit, click 🔄 Refresh Content. Watch the overlay's progress bar; rows publish immediately to index.html. Refreshes are additive — they never delete existing rows.\n" +
+    "- **Manual curated** (owner only): ask Claude in chat to 'refresh everything' — deeper Reddit + web sweep, edits data.js directly, pushes to main.\n\n" +
+    "### How to publish a Today's Reactive briefing\n" +
+    "1. In MFG cockpit, click 🔥 Today's Reactive.\n" +
+    "2. Pick the market (Canada is the live template; others marked Soon).\n" +
+    "3. Paste the strategist's brief into the textarea, OR upload .txt / .md / .pdf / .docx.\n" +
+    "4. Hit **Execute** — Gemini converts the raw brief into the structured briefing (Cultural read, Match read, 3 storyboards).\n" +
+    "5. Review the conversion. Edit anything that's off.\n" +
+    "6. Hit **Publish** — it appears on the public Today's Reactive page for that market.\n\n" +
+    "### How to use Triage\n" +
+    "- Drag cards between columns. Auto-grouped by tag — no manual column setup.\n" +
+    "- Delete: × on a card → 5-second toast with Undo before it's gone for good.\n" +
+    "- Snapshot history panel is collapsed by default; expand it to roll back to a saved state.\n\n" +
+    "### Markets — how each gets fed\n" +
+    "- 5 markets: 🇨🇦 Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, 🌍 Macro/Global.\n" +
+    "- News/social tagged by market; multi-market creative comma-joined and surfaces under each pill.\n" +
+    "- Today's Reactive and Content Calendar are per-market (Canada live, others 'Soon').\n" +
+    "- Fixtures, standings, ticker are shared.\n\n" +
+    "### Small print\n" +
+    "- Refreshes are additive; uploads survive code deploys (Supabase, not codebase). Only the × on a card deletes creative.\n" +
+    "- Drive files MUST be 'Anyone with link' for thumbnails and inline playback.\n" +
+    "- Sessions: MFG gate 7d, Creative-view 12h, Dashboard 8h (or 7d 'remember me').\n" +
+    "- Stale check: 'Refreshed Xm ago' chip on public dashboard + Audit Log in cockpit.\n\n" +
+    "When the user asks **how to do something**, walk them through the steps numbered, in order, using the recipes above. Reference the exact tab / button / field names. If it's a 'where do I find X' question, name the page (index.html / mfg.html / formation.html) and the tab.\n";
+
   function buildSystemInstruction(mode) {
     var modeBlock =
       mode === "mfg"
@@ -95,6 +155,7 @@
       "- **3–5 bullets is the default.** 7 maximum. Stop the second the question is answered.\n" +
       "- Each bullet is one short scannable line. Lead the first bullet with the answer; the rest add supporting facts. Don't restate the question.\n" +
       "- **bold** key terms inside bullets. Numbered lists only when the order genuinely matters.\n" +
+      "- **Exception for 'how do I…' / 'how to…' questions**: use a numbered step list in the order the user has to do them. Up to ~10 steps. Still no prose intro/outro — go straight to step 1.\n" +
       "- ### headers only when the user explicitly asks for a multi-section answer.\n" +
       '- Skip caveats, disclaimers, and "I cannot…" preambles unless directly relevant.\n' +
       '- Only switch to longer prose if the user explicitly asks ("dig deeper", "give me more", "explain in detail").\n\n' +
@@ -121,6 +182,8 @@
       "- For sensitive WC-adjacent stories (e.g. Iran-FIFA visa friction, Saudi Aramco sponsorship, ticket-pricing backlash), report what reputable outlets have reported. Do not editorialize, take a political side, or attribute motives. Frame as 'X has been reported by [outlets].'\n" +
       "- If you can't stay brand-safe and on-topic, decline that piece and offer a related WC angle.\n\n" +
       "**How to refuse off-topic asks:** one sentence acknowledging the limit, one sentence offering a relevant WC pivot. Example: \"I'm scoped to the 2026 FIFA World Cup so I can't weigh in on that — happy to dig into a related WC angle if there's one you'd like.\"\n\n" +
+      HOW_TO_GUIDE +
+      "\n" +
       "## Current context\n" +
       "- Today: " +
       new Date().toISOString().slice(0, 10) +
