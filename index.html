@@ -9425,63 +9425,57 @@
       let _liveFreshCount = 0; // items injected this session — surfaced on the chip
       async function fetchLiveUpdates(silent = false) {
         try {
-          if (!mfgSyncSb && window.supabase && window.supabase.createClient) {
-            mfgSyncSb = window.supabase.createClient(
-              MFG_SUPABASE_URL,
-              MFG_SUPABASE_KEY,
-            );
-          }
-          if (!mfgSyncSb) {
-            if (!silent)
-              console.warn(
-                "live updates: supabase client unavailable (CDN blocked?)",
-              );
-            return;
-          }
+          // Use plain fetch() against Supabase's PostgREST endpoint instead
+          // of the supabase-js client. The library loads via <script defer>,
+          // so it isn't always ready when bootDashboard fires on a warm
+          // cookie — the silent boot call would early-exit on !mfgSyncSb,
+          // leaving the chip + live items stuck on data.js values. Plain
+          // fetch is always available, so this always runs on boot.
           const cutoff = new Date(
             Date.now() - LIVE_UPDATE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
           ).toISOString();
-          const { data, error } = await mfgSyncSb
-            .from("live_updates")
-            .select("id, kind, payload, created_at")
-            .gte("created_at", cutoff)
-            .order("created_at", { ascending: false })
-            .limit(200);
-          if (error) {
-            // Table may not exist yet (pre-migration). Re-apply existing cache
-            // so an error here doesn't drop already-cached items.
-            if (!silent)
-              console.warn(
-                "live updates: supabase select error — table missing or RLS blocking?",
-                error,
-              );
+          const url =
+            MFG_SUPABASE_URL +
+            "/rest/v1/live_updates?select=id,kind,payload,created_at" +
+            "&created_at=gte." + encodeURIComponent(cutoff) +
+            "&order=created_at.desc&limit=200";
+          let data = null;
+          try {
+            const resp = await fetch(url, {
+              headers: {
+                apikey: MFG_SUPABASE_KEY,
+                Authorization: "Bearer " + MFG_SUPABASE_KEY,
+              },
+            });
+            if (!resp.ok) {
+              if (!silent)
+                console.warn(
+                  "live updates: REST select failed " + resp.status,
+                );
+              applyLiveCache();
+              return;
+            }
+            data = await resp.json();
+            if (!Array.isArray(data)) data = [];
+          } catch (e) {
+            if (!silent) console.warn("live updates: fetch failed", e);
             applyLiveCache();
             return;
           }
           if (!silent)
             console.log(
-              "live updates: fetched " + (data ? data.length : 0) + " rows",
+              "live updates: fetched " + data.length + " rows",
             );
           // Bump DASHBOARD_DATA.lastUpdated to the freshest live row so the
           // "Refreshed Xm ago" chip reflects Refresh-Content activity, not
           // just data.js edits. Only bumps forward (never backwards) so a
           // hand-edited data.js with a newer timestamp wins.
-          if (data && data.length) {
+          if (data.length) {
             const newest = data[0].created_at; // already ordered desc
             const cur = Date.parse(DASHBOARD_DATA.lastUpdated || 0) || 0;
             const newTs = Date.parse(newest) || 0;
-            console.warn(
-              "live updates: bump check newest=" + newest +
-                " cur=" + DASHBOARD_DATA.lastUpdated +
-                " newTs=" + newTs + " curMs=" + cur +
-                " willBump=" + (newTs > cur),
-            );
             if (newTs > cur) {
               DASHBOARD_DATA.lastUpdated = newest;
-              console.warn(
-                "live updates: lastUpdated set to " +
-                  DASHBOARD_DATA.lastUpdated,
-              );
               if (typeof renderTimestamp === "function") renderTimestamp();
             }
           }
