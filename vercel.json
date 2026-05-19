@@ -4,6 +4,7 @@
     { "source": "/api/gate", "destination": "/api/gate" },
     { "source": "/api/creative-gate", "destination": "/api/creative-gate" },
     { "source": "/api/mfg-gate", "destination": "/api/mfg-gate" },
+    { "source": "/api/secret-passwords", "destination": "/api/secret-passwords" },
     { "source": "/api/health", "destination": "/api/health" },
     { "source": "/api/reactive-convert", "destination": "/api/reactive-convert" },
     { "source": "/api/sb-write", "destination": "/api/sb-write" },
