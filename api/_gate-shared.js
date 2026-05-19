@@ -174,6 +174,34 @@ async function setLockout(scope, ip) {
   memHits.set(lockKey, { until: Date.now() + GATE_RL_LOCK_SEC * 1000 });
 }
 
+// Generic per-IP rate limit. Returns { ok, count, retryAfter }. Use for
+// authenticated routes where the gate cookie alone isn't enough to bound
+// blast radius if it leaks (e.g. /api/sb-write, manual /api/refresh).
+async function rateLimit(scope, ip, max, windowSec) {
+  const key = `wcc_rl:${scope}:${ip}`;
+  const remote = await upstashIncr(key, windowSec);
+  let count, ttl;
+  if (remote) {
+    count = remote.count;
+    ttl = remote.ttl > 0 ? remote.ttl : windowSec;
+  } else {
+    const now = Date.now();
+    const e = memHits.get(key);
+    if (!e || now - e.start > windowSec * 1000) {
+      memHits.set(key, { start: now, count: 1 });
+      count = 1;
+    } else {
+      e.count += 1;
+      count = e.count;
+    }
+    ttl = Math.max(
+      1,
+      windowSec - Math.floor((now - (memHits.get(key).start || now)) / 1000),
+    );
+  }
+  return { ok: count <= max, count, retryAfter: ttl };
+}
+
 async function clearFailures(scope, ip) {
   const key = `wcc_gate_fail:${scope}:${ip}`;
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -212,5 +240,6 @@ module.exports = {
   isLockedOut,
   setLockout,
   clearFailures,
+  rateLimit,
   signingSecret,
 };

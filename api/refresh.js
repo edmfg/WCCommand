@@ -16,9 +16,20 @@
 // during EDT, which covers the entire WC2026 window (Jun 11 – Jul 19).
 
 const crypto = require("crypto");
-const { verifyToken, readCookie, signingSecret } = require("./_gate-shared");
+const {
+  verifyToken,
+  readCookie,
+  signingSecret,
+  rateLimit,
+  clientIp,
+} = require("./_gate-shared");
 
 const MODEL = "gemini-2.5-flash";
+// Manual button path only: cap Gemini-grounded refreshes per IP per window.
+// One refresh consumes ~12 Google Search queries + a Gemini generation, so
+// even a leaked MFG cookie can only burn so much quota.
+const MANUAL_RL_MAX = 6;
+const MANUAL_RL_WINDOW_SEC = 60;
 const ENDPOINT =
   "https://generativelanguage.googleapis.com/v1beta/models/" +
   MODEL +
@@ -139,6 +150,13 @@ function extractJson(text) {
   }
 }
 
+// Strip raw "<" / ">" from text rendered as HTML on the public dashboard.
+// Defense-in-depth: the client renderer already runs escapeHtml, but with
+// Gemini-generated content this is cheap insurance.
+function safeText(s) {
+  return String(s == null ? "" : s).replace(/[<>]/g, "");
+}
+
 // Mirror of the client-side normalizers in mfg.html so the cron path
 // can produce identical row shapes without going through the browser.
 function normalizeNews(it, now) {
@@ -148,10 +166,10 @@ function normalizeNews(it, now) {
   if (!it.headline || !it.summary) return null;
   return {
     id: "ai-n-" + now + "-" + Math.random().toString(36).slice(2, 8),
-    headline: String(it.headline).slice(0, 160),
-    source: String(it.source || "AI").slice(0, 80),
+    headline: safeText(it.headline).slice(0, 160),
+    source: safeText(it.source || "AI").slice(0, 80),
     timestamp: new Date().toISOString(),
-    summary: String(it.summary).slice(0, 900),
+    summary: safeText(it.summary).slice(0, 900),
     url: String(it.url || "").slice(0, 500),
     tag: tag,
   };
@@ -174,14 +192,16 @@ function normalizeSocial(it, now) {
     : [];
   return {
     id: "ai-s-" + now + "-" + Math.random().toString(36).slice(2, 8),
-    topic: String(it.topic).slice(0, 160),
+    topic: safeText(it.topic).slice(0, 160),
     category: cat,
     volume:
       typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
     sentiment: sentiment,
-    summary: String(it.summary).slice(0, 900),
-    sampleQuote: String(it.sampleQuote || "").slice(0, 280),
-    quotes: quotes,
+    summary: safeText(it.summary).slice(0, 900),
+    sampleQuote: safeText(it.sampleQuote || "").slice(0, 280),
+    quotes: quotes.map((q) =>
+      q && typeof q.text === "string" ? { ...q, text: safeText(q.text) } : q,
+    ),
     platforms: platforms,
     sourceUrl: String(it.sourceUrl || it.url || "").slice(0, 500),
     timestamp: new Date().toISOString(),
@@ -191,7 +211,7 @@ function normalizeTicker(it) {
   if (typeof it !== "string") return null;
   const trimmed = it.trim();
   if (!trimmed) return null;
-  return trimmed.slice(0, 200);
+  return safeText(trimmed).slice(0, 200);
 }
 
 // Server-side insert into Supabase live_updates using the service-role key.
@@ -233,6 +253,23 @@ module.exports = async function handler(req, res) {
     return res
       .status(401)
       .json({ error: "MFG gate cookie or CRON_SECRET required" });
+  }
+  // Manual browser path only: rate-limit so an MFG cookie can't be used to
+  // mass-burn Gemini + Google Search quota. Cron path is trusted (and
+  // fires once a day) so it skips this check.
+  if (!isCron) {
+    const rl = await rateLimit(
+      "refresh-manual",
+      clientIp(req),
+      MANUAL_RL_MAX,
+      MANUAL_RL_WINDOW_SEC,
+    );
+    if (!rl.ok) {
+      res.setHeader("Retry-After", String(rl.retryAfter));
+      return res
+        .status(429)
+        .json({ error: "rate limited", retryAfter: rl.retryAfter });
+    }
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

@@ -18,9 +18,49 @@
 // policies, so anon writes are denied at the database.
 
 const crypto = require("crypto");
+const { rateLimit, clientIp } = require("./_gate-shared");
 
 const COOKIE_GATE = "wcc_gate";
 const COOKIE_MFG_GATE = "wcc_mfg_gate";
+
+// Per-IP rate limit. Gates the blast radius if an MFG cookie leaks: even
+// with a valid cookie, a stolen client can only mutate Supabase this fast.
+// 60 writes / minute is well above legitimate triage-drag / refresh-content
+// usage — the manual Refresh Content button sends ONE batch insert per run.
+const RL_MAX = 60;
+const RL_WINDOW_SEC = 60;
+
+// Fields whose values get rendered as HTML on the public dashboard. Any
+// "<" or ">" in these breaks out of the escapeHtml safety net only if the
+// client renderer somewhere misses an escape — so strip raw angle brackets
+// here as a defense-in-depth pass before the row hits the database. We
+// keep everything else (apostrophes, emoji, slashes) intact.
+const LIVE_UPDATES_TEXT_FIELDS = [
+  "headline",
+  "summary",
+  "topic",
+  "sampleQuote",
+  "text",
+  "source",
+];
+function stripAngleBrackets(s) {
+  return typeof s === "string" ? s.replace(/[<>]/g, "") : s;
+}
+function sanitizeLiveUpdatePayload(p) {
+  if (!p || typeof p !== "object") return p;
+  const out = { ...p };
+  for (const k of LIVE_UPDATES_TEXT_FIELDS) {
+    if (k in out) out[k] = stripAngleBrackets(out[k]);
+  }
+  if (Array.isArray(out.quotes)) {
+    out.quotes = out.quotes.map((q) =>
+      q && typeof q === "object" && typeof q.text === "string"
+        ? { ...q, text: stripAngleBrackets(q.text) }
+        : q,
+    );
+  }
+  return out;
+}
 
 // Tables this proxy is willing to mutate. Anything else returns 400.
 const ALLOWED_TABLES = new Set([
@@ -155,6 +195,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ ok: false, error: "gate cookie required" });
   }
 
+  const rl = await rateLimit("sb-write", clientIp(req), RL_MAX, RL_WINDOW_SEC);
+  if (!rl.ok) {
+    res.setHeader("Retry-After", String(rl.retryAfter));
+    return res
+      .status(429)
+      .json({ ok: false, error: "rate limited", retryAfter: rl.retryAfter });
+  }
+
   const SUPABASE_URL =
     process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -182,7 +230,18 @@ module.exports = async function handler(req, res) {
       .json({ ok: false, error: `op '${op}' not allowed on '${table}'` });
   }
 
-  const values = body.values;
+  let values = body.values;
+  // Defense-in-depth: sanitize HTML-rendered text fields in live_updates
+  // rows before they hit the database. The client renderer already runs
+  // escapeHtml on news/social, but stripping angle brackets here means a
+  // single missed escape anywhere downstream can't become stored XSS.
+  if (table === "live_updates" && Array.isArray(values)) {
+    values = values.map((row) =>
+      row && typeof row === "object"
+        ? { ...row, payload: sanitizeLiveUpdatePayload(row.payload) }
+        : row,
+    );
+  }
   const match = body.match || null;
   const onConflict = body.onConflict ? String(body.onConflict) : null;
   const returnRows = body.returnRows !== false; // default: return data
