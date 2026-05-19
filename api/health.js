@@ -24,8 +24,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "method not allowed" });
   }
 
-  const baseOk =
-    !!process.env.GEMINI_API_KEY && !!process.env.GATE_PASSWORD;
+  const baseOk = !!process.env.GEMINI_API_KEY && !!process.env.GATE_PASSWORD;
   const result = {
     ok: baseOk,
     time: new Date().toISOString(),

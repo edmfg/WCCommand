@@ -211,7 +211,9 @@ function normalizePayload(raw, market, liveDate) {
       flag,
       watermark,
       headline: s(b.headline),
-      spikes: arr(b.spikes).slice(0, 4).map((x) => spike(x, defaultType)),
+      spikes: arr(b.spikes)
+        .slice(0, 4)
+        .map((x) => spike(x, defaultType)),
     };
   }
   function ip(o) {
@@ -352,7 +354,12 @@ export default async function handler(req, res) {
         },
         signal: ac.signal,
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: buildPrompt(raw, market, liveDate) }] }],
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: buildPrompt(raw, market, liveDate) }],
+            },
+          ],
           generationConfig: {
             temperature: 0.4,
             responseMimeType: "application/json",

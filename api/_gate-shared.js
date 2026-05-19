@@ -6,8 +6,8 @@
 const crypto = require("crypto");
 
 const GATE_RL_WINDOW_SEC = 15 * 60; // 15 minutes
-const GATE_RL_MAX = 10;             // 10 failed attempts per window
-const GATE_RL_LOCK_SEC = 30 * 60;   // 30 minute lockout once tripped
+const GATE_RL_MAX = 10; // 10 failed attempts per window
+const GATE_RL_LOCK_SEC = 30 * 60; // 30 minute lockout once tripped
 
 function b64url(buf) {
   return Buffer.from(buf)
@@ -69,7 +69,11 @@ async function readJson(req, maxBytes = 4096) {
     });
     req.on("end", () => {
       if (!raw) return resolve({});
-      try { resolve(JSON.parse(raw)); } catch (e) { reject(e); }
+      try {
+        resolve(JSON.parse(raw));
+      } catch (e) {
+        reject(e);
+      }
     });
     req.on("error", reject);
   });
@@ -152,10 +156,18 @@ async function setLockout(scope, ip) {
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (url && token) {
     try {
-      await fetch(url + "/setex/" + encodeURIComponent(lockKey) + "/" + GATE_RL_LOCK_SEC + "/1", {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token },
-      });
+      await fetch(
+        url +
+          "/setex/" +
+          encodeURIComponent(lockKey) +
+          "/" +
+          GATE_RL_LOCK_SEC +
+          "/1",
+        {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+        },
+      );
       return;
     } catch (_) {}
   }

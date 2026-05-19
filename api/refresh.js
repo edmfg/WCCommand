@@ -161,7 +161,8 @@ function normalizeSocial(it, now) {
   const validCats = ["game", "food", "music", "fashion", "fandom", "memes"];
   const cat = validCats.indexOf(it.category) >= 0 ? it.category : "fandom";
   const validSent = ["positive", "negative", "mixed", "caution", "neutral"];
-  const sentiment = validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
+  const sentiment =
+    validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
   const validPlatforms = ["X", "TikTok", "IG", "Reddit", "YouTube"];
   let platforms = Array.isArray(it.platforms)
     ? it.platforms.filter((p) => validPlatforms.indexOf(p) >= 0)
@@ -175,7 +176,8 @@ function normalizeSocial(it, now) {
     id: "ai-s-" + now + "-" + Math.random().toString(36).slice(2, 8),
     topic: String(it.topic).slice(0, 160),
     category: cat,
-    volume: typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
+    volume:
+      typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
     sentiment: sentiment,
     summary: String(it.summary).slice(0, 900),
     sampleQuote: String(it.sampleQuote || "").slice(0, 280),
@@ -228,7 +230,9 @@ module.exports = async function handler(req, res) {
   }
   const isCron = cronAuthOk(req);
   if (!isCron && !mfgGateOk(req)) {
-    return res.status(401).json({ error: "MFG gate cookie or CRON_SECRET required" });
+    return res
+      .status(401)
+      .json({ error: "MFG gate cookie or CRON_SECRET required" });
   }
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -269,10 +273,15 @@ module.exports = async function handler(req, res) {
     }
 
     const parts =
-      (data.candidates && data.candidates[0] && data.candidates[0].content &&
+      (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
         data.candidates[0].content.parts) ||
       [];
-    const text = parts.map((p) => p.text || "").join("").trim();
+    const text = parts
+      .map((p) => p.text || "")
+      .join("")
+      .trim();
     const payload = extractJson(text);
     if (!payload) {
       return res.status(502).json({
@@ -282,8 +291,10 @@ module.exports = async function handler(req, res) {
     }
 
     const groundingMeta =
-      (data.candidates && data.candidates[0] &&
-        data.candidates[0].groundingMetadata) || null;
+      (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].groundingMetadata) ||
+      null;
 
     // Flatten groundingChunks into a UI-friendly array of { uri, title, domain }.
     const chunks = (groundingMeta && groundingMeta.groundingChunks) || [];
@@ -299,8 +310,7 @@ module.exports = async function handler(req, res) {
       })
       .filter(Boolean);
 
-    const queries =
-      (groundingMeta && groundingMeta.webSearchQueries) || [];
+    const queries = (groundingMeta && groundingMeta.webSearchQueries) || [];
 
     // Cron path: normalise + insert into live_updates ourselves, then
     // return a compact summary. No browser is listening; the response
@@ -311,15 +321,25 @@ module.exports = async function handler(req, res) {
       const rawSocial = Array.isArray(payload.social) ? payload.social : [];
       const rawTicker = Array.isArray(payload.ticker) ? payload.ticker : [];
       const news = rawNews.map((it) => normalizeNews(it, now)).filter(Boolean);
-      const social = rawSocial.map((it) => normalizeSocial(it, now)).filter(Boolean);
+      const social = rawSocial
+        .map((it) => normalizeSocial(it, now))
+        .filter(Boolean);
       const ticker = rawTicker.map(normalizeTicker).filter(Boolean);
 
       const rows = [];
       news.forEach((n) => {
-        rows.push({ id: n.id, kind: "news", payload: { ...n, source_kind: "cron" } });
+        rows.push({
+          id: n.id,
+          kind: "news",
+          payload: { ...n, source_kind: "cron" },
+        });
       });
       social.forEach((s) => {
-        rows.push({ id: s.id, kind: "social", payload: { ...s, source_kind: "cron" } });
+        rows.push({
+          id: s.id,
+          kind: "social",
+          payload: { ...s, source_kind: "cron" },
+        });
       });
       ticker.forEach((t) => {
         rows.push({

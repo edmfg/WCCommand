@@ -26,7 +26,7 @@ const {
 
 const COOKIE_NAME = "wcc_gate";
 const SCOPE = "dash";
-const SESSION_MS = 8 * 60 * 60 * 1000;       // 8 hours
+const SESSION_MS = 8 * 60 * 60 * 1000; // 8 hours
 const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function setCookie(res, value, maxAgeMs) {

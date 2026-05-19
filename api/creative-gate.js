@@ -19,8 +19,8 @@ const {
 
 const COOKIE_NAME = "wcc_creative_view";
 const SCOPE = "creative";
-const SESSION_MS = 12 * 60 * 60 * 1000;       // 12 hours
-const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000;  // 7 days
+const SESSION_MS = 12 * 60 * 60 * 1000; // 12 hours
+const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function setCookie(res, value, maxAgeMs) {
   res.setHeader(

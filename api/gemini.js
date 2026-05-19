@@ -37,7 +37,9 @@ function memSweep(now) {
     if (now - v.start > RATE_LIMIT_WINDOW_SEC * 1000) memHits.delete(k);
   }
   if (memHits.size > MEM_HARD_CAP) {
-    const sorted = [...memHits.entries()].sort((a, b) => a[1].start - b[1].start);
+    const sorted = [...memHits.entries()].sort(
+      (a, b) => a[1].start - b[1].start,
+    );
     const toDrop = memHits.size - MEM_HARD_CAP;
     for (let i = 0; i < toDrop; i++) memHits.delete(sorted[i][0]);
   }
@@ -115,14 +117,17 @@ function getOrIssueUserKey(req, res) {
 
 function issueUserCookie(res) {
   const id = require("crypto").randomBytes(12).toString("hex");
-  res.setHeader("Set-Cookie", [
-    "wcc_uid=" + id,
-    "Path=/",
-    "Secure",
-    "SameSite=Lax",
-    "Max-Age=" + 60 * 60 * 24 * 90,
-    "HttpOnly",
-  ].join("; "));
+  res.setHeader(
+    "Set-Cookie",
+    [
+      "wcc_uid=" + id,
+      "Path=/",
+      "Secure",
+      "SameSite=Lax",
+      "Max-Age=" + 60 * 60 * 24 * 90,
+      "HttpOnly",
+    ].join("; "),
+  );
   return id;
 }
 

@@ -58,7 +58,10 @@
     }
     var chosen = pool.slice(0, CHIP_LIMIT);
     try {
-      sessionStorage.setItem(CHIP_CACHE_KEY + ":" + mode, JSON.stringify(chosen));
+      sessionStorage.setItem(
+        CHIP_CACHE_KEY + ":" + mode,
+        JSON.stringify(chosen),
+      );
     } catch (e) {}
     return chosen;
   }

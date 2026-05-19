@@ -155,7 +155,8 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ ok: false, error: "gate cookie required" });
   }
 
-  const SUPABASE_URL = process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
+  const SUPABASE_URL =
+    process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!SERVICE_KEY) {
     return res
@@ -211,7 +212,9 @@ module.exports = async function handler(req, res) {
       params.push("on_conflict=" + onConflict);
     }
     if (params.length) url += "?" + params.join("&");
-    headers.Prefer = (returnRows ? "return=representation," : "") + "resolution=merge-duplicates";
+    headers.Prefer =
+      (returnRows ? "return=representation," : "") +
+      "resolution=merge-duplicates";
     bodyToSend = JSON.stringify(values);
   } else if (op === "update") {
     method = "PATCH";
