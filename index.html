@@ -88,6 +88,26 @@
         padding: 0;
         box-sizing: border-box;
       }
+      /* Perf: when the tab is hidden, pause every running CSS animation.
+         Set on <html> by the visibilitychange handler so the GPU
+         compositor stops repainting drifting blobs, shimmers, ticker
+         scrolls, etc. while no one is looking. */
+      html[data-hidden="1"] *,
+      html[data-hidden="1"] *::before,
+      html[data-hidden="1"] *::after {
+        animation-play-state: paused !important;
+      }
+      /* Perf + a11y: users with "reduce motion" set get no infinite
+         decorative animations. Page still works, just calmer. */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
       :root {
         --red: #cc0000;
         --red-dark: #990000;
@@ -1192,7 +1212,21 @@
           opacity 0.55s var(--transition),
           transform 0.55s var(--transition);
         pointer-events: none;
+        /* content-visibility lets the browser skip layout + paint for
+           non-active pages. Combined with the contain-intrinsic-size
+           below, off-screen pages cost roughly nothing. */
+        content-visibility: auto;
+        contain-intrinsic-size: 580px;
+      }
+      .carousel-page.active,
+      .carousel-page.exit-left,
+      .carousel-page.enter-left {
+        /* will-change only on pages that are actually transitioning or
+           active — promoting all pages to compositor layers (the old
+           rule) was creating one GPU layer per card-page, ~200 layers
+           with a full live_updates batch. */
         will-change: transform, opacity;
+        content-visibility: visible;
       }
       .carousel-page.active {
         opacity: 1;
@@ -7103,8 +7137,12 @@
       // Pause carousel timers when the page is backgrounded — saves CPU and
       // stops the animation queue from piling up while the user is in another
       // tab. Both carousels are paused together; resume on visibilitychange.
-      document.addEventListener("visibilitychange", () => {
+      // Also flips html[data-hidden="1"] so the CSS rule at the top of
+      // <style> can park every infinite background animation while we're
+      // not looking, dropping GPU compositor cost to ~zero.
+      function applyHiddenState() {
         const paused = document.hidden;
+        document.documentElement.dataset.hidden = paused ? "1" : "";
         try {
           if (paused) {
             newsCarousel && newsCarousel.pause && newsCarousel.pause();
@@ -7112,9 +7150,15 @@
           } else {
             newsCarousel && newsCarousel.resume && newsCarousel.resume();
             socialCarousel && socialCarousel.resume && socialCarousel.resume();
+            // Coming back into focus — top up data so the user doesn't
+            // stare at a snapshot from when they last looked. Cheap
+            // because the polling cycle pauses while hidden.
+            if (typeof fetchLiveUpdates === "function") fetchLiveUpdates(true);
+            if (typeof fetchMarketContent === "function") fetchMarketContent(true);
           }
         } catch (e) {}
-      });
+      }
+      document.addEventListener("visibilitychange", applyHiddenState);
 
       let newsCarousel = createCarousel("newsCards", "newsDots", 2800);
       let socialCarousel = createCarousel("socialCards", "socialDots", 3200);
@@ -7232,6 +7276,10 @@
         filtered = [...filtered].sort(
           (a, b) => (pinned.has(b.id) ? 1 : 0) - (pinned.has(a.id) ? 1 : 0),
         );
+        // Perf cap: only render the most-recent 30. Each card holds a
+        // backdrop-filter glass surface; rendering 200 keeps that many
+        // compositor layers alive even though only 3 are visible.
+        filtered = filtered.slice(0, 30);
         if (!filtered.length) {
           document.getElementById("newsCards").innerHTML =
             '<p style="color:var(--text-dim);font-size:0.85rem;padding:20px">No news matches this filter.</p>';
@@ -7354,6 +7402,8 @@
         filtered = [...filtered].sort(
           (a, b) => (pinned.has(b.id) ? 1 : 0) - (pinned.has(a.id) ? 1 : 0),
         );
+        // Perf cap: see renderNews. Caps social carousel DOM at 30 cards.
+        filtered = filtered.slice(0, 30);
         renderSentimentHeatmap();
         if (!filtered.length) {
           document.getElementById("socialCards").innerHTML =
@@ -9309,6 +9359,11 @@
         if (mfgPollTimer) clearInterval(mfgPollTimer);
         mfgPollTimer = setInterval(
           () => {
+            // Skip the spin while the tab is in the background — saves
+            // four Supabase round-trips + four re-renders every 5 min on
+            // every backgrounded tab. The visibilitychange listener
+            // already triggers a fresh fetch when the user comes back.
+            if (document.hidden) return;
             fetchMfgLatest(true);
             fetchMarketContent(true);
             fetchSharedAssets(true);
@@ -9438,7 +9493,10 @@
             MFG_SUPABASE_URL +
             "/rest/v1/live_updates?select=id,kind,payload,created_at" +
             "&created_at=gte." + encodeURIComponent(cutoff) +
-            "&order=created_at.desc&limit=200";
+            // 60 is plenty for the chip + carousels (capped to 30 each in
+            // renderNews/renderSocial). Trimming from 200 makes the boot
+            // fetch ~3x smaller and the merge much cheaper.
+            "&order=created_at.desc&limit=60";
           let data = null;
           try {
             const resp = await fetch(url, {
