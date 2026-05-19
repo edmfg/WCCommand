@@ -126,6 +126,10 @@
     "- Stale check: 'Refreshed Xm ago' chip on public dashboard + Audit Log in cockpit.\n\n" +
     "When the user asks **how to do something**, walk them through the steps numbered, in order, using the recipes above. Reference the exact tab / button / field names. If it's a 'where do I find X' question, name the page (index.html / mfg.html / formation.html) and the tab.\n";
 
+  // Expose the how-to block so the dashboard's inline Gemini panel (which has
+  // its own system instruction built in index.html) can append it too.
+  try { window.WCC_HOW_TO_GUIDE = HOW_TO_GUIDE; } catch (e) {}
+
   function buildSystemInstruction(mode) {
     var modeBlock =
       mode === "mfg"

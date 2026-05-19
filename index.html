@@ -9981,7 +9981,7 @@
   • **Live** — Breaking news ticker, News carousel, Social Trends carousel. Filter by market (All / Canada / Germany / USA / UK) or theme (Game / Culture / Trending). Cards auto-rotate; click any card to expand.
   • **Fixtures** — All 104 matches across 12 groups + knockouts. Sort by date or group; filter by stage.
   • **Creative** — Three sub-tabs: ⚽ WC Engine (active asset pipeline with market/status/format/deploy date), ▶️ YT x Genius, 📺 Fox S2 (planned).
-- **MFG Mode** (separate page, password-gated) is where the team manually pastes news + social conversations; that data flows into Supabase and surfaces on this dashboard.
+- **MFG Mode** (mfg.html, password-gated) is the production cockpit: 🔄 Refresh Content (Gemini sweep → live_updates), 🔥 Today's Reactive (brief → structured briefing → publish), 📅 Content Calendar, 🧯 Global Triage (kanban), 🎬 Creative Uploads (Drive links → public Creative tab), 📋 Audit Log. See the How-To block below for step-by-step recipes.
 - **Source quality**: news carousel items each have a real \`source\` and \`url\` (Al Jazeera, ESPN, beIN, FIFA, Goal, Bundesliga, etc.) from real April 2026 reporting. Social items are sourced from observed TikTok/X/Reddit/IG trends — \`sampleQuote\` fields are illustrative reconstructions, not verbatim quotes.
 - **Other features**: 🌍 BETA tag in nav, persistent rainbow Gemini button (you), countdown to next match, today-highlight on fixtures, live search, theme toggle (light/dark), MFG password-gated upload mode at /mfg.html.
 
@@ -10030,6 +10030,8 @@ You are a **2026 FIFA World Cup analyst**. Stay strictly inside this scope:
 - ### headers only when the user explicitly asks for a multi-section answer.
 - Skip caveats, disclaimers, and "I cannot…" preambles unless directly relevant.
 - Only switch to a longer prose answer if the user explicitly asks ("dig deeper", "give me more", "explain in detail").
+
+${window.WCC_HOW_TO_GUIDE || ""}
 
 # DASHBOARD DATA (live snapshot — trimmed for context budget)
 ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;

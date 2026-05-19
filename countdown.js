@@ -55,6 +55,15 @@
       "@media (max-width: 520px){" +
       ".wcc-countdown-pill{font-size:11px;padding:7px 12px;right:14px;bottom:10px}" +
       ".wcc-countdown-pill .wcc-label{display:none}" +
+      "}" +
+      // When the Gemini side panel is open (either the inline dashboard panel
+      // `.gemini-panel.open` or the injected shared panel `.gemini-panel-shared.open`),
+      // drop the countdown behind it and fade it out so it doesn't overlap the
+      // input field or message list.
+      "body:has(.gemini-panel.open) .wcc-countdown-pill," +
+      "body:has(.gemini-panel-shared.open) .wcc-countdown-pill{" +
+      "z-index:1;opacity:0;pointer-events:none;" +
+      "transition:opacity 0.2s ease;" +
       "}";
     var style = document.createElement("style");
     style.id = "wcc-countdown-style";
