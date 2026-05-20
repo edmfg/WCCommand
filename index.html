@@ -2471,7 +2471,11 @@
         text-transform: uppercase;
         color: #fff;
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 45%),
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.18),
+            rgba(255, 255, 255, 0) 45%
+          ),
           linear-gradient(135deg, #ff1a1a 0%, #cc0000 50%, #990000 100%);
         border: 1px solid rgba(255, 215, 0, 0.45);
         border-radius: 999px;
@@ -2481,7 +2485,9 @@
           0 8px 24px rgba(204, 0, 0, 0.35),
           inset 0 1px 0 rgba(255, 255, 255, 0.25),
           inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
       .reactive-pill:hover {
         transform: translateY(-1px);
@@ -2511,9 +2517,15 @@
         pointer-events: none;
       }
       @keyframes reactiveShine {
-        0% { left: -60%; }
-        60% { left: 120%; }
-        100% { left: 120%; }
+        0% {
+          left: -60%;
+        }
+        60% {
+          left: 120%;
+        }
+        100% {
+          left: 120%;
+        }
       }
       .reactive-pill .bolt {
         font-size: 16px;
@@ -2521,8 +2533,13 @@
         animation: reactivePulse 1.8s ease-in-out infinite;
       }
       @keyframes reactivePulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.18); }
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.18);
+        }
       }
       .reactive-pill .arrow {
         font-size: 18px;
@@ -2554,8 +2571,12 @@
         animation: marketFade 0.2s ease;
       }
       @keyframes marketFade {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
       .market-modal {
         position: relative;
@@ -2578,8 +2599,14 @@
         border-radius: 20px 20px 0 0;
       }
       @keyframes marketRise {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
       }
       .market-modal-close {
         position: absolute;
@@ -2695,6 +2722,56 @@
         border: 1px solid rgba(255, 215, 0, 0.3);
         padding: 3px 7px;
         border-radius: 4px;
+      }
+      @media (max-width: 600px) {
+        .reactive-pill {
+          padding: 12px 16px;
+          font-size: 13px;
+          letter-spacing: 0.14em;
+          gap: 10px;
+        }
+        .reactive-pill .bolt {
+          font-size: 14px;
+        }
+        .reactive-pill .arrow {
+          font-size: 16px;
+        }
+        .market-modal {
+          padding: 28px 20px 22px;
+          border-radius: 16px;
+        }
+        .market-modal-title {
+          font-size: 22px;
+        }
+        .market-modal-sub {
+          font-size: 12px;
+          margin-bottom: 18px;
+        }
+        .market-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        .market-card {
+          padding: 14px 14px;
+          gap: 12px;
+        }
+        .market-card-flag {
+          width: 40px;
+          height: 40px;
+          font-size: 26px;
+        }
+        .market-card-name {
+          font-size: 14px;
+        }
+        .market-card-meta {
+          font-size: 10px;
+        }
+        .market-card-soon {
+          top: 8px;
+          right: 10px;
+          font-size: 8px;
+          padding: 2px 6px;
+        }
       }
 
       /* ── Bookmarks bar (pinned cards) ── */
@@ -5886,9 +5963,16 @@
 
         // ↑↑↓↓←→←→ba — silent unlock while the gate is up.
         var k = [
-          "ArrowUp","ArrowUp","ArrowDown","ArrowDown",
-          "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight",
-          "b","a",
+          "ArrowUp",
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowLeft",
+          "ArrowRight",
+          "b",
+          "a",
         ];
         var ki = 0;
         document.addEventListener("keydown", function (e) {
@@ -5954,15 +6038,27 @@
           ><span class="beta-badge">BETA v2.9</span></a
         >
         <nav class="header-nav">
-          <button class="tab-btn active" data-tab="live"
-            >Live<span class="whats-new-badge" data-whats-new="live" hidden></span
-          ></button>
-          <button class="tab-btn" data-tab="calendar"
-            >Fixtures<span class="whats-new-badge" data-whats-new="calendar" hidden></span
-          ></button>
-          <button class="tab-btn" data-tab="creative"
-            >Creative<span class="whats-new-badge" data-whats-new="creative" hidden></span
-          ></button>
+          <button class="tab-btn active" data-tab="live">
+            Live<span
+              class="whats-new-badge"
+              data-whats-new="live"
+              hidden
+            ></span>
+          </button>
+          <button class="tab-btn" data-tab="calendar">
+            Fixtures<span
+              class="whats-new-badge"
+              data-whats-new="calendar"
+              hidden
+            ></span>
+          </button>
+          <button class="tab-btn" data-tab="creative">
+            Creative<span
+              class="whats-new-badge"
+              data-whats-new="creative"
+              hidden
+            ></span>
+          </button>
         </nav>
         <div class="header-actions">
           <button class="help-link" id="helpBtn" type="button">
@@ -6151,7 +6247,11 @@
             class="next24h-toggle"
             title="Show only matches kicking off within 24 hours"
           >
-            <input type="checkbox" id="next24hToggle" onchange="renderMatches()" />
+            <input
+              type="checkbox"
+              id="next24hToggle"
+              onchange="renderMatches()"
+            />
             <span>⏱ Next 24h</span>
           </label>
         </div>
@@ -6212,8 +6312,9 @@
               for="assetSort"
               style="
                 font-family:
-                  'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
-                  'Noto Color Emoji', sans-serif;
+                  &quot;Oswald&quot;, &quot;Apple Color Emoji&quot;,
+                  &quot;Segoe UI Emoji&quot;, &quot;Noto Color Emoji&quot;,
+                  sans-serif;
                 font-size: 11px;
                 font-weight: 600;
                 letter-spacing: 1.4px;
@@ -6455,7 +6556,7 @@
         <button
           class="shortcuts-close"
           aria-label="Close"
-          onclick="document.getElementById('shortcutsOverlay').hidden=true"
+          onclick="document.getElementById('shortcutsOverlay').hidden = true"
         >
           ×
         </button>
@@ -6494,8 +6595,9 @@
           style="
             margin: 0 0 6px;
             font-family:
-              'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
-              'Noto Color Emoji', sans-serif;
+              &quot;Oswald&quot;, &quot;Apple Color Emoji&quot;,
+              &quot;Segoe UI Emoji&quot;, &quot;Noto Color Emoji&quot;,
+              sans-serif;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
@@ -6504,9 +6606,8 @@
           🔒 Creative access
         </h2>
         <p style="font-size: 13px; color: var(--text-dim); margin: 0 0 16px">
-          Enter the password to view creative assets. Ask your local MFG
-          person, or use the <strong>Help</strong> button to request the
-          password.
+          Enter the password to view creative assets. Ask your local MFG person,
+          or use the <strong>Help</strong> button to request the password.
         </p>
         <input
           type="password"
@@ -6538,7 +6639,6 @@
         </div>
       </div>
     </div>
-
 
     <div class="fact-bar" id="factBar">
       <div class="fact-label">⚽ Fun Fact</div>
@@ -8428,8 +8528,8 @@
             sel._wired = true;
             sel.addEventListener("change", () => {
               const activeMarket =
-                document.querySelector("#filterBar .filter-pill.active")?.dataset
-                  .market || "All";
+                document.querySelector("#filterBar .filter-pill.active")
+                  ?.dataset.market || "All";
               renderAssets(activeMarket);
             });
           }
@@ -8757,11 +8857,7 @@
         const creativeTs = map.creative || 0;
         // Live = news + social created since last live-visit
         const liveCount =
-          countNewSince(
-            DASHBOARD_DATA.news || [],
-            liveTs,
-            (n) => n.timestamp,
-          ) +
+          countNewSince(DASHBOARD_DATA.news || [], liveTs, (n) => n.timestamp) +
           countNewSince(
             DASHBOARD_DATA.social || [],
             liveTs,
@@ -8792,7 +8888,9 @@
           bar.hidden = true;
           return;
         }
-        const newsById = new Map((DASHBOARD_DATA.news || []).map((n) => [n.id, n]));
+        const newsById = new Map(
+          (DASHBOARD_DATA.news || []).map((n) => [n.id, n]),
+        );
         const socialById = new Map(
           (DASHBOARD_DATA.social || []).map((s) => [s.id, s]),
         );
@@ -9540,7 +9638,7 @@
           typingEl.className = "gemini-msg assistant gemini-typing";
           typingEl.innerHTML =
             '<span class="typing-dots" aria-label="Gemini is typing">' +
-            '<span></span><span></span><span></span>' +
+            "<span></span><span></span><span></span>" +
             "</span>";
           messages.appendChild(typingEl);
           messages.scrollTop = messages.scrollHeight;
@@ -9755,7 +9853,11 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         document.addEventListener("keydown", (e) => {
           if (e.key !== "Enter" && e.key !== " ") return;
           const link = document.activeElement;
-          if (!link || !link.classList || !link.classList.contains("entity-link"))
+          if (
+            !link ||
+            !link.classList ||
+            !link.classList.contains("entity-link")
+          )
             return;
           e.preventDefault();
           link.click();
@@ -9939,9 +10041,7 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           ×
         </button>
         <div class="market-modal-tag">Today's Reactive</div>
-        <h2 class="market-modal-title" id="marketModalTitle">
-          Pick a market
-        </h2>
+        <h2 class="market-modal-title" id="marketModalTitle">Pick a market</h2>
         <p class="market-modal-sub">
           Reader-agent briefings + storyboard plays for today.
         </p>
@@ -10015,7 +10115,8 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
       }
       function pickMarket(market) {
         if (market !== "ca") return;
-        window.location.href = "formation.html?market=" + encodeURIComponent(market);
+        window.location.href =
+          "formation.html?market=" + encodeURIComponent(market);
       }
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
