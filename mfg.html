@@ -218,7 +218,6 @@
         color: var(--gold);
       }
 
-
       .gate-box {
         text-align: center;
         padding: 48px 40px;
@@ -427,7 +426,11 @@
         max-height: calc(100vh - 48px);
         display: flex;
         flex-direction: column;
-        background: linear-gradient(135deg, rgba(18, 24, 36, 0.97), rgba(28, 22, 48, 0.97));
+        background: linear-gradient(
+          135deg,
+          rgba(18, 24, 36, 0.97),
+          rgba(28, 22, 48, 0.97)
+        );
         border: 1px solid rgba(255, 215, 0, 0.4);
         border-radius: 16px;
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
@@ -645,8 +648,12 @@
         animation: refresh-spin 1.1s linear infinite;
       }
       @keyframes refresh-spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       /* Refresh overlay — progress card while Gemini scrapes */
@@ -666,7 +673,11 @@
       }
       .refresh-card {
         width: min(520px, 92vw);
-        background: linear-gradient(135deg, rgba(20, 26, 38, 0.96), rgba(28, 22, 48, 0.96));
+        background: linear-gradient(
+          135deg,
+          rgba(20, 26, 38, 0.96),
+          rgba(28, 22, 48, 0.96)
+        );
         border: 1px solid rgba(255, 215, 0, 0.35);
         border-radius: 14px;
         padding: 28px 28px 22px;
@@ -687,7 +698,14 @@
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: conic-gradient(from 0deg, #ffd700, #ff5252, #9b5cff, #29b6ff, #ffd700);
+        background: conic-gradient(
+          from 0deg,
+          #ffd700,
+          #ff5252,
+          #9b5cff,
+          #29b6ff,
+          #ffd700
+        );
         animation: refresh-spin 2.4s linear infinite;
         box-shadow: 0 0 22px rgba(155, 92, 255, 0.55);
         flex-shrink: 0;
@@ -768,8 +786,13 @@
         font-weight: 800;
       }
       @keyframes refresh-pulse {
-        0%, 100% { box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.12); }
-        50%      { box-shadow: 0 0 0 9px rgba(255, 215, 0, 0.04); }
+        0%,
+        100% {
+          box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.12);
+        }
+        50% {
+          box-shadow: 0 0 0 9px rgba(255, 215, 0, 0.04);
+        }
       }
       .refresh-progress {
         height: 6px;
@@ -844,11 +867,21 @@
         width: 16px;
         text-align: center;
       }
-      .refresh-feed-line.search { color: #c2cbe0; }
-      .refresh-feed-line.source { color: #9bcbff; }
-      .refresh-feed-line.social { color: #c8a3ff; }
-      .refresh-feed-line.publish { color: #79e9b0; }
-      .refresh-feed-line.warn { color: #ffb86b; }
+      .refresh-feed-line.search {
+        color: #c2cbe0;
+      }
+      .refresh-feed-line.source {
+        color: #9bcbff;
+      }
+      .refresh-feed-line.social {
+        color: #c8a3ff;
+      }
+      .refresh-feed-line.publish {
+        color: #79e9b0;
+      }
+      .refresh-feed-line.warn {
+        color: #ffb86b;
+      }
       .refresh-feed-line .domain {
         color: var(--gold);
         margin-right: 6px;
@@ -858,8 +891,14 @@
         flex: 1 1 auto;
       }
       @keyframes feed-in {
-        from { opacity: 0; transform: translateY(4px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .refresh-result {
@@ -915,7 +954,9 @@
         margin-bottom: 14px;
       }
       @media (max-width: 760px) {
-        .reactive-row { grid-template-columns: 1fr; }
+        .reactive-row {
+          grid-template-columns: 1fr;
+        }
       }
       .reactive-field label {
         display: block;
@@ -958,7 +999,11 @@
         color: var(--text);
       }
       .reactive-mode.active {
-        background: linear-gradient(180deg, rgba(204, 0, 0, 0.45), rgba(204, 0, 0, 0.18));
+        background: linear-gradient(
+          180deg,
+          rgba(204, 0, 0, 0.45),
+          rgba(204, 0, 0, 0.18)
+        );
         color: #fff;
       }
       .reactive-input-wrap {
@@ -1215,7 +1260,10 @@
         font-size: 12px;
       }
       @media (max-width: 760px) {
-        .audit-row { grid-template-columns: 1fr; gap: 4px; }
+        .audit-row {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
       }
       .audit-row .a-time {
         color: var(--text-muted);
@@ -2199,7 +2247,10 @@
         white-space: nowrap;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.15s, background 0.15s, color 0.15s;
+        transition:
+          opacity 0.15s,
+          background 0.15s,
+          color 0.15s;
       }
       .triage-item:hover .triage-item-to-creative,
       .triage-item-to-creative:focus-visible {
@@ -3068,14 +3119,38 @@
       }
 
       /* Phase color palette — matches the PDF banding */
-      .cal-phase-lead-up   { background: #f9c5c1; color: #4d1a16; }
-      .cal-phase-group     { background: #f6a96b; color: #3d1c00; }
-      .cal-phase-r32       { background: #c8e6e8; color: #0d4044; }
-      .cal-phase-r16       { background: #9ed4d8; color: #082f33; }
-      .cal-phase-rest      { background: #d4d4d8; color: #1f1f23; }
-      .cal-phase-qf        { background: #7cc2c8; color: #062528; }
-      .cal-phase-sf        { background: #5eaeb5; color: #051f22; }
-      .cal-phase-final     { background: #fcd34d; color: #422a00; }
+      .cal-phase-lead-up {
+        background: #f9c5c1;
+        color: #4d1a16;
+      }
+      .cal-phase-group {
+        background: #f6a96b;
+        color: #3d1c00;
+      }
+      .cal-phase-r32 {
+        background: #c8e6e8;
+        color: #0d4044;
+      }
+      .cal-phase-r16 {
+        background: #9ed4d8;
+        color: #082f33;
+      }
+      .cal-phase-rest {
+        background: #d4d4d8;
+        color: #1f1f23;
+      }
+      .cal-phase-qf {
+        background: #7cc2c8;
+        color: #062528;
+      }
+      .cal-phase-sf {
+        background: #5eaeb5;
+        color: #051f22;
+      }
+      .cal-phase-final {
+        background: #fcd34d;
+        color: #422a00;
+      }
 
       /* Scrollable grid */
       .cal-scroll {
@@ -3214,7 +3289,9 @@
         cursor: pointer;
         border: 1px solid rgba(0, 0, 0, 0.18);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
       }
       .cal-entry > span:not(.cal-warn):not(.cal-status-dot) {
         flex: 1;
@@ -3228,7 +3305,9 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
         z-index: 5;
       }
-      .cal-entry.cal-tbd { opacity: 0.78; }
+      .cal-entry.cal-tbd {
+        opacity: 0.78;
+      }
       .cal-entry.cal-tbd::after {
         content: " — TBD";
         font-weight: 500;
@@ -3237,14 +3316,38 @@
       }
 
       /* Entry color by phase (mirrors banding) */
-      .cal-entry-lead-up { background: #f9c5c1; color: #3d1410; }
-      .cal-entry-group   { background: #f6a96b; color: #321600; }
-      .cal-entry-r32     { background: #c8e6e8; color: #082f33; }
-      .cal-entry-r16     { background: #9ed4d8; color: #062528; }
-      .cal-entry-qf      { background: #7cc2c8; color: #052022; }
-      .cal-entry-sf      { background: #5eaeb5; color: #04181b; }
-      .cal-entry-final   { background: #fcd34d; color: #3a2400; }
-      .cal-entry-rest    { background: #d4d4d8; color: #1f1f23; }
+      .cal-entry-lead-up {
+        background: #f9c5c1;
+        color: #3d1410;
+      }
+      .cal-entry-group {
+        background: #f6a96b;
+        color: #321600;
+      }
+      .cal-entry-r32 {
+        background: #c8e6e8;
+        color: #082f33;
+      }
+      .cal-entry-r16 {
+        background: #9ed4d8;
+        color: #062528;
+      }
+      .cal-entry-qf {
+        background: #7cc2c8;
+        color: #052022;
+      }
+      .cal-entry-sf {
+        background: #5eaeb5;
+        color: #04181b;
+      }
+      .cal-entry-final {
+        background: #fcd34d;
+        color: #3a2400;
+      }
+      .cal-entry-rest {
+        background: #d4d4d8;
+        color: #1f1f23;
+      }
 
       .cal-entry-prompt {
         font-weight: 400;
@@ -3262,7 +3365,9 @@
         justify-content: center;
         z-index: 999;
       }
-      .cal-detail.shown { display: flex; }
+      .cal-detail.shown {
+        display: flex;
+      }
       .cal-detail-box {
         background: rgba(20, 22, 28, 0.98);
         border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3333,7 +3438,9 @@
         font-weight: 600;
         margin-right: 8px;
       }
-      .cal-detail-save:hover { background: #1d4ed8; }
+      .cal-detail-save:hover {
+        background: #1d4ed8;
+      }
       .cal-edit-input {
         width: 100%;
         background: rgba(0, 0, 0, 0.35);
@@ -3392,7 +3499,11 @@
         font-weight: 700;
       }
       .cal-date-row .cal-cell.cal-match-day {
-        background: linear-gradient(180deg, rgba(239,68,68,0.12), rgba(0,0,0,0.28));
+        background: linear-gradient(
+          180deg,
+          rgba(239, 68, 68, 0.12),
+          rgba(0, 0, 0, 0.28)
+        );
         border-bottom: 2px solid #ef4444;
         color: #fff;
       }
@@ -3424,7 +3535,9 @@
         cursor: pointer;
         transition: all 0.15s ease;
       }
-      .cal-chip:hover { background: rgba(255, 255, 255, 0.12); }
+      .cal-chip:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
       .cal-chip.active {
         background: #2563eb;
         border-color: #2563eb;
@@ -3465,7 +3578,8 @@
         font-family: inherit;
         margin-left: 6px;
       }
-      .cal-print-btn:hover, .cal-overlay-btn:hover {
+      .cal-print-btn:hover,
+      .cal-overlay-btn:hover {
         background: rgba(255, 255, 255, 0.1);
       }
       .cal-overlay-btn.active {
@@ -3479,10 +3593,14 @@
         margin-bottom: 8px;
         display: none;
       }
-      .cal-overlay-note.shown { display: block; }
+      .cal-overlay-note.shown {
+        display: block;
+      }
 
       /* Status badges (corner dots on entry bars) */
-      .cal-entry { position: absolute; }
+      .cal-entry {
+        position: absolute;
+      }
       .cal-entry .cal-status-dot {
         position: absolute;
         top: 4px;
@@ -3492,16 +3610,30 @@
         border-radius: 999px;
         box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
       }
-      .cal-status-locked  { background: #22c55e; }   /* green */
-      .cal-status-drafted { background: #facc15; }   /* yellow */
-      .cal-status-live    { background: #ef4444; }   /* red */
-      .cal-status-tbd     { background: #94a3b8; }   /* slate */
+      .cal-status-locked {
+        background: #22c55e;
+      } /* green */
+      .cal-status-drafted {
+        background: #facc15;
+      } /* yellow */
+      .cal-status-live {
+        background: #ef4444;
+      } /* red */
+      .cal-status-tbd {
+        background: #94a3b8;
+      } /* slate */
 
       /* Filter dimming */
-      .cal-entry.cal-dim { opacity: 0.18; filter: grayscale(0.7); }
+      .cal-entry.cal-dim {
+        opacity: 0.18;
+        filter: grayscale(0.7);
+      }
 
       /* Faded overlay rows (from non-primary markets) */
-      .cal-entry.cal-overlay { opacity: 0.4; border-style: dashed; }
+      .cal-entry.cal-overlay {
+        opacity: 0.4;
+        border-style: dashed;
+      }
 
       /* Conflict warning marker on bars */
       .cal-entry .cal-warn {
@@ -3522,7 +3654,10 @@
 
       /* Print stylesheet — landscape, no UI chrome, full grid */
       @media print {
-        body { background: #fff !important; color: #000 !important; }
+        body {
+          background: #fff !important;
+          color: #000 !important;
+        }
         .gemini-toggle-shared,
         .countdown-pill,
         #marketGate,
@@ -3533,11 +3668,24 @@
         .cal-print-btn,
         .cal-overlay-btn,
         .cal-jump-row,
-        .cal-filter-row { display: none !important; }
-        .cal-scroll { overflow: visible !important; cursor: auto !important; }
-        .cal-wrap { border: 1px solid #999; background: #fff !important; }
-        .cal-channel-cell { background: #f3f4f6 !important; color: #000 !important; }
-        .cal-detail { display: none !important; }
+        .cal-filter-row {
+          display: none !important;
+        }
+        .cal-scroll {
+          overflow: visible !important;
+          cursor: auto !important;
+        }
+        .cal-wrap {
+          border: 1px solid #999;
+          background: #fff !important;
+        }
+        .cal-channel-cell {
+          background: #f3f4f6 !important;
+          color: #000 !important;
+        }
+        .cal-detail {
+          display: none !important;
+        }
       }
     </style>
     <script>
@@ -3576,11 +3724,16 @@
         </div>
         <p class="gate-help">
           Email
-          <a href="mailto:ed.tsue@mediafuturesgroup.com">ed.tsue@mediafuturesgroup.com</a>
+          <a href="mailto:ed.tsue@mediafuturesgroup.com"
+            >ed.tsue@mediafuturesgroup.com</a
+          >
           for password.
         </p>
         <p class="gate-help" style="margin-top: 14px">
-          <a href="index.html" style="color: var(--gold); text-decoration: none">
+          <a
+            href="index.html"
+            style="color: var(--gold); text-decoration: none"
+          >
             &larr; Back to public dashboard
           </a>
         </p>
@@ -3665,23 +3818,31 @@
       </div>
     </div>
 
-
     <!-- Refresh Content overlay -->
-    <div id="refreshOverlay" class="refresh-overlay" role="dialog" aria-modal="true" aria-labelledby="refreshTitle">
+    <div
+      id="refreshOverlay"
+      class="refresh-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="refreshTitle"
+    >
       <div class="refresh-card">
         <h2 id="refreshTitle" class="refresh-card-title">
           <span class="gem-orb" aria-hidden="true"></span>
           Refreshing live content
         </h2>
         <p class="refresh-card-sub" id="refreshSub">
-          Gemini is scanning the web and social chatter for the latest WC2026 stories.
+          Gemini is scanning the web and social chatter for the latest WC2026
+          stories.
         </p>
         <ul class="refresh-steps" id="refreshSteps">
           <li class="refresh-step" data-step="search-news">
-            <span class="dot"></span><span>Searching news (BBC, ESPN, Athletic, FIFA)…</span>
+            <span class="dot"></span
+            ><span>Searching news (BBC, ESPN, Athletic, FIFA)…</span>
           </li>
           <li class="refresh-step" data-step="search-social">
-            <span class="dot"></span><span>Scanning Reddit & social chatter…</span>
+            <span class="dot"></span
+            ><span>Scanning Reddit & social chatter…</span>
           </li>
           <li class="refresh-step" data-step="structure">
             <span class="dot"></span><span>Structuring & deduping…</span>
@@ -3690,16 +3851,27 @@
             <span class="dot"></span><span>Publishing to dashboard…</span>
           </li>
         </ul>
-        <div class="refresh-progress"><div class="refresh-progress-bar" id="refreshBar"></div></div>
+        <div class="refresh-progress">
+          <div class="refresh-progress-bar" id="refreshBar"></div>
+        </div>
         <div class="refresh-progress-row">
           <span class="refresh-progress-pct" id="refreshPct">0%</span>
-          <span class="refresh-progress-step" id="refreshStepLabel">Starting…</span>
+          <span class="refresh-progress-step" id="refreshStepLabel"
+            >Starting…</span
+          >
         </div>
         <div class="refresh-feed" id="refreshFeed" aria-live="polite"></div>
         <div class="refresh-result" id="refreshResult"></div>
         <div class="refresh-actions">
           <button type="button" id="refreshCancel">Cancel</button>
-          <button type="button" id="refreshClose" class="primary" style="display: none">Done</button>
+          <button
+            type="button"
+            id="refreshClose"
+            class="primary"
+            style="display: none"
+          >
+            Done
+          </button>
         </div>
       </div>
     </div>
@@ -3721,7 +3893,8 @@
               World Cup HQ — how it all works
             </h2>
             <p class="intro-subtitle">
-              A plain-English tour of the public dashboard and the MFG cockpit. Skim it once, you'll be set.
+              A plain-English tour of the public dashboard and the MFG cockpit.
+              Skim it once, you'll be set.
             </p>
           </div>
           <button
@@ -3737,84 +3910,261 @@
           <section>
             <h3><span class="intro-num">1</span>What this is</h3>
             <ul>
-              <li><strong>World Cup HQ</strong> is MFG's command centre for the 2026 FIFA World Cup (Jun 11 – Jul 19, Canada / Mexico / USA).</li>
-              <li>It's a real-time intelligence + production tool. You read the world from it. You also make the work happen from it.</li>
-              <li>Two surfaces, one system:
+              <li>
+                <strong>World Cup HQ</strong> is MFG's command centre for the
+                2026 FIFA World Cup (Jun 11 – Jul 19, Canada / Mexico / USA).
+              </li>
+              <li>
+                It's a real-time intelligence + production tool. You read the
+                world from it. You also make the work happen from it.
+              </li>
+              <li>
+                Two surfaces, one system:
                 <ul>
-                  <li><strong>Public Dashboard</strong> — what the wider team sees. News, social chatter, fixtures, creative work.</li>
-                  <li><strong>MFG Cockpit</strong> (you're here right now) — where the MFG team produces and ships the content that powers the public dashboard.</li>
+                  <li>
+                    <strong>Public Dashboard</strong> — what the wider team
+                    sees. News, social chatter, fixtures, creative work.
+                  </li>
+                  <li>
+                    <strong>MFG Cockpit</strong> (you're here right now) — where
+                    the MFG team produces and ships the content that powers the
+                    public dashboard.
+                  </li>
                 </ul>
               </li>
-              <li>Every surface is password-gated. The same password unlocks all three gates (dashboard, creative, MFG); each gate sets its own cookie so sessions stay separate.</li>
+              <li>
+                Every surface is password-gated. The same password unlocks all
+                three gates (dashboard, creative, MFG); each gate sets its own
+                cookie so sessions stay separate.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h3><span class="intro-num">2</span>Public Dashboard — what's in it</h3>
+            <h3>
+              <span class="intro-num">2</span>Public Dashboard — what's in it
+            </h3>
             <ul>
-              <li><strong>Live tab</strong> — the headline surface:
+              <li>
+                <strong>Live tab</strong> — the headline surface:
                 <ul>
-                  <li><strong>Breaking ticker</strong> across the top — short, flag-led one-liners.</li>
-                  <li><strong>Pinned bookmarks bar</strong> — chips for any card the user has starred. Click to scroll + flash; × to unpin.</li>
-                  <li><strong>Sentiment heatmap</strong> — volume × sentiment per market. Flashes open once on first load.</li>
-                  <li><strong>Filter pills</strong> — All / Recent (72h) / Canada / Germany / UK / USA / Game / Culture. Multi-select with OR.</li>
-                  <li><strong>News carousel</strong> — tagged Canada / USA / Germany / UK / Macro / Global. Each card links out.</li>
-                  <li><strong>Social Trends carousel</strong> — tagged game / food / music / fashion / fandom / memes, with platform pills (X / TikTok / IG / Reddit / YouTube), volume 🔥 dots, and sentiment.</li>
-                  <li><strong>Entity auto-linking</strong> — coach / player / team / venue mentions are clickable; clicking drops them into search and filters every surface.</li>
+                  <li>
+                    <strong>Breaking ticker</strong> across the top — short,
+                    flag-led one-liners.
+                  </li>
+                  <li>
+                    <strong>Pinned bookmarks bar</strong> — chips for any card
+                    the user has starred. Click to scroll + flash; × to unpin.
+                  </li>
+                  <li>
+                    <strong>Sentiment heatmap</strong> — volume × sentiment per
+                    market. Flashes open once on first load.
+                  </li>
+                  <li>
+                    <strong>Filter pills</strong> — All / Recent (72h) / Canada
+                    / Germany / UK / USA / Game / Culture. Multi-select with OR.
+                  </li>
+                  <li>
+                    <strong>News carousel</strong> — tagged Canada / USA /
+                    Germany / UK / Macro / Global. Each card links out.
+                  </li>
+                  <li>
+                    <strong>Social Trends carousel</strong> — tagged game / food
+                    / music / fashion / fandom / memes, with platform pills (X /
+                    TikTok / IG / Reddit / YouTube), volume 🔥 dots, and
+                    sentiment.
+                  </li>
+                  <li>
+                    <strong>Entity auto-linking</strong> — coach / player / team
+                    / venue mentions are clickable; clicking drops them into
+                    search and filters every surface.
+                  </li>
                 </ul>
               </li>
-              <li><strong>Fixtures tab</strong> — all 104 matches.
+              <li>
+                <strong>Fixtures tab</strong> — all 104 matches.
                 <ul>
-                  <li>Three views: <strong>Calendar</strong>, <strong>By Date</strong>, <strong>Standings</strong> (live recompute from scores).</li>
-                  <li>Filter by stage; "<strong>⏱ Next 24h</strong>" toggle for what's kicking off soon.</li>
+                  <li>
+                    Three views: <strong>Calendar</strong>,
+                    <strong>By Date</strong>, <strong>Standings</strong> (live
+                    recompute from scores).
+                  </li>
+                  <li>
+                    Filter by stage; "<strong>⏱ Next 24h</strong>" toggle for
+                    what's kicking off soon.
+                  </li>
                   <li>Today gets a TODAY badge + glowing left guide.</li>
                 </ul>
               </li>
-              <li><strong>Creative tab</strong> — gated separately. Three sub-tabs: <strong>WC Engine</strong>, <strong>YT × Genius</strong>, <strong>Fox S2</strong>. Cards come from Supabase (live MFG uploads) merged with hardcoded assets. Sort + market filter pills. Drive videos play inline in an overlay.</li>
-              <li><strong>Today's Reactive</strong> — red pill at top of Live. Opens a market chooser → goes to a per-market briefing page with two intelligence reads (Cultural + Match) and three iPhone-style storyboards.</li>
+              <li>
+                <strong>Creative tab</strong> — gated separately. Three
+                sub-tabs: <strong>WC Engine</strong>,
+                <strong>YT × Genius</strong>, <strong>Fox S2</strong>. Cards
+                come from Supabase (live MFG uploads) merged with hardcoded
+                assets. Sort + market filter pills. Drive videos play inline in
+                an overlay.
+              </li>
+              <li>
+                <strong>Today's Reactive</strong> — red pill at top of Live.
+                Opens a market chooser → goes to a per-market briefing page with
+                two intelligence reads (Cultural + Match) and three iPhone-style
+                storyboards.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h3><span class="intro-num">3</span>MFG Cockpit — what's in here</h3>
+            <h3>
+              <span class="intro-num">3</span>MFG Cockpit — what's in here
+            </h3>
             <ul>
-              <li><strong>🔄 Refresh Content</strong> — runs a Gemini-grounded sweep of WC2026 news / Reddit / social and inserts fresh rows into the public dashboard's Live feed. Watch the overlay's progress bar; rows appear immediately on <code>index.html</code> after publishing.</li>
-              <li><strong>🔥 Today's Reactive</strong> — paste a strategist's brief (or upload .txt / .md / .pdf / .docx), pick the market, hit <strong>Execute</strong>. Gemini converts the raw brief into the structured briefing the public Today's Reactive surface renders. Review the conversion, then <strong>Publish</strong>.</li>
-              <li><strong>📅 Content Calendar</strong> — per-market production calendar across Lead Up → Group Stage → Knockouts → Final. Social / Reactive / Digital OOH slots. Canada is live; USA / UK / Germany on the way.</li>
-              <li><strong>🧯 Global Triage</strong> — drag-and-drop kanban for work across markets. Auto-groups by tag (creative / strategy / macro / activation / media / production / talent / partnerships / legal). Soft-delete with a 5-second Undo toast. Snapshots saved to Supabase.</li>
-              <li><strong>🎬 Creative Uploads</strong> — post Drive-hosted creative to the public Creative tab. Multi-select markets, optional Bento slot, optional Live-from / Live-until window. Files stay on Drive — only the link is stored. <strong>Drive files must be "Anyone with link"</strong> or the iframe preview breaks.</li>
-              <li><strong>📋 Audit Log</strong> — chronological feed of every publish across Creative / Triage / Reactive. Filter chips + search; CSV export.</li>
+              <li>
+                <strong>🔄 Refresh Content</strong> — runs a Gemini-grounded
+                sweep of WC2026 news / Reddit / social and inserts fresh rows
+                into the public dashboard's Live feed. Watch the overlay's
+                progress bar; rows appear immediately on
+                <code>index.html</code> after publishing.
+              </li>
+              <li>
+                <strong>🔥 Today's Reactive</strong> — paste a strategist's
+                brief (or upload .txt / .md / .pdf / .docx), pick the market,
+                hit <strong>Execute</strong>. Gemini converts the raw brief into
+                the structured briefing the public Today's Reactive surface
+                renders. Review the conversion, then <strong>Publish</strong>.
+              </li>
+              <li>
+                <strong>📅 Content Calendar</strong> — per-market production
+                calendar across Lead Up → Group Stage → Knockouts → Final.
+                Social / Reactive / Digital OOH slots. Canada is live; USA / UK
+                / Germany on the way.
+              </li>
+              <li>
+                <strong>🧯 Global Triage</strong> — drag-and-drop kanban for
+                work across markets. Auto-groups by tag (creative / strategy /
+                macro / activation / media / production / talent / partnerships
+                / legal). Soft-delete with a 5-second Undo toast. Snapshots
+                saved to Supabase.
+              </li>
+              <li>
+                <strong>🎬 Creative Uploads</strong> — post Drive-hosted
+                creative to the public Creative tab. Multi-select markets,
+                optional Bento slot, optional Live-from / Live-until window.
+                Files stay on Drive — only the link is stored.
+                <strong>Drive files must be "Anyone with link"</strong> or the
+                iframe preview breaks.
+              </li>
+              <li>
+                <strong>📋 Audit Log</strong> — chronological feed of every
+                publish across Creative / Triage / Reactive. Filter chips +
+                search; CSV export.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h3><span class="intro-num">4</span>Markets — how each gets and uses its own data</h3>
+            <h3>
+              <span class="intro-num">4</span>Markets — how each gets and uses
+              its own data
+            </h3>
             <ul>
-              <li>World Cup HQ runs <strong>five markets in parallel</strong>: 🇨🇦 Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, and 🌍 Macro / Global (cross-market stories — FIFA news, pricing, broadcast, regulation).</li>
-              <li>Every piece of content is tagged with at least one market. The <strong>filter pills</strong> at the top of the Live tab flip the public dashboard to one or more markets at a time.</li>
-              <li><strong>What each market sees on the public dashboard:</strong>
+              <li>
+                World Cup HQ runs <strong>five markets in parallel</strong>: 🇨🇦
+                Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, and 🌍 Macro / Global
+                (cross-market stories — FIFA news, pricing, broadcast,
+                regulation).
+              </li>
+              <li>
+                Every piece of content is tagged with at least one market. The
+                <strong>filter pills</strong> at the top of the Live tab flip
+                the public dashboard to one or more markets at a time.
+              </li>
+              <li>
+                <strong>What each market sees on the public dashboard:</strong>
                 <ul>
-                  <li><strong>News & social</strong> — filtered by tag (<code>Canada / USA / Germany / UK / Macro / Global</code>). A Canada-tagged article only shows under "All" or under the 🇨🇦 pill.</li>
-                  <li><strong>Creative assets</strong> — tagged with one OR many markets (comma-separated). A multi-market asset surfaces under <strong>each</strong> market's filter pill, not just the first one.</li>
-                  <li><strong>Today's Reactive</strong> — its own per-market briefing page reached via the red "Today's Reactive" pill on Live. Different Cultural read, Match read, and three storyboards for each market.</li>
-                  <li><strong>Content Calendar</strong> — its own per-market production schedule (Social, Reactive, Digital OOH slots across Lead Up → Group Stage → Knockouts → Final).</li>
-                  <li><strong>Fixtures, Standings, Ticker</strong> — shared across all markets (the matches don't belong to any one market).</li>
+                  <li>
+                    <strong>News & social</strong> — filtered by tag (<code
+                      >Canada / USA / Germany / UK / Macro / Global</code
+                    >). A Canada-tagged article only shows under "All" or under
+                    the 🇨🇦 pill.
+                  </li>
+                  <li>
+                    <strong>Creative assets</strong> — tagged with one OR many
+                    markets (comma-separated). A multi-market asset surfaces
+                    under <strong>each</strong> market's filter pill, not just
+                    the first one.
+                  </li>
+                  <li>
+                    <strong>Today's Reactive</strong> — its own per-market
+                    briefing page reached via the red "Today's Reactive" pill on
+                    Live. Different Cultural read, Match read, and three
+                    storyboards for each market.
+                  </li>
+                  <li>
+                    <strong>Content Calendar</strong> — its own per-market
+                    production schedule (Social, Reactive, Digital OOH slots
+                    across Lead Up → Group Stage → Knockouts → Final).
+                  </li>
+                  <li>
+                    <strong>Fixtures, Standings, Ticker</strong> — shared across
+                    all markets (the matches don't belong to any one market).
+                  </li>
                 </ul>
               </li>
-              <li><strong>How each market gets fed:</strong>
+              <li>
+                <strong>How each market gets fed:</strong>
                 <ul>
-                  <li><strong>Auto-refresh (5am NY cron)</strong> — one Gemini sweep covers all five markets at once. The prompt explicitly instructs Gemini to spread items across Canada / USA / Germany / UK / Macro / Global so no one market dominates.</li>
-                  <li><strong>Manual Refresh Content button</strong> — same Gemini flow, run on demand from the cockpit. Fills every market in a single run.</li>
-                  <li><strong>Today's Reactive (cockpit)</strong> — done <strong>one market at a time</strong>. Pick the market, paste or upload the strategist's brief, hit Execute, Gemini converts it, then Publish. The result only shows on that market's Today's Reactive page.</li>
-                  <li><strong>Creative Uploads (cockpit)</strong> — the uploader <strong>multi-selects</strong> markets per asset. One upload can serve several markets if the creative is global, and the same row appears under each market's pill.</li>
-                  <li><strong>Manual "refresh everything" in chat</strong> — when Claude is asked to refresh in chat, it sweeps web + Reddit and edits <code>data.js</code> directly with new items already tagged by market.</li>
+                  <li>
+                    <strong>Auto-refresh (5am NY cron)</strong> — one Gemini
+                    sweep covers all five markets at once. The prompt explicitly
+                    instructs Gemini to spread items across Canada / USA /
+                    Germany / UK / Macro / Global so no one market dominates.
+                  </li>
+                  <li>
+                    <strong>Manual Refresh Content button</strong> — same Gemini
+                    flow, run on demand from the cockpit. Fills every market in
+                    a single run.
+                  </li>
+                  <li>
+                    <strong>Today's Reactive (cockpit)</strong> — done
+                    <strong>one market at a time</strong>. Pick the market,
+                    paste or upload the strategist's brief, hit Execute, Gemini
+                    converts it, then Publish. The result only shows on that
+                    market's Today's Reactive page.
+                  </li>
+                  <li>
+                    <strong>Creative Uploads (cockpit)</strong> — the uploader
+                    <strong>multi-selects</strong> markets per asset. One upload
+                    can serve several markets if the creative is global, and the
+                    same row appears under each market's pill.
+                  </li>
+                  <li>
+                    <strong>Manual "refresh everything" in chat</strong> — when
+                    Claude is asked to refresh in chat, it sweeps web + Reddit
+                    and edits <code>data.js</code> directly with new items
+                    already tagged by market.
+                  </li>
                 </ul>
               </li>
-              <li><strong>Today's status by market:</strong>
+              <li>
+                <strong>Today's status by market:</strong>
                 <ul>
-                  <li>🇨🇦 <strong>Canada</strong> — fully live. Today's Reactive briefing + Content Calendar both populated.</li>
-                  <li>🇺🇸 <strong>USA</strong>, 🇬🇧 <strong>UK</strong>, 🇩🇪 <strong>Germany</strong> — exist as filter pills, receive News / Social / Creative items, but Today's Reactive and Content Calendar are marked "Soon" until the team produces those briefings.</li>
-                  <li>🌍 <strong>Macro / Global</strong> — cross-market stories (FIFA pricing, ticketing controversy, broadcast deals, regulatory). No dedicated Reactive page; Macro items surface on every market's Live feed.</li>
+                  <li>
+                    🇨🇦 <strong>Canada</strong> — fully live. Today's Reactive
+                    briefing + Content Calendar both populated.
+                  </li>
+                  <li>
+                    🇺🇸 <strong>USA</strong>, 🇬🇧 <strong>UK</strong>, 🇩🇪
+                    <strong>Germany</strong> — exist as filter pills, receive
+                    News / Social / Creative items, but Today's Reactive and
+                    Content Calendar are marked "Soon" until the team produces
+                    those briefings.
+                  </li>
+                  <li>
+                    🌍 <strong>Macro / Global</strong> — cross-market stories
+                    (FIFA pricing, ticketing controversy, broadcast deals,
+                    regulatory). No dedicated Reactive page; Macro items surface
+                    on every market's Live feed.
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -3823,44 +4173,130 @@
           <section>
             <h3><span class="intro-num">5</span>How content flows</h3>
             <ul>
-              <li><strong>Automatic, daily</strong> — a Vercel cron hits <code>/api/refresh</code> at <strong>5am New York</strong> every morning. Gemini runs 12+ live Google Search queries, structures the results, writes to Supabase <code>live_updates</code>. You wake up to a fresh dashboard.</li>
-              <li><strong>Manual, on-demand</strong> — hit the <strong>🔄 Refresh Content</strong> button any time. Same flow, but you watch it run live (queries, sources, publish progress).</li>
-              <li><strong>Manual, curated</strong> — the owner can also ask Claude in chat to "refresh everything" — deeper Reddit + web sweep, edits <code>data.js</code> directly, pushes to main.</li>
-              <li><strong>The "Refreshed Xm ago" chip</strong> on the public dashboard always reflects the <strong>freshest</strong> Supabase row — auto / manual button / manual chat all bump it.</li>
-              <li><strong>During the tournament</strong> (Jun 11 – Jul 19) — match results, scores, and standings update from <code>data.js</code>; the refresh flow also patches match statuses where it sees fresh results.</li>
+              <li>
+                <strong>Automatic, daily</strong> — a Vercel cron hits
+                <code>/api/refresh</code> at <strong>5am New York</strong> every
+                morning. Gemini runs 12+ live Google Search queries, structures
+                the results, writes to Supabase <code>live_updates</code>. You
+                wake up to a fresh dashboard.
+              </li>
+              <li>
+                <strong>Manual, on-demand</strong> — hit the
+                <strong>🔄 Refresh Content</strong> button any time. Same flow,
+                but you watch it run live (queries, sources, publish progress).
+              </li>
+              <li>
+                <strong>Manual, curated</strong> — the owner can also ask Claude
+                in chat to "refresh everything" — deeper Reddit + web sweep,
+                edits <code>data.js</code> directly, pushes to main.
+              </li>
+              <li>
+                <strong>The "Refreshed Xm ago" chip</strong> on the public
+                dashboard always reflects the <strong>freshest</strong> Supabase
+                row — auto / manual button / manual chat all bump it.
+              </li>
+              <li>
+                <strong>During the tournament</strong> (Jun 11 – Jul 19) — match
+                results, scores, and standings update from <code>data.js</code>;
+                the refresh flow also patches match statuses where it sees fresh
+                results.
+              </li>
             </ul>
           </section>
 
           <section>
             <h3><span class="intro-num">6</span>Supporting cast (always-on)</h3>
             <ul>
-              <li><strong>Gemini button</strong> — bottom-right on both pages. Brand-safe assistant, mode-aware (Dashboard vs MFG). Bullet answers, three prepopulated chips above the input. Hit <strong>G</strong> to open.</li>
-              <li><strong>Countdown pill</strong> — floating, drag-to-reposition. Counts down days / hours / minutes to kickoff.</li>
-              <li><strong>Global search</strong> (Cmd + K) — searches news / social / matches / assets. Press <strong>?</strong> for the full keyboard shortcuts overlay (1 / 2 / 3 for tabs, G for Gemini, Esc to close).</li>
-              <li><strong>Tab "what's new" badges</strong> — gold-red pills on tab labels show items added since your last visit to that tab.</li>
-              <li><strong>Theme toggle</strong> — light / dark. Persists across sessions.</li>
+              <li>
+                <strong>Gemini button</strong> — bottom-right on both pages.
+                Brand-safe assistant, mode-aware (Dashboard vs MFG). Bullet
+                answers, three prepopulated chips above the input. Hit
+                <strong>G</strong> to open.
+              </li>
+              <li>
+                <strong>Countdown pill</strong> — floating, drag-to-reposition.
+                Counts down days / hours / minutes to kickoff.
+              </li>
+              <li>
+                <strong>Global search</strong> (Cmd + K) — searches news /
+                social / matches / assets. Press <strong>?</strong> for the full
+                keyboard shortcuts overlay (1 / 2 / 3 for tabs, G for Gemini,
+                Esc to close).
+              </li>
+              <li>
+                <strong>Tab "what's new" badges</strong> — gold-red pills on tab
+                labels show items added since your last visit to that tab.
+              </li>
+              <li>
+                <strong>Theme toggle</strong> — light / dark. Persists across
+                sessions.
+              </li>
             </ul>
           </section>
 
           <section>
             <h3><span class="intro-num">7</span>Where the data lives</h3>
             <ul>
-              <li><strong>Supabase</strong> is the shared brain — <code>live_updates</code> (news / social / ticker), <code>creative_assets</code> (Drive links), <code>mfg_triage</code> + snapshots, <code>today_reactive</code>, audit / dashboard updates.</li>
-              <li><strong>data.js</strong> is the codebase content fallback — fixtures, hardcoded ticker / news / social, hardcoded creative. Edited via PR / push; never edited live by the cockpit.</li>
-              <li><strong>Vercel</strong> hosts the static pages + the API functions (gates, Gemini proxy, refresh, sb-write). No build step — push to main and it's live in seconds.</li>
-              <li><strong>Gemini 2.5 Flash + Google Search grounding</strong> powers Refresh Content and the Today's Reactive converter. Output is grounded — sources are surfaced in the refresh overlay.</li>
+              <li>
+                <strong>Supabase</strong> is the shared brain —
+                <code>live_updates</code> (news / social / ticker),
+                <code>creative_assets</code> (Drive links),
+                <code>mfg_triage</code> + snapshots,
+                <code>today_reactive</code>, audit / dashboard updates.
+              </li>
+              <li>
+                <strong>data.js</strong> is the codebase content fallback —
+                fixtures, hardcoded ticker / news / social, hardcoded creative.
+                Edited via PR / push; never edited live by the cockpit.
+              </li>
+              <li>
+                <strong>Vercel</strong> hosts the static pages + the API
+                functions (gates, Gemini proxy, refresh, sb-write). No build
+                step — push to main and it's live in seconds.
+              </li>
+              <li>
+                <strong>Gemini 2.5 Flash + Google Search grounding</strong>
+                powers Refresh Content and the Today's Reactive converter.
+                Output is grounded — sources are surfaced in the refresh
+                overlay.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h3><span class="intro-num">8</span>Things to know (the small print)</h3>
+            <h3>
+              <span class="intro-num">8</span>Things to know (the small print)
+            </h3>
             <ul>
-              <li><strong>Refreshes are additive</strong> — they never delete existing rows. The public dashboard caps how many show; older items just roll off the bottom.</li>
-              <li><strong>Creative uploads survive deploys</strong> — they're in Supabase, not the codebase. Pushing new code never wipes them. Only the × button on a card deletes.</li>
-              <li><strong>Drive sharing</strong> — every uploaded Drive asset must be set to "Anyone with the link can view" or thumbnails / inline playback break.</li>
-              <li><strong>Multi-market assets</strong> — pick more than one market; the card surfaces under each market's filter pill.</li>
-              <li><strong>The MFG gate cookie</strong> lasts 7 days. The Creative-view gate is 12 hours. The Dashboard gate is 8 hours (or 7 days with "remember me").</li>
-              <li><strong>If something looks stale</strong> — check the "Refreshed Xm ago" chip on the public dashboard, then the Audit Log here. The two together tell you exactly what shipped and when.</li>
+              <li>
+                <strong>Refreshes are additive</strong> — they never delete
+                existing rows. The public dashboard caps how many show; older
+                items just roll off the bottom.
+              </li>
+              <li>
+                <strong>Creative uploads survive deploys</strong> — they're in
+                Supabase, not the codebase. Pushing new code never wipes them.
+                Only the × button on a card deletes.
+              </li>
+              <li>
+                <strong>Drive sharing</strong> — every uploaded Drive asset must
+                be set to "Anyone with the link can view" or thumbnails / inline
+                playback break.
+              </li>
+              <li>
+                <strong>Multi-market assets</strong> — pick more than one
+                market; the card surfaces under each market's filter pill.
+              </li>
+              <li>
+                <strong>The MFG gate cookie</strong> lasts 7 days. The
+                Creative-view gate is 12 hours. The Dashboard gate is 8 hours
+                (or 7 days with "remember me").
+              </li>
+              <li>
+                <strong>If something looks stale</strong> — check the "Refreshed
+                Xm ago" chip on the public dashboard, then the Audit Log here.
+                The two together tell you exactly what shipped and when.
+              </li>
             </ul>
           </section>
         </div>
@@ -4510,10 +4946,7 @@
               margin-bottom: 12px;
             "
           >
-            <div
-              class="section-title"
-              style="font-size: 14px; margin: 0"
-            >
+            <div class="section-title" style="font-size: 14px; margin: 0">
               Recent uploads
             </div>
             <span style="flex: 1"></span>
@@ -4596,8 +5029,8 @@
                 min-width: 240px;
               "
             >
-              Full archive of every Drive link MFG has published. Hover any
-              card to delete.
+              Full archive of every Drive link MFG has published. Hover any card
+              to delete.
             </p>
             <input
               type="search"
@@ -4663,11 +5096,7 @@
               </div>
               <div class="reactive-field">
                 <label for="reactiveLiveDate">Live date</label>
-                <input
-                  type="date"
-                  id="reactiveLiveDate"
-                  class="gate-input"
-                />
+                <input type="date" id="reactiveLiveDate" class="gate-input" />
               </div>
             </div>
 
@@ -4698,11 +5127,7 @@
               ></textarea>
             </div>
 
-            <div
-              id="reactiveUploadWrap"
-              class="reactive-input-wrap"
-              hidden
-            >
+            <div id="reactiveUploadWrap" class="reactive-input-wrap" hidden>
               <label for="reactiveFile">Upload a brief</label>
               <input
                 type="file"
@@ -4753,11 +5178,7 @@
                 >
                   Re-run conversion
                 </button>
-                <button
-                  class="gate-btn"
-                  id="reactivePublishBtn"
-                  type="button"
-                >
+                <button class="gate-btn" id="reactivePublishBtn" type="button">
                   ✅ Publish to dashboard
                 </button>
               </div>
@@ -4773,9 +5194,7 @@
               Recent publishes
             </div>
             <div id="reactiveHistoryList" class="reactive-history-list">
-              <div class="reactive-history-empty">
-                Nothing published yet.
-              </div>
+              <div class="reactive-history-empty">Nothing published yet.</div>
             </div>
           </div>
         </div>
@@ -4849,8 +5268,8 @@
             "
           >
             Per-market production calendar — Social, Reactive, and Digital OOH
-            slots across Lead Up → Group Stage → Knockouts → Final. Pick a market
-            to load.
+            slots across Lead Up → Group Stage → Knockouts → Final. Pick a
+            market to load.
           </p>
 
           <!-- Step 1: market picker -->
@@ -4868,7 +5287,11 @@
               Select market
             </div>
             <div class="cal-market-grid">
-              <button class="cal-market-card" type="button" data-cal-market="ca">
+              <button
+                class="cal-market-card"
+                type="button"
+                data-cal-market="ca"
+              >
                 <span class="cal-market-flag">🇨🇦</span>
                 <span class="cal-market-name">Canada</span>
                 <span class="cal-market-sub">Lead Up → Final</span>
@@ -4970,11 +5393,17 @@
             });
             const j = await res.json().catch(() => ({}));
             if (!res.ok || !j.ok) {
-              return { data: null, error: { message: (j && j.error) || ("HTTP " + res.status) } };
+              return {
+                data: null,
+                error: { message: (j && j.error) || "HTTP " + res.status },
+              };
             }
             return { data: j.data, error: null };
           } catch (e) {
-            return { data: null, error: { message: String((e && e.message) || e) } };
+            return {
+              data: null,
+              error: { message: String((e && e.message) || e) },
+            };
           }
         }
         window.__mfgSbWrite = sbWrite;
@@ -5062,6 +5491,17 @@
           if (currentUserLabel) marketUser.value = currentUserLabel;
           marketSelect.focus();
         }
+
+        // Silent unlock for konami.js. Skips the password prompt and jumps
+        // to either the cockpit (if market + user are already known) or
+        // the market-identity gate. No cookie is set — Supabase writes
+        // through /api/sb-write will still 401, but reads work.
+        window.__wccUnlockMfgGate = function () {
+          if (gate.style.display === "none") return false;
+          if (currentMarket && currentUserLabel) showApp();
+          else showMarketGate();
+          return true;
+        };
 
         function submitMarketIdentity() {
           const market = (marketSelect.value || "").trim();
@@ -6337,7 +6777,8 @@
               const item = triage.columns[ci] && triage.columns[ci].items[ii];
               if (!item) return;
               const tmp = document.createElement("div");
-              tmp.innerHTML = item.html != null ? item.html : escTriage(item.text || "");
+              tmp.innerHTML =
+                item.html != null ? item.html : escTriage(item.text || "");
               const titleText = (tmp.textContent || "").trim().slice(0, 160);
               try {
                 sessionStorage.setItem(
@@ -7414,7 +7855,8 @@
             toastEl.textContent = "";
           }
         }
-        if (startInput) startInput.addEventListener("change", syncDateConstraints);
+        if (startInput)
+          startInput.addEventListener("change", syncDateConstraints);
         if (endInput) endInput.addEventListener("change", syncDateConstraints);
 
         // Triage → Creative handoff: pulls a payload set by the triage tab when
@@ -7640,24 +8082,28 @@
             submitBtn.disabled = true;
             submitBtn.textContent = "Publishing…";
             try {
-              const { error } = await window.__mfgSbWrite("creative_assets", "insert", {
-                values: {
-                  headline: title || headlineFallback,
-                  market: markets.join(","),
-                  format: "Drive",
-                  status: "Live",
-                  deploy_date: startDate,
-                  live_end_date: endDate,
-                  channel: channel,
-                  bento: bento,
-                  subtab: "engine",
-                  kind: "drive",
-                  drive_url: driveUrl,
-                  drive_file_id: fileId,
-                  uploaded_by: "MFG",
+              const { error } = await window.__mfgSbWrite(
+                "creative_assets",
+                "insert",
+                {
+                  values: {
+                    headline: title || headlineFallback,
+                    market: markets.join(","),
+                    format: "Drive",
+                    status: "Live",
+                    deploy_date: startDate,
+                    live_end_date: endDate,
+                    channel: channel,
+                    bento: bento,
+                    subtab: "engine",
+                    kind: "drive",
+                    drive_url: driveUrl,
+                    drive_file_id: fileId,
+                    uploaded_by: "MFG",
+                  },
+                  returnRows: false,
                 },
-                returnRows: false,
-              });
+              );
               if (error) throw error;
               showToast(
                 "Published. Visible on the dashboard's Creative tab now.",
@@ -7791,10 +8237,7 @@
             } catch (err) {
               console.error("delete failed", err);
               pd.hiddenNodes.forEach((c) => (c.style.display = ""));
-              showToast(
-                "Delete failed: " + (err.message || String(err)),
-                true,
-              );
+              showToast("Delete failed: " + (err.message || String(err)), true);
             }
           })();
         }
@@ -7872,7 +8315,9 @@
                   ),
                 );
                 nodes.forEach((c) => (c.style.display = "none"));
-                const headlineEl = card.querySelector(".creative-recent-headline, h4, h5, .headline");
+                const headlineEl = card.querySelector(
+                  ".creative-recent-headline, h4, h5, .headline",
+                );
                 const headline =
                   (headlineEl && headlineEl.textContent.trim()) ||
                   "Creative asset";
@@ -7979,7 +8424,9 @@
           overlay.setAttribute("aria-hidden", "true");
           document.body.style.overflow = "";
           if (lastFocus && typeof lastFocus.focus === "function") {
-            try { lastFocus.focus(); } catch (e) {}
+            try {
+              lastFocus.focus();
+            } catch (e) {}
           }
         }
 
@@ -8076,7 +8523,8 @@
           exportBtn.disabled = true;
           exportBtn.textContent = "Building PDF…";
           try {
-            if (!window.jspdf || !window.jspdf.jsPDF) await loadScript(CDN_JSPDF);
+            if (!window.jspdf || !window.jspdf.jsPDF)
+              await loadScript(CDN_JSPDF);
             const jsPDFCtor =
               (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
             if (!jsPDFCtor) throw new Error("jsPDF failed to load");
@@ -8190,10 +8638,7 @@
                 pdf.text(lines, margin + bulletIndent, y);
                 y += lines.length * 13 + 2;
                 b.subs.forEach((sub) => {
-                  const sLines = pdf.splitTextToSize(
-                    sub,
-                    innerW - subIndent,
-                  );
+                  const sLines = pdf.splitTextToSize(sub, innerW - subIndent);
                   ensureRoom(sLines.length * 12 + 2);
                   pdf.setTextColor(...COL_MUTED);
                   pdf.text("·", margin + bulletIndent, y);
@@ -8283,7 +8728,11 @@
           else if (kind === "publish") icon = "✓";
           else if (kind === "warn") icon = "⚠";
           line.innerHTML =
-            '<span class="icon">' + icon + '</span><span class="text">' + html + "</span>";
+            '<span class="icon">' +
+            icon +
+            '</span><span class="text">' +
+            html +
+            "</span>";
           feedEl.appendChild(line);
           feedEl.scrollTop = feedEl.scrollHeight;
         }
@@ -8335,11 +8784,24 @@
           _simTimer = setInterval(tick, 700);
         }
         function stopSimulatedQueries() {
-          if (_simTimer) { clearInterval(_simTimer); _simTimer = null; }
+          if (_simTimer) {
+            clearInterval(_simTimer);
+            _simTimer = null;
+          }
         }
 
-        const STEP_ORDER = ["search-news", "search-social", "structure", "publish"];
-        const STEP_PROGRESS = { "search-news": 25, "search-social": 50, structure: 80, publish: 100 };
+        const STEP_ORDER = [
+          "search-news",
+          "search-social",
+          "structure",
+          "publish",
+        ];
+        const STEP_PROGRESS = {
+          "search-news": 25,
+          "search-social": 50,
+          structure: 80,
+          publish: 100,
+        };
         let _abort = null;
         let _busy = false;
 
@@ -8365,7 +8827,8 @@
           // START of the active step so finer-grained setPct() calls inside the
           // step can drip it up to the END value.
           const stepIdx = STEP_ORDER.indexOf(key);
-          const startPct = stepIdx <= 0 ? 0 : STEP_PROGRESS[STEP_ORDER[stepIdx - 1]];
+          const startPct =
+            stepIdx <= 0 ? 0 : STEP_PROGRESS[STEP_ORDER[stepIdx - 1]];
           setPct(startPct);
           setStepLabel(STEP_LABEL[key] || "");
         }
@@ -8377,7 +8840,8 @@
           }
           resultEl.style.display = "block";
           resultEl.classList.add("error");
-          resultEl.textContent = msg || "Something went wrong. Try again in a minute.";
+          resultEl.textContent =
+            msg || "Something went wrong. Try again in a minute.";
           setPct(_currentPct, "error");
           setStepLabel("Failed at " + (STEP_LABEL[activeKey] || activeKey));
           cancelBtn.textContent = "Close";
@@ -8391,9 +8855,14 @@
           resultEl.style.display = "block";
           resultEl.classList.remove("error");
           resultEl.innerHTML =
-            "Published <strong>" + counts.news + "</strong> news, <strong>" +
-            counts.social + "</strong> social, <strong>" + counts.ticker +
-            "</strong> ticker item" + (counts.ticker === 1 ? "" : "s") +
+            "Published <strong>" +
+            counts.news +
+            "</strong> news, <strong>" +
+            counts.social +
+            "</strong> social, <strong>" +
+            counts.ticker +
+            "</strong> ticker item" +
+            (counts.ticker === 1 ? "" : "s") +
             ". Reload the dashboard to see them.";
           cancelBtn.style.display = "none";
           closeBtn.style.display = "";
@@ -8419,7 +8888,12 @@
         function closeOverlay() {
           overlay.classList.remove("open");
           stopSimulatedQueries();
-          if (_abort) { try { _abort.abort(); } catch (e) {} _abort = null; }
+          if (_abort) {
+            try {
+              _abort.abort();
+            } catch (e) {}
+            _abort = null;
+          }
           _busy = false;
           btn.classList.remove("is-busy");
           btn.innerHTML = "🔄 Refresh Content";
@@ -8428,12 +8902,24 @@
         cancelBtn.addEventListener("click", closeOverlay);
         closeBtn.addEventListener("click", closeOverlay);
         document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape" && overlay.classList.contains("open") && !_busy) closeOverlay();
+          if (
+            e.key === "Escape" &&
+            overlay.classList.contains("open") &&
+            !_busy
+          )
+            closeOverlay();
         });
 
         function normalizeNews(it, now) {
           if (!it || typeof it !== "object") return null;
-          const validTags = ["Canada", "USA", "Germany", "UK", "Macro", "Global"];
+          const validTags = [
+            "Canada",
+            "USA",
+            "Germany",
+            "UK",
+            "Macro",
+            "Global",
+          ];
           const tag = validTags.indexOf(it.tag) >= 0 ? it.tag : "Global";
           if (!it.headline || !it.summary) return null;
           return {
@@ -8448,10 +8934,25 @@
         }
         function normalizeSocial(it, now) {
           if (!it || typeof it !== "object") return null;
-          const validCats = ["game", "food", "music", "fashion", "fandom", "memes"];
-          const cat = validCats.indexOf(it.category) >= 0 ? it.category : "fandom";
-          const validSent = ["positive", "negative", "mixed", "caution", "neutral"];
-          const sentiment = validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
+          const validCats = [
+            "game",
+            "food",
+            "music",
+            "fashion",
+            "fandom",
+            "memes",
+          ];
+          const cat =
+            validCats.indexOf(it.category) >= 0 ? it.category : "fandom";
+          const validSent = [
+            "positive",
+            "negative",
+            "mixed",
+            "caution",
+            "neutral",
+          ];
+          const sentiment =
+            validSent.indexOf(it.sentiment) >= 0 ? it.sentiment : "neutral";
           const validPlatforms = ["X", "TikTok", "IG", "Reddit", "YouTube"];
           let platforms = Array.isArray(it.platforms)
             ? it.platforms.filter((p) => validPlatforms.indexOf(p) >= 0)
@@ -8465,7 +8966,10 @@
             id: "ai-s-" + now + "-" + Math.random().toString(36).slice(2, 8),
             topic: String(it.topic).slice(0, 160),
             category: cat,
-            volume: typeof it.volume === "string" && it.volume.length ? it.volume : "🔥🔥🔥",
+            volume:
+              typeof it.volume === "string" && it.volume.length
+                ? it.volume
+                : "🔥🔥🔥",
             sentiment: sentiment,
             summary: String(it.summary).slice(0, 900),
             sampleQuote: String(it.sampleQuote || "").slice(0, 280),
@@ -8506,17 +9010,25 @@
             stopSimulatedQueries();
             if (!resp.ok) {
               const txt = await resp.text().catch(() => "");
-              throw new Error("Server " + resp.status + ": " + txt.slice(0, 200));
+              throw new Error(
+                "Server " + resp.status + ": " + txt.slice(0, 200),
+              );
             }
             const data = await resp.json();
-            if (!data || !data.payload) throw new Error("Empty Gemini response");
+            if (!data || !data.payload)
+              throw new Error("Empty Gemini response");
 
             // Reveal actual Google Search queries Gemini ran, then the sources.
             // Interpolate % so the bar moves continuously instead of jumping
             // between the four discrete steps.
             const realQueries = Array.isArray(data.queries) ? data.queries : [];
             if (realQueries.length) {
-              feedLog("", "Gemini ran " + realQueries.length + " live Google Search queries:");
+              feedLog(
+                "",
+                "Gemini ran " +
+                  realQueries.length +
+                  " live Google Search queries:",
+              );
               const queryCap = Math.min(realQueries.length, 25);
               for (let i = 0; i < queryCap; i++) {
                 feedLog("search", "<em>" + realQueries[i] + "</em>");
@@ -8531,11 +9043,17 @@
               const srcCap = Math.min(sources.length, 40);
               for (let i = 0; i < srcCap; i++) {
                 const s = sources[i];
-                const isSocial = /reddit|x\.com|twitter|tiktok|instagram/i.test(s.domain || "");
+                const isSocial = /reddit|x\.com|twitter|tiktok|instagram/i.test(
+                  s.domain || "",
+                );
                 feedLog(
                   isSocial ? "social" : "source",
-                  '<span class="domain">' + (s.domain || "source") + "</span>" +
-                    (s.title ? s.title.replace(/</g, "&lt;").slice(0, 120) : s.uri.slice(0, 120)),
+                  '<span class="domain">' +
+                    (s.domain || "source") +
+                    "</span>" +
+                    (s.title
+                      ? s.title.replace(/</g, "&lt;").slice(0, 120)
+                      : s.uri.slice(0, 120)),
                 );
                 // Step 2 ends at 50%; drip 25 → 50 across the sources.
                 setPct(25 + ((i + 1) / srcCap) * 25);
@@ -8545,11 +9063,21 @@
 
             markActive("structure");
             feedLog("", "Structuring + deduping…");
-            const rawNews = Array.isArray(data.payload.news) ? data.payload.news : [];
-            const rawSocial = Array.isArray(data.payload.social) ? data.payload.social : [];
-            const rawTicker = Array.isArray(data.payload.ticker) ? data.payload.ticker : [];
-            const news = rawNews.map((it) => normalizeNews(it, now)).filter(Boolean);
-            const social = rawSocial.map((it) => normalizeSocial(it, now)).filter(Boolean);
+            const rawNews = Array.isArray(data.payload.news)
+              ? data.payload.news
+              : [];
+            const rawSocial = Array.isArray(data.payload.social)
+              ? data.payload.social
+              : [];
+            const rawTicker = Array.isArray(data.payload.ticker)
+              ? data.payload.ticker
+              : [];
+            const news = rawNews
+              .map((it) => normalizeNews(it, now))
+              .filter(Boolean);
+            const social = rawSocial
+              .map((it) => normalizeSocial(it, now))
+              .filter(Boolean);
             const ticker = rawTicker.map(normalizeTicker).filter(Boolean);
 
             if (news.length + social.length + ticker.length === 0) {
@@ -8583,7 +9111,8 @@
             });
             ticker.forEach((t) => {
               rows.push({
-                id: "ai-t-" + now + "-" + Math.random().toString(36).slice(2, 8),
+                id:
+                  "ai-t-" + now + "-" + Math.random().toString(36).slice(2, 8),
                 kind: "ticker",
                 payload: { text: t },
               });
@@ -8619,12 +9148,17 @@
                 " rows into live_updates. Reload the public dashboard to see them.",
             );
 
-            markSuccess({ news: news.length, social: social.length, ticker: ticker.length });
+            markSuccess({
+              news: news.length,
+              social: social.length,
+              ticker: ticker.length,
+            });
           } catch (err) {
             stopSimulatedQueries();
             if (err && err.name === "AbortError") return;
             const activeKey =
-              stepsEl.querySelector(".refresh-step.active")?.dataset.step || "search-news";
+              stepsEl.querySelector(".refresh-step.active")?.dataset.step ||
+              "search-news";
             feedLog("warn", (err.message || String(err)).replace(/</g, "&lt;"));
             markAllFailed(activeKey, err.message || String(err));
             console.error("refresh content failed", err);
@@ -8668,21 +9202,24 @@
           try {
             const d = new Date(ts);
             const now = new Date();
-            const sameDay =
-              d.toDateString() === now.toDateString();
+            const sameDay = d.toDateString() === now.toDateString();
             if (sameDay) {
               return d.toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "2-digit",
               });
             }
-            return d.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }) + " · " + d.toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-            });
+            return (
+              d.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              }) +
+              " · " +
+              d.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            );
           } catch (e) {
             return "";
           }
@@ -8695,7 +9232,8 @@
           Global: "🌍",
         };
         function readIdentity() {
-          let m = "", u = "";
+          let m = "",
+            u = "";
           try {
             m =
               localStorage.getItem("mfg_market") ||
@@ -8824,9 +9362,9 @@
         }
         function getRawInput() {
           if (reactiveRawInput) return reactiveRawInput;
-          return (reactiveEls.reactivePaste &&
-            reactiveEls.reactivePaste.value) ||
-            "";
+          return (
+            (reactiveEls.reactivePaste && reactiveEls.reactivePaste.value) || ""
+          );
         }
 
         async function loadReactiveHistory() {
@@ -8862,7 +9400,7 @@
                 '<span class="h-flag">' +
                 (FLAG[r.market] || "🌐") +
                 "</span>" +
-                '<div><div>' +
+                "<div><div>" +
                 escHtml(r.market) +
                 " · live " +
                 escHtml(r.live_date || "") +
@@ -8926,7 +9464,11 @@
               const text = await parseUploadedFile(file);
               reactiveRawInput = String(text || "").trim();
               setFileStatus(
-                "Parsed " + file.name + " · " + reactiveRawInput.length + " chars",
+                "Parsed " +
+                  file.name +
+                  " · " +
+                  reactiveRawInput.length +
+                  " chars",
                 "ok",
               );
             } catch (err) {
@@ -8990,7 +9532,10 @@
             setReactiveStatus("Conversion ready — review below.", "ok");
             renderReactivePreview(reactivePayload);
             e.reactiveStep2.hidden = false;
-            e.reactiveStep2.scrollIntoView({ behavior: "smooth", block: "start" });
+            e.reactiveStep2.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
           } catch (err) {
             setReactiveStatus(
               "Network error: " + (err && err.message ? err.message : err),
@@ -9015,18 +9560,26 @@
           function spikeHtml(s) {
             return (
               '<div class="reactive-preview-spike">' +
-              '<div class="pv-title">' + escHtml(s.title) + "</div>" +
+              '<div class="pv-title">' +
+              escHtml(s.title) +
+              "</div>" +
               '<div class="pv-meta">' +
               escHtml(s.type) +
               " · vol " +
               s.volume +
               "</div>" +
-              '<div class="pv-body">' + escHtml(s.signal) + "</div>" +
+              '<div class="pv-body">' +
+              escHtml(s.signal) +
+              "</div>" +
               (s.context
-                ? '<div class="pv-body" style="margin-top:6px">' + escHtml(s.context) + "</div>"
+                ? '<div class="pv-body" style="margin-top:6px">' +
+                  escHtml(s.context) +
+                  "</div>"
                 : "") +
               (s.voice
-                ? '<div class="pv-body" style="margin-top:6px;font-style:italic">"' + escHtml(s.voice) + '"</div>'
+                ? '<div class="pv-body" style="margin-top:6px;font-style:italic">"' +
+                  escHtml(s.voice) +
+                  '"</div>'
                 : "") +
               "</div>"
             );
@@ -9042,9 +9595,15 @@
           function storyHtml(s) {
             return (
               '<div class="reactive-preview-storyboard">' +
-              '<div class="pv-num">STORYBOARD ' + escHtml(s.number) + "</div>" +
-              '<div style="font-weight:600;font-size:14px">' + escHtml(s.title) + "</div>" +
-              '<div class="pv-prompt">' + escHtml(s.prompt) + "</div>" +
+              '<div class="pv-num">STORYBOARD ' +
+              escHtml(s.number) +
+              "</div>" +
+              '<div style="font-weight:600;font-size:14px">' +
+              escHtml(s.title) +
+              "</div>" +
+              '<div class="pv-prompt">' +
+              escHtml(s.prompt) +
+              "</div>" +
               '<div class="pv-body" style="margin-top:6px;font-size:11px;color:var(--text-muted)">' +
               escHtml(s.sourceSignal) +
               " · " +
@@ -9053,7 +9612,9 @@
               escHtml(s.bucket) +
               "</div>" +
               (s.whyPrompt
-                ? '<div class="pv-body" style="margin-top:8px">' + escHtml(s.whyPrompt) + "</div>"
+                ? '<div class="pv-body" style="margin-top:8px">' +
+                  escHtml(s.whyPrompt) +
+                  "</div>"
                 : "") +
               "</div>"
             );
@@ -9104,7 +9665,9 @@
               if (existing && existing.length) {
                 const row = existing[0];
                 const who = row.uploaded_by || "someone";
-                const created = row.created_at ? new Date(row.created_at) : null;
+                const created = row.created_at
+                  ? new Date(row.created_at)
+                  : null;
                 let when = "earlier";
                 if (created) {
                   const ageMin = Math.max(
@@ -9144,16 +9707,20 @@
             }
           }
           setReactiveStatus("Publishing…");
-          const { error } = await window.__mfgSbWrite("today_reactive", "insert", {
-            values: {
-              market,
-              payload: reactivePayload,
-              raw_input: getRawInput().slice(0, 40000),
-              uploaded_by: id.user || "MFG",
-              live_date: liveDate,
+          const { error } = await window.__mfgSbWrite(
+            "today_reactive",
+            "insert",
+            {
+              values: {
+                market,
+                payload: reactivePayload,
+                raw_input: getRawInput().slice(0, 40000),
+                uploaded_by: id.user || "MFG",
+                live_date: liveDate,
+              },
+              returnRows: false,
             },
-            returnRows: false,
-          });
+          );
           e.reactivePublishBtn.disabled = false;
           if (error) {
             setReactiveStatus("Publish failed: " + error.message, "err");
@@ -9274,8 +9841,12 @@
               const flag = FLAG[r.market] || (r.market ? "🌐" : "");
               return (
                 '<div class="audit-row">' +
-                '<div class="a-time">' + escHtml(fmtTime(r.time)) + "</div>" +
-                '<div class="a-source ' + escHtml(r.source) + '">' +
+                '<div class="a-time">' +
+                escHtml(fmtTime(r.time)) +
+                "</div>" +
+                '<div class="a-source ' +
+                escHtml(r.source) +
+                '">' +
                 escHtml(r.source) +
                 "</div>" +
                 '<div class="a-market">' +
@@ -9370,7 +9941,14 @@
               flashAuditExportLabel("Nothing to export");
               return;
             }
-            const header = ["time_iso", "source", "market", "who", "summary", "ref"];
+            const header = [
+              "time_iso",
+              "source",
+              "market",
+              "who",
+              "summary",
+              "ref",
+            ];
             const lines = [header.join(",")];
             rows.forEach((r) => {
               lines.push(
@@ -9424,41 +10002,59 @@
           const da = Date.UTC(
             +a.slice(0, 4),
             +a.slice(5, 7) - 1,
-            +a.slice(8, 10)
+            +a.slice(8, 10),
           );
           const db = Date.UTC(
             +b.slice(0, 4),
             +b.slice(5, 7) - 1,
-            +b.slice(8, 10)
+            +b.slice(8, 10),
           );
           return Math.round((db - da) / 86400000);
         }
         function addDays(iso, n) {
           const d = new Date(
-            Date.UTC(
-              +iso.slice(0, 4),
-              +iso.slice(5, 7) - 1,
-              +iso.slice(8, 10)
-            )
+            Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)),
           );
           d.setUTCDate(d.getUTCDate() + n);
           return d.toISOString().slice(0, 10);
         }
         function fmtShort(iso) {
           const d = new Date(
-            Date.UTC(
-              +iso.slice(0, 4),
-              +iso.slice(5, 7) - 1,
-              +iso.slice(8, 10)
-            )
+            Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)),
           );
-          const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
           return d.getUTCDate() + " " + months[d.getUTCMonth()];
         }
         function formatUpdated(iso) {
           try {
             const d = new Date(iso);
-            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const months = [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ];
             const hh = String(d.getHours()).padStart(2, "0");
             const mm = String(d.getMinutes()).padStart(2, "0");
             return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${hh}:${mm}`;
@@ -9468,13 +10064,11 @@
         }
         function dowShort(iso) {
           const d = new Date(
-            Date.UTC(
-              +iso.slice(0, 4),
-              +iso.slice(5, 7) - 1,
-              +iso.slice(8, 10)
-            )
+            Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)),
           );
-          return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getUTCDay()];
+          return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+            d.getUTCDay()
+          ];
         }
         function escapeHtml(s) {
           return String(s == null ? "" : s)
@@ -9488,12 +10082,16 @@
         // ── Per-market local overrides (inline edit) ──
         const overridesKey = (mk) => "wcc_cal_overrides_" + mk;
         function loadOverrides(mk) {
-          try { return JSON.parse(localStorage.getItem(overridesKey(mk)) || "{}"); }
-          catch (_) { return {}; }
+          try {
+            return JSON.parse(localStorage.getItem(overridesKey(mk)) || "{}");
+          } catch (_) {
+            return {};
+          }
         }
         function saveOverrides(mk, obj) {
-          try { localStorage.setItem(overridesKey(mk), JSON.stringify(obj)); }
-          catch (_) {}
+          try {
+            localStorage.setItem(overridesKey(mk), JSON.stringify(obj));
+          } catch (_) {}
         }
 
         // ── Inferred status: locked / drafted / live / tbd ──
@@ -9515,22 +10113,31 @@
                 if (a.start <= b.end && b.start <= a.end) {
                   const key = ri + ":" + ai;
                   warnings[key] = warnings[key] || [];
-                  warnings[key].push("Overlaps with another entry on the same channel");
+                  warnings[key].push(
+                    "Overlaps with another entry on the same channel",
+                  );
                 }
               });
               // CA-match lead-time check
               if (a.label && /match in CA/i.test(a.label) && matches) {
                 matches.forEach((m) => {
-                  if (!a.label.toLowerCase().includes("ca") &&
-                      !a.label.toLowerCase().includes("canada") &&
-                      !a.label.toLowerCase().includes("bosnia") &&
-                      !a.label.toLowerCase().includes("qatar") &&
-                      !a.label.toLowerCase().includes("switzerland")) return;
+                  if (
+                    !a.label.toLowerCase().includes("ca") &&
+                    !a.label.toLowerCase().includes("canada") &&
+                    !a.label.toLowerCase().includes("bosnia") &&
+                    !a.label.toLowerCase().includes("qatar") &&
+                    !a.label.toLowerCase().includes("switzerland")
+                  )
+                    return;
                   const lead = dayDiff(a.start, m.date);
                   if (lead >= 0 && lead < 2 && a.end >= m.date) {
                     const key = ri + ":" + ai;
                     warnings[key] = warnings[key] || [];
-                    warnings[key].push("Launches < 2 days before " + m.label + " — under target lead time");
+                    warnings[key].push(
+                      "Launches < 2 days before " +
+                        m.label +
+                        " — under target lead time",
+                    );
                   }
                 });
               }
@@ -9549,7 +10156,9 @@
           }
           const matchDates = new Set((data.matches || []).map((m) => m.date));
           const matchByDate = {};
-          (data.matches || []).forEach((m) => { matchByDate[m.date] = m; });
+          (data.matches || []).forEach((m) => {
+            matchByDate[m.date] = m;
+          });
           const conflicts = detectConflicts(data.rows, data.matches);
 
           // Phase header — one cell per phase, spanning its days.
@@ -9568,7 +10177,9 @@
               const isWeekend = dow === "Sat" || dow === "Sun";
               const m = matchByDate[iso];
               const matchClass = m ? "cal-match-day" : "";
-              const pip = m ? `<span class="cal-match-pip" title="${escapeHtml(m.label + " — " + m.venue)}">${escapeHtml(m.label.split(" ")[0])}</span>` : "";
+              const pip = m
+                ? `<span class="cal-match-pip" title="${escapeHtml(m.label + " — " + m.venue)}">${escapeHtml(m.label.split(" ")[0])}</span>`
+                : "";
               return `<div class="cal-cell ${isWeekend ? "cal-weekend" : ""} ${matchClass}"><span class="cal-date-dow">${dow}</span>${fmtShort(iso)}${pip}</div>`;
             })
             .join("");
@@ -9581,23 +10192,28 @@
                 .map((e, entryIdx) => {
                   const overrideKey = rowIdx + ":" + entryIdx;
                   const editedPrompt = overrides[overrideKey];
-                  const promptText = editedPrompt != null ? editedPrompt : e.prompt;
+                  const promptText =
+                    editedPrompt != null ? editedPrompt : e.prompt;
                   const status = entryStatus(e, editedPrompt != null, todayIso);
                   const startOffset = dayDiff(data.dateStart, e.start);
                   const span = dayDiff(e.start, e.end) + 1;
                   const left = `calc(${startOffset} * var(--cal-col-w))`;
                   const width = `calc(${span} * var(--cal-col-w) - 4px)`;
                   const phaseClass = `cal-entry-${e.phase || "group"}`;
-                  const tbdClass = (e.tbd && editedPrompt == null) ? "cal-tbd" : "";
+                  const tbdClass =
+                    e.tbd && editedPrompt == null ? "cal-tbd" : "";
                   const showPrompt = !(e.tbd && editedPrompt == null);
                   const prompt = showPrompt
                     ? `<span class="cal-entry-prompt">— ${escapeHtml(promptText)}</span>`
                     : "";
                   const types = [e.type || "fandom"];
-                  if ((e.type || "") === "either") types.push("cultural-through","fandom");
+                  if ((e.type || "") === "either")
+                    types.push("cultural-through", "fandom");
                   const typeAttr = types.join(",");
                   const warn = conflicts[overrideKey];
-                  const warnHtml = warn ? `<span class="cal-warn" title="${escapeHtml(warn.join(' • '))}">!</span>` : "";
+                  const warnHtml = warn
+                    ? `<span class="cal-warn" title="${escapeHtml(warn.join(" • "))}">!</span>`
+                    : "";
                   return `<div class="cal-entry ${phaseClass} ${tbdClass}"
                           style="left:${left}; width:${width};"
                           data-row="${rowIdx}" data-entry="${entryIdx}"
@@ -9615,8 +10231,10 @@
             .join("");
 
           // Today line if today is within range.
-          const todayOffset = (todayIso >= data.dateStart && todayIso <= data.dateEnd)
-            ? dayDiff(data.dateStart, todayIso) : -1;
+          const todayOffset =
+            todayIso >= data.dateStart && todayIso <= data.dateEnd
+              ? dayDiff(data.dateStart, todayIso)
+              : -1;
 
           // Filter chip + jump-button rows.
           const filters = [
@@ -9626,15 +10244,21 @@
             { key: "cultural-through", label: "Cultural — made it through" },
             { key: "reactive", label: "Reactive" },
             { key: "game-altering", label: "Game altering" },
-            { key: "dooh", label: "DOOH" }
+            { key: "dooh", label: "DOOH" },
           ];
           const filterChips = filters
-            .map((f) => `<button class="cal-chip ${f.key === "all" ? "active" : ""}" type="button" data-cal-filter="${f.key}">${escapeHtml(f.label)}</button>`)
+            .map(
+              (f) =>
+                `<button class="cal-chip ${f.key === "all" ? "active" : ""}" type="button" data-cal-filter="${f.key}">${escapeHtml(f.label)}</button>`,
+            )
             .join("");
 
           const jumpButtons = data.phases
             .filter((p) => p.key !== "rest")
-            .map((p) => `<button class="cal-jump-btn" type="button" data-cal-jump="${escapeHtml(p.start)}">${escapeHtml(p.name)}</button>`)
+            .map(
+              (p) =>
+                `<button class="cal-jump-btn" type="button" data-cal-jump="${escapeHtml(p.start)}">${escapeHtml(p.name)}</button>`,
+            )
             .join("");
 
           const statusLegend = `
@@ -9705,16 +10329,20 @@
           calPicker.style.display = "none";
 
           // Back button.
-          document.getElementById("calBackBtn").addEventListener("click", () => {
-            calView.style.display = "none";
-            calView.innerHTML = "";
-            calPicker.style.display = "";
-          });
+          document
+            .getElementById("calBackBtn")
+            .addEventListener("click", () => {
+              calView.style.display = "none";
+              calView.innerHTML = "";
+              calPicker.style.display = "";
+            });
 
           // Print button.
-          document.getElementById("calPrintBtn").addEventListener("click", () => {
-            window.print();
-          });
+          document
+            .getElementById("calPrintBtn")
+            .addEventListener("click", () => {
+              window.print();
+            });
 
           // Overlay toggle (USA/UK/DE currently have no data → show note).
           const overlayBtn = document.getElementById("calOverlayBtn");
@@ -9730,7 +10358,9 @@
           const filterChipEls = calView.querySelectorAll("[data-cal-filter]");
           filterChipEls.forEach((chip) => {
             chip.addEventListener("click", () => {
-              filterChipEls.forEach((c) => c.classList.toggle("active", c === chip));
+              filterChipEls.forEach((c) =>
+                c.classList.toggle("active", c === chip),
+              );
               const f = chip.dataset.calFilter;
               calView.querySelectorAll(".cal-entry").forEach((bar) => {
                 if (f === "all") {
@@ -9750,18 +10380,32 @@
               const iso = btn.dataset.calJump;
               const offset = dayDiff(data.dateStart, iso);
               scrollerEarly.scrollTo({
-                left: offset * (parseFloat(getComputedStyle(scrollerEarly.querySelector(".cal-grid")).getPropertyValue("--cal-col-w")) || 44),
-                behavior: "smooth"
+                left:
+                  offset *
+                  (parseFloat(
+                    getComputedStyle(
+                      scrollerEarly.querySelector(".cal-grid"),
+                    ).getPropertyValue("--cal-col-w"),
+                  ) || 44),
+                behavior: "smooth",
               });
             });
           });
           calView.querySelectorAll("[data-cal-jump-today]").forEach((btn) => {
             btn.addEventListener("click", () => {
               if (todayOffset < 0) return;
-              const colW = parseFloat(getComputedStyle(scrollerEarly.querySelector(".cal-grid")).getPropertyValue("--cal-col-w")) || 44;
+              const colW =
+                parseFloat(
+                  getComputedStyle(
+                    scrollerEarly.querySelector(".cal-grid"),
+                  ).getPropertyValue("--cal-col-w"),
+                ) || 44;
               scrollerEarly.scrollTo({
-                left: Math.max(0, todayOffset * colW - scrollerEarly.clientWidth / 2),
-                behavior: "smooth"
+                left: Math.max(
+                  0,
+                  todayOffset * colW - scrollerEarly.clientWidth / 2,
+                ),
+                behavior: "smooth",
               });
             });
           });
@@ -9780,13 +10424,15 @@
             if (clamped === colW) return;
             // Keep the date under the cursor stable while zooming.
             const rect = scroller.getBoundingClientRect();
-            const anchor = anchorClientX == null
-              ? rect.left + rect.width / 2
-              : anchorClientX;
+            const anchor =
+              anchorClientX == null
+                ? rect.left + rect.width / 2
+                : anchorClientX;
             const offsetIn = anchor - rect.left + scroller.scrollLeft;
-            const channelW = parseFloat(
-              getComputedStyle(grid).getPropertyValue("--cal-channel-w")
-            ) || 200;
+            const channelW =
+              parseFloat(
+                getComputedStyle(grid).getPropertyValue("--cal-channel-w"),
+              ) || 200;
             const dayUnderAnchor = (offsetIn - channelW) / colW;
             colW = clamped;
             grid.style.setProperty("--cal-col-w", colW + "px");
@@ -9795,12 +10441,13 @@
               const start = +bar.dataset.calStart;
               const span = +bar.dataset.calSpan;
               if (!Number.isFinite(start) || !Number.isFinite(span)) return;
-              bar.style.left = (start * colW) + "px";
-              bar.style.width = (span * colW - 4) + "px";
+              bar.style.left = start * colW + "px";
+              bar.style.width = span * colW - 4 + "px";
             });
             const newOffsetIn = channelW + dayUnderAnchor * colW;
             scroller.scrollLeft = newOffsetIn - (anchor - rect.left);
-            zoomReadout.textContent = Math.round((colW / BASE_COL_W) * 100) + "%";
+            zoomReadout.textContent =
+              Math.round((colW / BASE_COL_W) * 100) + "%";
           }
 
           // Pre-stamp each entry with its day-offset so applyZoom can resize cleanly.
@@ -9839,33 +10486,43 @@
             if (!dragging) return;
             dragging = false;
             scroller.classList.remove("cal-dragging");
-            try { scroller.releasePointerCapture(e.pointerId); } catch (_) {}
+            try {
+              scroller.releasePointerCapture(e.pointerId);
+            } catch (_) {}
           }
           scroller.addEventListener("pointerup", endDrag);
           scroller.addEventListener("pointercancel", endDrag);
           // Suppress entry-click after a drag.
-          scroller.addEventListener("click", (e) => {
-            if (dragMoved) {
-              e.stopPropagation();
-              e.preventDefault();
-              dragMoved = false;
-            }
-          }, true);
+          scroller.addEventListener(
+            "click",
+            (e) => {
+              if (dragMoved) {
+                e.stopPropagation();
+                e.preventDefault();
+                dragMoved = false;
+              }
+            },
+            true,
+          );
 
           // Ctrl/⌘ + wheel = zoom; plain wheel = horizontal scroll.
-          scroller.addEventListener("wheel", (e) => {
-            if (e.ctrlKey || e.metaKey) {
-              e.preventDefault();
-              const factor = Math.exp(-e.deltaY * 0.0035);
-              applyZoom(colW * factor, e.clientX);
-            } else if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-              // shift→horizontal scroll convenience for trackpads/mice without horizontal
-              if (e.shiftKey) {
+          scroller.addEventListener(
+            "wheel",
+            (e) => {
+              if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
-                scroller.scrollLeft += e.deltaY;
+                const factor = Math.exp(-e.deltaY * 0.0035);
+                applyZoom(colW * factor, e.clientX);
+              } else if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                // shift→horizontal scroll convenience for trackpads/mice without horizontal
+                if (e.shiftKey) {
+                  e.preventDefault();
+                  scroller.scrollLeft += e.deltaY;
+                }
               }
-            }
-          }, { passive: false });
+            },
+            { passive: false },
+          );
 
           // Pinch-zoom (two-finger) on touch.
           const activePtrs = new Map();
@@ -9921,7 +10578,8 @@
             const entry = row.entries[entryIdx];
             const ovKey = rowIdx + ":" + entryIdx;
             const editedPrompt = overrides[ovKey];
-            const currentPrompt = editedPrompt != null ? editedPrompt : entry.prompt;
+            const currentPrompt =
+              editedPrompt != null ? editedPrompt : entry.prompt;
             const status = entryStatus(entry, editedPrompt != null, todayIso);
 
             const noteHtml = entry.note
@@ -9948,7 +10606,7 @@
                 <span>· status: ${status}</span>
               </div>
               ${noteHtml}
-              ${conflicts[ovKey] ? `<div class="cal-detail-note" style="border-left-color:#ef4444;color:#fca5a5;">⚠ ${conflicts[ovKey].map(escapeHtml).join(' · ')}</div>` : ""}
+              ${conflicts[ovKey] ? `<div class="cal-detail-note" style="border-left-color:#ef4444;color:#fca5a5;">⚠ ${conflicts[ovKey].map(escapeHtml).join(" · ")}</div>` : ""}
               <div>${buttons}</div>
             `;
             detail.classList.add("shown");
@@ -9962,14 +10620,18 @@
                   renderCalendar(data);
                 });
               } else {
-                b.addEventListener("click", () => detail.classList.remove("shown"));
+                b.addEventListener("click", () =>
+                  detail.classList.remove("shown"),
+                );
               }
             });
 
             const saveBtn = detailBox.querySelector("#calEditSave");
             if (saveBtn) {
               saveBtn.addEventListener("click", () => {
-                const txt = (document.getElementById("calEditInput").value || "").trim();
+                const txt = (
+                  document.getElementById("calEditInput").value || ""
+                ).trim();
                 if (!txt) {
                   delete overrides[ovKey];
                 } else {

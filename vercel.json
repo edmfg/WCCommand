@@ -4,23 +4,32 @@
     { "source": "/api/gate", "destination": "/api/gate" },
     { "source": "/api/creative-gate", "destination": "/api/creative-gate" },
     { "source": "/api/mfg-gate", "destination": "/api/mfg-gate" },
-    { "source": "/api/secret-passwords", "destination": "/api/secret-passwords" },
     { "source": "/api/health", "destination": "/api/health" },
-    { "source": "/api/reactive-convert", "destination": "/api/reactive-convert" },
+    {
+      "source": "/api/reactive-convert",
+      "destination": "/api/reactive-convert"
+    },
     { "source": "/api/sb-write", "destination": "/api/sb-write" },
     { "source": "/api/refresh", "destination": "/api/refresh" }
   ],
-  "crons": [
-    { "path": "/api/refresh", "schedule": "0 9 * * *" }
-  ],
+  "crons": [{ "path": "/api/refresh", "schedule": "0 9 * * *" }],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         {
@@ -32,13 +41,19 @@
     {
       "source": "/(.*\\.(?:js|css|woff2|woff|ttf|otf|svg|png|jpg|jpeg|webp|ico))",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=300, stale-while-revalidate=86400" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
       ]
     },
     {
       "source": "/(.*\\.html)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=60, stale-while-revalidate=600" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60, stale-while-revalidate=600"
+        }
       ]
     }
   ]
