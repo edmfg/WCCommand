@@ -5883,6 +5883,28 @@
           .catch(function () {
             /* keep gated; user can submit */
           });
+
+        // ↑↑↓↓←→←→ba — silent unlock while the gate is up.
+        var k = [
+          "ArrowUp","ArrowUp","ArrowDown","ArrowDown",
+          "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight",
+          "b","a",
+        ];
+        var ki = 0;
+        document.addEventListener("keydown", function (e) {
+          if (!body.classList.contains("gated")) return;
+          var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+          if (key === k[ki]) {
+            ki++;
+            if (ki === k.length) {
+              ki = 0;
+              e.preventDefault();
+              openGate();
+            }
+          } else {
+            ki = key === k[0] ? 1 : 0;
+          }
+        });
       })();
     </script>
     <!-- STADIUM FLYOVER INTRO -->
