@@ -5962,6 +5962,8 @@
           });
 
         // ↑↑↓↓←→←→ba — silent unlock while the gate is up.
+        // Bound on window in capture phase so the password input / browser
+        // autocomplete dropdown can't swallow ArrowUp/ArrowDown first.
         var k = [
           "ArrowUp",
           "ArrowUp",
@@ -5975,20 +5977,31 @@
           "a",
         ];
         var ki = 0;
-        document.addEventListener("keydown", function (e) {
-          if (!body.classList.contains("gated")) return;
-          var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-          if (key === k[ki]) {
-            ki++;
-            if (ki === k.length) {
-              ki = 0;
-              e.preventDefault();
-              openGate();
+        window.addEventListener(
+          "keydown",
+          function (e) {
+            if (!body.classList.contains("gated")) return;
+            var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+            if (key === k[ki]) {
+              // Stop arrow keys from feeding the autocomplete dropdown so
+              // the next key in the sequence still reaches us.
+              if (key.indexOf("Arrow") === 0) e.preventDefault();
+              ki++;
+              if (ki === k.length) {
+                ki = 0;
+                e.preventDefault();
+                if (pwInput) {
+                  pwInput.value = "";
+                  pwInput.blur();
+                }
+                openGate();
+              }
+            } else {
+              ki = key === k[0] ? 1 : 0;
             }
-          } else {
-            ki = key === k[0] ? 1 : 0;
-          }
-        });
+          },
+          true,
+        );
       })();
     </script>
     <!-- STADIUM FLYOVER INTRO -->
