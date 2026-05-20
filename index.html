@@ -1008,8 +1008,12 @@
         background: #0a0c14;
       }
       @media (max-width: 760px) {
-        #panel-reactive { margin: -16px -16px; }
-        .reactive-frame { height: calc(100vh - 60px); }
+        #panel-reactive {
+          margin: -16px -16px;
+        }
+        .reactive-frame {
+          height: calc(100vh - 60px);
+        }
       }
       @keyframes fadeUp {
         from {
@@ -1070,8 +1074,15 @@
         box-shadow: 0 0 8px rgba(239, 83, 80, 0.55);
       }
       @keyframes refreshPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.55; transform: scale(0.85); }
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.55;
+          transform: scale(0.85);
+        }
       }
       .updated .updated-full {
         color: var(--text-dim);
@@ -2055,11 +2066,22 @@
         top: 0;
         bottom: 0;
         width: 3px;
-        background: linear-gradient(180deg, transparent, #69f0ae 30%, #69f0ae 70%, transparent);
+        background: linear-gradient(
+          180deg,
+          transparent,
+          #69f0ae 30%,
+          #69f0ae 70%,
+          transparent
+        );
       }
       @keyframes matchLivePulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.45); }
-        50% { box-shadow: 0 0 22px 2px rgba(0, 200, 83, 0.25); }
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.45);
+        }
+        50% {
+          box-shadow: 0 0 22px 2px rgba(0, 200, 83, 0.25);
+        }
       }
       .team {
         display: flex;
@@ -2519,8 +2541,9 @@
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji",
-          "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          "Twemoji Mozilla", sans-serif;
         font-weight: 700;
         font-size: 0.6rem;
         text-transform: uppercase;
@@ -2542,8 +2565,9 @@
         animation: liveDot 1.6s ease-in-out infinite;
       }
       .asset-expired-pill {
-        font-family: "Oswald", "Apple Color Emoji", "Segoe UI Emoji",
-          "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+        font-family:
+          "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+          "Twemoji Mozilla", sans-serif;
         font-weight: 600;
         font-size: 0.58rem;
         text-transform: uppercase;
@@ -2561,8 +2585,15 @@
         opacity: 0.85;
       }
       @keyframes liveDot {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.7); }
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
+        }
       }
       .asset-format {
         font-family:
@@ -3040,10 +3071,12 @@
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
       }
-      .reactive-market-modal { max-width: 560px; }
+      .reactive-market-modal {
+        max-width: 560px;
+      }
       .reactive-market-title {
         margin: 0 0 6px;
-        font-family: 'Oswald', sans-serif;
+        font-family: "Oswald", sans-serif;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1.5px;
@@ -3072,7 +3105,10 @@
         border-radius: 12px;
         color: var(--text);
         cursor: pointer;
-        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        transition:
+          transform 0.18s ease,
+          border-color 0.18s ease,
+          background 0.18s ease;
         font: inherit;
       }
       body.light .market-card {
@@ -5817,6 +5853,12 @@
             window._gateOpenedEarly = true;
           }
         }
+        // Expose for konami.js silent unlock.
+        window.__wccUnlockDashboardGate = function () {
+          if (!body.classList.contains("gated")) return false;
+          openGate();
+          return true;
+        };
         if (form) form.addEventListener("submit", onSubmit);
         async function onSubmit(e) {
           e.preventDefault();
@@ -5980,18 +6022,34 @@
           /><span>World Cup HQ</span></a
         >
         <nav class="header-nav">
-          <button class="tab-btn active" data-tab="live"
-            >Live<span class="whats-new-badge" data-whats-new="live" hidden></span
-          ></button>
-          <button class="tab-btn" data-tab="reactive" type="button"
-            >Today's Reactive<span class="whats-new-badge" data-whats-new="reactive" hidden></span
-          ></button>
-          <button class="tab-btn" data-tab="calendar"
-            >Fixtures<span class="whats-new-badge" data-whats-new="calendar" hidden></span
-          ></button>
-          <button class="tab-btn" data-tab="creative"
-            >Creative<span class="whats-new-badge" data-whats-new="creative" hidden></span
-          ></button>
+          <button class="tab-btn active" data-tab="live">
+            Live<span
+              class="whats-new-badge"
+              data-whats-new="live"
+              hidden
+            ></span>
+          </button>
+          <button class="tab-btn" data-tab="reactive" type="button">
+            Today's Reactive<span
+              class="whats-new-badge"
+              data-whats-new="reactive"
+              hidden
+            ></span>
+          </button>
+          <button class="tab-btn" data-tab="calendar">
+            Fixtures<span
+              class="whats-new-badge"
+              data-whats-new="calendar"
+              hidden
+            ></span>
+          </button>
+          <button class="tab-btn" data-tab="creative">
+            Creative<span
+              class="whats-new-badge"
+              data-whats-new="creative"
+              hidden
+            ></span>
+          </button>
         </nav>
         <div class="header-actions">
           <button class="help-link" id="helpBtn" type="button">
@@ -6041,7 +6099,6 @@
 
       <!-- LIVE -->
       <div class="tab-panel active" id="panel-live">
-
         <!-- Pinned cards strip (shows whatever the user has starred) -->
         <div id="bookmarksBar" class="bookmarks-bar" hidden>
           <div class="bookmarks-bar-head">
@@ -6168,7 +6225,11 @@
             class="next24h-toggle"
             title="Show only matches kicking off within 24 hours"
           >
-            <input type="checkbox" id="next24hToggle" onchange="renderMatches()" />
+            <input
+              type="checkbox"
+              id="next24hToggle"
+              onchange="renderMatches()"
+            />
             <span>⏱ Next 24h</span>
           </label>
         </div>
@@ -6229,8 +6290,9 @@
               for="assetSort"
               style="
                 font-family:
-                  'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
-                  'Noto Color Emoji', sans-serif;
+                  &quot;Oswald&quot;, &quot;Apple Color Emoji&quot;,
+                  &quot;Segoe UI Emoji&quot;, &quot;Noto Color Emoji&quot;,
+                  sans-serif;
                 font-size: 11px;
                 font-weight: 600;
                 letter-spacing: 1.4px;
@@ -6482,7 +6544,7 @@
         <button
           class="shortcuts-close"
           aria-label="Close"
-          onclick="document.getElementById('shortcutsOverlay').hidden=true"
+          onclick="document.getElementById('shortcutsOverlay').hidden = true"
         >
           ×
         </button>
@@ -6512,26 +6574,54 @@
         aria-modal="true"
         aria-labelledby="reactiveMarketTitle"
       >
-        <button class="card-modal-close" id="reactiveMarketClose" aria-label="Close">×</button>
-        <h2 id="reactiveMarketTitle" class="reactive-market-title">Today's Reactive</h2>
-        <p class="reactive-market-sub">Choose a market to load today's briefing.</p>
+        <button
+          class="card-modal-close"
+          id="reactiveMarketClose"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h2 id="reactiveMarketTitle" class="reactive-market-title">
+          Today's Reactive
+        </h2>
+        <p class="reactive-market-sub">
+          Choose a market to load today's briefing.
+        </p>
         <div class="reactive-market-grid">
           <button class="market-card" data-market="ca" type="button">
             <span class="market-flag" aria-hidden="true">🇨🇦</span>
             <span class="market-name">Canada</span>
             <span class="market-meta">Live</span>
           </button>
-          <button class="market-card disabled" data-market="uk" type="button" disabled aria-disabled="true">
+          <button
+            class="market-card disabled"
+            data-market="uk"
+            type="button"
+            disabled
+            aria-disabled="true"
+          >
             <span class="market-flag" aria-hidden="true">🇬🇧</span>
             <span class="market-name">United Kingdom</span>
             <span class="market-tag">Soon</span>
           </button>
-          <button class="market-card disabled" data-market="de" type="button" disabled aria-disabled="true">
+          <button
+            class="market-card disabled"
+            data-market="de"
+            type="button"
+            disabled
+            aria-disabled="true"
+          >
             <span class="market-flag" aria-hidden="true">🇩🇪</span>
             <span class="market-name">Germany</span>
             <span class="market-tag">Soon</span>
           </button>
-          <button class="market-card disabled" data-market="usa" type="button" disabled aria-disabled="true">
+          <button
+            class="market-card disabled"
+            data-market="usa"
+            type="button"
+            disabled
+            aria-disabled="true"
+          >
             <span class="market-flag" aria-hidden="true">🇺🇸</span>
             <span class="market-name">USA</span>
             <span class="market-tag">Soon</span>
@@ -6559,8 +6649,9 @@
           style="
             margin: 0 0 6px;
             font-family:
-              'Oswald', 'Apple Color Emoji', 'Segoe UI Emoji',
-              'Noto Color Emoji', sans-serif;
+              &quot;Oswald&quot;, &quot;Apple Color Emoji&quot;,
+              &quot;Segoe UI Emoji&quot;, &quot;Noto Color Emoji&quot;,
+              sans-serif;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
@@ -6569,9 +6660,8 @@
           🔒 Creative access
         </h2>
         <p style="font-size: 13px; color: var(--text-dim); margin: 0 0 16px">
-          Enter the password to view creative assets. Ask your local MFG
-          person, or use the <strong>Help</strong> button to request the
-          password.
+          Enter the password to view creative assets. Ask your local MFG person,
+          or use the <strong>Help</strong> button to request the password.
         </p>
         <input
           type="password"
@@ -6603,7 +6693,6 @@
         </div>
       </div>
     </div>
-
 
     <button
       class="gemini-toggle"
@@ -6715,7 +6804,8 @@
         // the lazy first paint.
         // Creative tab is gated + behind a click — defer its (heavy) asset
         // grid into idle time so it doesn't block first paint.
-        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+        const idle =
+          window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
         idle(() => {
           renderAssets();
           renderSubtabAssets("genius");
@@ -6788,7 +6878,7 @@
               " fresh</span>"
             : "";
         el.innerHTML =
-          '<span>Refreshed ' +
+          "<span>Refreshed " +
           rel +
           "</span>" +
           '<span class="updated-full">· ' +
@@ -7129,8 +7219,15 @@
           resetTimer();
         });
 
-        function pause() { if (timer) { clearInterval(timer); timer = null; } }
-        function resume() { resetTimer(); }
+        function pause() {
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }
+        function resume() {
+          resetTimer();
+        }
         return { next, prev, goTo, setCards, pause, resume };
       }
 
@@ -7154,7 +7251,8 @@
             // stare at a snapshot from when they last looked. Cheap
             // because the polling cycle pauses while hidden.
             if (typeof fetchLiveUpdates === "function") fetchLiveUpdates(true);
-            if (typeof fetchMarketContent === "function") fetchMarketContent(true);
+            if (typeof fetchMarketContent === "function")
+              fetchMarketContent(true);
           }
         } catch (e) {}
       }
@@ -8019,24 +8117,25 @@
           container.innerHTML = allDays
             .map((date) => {
               const games = byDate[date] || [];
-              const dateStr = new Date(
-                date + "T12:00:00",
-              ).toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              });
+              const dateStr = new Date(date + "T12:00:00").toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                },
+              );
               const isToday = date === todayIso;
               const isPast = date < todayIso;
               const isFuture = date > todayIso;
               const stateClass = isToday
                 ? " is-today"
                 : isPast
-                ? " is-past"
-                : isFuture
-                ? " is-future"
-                : "";
+                  ? " is-past"
+                  : isFuture
+                    ? " is-future"
+                    : "";
               if (!games.length) {
                 // Rest day — clearly labelled so the timeline reads continuous.
                 return `<div class="date-group date-rest${stateClass}">
@@ -8382,7 +8481,8 @@
         const hasEnd = !!a.liveEndDate;
         const startedOrNoStart = !hasStart || a.deployDate <= todayIso;
         const endedAlready = hasEnd && a.liveEndDate < todayIso;
-        const liveNow = (hasStart || hasEnd) && startedOrNoStart && !endedAlready;
+        const liveNow =
+          (hasStart || hasEnd) && startedOrNoStart && !endedAlready;
         const isExpired = endedAlready;
         const liveBadge = liveNow
           ? `<span class="asset-live-pill" title="Within the live window">Live</span>`
@@ -8529,8 +8629,8 @@
             sel._wired = true;
             sel.addEventListener("change", () => {
               const activeMarket =
-                document.querySelector("#filterBar .filter-pill.active")?.dataset
-                  .market || "All";
+                document.querySelector("#filterBar .filter-pill.active")
+                  ?.dataset.market || "All";
               renderAssets(activeMarket);
             });
           }
@@ -8901,12 +9001,17 @@
             MFG_SUPABASE_URL +
             "/rest/v1/today_reactive?select=market&order=created_at.desc&limit=200";
           const resp = await fetch(url, {
-            headers: { apikey: MFG_SUPABASE_KEY, Authorization: "Bearer " + MFG_SUPABASE_KEY },
+            headers: {
+              apikey: MFG_SUPABASE_KEY,
+              Authorization: "Bearer " + MFG_SUPABASE_KEY,
+            },
           });
           if (!resp.ok) return;
           const rows = await resp.json();
           const present = new Set(
-            (rows || []).map((r) => String(r.market || "").trim()).filter(Boolean),
+            (rows || [])
+              .map((r) => String(r.market || "").trim())
+              .filter(Boolean),
           );
           window._reactiveAvailability = present;
           applyReactiveAvailability(overlay, present);
@@ -8973,11 +9078,7 @@
         const creativeTs = map.creative || 0;
         // Live = news + social created since last live-visit
         const liveCount =
-          countNewSince(
-            DASHBOARD_DATA.news || [],
-            liveTs,
-            (n) => n.timestamp,
-          ) +
+          countNewSince(DASHBOARD_DATA.news || [], liveTs, (n) => n.timestamp) +
           countNewSince(
             DASHBOARD_DATA.social || [],
             liveTs,
@@ -9008,7 +9109,9 @@
           bar.hidden = true;
           return;
         }
-        const newsById = new Map((DASHBOARD_DATA.news || []).map((n) => [n.id, n]));
+        const newsById = new Map(
+          (DASHBOARD_DATA.news || []).map((n) => [n.id, n]),
+        );
         const socialById = new Map(
           (DASHBOARD_DATA.social || []).map((s) => [s.id, s]),
         );
@@ -9166,6 +9269,14 @@
           .getElementById("creativeViewGateOverlay")
           ?.classList.remove("open");
       }
+      // Silent unlock for konami.js. Marks Creative as viewable, hides the
+      // modal if it's up, and switches to the Creative tab.
+      window.__wccUnlockCreativeGate = function () {
+        window._creativeViewUnlocked = true;
+        closeCreativeViewGate();
+        if (typeof switchTab === "function") switchTab("creative");
+        return true;
+      };
       function setupCreativeViewGate() {
         const overlay = document.getElementById("creativeViewGateOverlay");
         const input = document.getElementById("creativeViewGateInput");
@@ -9264,11 +9375,17 @@
           });
           const j = await res.json().catch(() => ({}));
           if (!res.ok || !j.ok) {
-            return { data: null, error: { message: (j && j.error) || ("HTTP " + res.status) } };
+            return {
+              data: null,
+              error: { message: (j && j.error) || "HTTP " + res.status },
+            };
           }
           return { data: j.data, error: null };
         } catch (e) {
-          return { data: null, error: { message: String((e && e.message) || e) } };
+          return {
+            data: null,
+            error: { message: String((e && e.message) || e) },
+          };
         }
       }
       window.__dashSbWrite = sbWriteProxy;
@@ -9455,9 +9572,7 @@
           }
         }
         if (_liveCache.social.length) {
-          const existingIds = new Set(
-            DASHBOARD_DATA.social.map((s) => s.id),
-          );
+          const existingIds = new Set(DASHBOARD_DATA.social.map((s) => s.id));
           const fresh = _liveCache.social.filter((s) => !existingIds.has(s.id));
           if (fresh.length) {
             DASHBOARD_DATA.social = [...fresh, ...DASHBOARD_DATA.social];
@@ -9492,7 +9607,8 @@
           const url =
             MFG_SUPABASE_URL +
             "/rest/v1/live_updates?select=id,kind,payload,created_at" +
-            "&created_at=gte." + encodeURIComponent(cutoff) +
+            "&created_at=gte." +
+            encodeURIComponent(cutoff) +
             // 60 is plenty for the chip + carousels (capped to 30 each in
             // renderNews/renderSocial). Trimming from 200 makes the boot
             // fetch ~3x smaller and the merge much cheaper.
@@ -9507,9 +9623,7 @@
             });
             if (!resp.ok) {
               if (!silent)
-                console.warn(
-                  "live updates: REST select failed " + resp.status,
-                );
+                console.warn("live updates: REST select failed " + resp.status);
               applyLiveCache();
               return;
             }
@@ -9521,9 +9635,7 @@
             return;
           }
           if (!silent)
-            console.log(
-              "live updates: fetched " + data.length + " rows",
-            );
+            console.log("live updates: fetched " + data.length + " rows");
           // Bump DASHBOARD_DATA.lastUpdated to the freshest live row so the
           // "Refreshed Xm ago" chip reflects Refresh-Content activity, not
           // just data.js edits. Only bumps forward (never backwards) so a
@@ -9959,7 +10071,7 @@
           typingEl.className = "gemini-msg assistant gemini-typing";
           typingEl.innerHTML =
             '<span class="typing-dots" aria-label="Gemini is typing">' +
-            '<span></span><span></span><span></span>' +
+            "<span></span><span></span><span></span>" +
             "</span>";
           messages.appendChild(typingEl);
           messages.scrollTop = messages.scrollHeight;
@@ -10176,7 +10288,11 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         document.addEventListener("keydown", (e) => {
           if (e.key !== "Enter" && e.key !== " ") return;
           const link = document.activeElement;
-          if (!link || !link.classList || !link.classList.contains("entity-link"))
+          if (
+            !link ||
+            !link.classList ||
+            !link.classList.contains("entity-link")
+          )
             return;
           e.preventDefault();
           link.click();
