@@ -35,11 +35,17 @@ const ENDPOINT =
   MODEL +
   ":generateContent";
 
-function mfgGateOk(req) {
+function gateOk(req) {
+  // Accept either the MFG cockpit cookie or the dashboard cookie. Both gates
+  // use the same GATE_PASSWORD env, so possessing either is equivalent auth.
+  // Mirrors the pattern in /api/sb-write.
   const secret = signingSecret();
   if (!secret) return false;
-  const cookie = readCookie(req, "wcc_mfg_gate");
-  return !!(cookie && verifyToken(cookie, secret));
+  const t1 = readCookie(req, "wcc_mfg_gate");
+  if (t1 && verifyToken(t1, secret)) return true;
+  const t2 = readCookie(req, "wcc_gate");
+  if (t2 && verifyToken(t2, secret)) return true;
+  return false;
 }
 
 function cronAuthOk(req) {
@@ -249,10 +255,10 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
   const isCron = cronAuthOk(req);
-  if (!isCron && !mfgGateOk(req)) {
+  if (!isCron && !gateOk(req)) {
     return res
       .status(401)
-      .json({ error: "MFG gate cookie or CRON_SECRET required" });
+      .json({ error: "Gate cookie or CRON_SECRET required" });
   }
   // Manual browser path only: rate-limit so an MFG cookie can't be used to
   // mass-burn Gemini + Google Search quota. Cron path is trusted (and

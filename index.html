@@ -5856,6 +5856,17 @@
         // Expose for konami.js silent unlock.
         window.__wccUnlockDashboardGate = function () {
           if (!body.classList.contains("gated")) return false;
+          // Strip any stale tab hash (e.g. `#creative`) before booting so
+          // handleHash() in init() lands the user on Live by default.
+          if (location.hash && location.hash !== "#live") {
+            try {
+              history.replaceState(
+                null,
+                "",
+                location.pathname + location.search,
+              );
+            } catch (_) {}
+          }
           openGate();
           return true;
         };
@@ -9269,12 +9280,16 @@
           .getElementById("creativeViewGateOverlay")
           ?.classList.remove("open");
       }
-      // Silent unlock for konami.js. Marks Creative as viewable, hides the
-      // modal if it's up, and switches to the Creative tab.
+      // Silent unlock for konami.js. Marks Creative as viewable and hides
+      // the modal if it's up. Only switches to the Creative tab when the
+      // user was actively trying to enter Creative (modal currently open) —
+      // otherwise the dashboard-wide konami would yank them off Live.
       window.__wccUnlockCreativeGate = function () {
+        var overlay = document.getElementById("creativeViewGateOverlay");
+        var wasOpen = !!(overlay && overlay.classList.contains("open"));
         window._creativeViewUnlocked = true;
         closeCreativeViewGate();
-        if (typeof switchTab === "function") switchTab("creative");
+        if (wasOpen && typeof switchTab === "function") switchTab("creative");
         return true;
       };
       function setupCreativeViewGate() {
