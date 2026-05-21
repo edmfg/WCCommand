@@ -7797,7 +7797,10 @@
           activateTab(btn.dataset.mfgTab);
         });
         const _hashTab = (location.hash || "").replace(/^#mfg-/, "");
-        if (_hashTab && TAB_TO_PANEL[_hashTab]) activateTab(_hashTab);
+        const _initialTab = TAB_TO_PANEL[_hashTab] ? _hashTab : "reactive";
+        // Defer so tab-init fns (initReactiveTab, initCalendarTab, loadAuditLog)
+        // defined further down this <script> are registered before we call them.
+        setTimeout(() => activateTab(_initialTab), 0);
 
         // Creative Uploads form -------------------------------------------
         const SUPABASE_URL = "https://ypisjfefbccgtxesteja.supabase.co";
