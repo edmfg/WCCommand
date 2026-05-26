@@ -4370,6 +4370,9 @@
           <button class="tab-btn active" type="button" data-mfg-tab="reactive">
             🔥 Today's Reactive
           </button>
+          <button class="tab-btn" type="button" data-mfg-tab="cycle">
+            🌀 One Reactive Cycle
+          </button>
           <button class="tab-btn" type="button" data-mfg-tab="calendar">
             📅 Content Calendar
           </button>
@@ -5196,6 +5199,45 @@
             <div id="reactiveHistoryList" class="reactive-history-list">
               <div class="reactive-history-empty">Nothing published yet.</div>
             </div>
+          </div>
+        </div>
+
+        <!-- ─────── ONE REACTIVE CYCLE PANEL ─────── -->
+        <div class="tab-panel" id="panel-cycle">
+          <div class="section-title">🌀 One Reactive Cycle</div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            A typical match-day cadence from <strong>Round of 32 through the
+            Final</strong>. Hour-by-hour, 9am–5pm ET, who's doing what so a
+            reactive moment goes from signal → posted asset without a scramble.
+          </p>
+
+          <div class="form-card glass" style="padding: 0; overflow: hidden">
+            <table class="data-table" id="cycleScheduleTable">
+              <thead>
+                <tr>
+                  <th style="width: 110px">Hour (ET)</th>
+                  <th>Task</th>
+                  <th style="width: 180px">Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>9:00 AM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>10:00 AM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>11:00 AM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>12:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>1:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>2:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>3:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>4:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+                <tr><td>5:00 PM</td><td style="color: var(--text-muted)">—</td><td style="color: var(--text-muted)">—</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -7762,6 +7804,7 @@
           creative: "panel-creative",
           audit: "panel-audit",
           calendar: "panel-calendar",
+          cycle: "panel-cycle",
         };
         function activateTab(name) {
           if (!TAB_TO_PANEL[name]) name = "reactive";
