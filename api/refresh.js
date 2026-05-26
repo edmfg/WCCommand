@@ -12,8 +12,9 @@
 //      key (same path /api/sb-write uses). Cron-sourced rows get
 //      payload.source = "cron" so the activity feed can distinguish them.
 //
-// Configured via vercel.json `crons` at 0 9 * * * (UTC) = 5am New York
-// during EDT, which covers the entire WC2026 window (Jun 11 – Jul 19).
+// Configured via vercel.json `crons` at 0 9,16,22 * * * (UTC) = 5am / 12pm
+// / 6pm New York during EDT — fires three times a day so the dashboard
+// stays fresh through the WC2026 window (Jun 11 – Jul 19).
 
 const crypto = require("crypto");
 const {

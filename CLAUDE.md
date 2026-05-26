@@ -245,7 +245,7 @@ Deployment Protection: previously enabled, **currently OFF on Production** (the 
 
 ## Daily auto-refresh (Vercel Cron → `/api/refresh`)
 
-A Vercel Cron at **`0 9 * * *` UTC** (= 5am New York during EDT, which covers the whole WC window) calls `GET /api/refresh` with `Authorization: Bearer ${CRON_SECRET}`. The endpoint:
+A Vercel Cron at **`0 9,16,22 * * *` UTC** (= 5am / 12pm / 6pm New York during EDT — three fires a day across the WC window) calls `GET /api/refresh` with `Authorization: Bearer ${CRON_SECRET}`. The endpoint:
 
 1. Runs the same Gemini 2.5 Flash + Google Search grounding flow the manual button uses.
 2. **Server-side**, normalises the JSON payload (mirrors of `normalizeNews`/`normalizeSocial`/`normalizeTicker` from `mfg.html`) and inserts rows into Supabase `live_updates` using `SUPABASE_SERVICE_ROLE_KEY` (same RLS-bypass path as `/api/sb-write`).
