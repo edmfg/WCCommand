@@ -72,6 +72,7 @@ const ALLOWED_TABLES = new Set([
   "dashboard_content",
   "live_updates",
   "reactive_cycle",
+  "vacation_schedule",
 ]);
 
 // Per-table per-op allowlist. Stops a stolen cookie from doing things the
@@ -88,6 +89,8 @@ const ALLOWED_OPS = {
   live_updates: new Set(["insert"]),
   // One Reactive Cycle: single-row jsonb upsert, same as mfg_triage.
   reactive_cycle: new Set(["upsert"]),
+  // Vacation schedule: single-row jsonb upsert, same pattern.
+  vacation_schedule: new Set(["upsert"]),
 };
 
 const MAX_BODY_BYTES = 256 * 1024;

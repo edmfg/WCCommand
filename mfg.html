@@ -5205,11 +5205,29 @@
         <!-- ─────── ONE REACTIVE CYCLE PANEL ─────── -->
         <div class="tab-panel" id="panel-cycle">
           <div class="section-title">🌀 One Reactive Cycle</div>
+          <div
+            style="
+              display: inline-block;
+              font-family: var(--font-display);
+              font-size: 11px;
+              font-weight: 700;
+              letter-spacing: 1.5px;
+              text-transform: uppercase;
+              color: var(--text);
+              background: rgba(255, 215, 0, 0.1);
+              border: 1px solid rgba(255, 215, 0, 0.3);
+              border-radius: 999px;
+              padding: 6px 14px;
+              margin: -2px 0 12px;
+            "
+          >
+            🏆 Knockout Stage · June 28 → Final · July 19
+          </div>
           <p
             style="
               color: var(--text-muted);
               font-size: 13px;
-              margin: -6px 0 16px;
+              margin: 0 0 16px;
             "
           >
             A typical match-day cadence from <strong>Round of 32 through the
@@ -5275,6 +5293,67 @@
           >
             Click any cell to edit. Changes save automatically and sync to everyone with MFG access.
           </p>
+
+          <!-- ─────── Vacation Schedule sub-section ─────── -->
+          <div class="section-title" style="margin-top: 36px">🏖️ Vacation Schedule</div>
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 13px;
+              margin: -6px 0 16px;
+            "
+          >
+            Who's out when — so coverage gaps are visible at a glance.
+          </p>
+
+          <div class="form-card glass" style="padding: 0; overflow: hidden">
+            <table class="data-table" id="vacationScheduleTable">
+              <thead>
+                <tr>
+                  <th style="width: 180px">Person</th>
+                  <th style="width: 220px">Dates</th>
+                  <th>Notes</th>
+                  <th style="width: 44px; text-align: center" aria-label="Actions"></th>
+                </tr>
+              </thead>
+              <tbody id="vacationScheduleBody">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+              margin-top: 12px;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              type="button"
+              id="vacationAddRowBtn"
+              class="btn-secondary"
+              style="
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--text);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 8px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 13px;
+              "
+            >
+              + Add row
+            </button>
+            <div
+              id="vacationSaveStatus"
+              style="font-size: 12px; color: var(--text-muted); min-height: 16px"
+              aria-live="polite"
+            ></div>
+          </div>
         </div>
 
         <!-- ─────── AUDIT LOG PANEL ─────── -->
@@ -10148,6 +10227,204 @@
             requestAnimationFrame(() => {
               const last = document.querySelector(
                 "#cycleScheduleBody tr:last-child [data-cycle-field=\"hour\"]",
+              );
+              if (last) last.focus();
+            });
+          }
+        });
+
+        // ── Vacation Schedule (sub-section of the One Reactive Cycle tab) ──
+        // Same single-row jsonb pattern as reactive_cycle.
+        const VAC_TABLE = "vacation_schedule";
+        const VAC_ROW_ID = "default";
+
+        let vacationRowsState = null;
+        let vacationSaveTimer = null;
+        let vacationSaveInFlight = false;
+
+        function setVacationStatus(msg, kind) {
+          const el = document.getElementById("vacationSaveStatus");
+          if (!el) return;
+          el.textContent = msg || "";
+          el.style.color =
+            kind === "ok"
+              ? "var(--accent-green, #4ade80)"
+              : kind === "err"
+                ? "var(--danger, #ef4444)"
+                : "var(--text-muted)";
+        }
+
+        function renderVacationRows() {
+          const tbody = document.getElementById("vacationScheduleBody");
+          if (!tbody) return;
+          if (
+            !Array.isArray(vacationRowsState) ||
+            vacationRowsState.length === 0
+          ) {
+            tbody.innerHTML =
+              '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">No vacations on file — click <strong>+ Add row</strong> to add one.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = vacationRowsState
+            .map(
+              (r, i) =>
+                '<tr data-vac-idx="' +
+                i +
+                '">' +
+                '<td contenteditable="true" data-vac-field="person">' +
+                (r.person || "") +
+                "</td>" +
+                '<td contenteditable="true" data-vac-field="dates">' +
+                (r.dates || "") +
+                "</td>" +
+                '<td contenteditable="true" data-vac-field="notes">' +
+                (r.notes || "") +
+                "</td>" +
+                '<td style="text-align: center"><button type="button" class="vacation-del-btn" title="Delete row" aria-label="Delete row" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px">×</button></td>' +
+                "</tr>",
+            )
+            .join("");
+        }
+
+        function readVacationFromDom() {
+          const rows = document.querySelectorAll(
+            "#vacationScheduleBody tr[data-vac-idx]",
+          );
+          vacationRowsState = Array.from(rows).map((tr) => {
+            const cell = (field) => {
+              const td = tr.querySelector('[data-vac-field="' + field + '"]');
+              return td ? td.innerHTML.trim() : "";
+            };
+            return {
+              person: cell("person"),
+              dates: cell("dates"),
+              notes: cell("notes"),
+            };
+          });
+        }
+
+        async function saveVacationRowsNow() {
+          if (vacationSaveInFlight) return;
+          const sbWriteFn = window.__mfgSbWrite;
+          if (!sbWriteFn) {
+            setVacationStatus("Save unavailable (no MFG session).", "err");
+            return;
+          }
+          vacationSaveInFlight = true;
+          setVacationStatus("Saving…", "");
+          try {
+            const { error } = await sbWriteFn(VAC_TABLE, "upsert", {
+              values: {
+                id: VAC_ROW_ID,
+                data: { rows: vacationRowsState },
+                updated_at: new Date().toISOString(),
+              },
+              onConflict: "id",
+            });
+            if (error) {
+              setVacationStatus("Save failed: " + error.message, "err");
+            } else {
+              setVacationStatus("Saved.", "ok");
+              setTimeout(() => {
+                const el = document.getElementById("vacationSaveStatus");
+                if (el && el.textContent === "Saved.")
+                  setVacationStatus("", "");
+              }, 1800);
+            }
+          } finally {
+            vacationSaveInFlight = false;
+          }
+        }
+
+        function queueVacationSave() {
+          if (vacationSaveTimer) clearTimeout(vacationSaveTimer);
+          vacationSaveTimer = setTimeout(() => {
+            readVacationFromDom();
+            saveVacationRowsNow();
+          }, 350);
+        }
+
+        async function loadVacationRowsFromCloud() {
+          try {
+            const sb = typeof getSb === "function" ? getSb() : null;
+            if (sb) {
+              const { data, error } = await sb
+                .from(VAC_TABLE)
+                .select("data")
+                .eq("id", VAC_ROW_ID)
+                .maybeSingle();
+              if (
+                !error &&
+                data &&
+                data.data &&
+                Array.isArray(data.data.rows)
+              ) {
+                vacationRowsState = data.data.rows;
+                return;
+              }
+            }
+          } catch (e) {
+            // fall through
+          }
+          vacationRowsState = [];
+        }
+
+        // Extend initCycleTab so opening the One Reactive Cycle tab also
+        // loads the vacation rows. (initCycleTab is defined above and is
+        // idempotent via cycleInitStarted.)
+        const _origInitCycleTab = window.initCycleTab;
+        window.initCycleTab = async function () {
+          if (typeof _origInitCycleTab === "function") {
+            await _origInitCycleTab();
+          }
+          if (vacationRowsState === null) {
+            await loadVacationRowsFromCloud();
+            renderVacationRows();
+          }
+        };
+
+        document.addEventListener("input", (e) => {
+          const td = e.target.closest(
+            "#vacationScheduleBody [data-vac-field]",
+          );
+          if (!td) return;
+          queueVacationSave();
+        });
+        document.addEventListener(
+          "blur",
+          (e) => {
+            const td = e.target.closest(
+              "#vacationScheduleBody [data-vac-field]",
+            );
+            if (!td) return;
+            if (vacationSaveTimer) clearTimeout(vacationSaveTimer);
+            readVacationFromDom();
+            saveVacationRowsNow();
+          },
+          true,
+        );
+        document.addEventListener("click", (e) => {
+          const delBtn = e.target.closest(
+            "#vacationScheduleBody .vacation-del-btn",
+          );
+          if (delBtn) {
+            const tr = delBtn.closest("tr[data-vac-idx]");
+            if (!tr || !Array.isArray(vacationRowsState)) return;
+            const idx = parseInt(tr.dataset.vacIdx, 10);
+            if (isNaN(idx)) return;
+            vacationRowsState.splice(idx, 1);
+            renderVacationRows();
+            saveVacationRowsNow();
+            return;
+          }
+          if (e.target && e.target.id === "vacationAddRowBtn") {
+            if (!Array.isArray(vacationRowsState)) vacationRowsState = [];
+            vacationRowsState.push({ person: "", dates: "", notes: "" });
+            renderVacationRows();
+            saveVacationRowsNow();
+            requestAnimationFrame(() => {
+              const last = document.querySelector(
+                "#vacationScheduleBody tr:last-child [data-vac-field=\"person\"]",
               );
               if (last) last.focus();
             });
