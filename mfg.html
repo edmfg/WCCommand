@@ -3686,6 +3686,62 @@
         .cal-detail {
           display: none !important;
         }
+        /* One Reactive Cycle export-to-PDF: strip chrome, clean tables. */
+        #cyclePrintBtn,
+        #cycleAddRowBtn,
+        #vacationAddRowBtn,
+        #cycleSaveStatus,
+        #vacationSaveStatus,
+        .cycle-del-btn,
+        .vacation-del-btn,
+        .refresh-content-btn,
+        .header-back,
+        .header-actions,
+        #cycleEditHint {
+          display: none !important;
+        }
+        #cycleScheduleTable th:last-child,
+        #cycleScheduleTable td:last-child,
+        #vacationScheduleTable th:last-child,
+        #vacationScheduleTable td:last-child {
+          display: none !important;
+        }
+        #panel-cycle {
+          background: #fff !important;
+        }
+        #panel-cycle .form-card,
+        #panel-cycle .data-table,
+        #panel-cycle .data-table th,
+        #panel-cycle .data-table td {
+          background: #fff !important;
+          color: #000 !important;
+          border-color: #ccc !important;
+          box-shadow: none !important;
+          backdrop-filter: none !important;
+        }
+        #panel-cycle .data-table th {
+          background: #f3f4f6 !important;
+          color: #000 !important;
+        }
+        #panel-cycle .section-title,
+        #panel-cycle p,
+        #panel-cycle strong,
+        #panel-cycle em,
+        #panel-cycle code {
+          color: #000 !important;
+        }
+        #panel-cycle [contenteditable] {
+          outline: none !important;
+        }
+        #panel-cycle table {
+          page-break-inside: auto;
+        }
+        #panel-cycle tr {
+          page-break-inside: avoid;
+        }
+        @page {
+          margin: 14mm;
+        }
       }
     </style>
     <script>
@@ -5207,21 +5263,47 @@
           <div class="section-title">🌀 One Reactive Cycle</div>
           <div
             style="
-              display: inline-block;
-              font-family: var(--font-display);
-              font-size: 11px;
-              font-weight: 700;
-              letter-spacing: 1.5px;
-              text-transform: uppercase;
-              color: var(--text);
-              background: rgba(255, 215, 0, 0.1);
-              border: 1px solid rgba(255, 215, 0, 0.3);
-              border-radius: 999px;
-              padding: 6px 14px;
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              flex-wrap: wrap;
               margin: -2px 0 12px;
             "
           >
-            🏆 Knockout Stage · June 28 → Final · July 19
+            <div
+              style="
+                font-family: var(--font-display);
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                color: var(--text);
+                background: rgba(255, 215, 0, 0.1);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 999px;
+                padding: 6px 14px;
+              "
+            >
+              🏆 Knockout Stage · June 28 → Final · July 19
+            </div>
+            <button
+              type="button"
+              id="cyclePrintBtn"
+              title="Open the browser print dialog — choose 'Save as PDF' as destination."
+              style="
+                margin-left: auto;
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--text);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                padding: 8px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+              "
+            >
+              📄 Export PDF
+            </button>
           </div>
           <p
             style="
@@ -5285,6 +5367,7 @@
           </div>
 
           <p
+            id="cycleEditHint"
             style="
               color: var(--text-muted);
               font-size: 12px;
@@ -10230,6 +10313,21 @@
               );
               if (last) last.focus();
             });
+          }
+          if (e.target && e.target.closest("#cyclePrintBtn")) {
+            // Flush any pending debounced edit before printing so the PDF
+            // never lags behind on-screen state.
+            if (cycleSaveTimer) {
+              clearTimeout(cycleSaveTimer);
+              readCycleFromDom();
+              renderCycleRows();
+            }
+            if (vacationSaveTimer) {
+              clearTimeout(vacationSaveTimer);
+              readVacationFromDom();
+              renderVacationRows();
+            }
+            window.print();
           }
         });
 
