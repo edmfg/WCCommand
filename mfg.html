@@ -5223,25 +5223,58 @@
                 <tr>
                   <th style="width: 110px">Hour (ET)</th>
                   <th>Task</th>
-                  <th style="width: 180px">Owner</th>
+                  <th style="width: 200px">Owner</th>
+                  <th style="width: 44px; text-align: center" aria-label="Actions"></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr><td>8:00 AM</td><td>HQ auto-refreshes — Vercel Cron pulls overnight WC2026 news / social / ticker into <code>live_updates</code> via Gemini + Google Search grounding. No human in the loop.</td><td>🤖 Vercel Cron</td></tr>
-                <tr><td>9:00 AM</td><td>Run WPP Open Agentic Team — manually upload <strong>Burson</strong> and <strong>EAFC</strong> (WIP) data so signals are enriched with brand + audience context. In parallel, scan the HQ's auto-refreshed content for anything interesting and confirm the Agentic Team's output.</td><td>Strategist</td></tr>
-                <tr><td>9:30 AM</td><td>Beautify the Agentic Team output using <strong>Today's Reactive</strong> and send <strong>max 3 creative options</strong> to Creative. Strategist may recommend one, but Creative picks which to pursue.</td><td>Strategist → Creative</td></tr>
-                <tr><td>10:00 AM</td><td>Creative starts ideation on <strong>0–3 potential assets</strong> — descriptions of Veo clip, post copy, etc. Only <strong>BENTO 3</strong> is available for reactive (one long query, no results).</td><td>Creative</td></tr>
-                <tr><td>11:00 AM</td><td>MFG Creative sends <strong>0–3 options</strong> to Michelle / Chris Henry for review. <em>(0 if truly nothing interesting happened yesterday.)</em></td><td>MFG Creative → Michelle / Chris Henry</td></tr>
-                <tr><td>11:30 AM</td><td>Michelle / Chris Henry choose <strong>0 or 1 asset</strong> to proceed into production.</td><td>Michelle / Chris Henry</td></tr>
-                <tr><td>12:00 PM</td><td><strong>Production block (12:00 – 2:00 PM).</strong> Veo clips generated, copy drafted, post mocked up.</td><td>Creative</td></tr>
-                <tr><td>1:00 PM</td><td>Production continues — finalising clip, copy, and post layout.</td><td>Creative</td></tr>
-                <tr><td>2:00 PM</td><td>MFG sends the finished asset to <strong>Michelle / Chris Henry for legal review</strong>.</td><td>MFG → Michelle / Chris Henry</td></tr>
-                <tr><td>3:00 PM</td><td>Legal review in progress — team stays on standby and continues monitoring the next signal.</td><td>Michelle / Chris Henry (review) · MFG (standby)</td></tr>
-                <tr><td>4:00 PM</td><td>Michelle / Chris return with <strong>approval and/or feedback</strong> — outcomes range from "ship it" to revisions to "do not run". MFG actions any revisions immediately.</td><td>Michelle / Chris Henry → MFG</td></tr>
-                <tr><td>5:00 PM</td><td>Asset is sent to <strong>Meta for approval / activation</strong>. Goes live that same night.</td><td>MFG → Meta</td></tr>
+              <tbody id="cycleScheduleBody">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
               </tbody>
             </table>
           </div>
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+              margin-top: 12px;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              type="button"
+              id="cycleAddRowBtn"
+              class="btn-secondary"
+              style="
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--text);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 8px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 13px;
+              "
+            >
+              + Add row
+            </button>
+            <div
+              id="cycleSaveStatus"
+              style="font-size: 12px; color: var(--text-muted); min-height: 16px"
+              aria-live="polite"
+            ></div>
+          </div>
+
+          <p
+            style="
+              color: var(--text-muted);
+              font-size: 12px;
+              margin: 12px 0 0;
+            "
+          >
+            Click any cell to edit. Changes save automatically and sync to everyone with MFG access.
+          </p>
         </div>
 
         <!-- ─────── AUDIT LOG PANEL ─────── -->
@@ -7832,6 +7865,9 @@
           if (name === "calendar" && typeof initCalendarTab === "function") {
             initCalendarTab();
           }
+          if (name === "cycle" && typeof initCycleTab === "function") {
+            initCycleTab();
+          }
         }
         // Expose for buttons inside other panels (e.g. an "Open Audit Log"
         // shortcut on the Reactive success state).
@@ -9919,6 +9955,204 @@
           renderAudit();
         }
         window.loadAuditLog = loadAuditLogImpl;
+
+        // ── One Reactive Cycle tab ──
+        // Single-row jsonb stored in public.reactive_cycle (id = 'default').
+        // Reads use the publishable Supabase client; writes go through
+        // /api/sb-write so the wcc_mfg_gate cookie gates mutations.
+        const CYCLE_TABLE = "reactive_cycle";
+        const CYCLE_ROW_ID = "default";
+        const CYCLE_DEFAULT_ROWS = [
+          { hour: "8:00 AM", task: "HQ auto-refreshes — Vercel Cron pulls overnight WC2026 news / social / ticker into <code>live_updates</code> via Gemini + Google Search grounding. No human in the loop.", owner: "🤖 Vercel Cron" },
+          { hour: "9:00 AM", task: "Run WPP Open Agentic Team — manually upload <strong>Burson</strong> and <strong>EAFC</strong> (WIP) data so signals are enriched with brand + audience context. In parallel, scan the HQ's auto-refreshed content for anything interesting and confirm the Agentic Team's output.", owner: "Strategist" },
+          { hour: "9:30 AM", task: "Beautify the Agentic Team output using <strong>Today's Reactive</strong> and send <strong>max 3 creative options</strong> to Creative. Strategist may recommend one, but Creative picks which to pursue.", owner: "Strategist → Creative" },
+          { hour: "10:00 AM", task: "Creative starts ideation on <strong>0–3 potential assets</strong> — descriptions of Veo clip, post copy, etc. Only <strong>BENTO 3</strong> is available for reactive (one long query, no results).", owner: "Creative" },
+          { hour: "11:00 AM", task: "MFG Creative sends <strong>0–3 options</strong> to Michelle / Chris Henry for review. <em>(0 if truly nothing interesting happened yesterday.)</em>", owner: "MFG Creative → Michelle / Chris Henry" },
+          { hour: "11:30 AM", task: "Michelle / Chris Henry choose <strong>0 or 1 asset</strong> to proceed into production.", owner: "Michelle / Chris Henry" },
+          { hour: "12:00 PM", task: "<strong>Production block (12:00 – 2:00 PM).</strong> Veo clips generated, copy drafted, post mocked up.", owner: "Creative" },
+          { hour: "1:00 PM", task: "Production continues — finalising clip, copy, and post layout.", owner: "Creative" },
+          { hour: "2:00 PM", task: "MFG sends the finished asset to <strong>Michelle / Chris Henry for legal review</strong>.", owner: "MFG → Michelle / Chris Henry" },
+          { hour: "3:00 PM", task: "Legal review in progress — team stays on standby and continues monitoring the next signal.", owner: "Michelle / Chris Henry (review) · MFG (standby)" },
+          { hour: "4:00 PM", task: "Michelle / Chris return with <strong>approval and/or feedback</strong> — outcomes range from \"ship it\" to revisions to \"do not run\". MFG actions any revisions immediately.", owner: "Michelle / Chris Henry → MFG" },
+          { hour: "5:00 PM", task: "Asset is sent to <strong>Meta for approval / activation</strong>. Goes live that same night.", owner: "MFG → Meta" },
+        ];
+
+        let cycleRowsState = null;
+        let cycleSaveTimer = null;
+        let cycleSaveInFlight = false;
+        let cycleInitStarted = false;
+
+        function setCycleStatus(msg, kind) {
+          const el = document.getElementById("cycleSaveStatus");
+          if (!el) return;
+          el.textContent = msg || "";
+          el.style.color =
+            kind === "ok"
+              ? "var(--accent-green, #4ade80)"
+              : kind === "err"
+                ? "var(--danger, #ef4444)"
+                : "var(--text-muted)";
+        }
+
+        function renderCycleRows() {
+          const tbody = document.getElementById("cycleScheduleBody");
+          if (!tbody) return;
+          if (!Array.isArray(cycleRowsState) || cycleRowsState.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">No rows yet — click <strong>+ Add row</strong> to start.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = cycleRowsState
+            .map(
+              (r, i) =>
+                '<tr data-cycle-idx="' +
+                i +
+                '">' +
+                '<td contenteditable="true" data-cycle-field="hour">' +
+                (r.hour || "") +
+                "</td>" +
+                '<td contenteditable="true" data-cycle-field="task">' +
+                (r.task || "") +
+                "</td>" +
+                '<td contenteditable="true" data-cycle-field="owner">' +
+                (r.owner || "") +
+                "</td>" +
+                '<td style="text-align: center"><button type="button" class="cycle-del-btn" title="Delete row" aria-label="Delete row" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px">×</button></td>' +
+                "</tr>",
+            )
+            .join("");
+        }
+
+        function readCycleFromDom() {
+          const rows = document.querySelectorAll(
+            "#cycleScheduleBody tr[data-cycle-idx]",
+          );
+          cycleRowsState = Array.from(rows).map((tr) => {
+            const cell = (field) => {
+              const td = tr.querySelector('[data-cycle-field="' + field + '"]');
+              return td ? td.innerHTML.trim() : "";
+            };
+            return { hour: cell("hour"), task: cell("task"), owner: cell("owner") };
+          });
+        }
+
+        async function saveCycleRowsNow() {
+          if (cycleSaveInFlight) return;
+          const sbWriteFn = window.__mfgSbWrite;
+          if (!sbWriteFn) {
+            setCycleStatus("Save unavailable (no MFG session).", "err");
+            return;
+          }
+          cycleSaveInFlight = true;
+          setCycleStatus("Saving…", "");
+          try {
+            const { error } = await sbWriteFn(CYCLE_TABLE, "upsert", {
+              values: {
+                id: CYCLE_ROW_ID,
+                data: { rows: cycleRowsState },
+                updated_at: new Date().toISOString(),
+              },
+              onConflict: "id",
+            });
+            if (error) {
+              setCycleStatus("Save failed: " + error.message, "err");
+            } else {
+              setCycleStatus("Saved.", "ok");
+              setTimeout(() => {
+                const el = document.getElementById("cycleSaveStatus");
+                if (el && el.textContent === "Saved.") setCycleStatus("", "");
+              }, 1800);
+            }
+          } finally {
+            cycleSaveInFlight = false;
+          }
+        }
+
+        function queueCycleSave() {
+          if (cycleSaveTimer) clearTimeout(cycleSaveTimer);
+          cycleSaveTimer = setTimeout(() => {
+            readCycleFromDom();
+            saveCycleRowsNow();
+          }, 350);
+        }
+
+        async function loadCycleRowsFromCloud() {
+          try {
+            const sb = typeof getSb === "function" ? getSb() : null;
+            if (sb) {
+              const { data, error } = await sb
+                .from(CYCLE_TABLE)
+                .select("data")
+                .eq("id", CYCLE_ROW_ID)
+                .maybeSingle();
+              if (
+                !error &&
+                data &&
+                data.data &&
+                Array.isArray(data.data.rows) &&
+                data.data.rows.length > 0
+              ) {
+                cycleRowsState = data.data.rows;
+                return;
+              }
+            }
+          } catch (e) {
+            // fall through to defaults
+          }
+          cycleRowsState = JSON.parse(JSON.stringify(CYCLE_DEFAULT_ROWS));
+        }
+
+        window.initCycleTab = async function () {
+          if (cycleInitStarted) return;
+          cycleInitStarted = true;
+          await loadCycleRowsFromCloud();
+          renderCycleRows();
+        };
+
+        // Event delegation: editable cells, delete buttons, add-row button.
+        document.addEventListener("input", (e) => {
+          const td = e.target.closest(
+            "#cycleScheduleBody [data-cycle-field]",
+          );
+          if (!td) return;
+          queueCycleSave();
+        });
+        document.addEventListener("blur", (e) => {
+          const td = e.target.closest(
+            "#cycleScheduleBody [data-cycle-field]",
+          );
+          if (!td) return;
+          // force immediate save on blur (skip the debounce)
+          if (cycleSaveTimer) clearTimeout(cycleSaveTimer);
+          readCycleFromDom();
+          saveCycleRowsNow();
+        }, true);
+        document.addEventListener("click", (e) => {
+          const delBtn = e.target.closest("#cycleScheduleBody .cycle-del-btn");
+          if (delBtn) {
+            const tr = delBtn.closest("tr[data-cycle-idx]");
+            if (!tr || !Array.isArray(cycleRowsState)) return;
+            const idx = parseInt(tr.dataset.cycleIdx, 10);
+            if (isNaN(idx)) return;
+            cycleRowsState.splice(idx, 1);
+            renderCycleRows();
+            saveCycleRowsNow();
+            return;
+          }
+          if (e.target && e.target.id === "cycleAddRowBtn") {
+            if (!Array.isArray(cycleRowsState)) cycleRowsState = [];
+            cycleRowsState.push({ hour: "", task: "", owner: "" });
+            renderCycleRows();
+            saveCycleRowsNow();
+            // focus the new hour cell
+            requestAnimationFrame(() => {
+              const last = document.querySelector(
+                "#cycleScheduleBody tr:last-child [data-cycle-field=\"hour\"]",
+              );
+              if (last) last.focus();
+            });
+          }
+        });
 
         // Wire audit filters/search/refresh once on script load
         document.addEventListener("click", (e) => {
