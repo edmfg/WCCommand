@@ -3653,6 +3653,99 @@
       }
 
       /* Print stylesheet — landscape, no UI chrome, full grid */
+      /* ─── One Reactive Cycle (cycle + vacation tables) ─── */
+      /* Role color-coding on the Owner cell */
+      .cycle-owner-strategist { color: #60a5fa !important; }
+      .cycle-owner-creative { color: #c084fc !important; }
+      .cycle-owner-mfg-creative { color: #fb923c !important; }
+      .cycle-owner-mfg { color: #f87171 !important; }
+      .cycle-owner-review { color: #facc15 !important; }
+      .cycle-owner-cron { color: #94a3b8 !important; font-style: italic; }
+      .cycle-owner-meta { color: #34d399 !important; }
+      /* Out-of-office badge appended to owner cells */
+      td.cycle-owner-ooo::after {
+        content: " 🏖️";
+        font-style: normal;
+        opacity: 0.95;
+      }
+      /* Now-row highlight */
+      #cycleScheduleBody tr.cycle-row-now > td {
+        background: rgba(255, 215, 0, 0.08) !important;
+        box-shadow: inset 3px 0 0 0 #facc15;
+      }
+      #cycleScheduleBody tr.cycle-row-now > td:nth-child(2)::before {
+        content: "● NOW";
+        display: inline-block;
+        font-family: var(--font-display);
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: #facc15;
+        background: rgba(250, 204, 21, 0.12);
+        padding: 2px 6px;
+        border-radius: 999px;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      /* Drag grip column */
+      .cycle-grip {
+        width: 26px;
+        text-align: center;
+        color: var(--text-muted);
+        cursor: grab;
+        user-select: none;
+        font-size: 16px;
+      }
+      .cycle-grip:active { cursor: grabbing; }
+      tr.cycle-row-dragging > td { opacity: 0.45; }
+      tr.cycle-row-drop-above > td { box-shadow: inset 0 2px 0 0 #facc15; }
+      tr.cycle-row-drop-below > td { box-shadow: inset 0 -2px 0 0 #facc15; }
+      /* Today's matches strip */
+      #cycleTodayMatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 16px;
+      }
+      .cycle-match-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: var(--text);
+      }
+      .cycle-match-chip .match-time {
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #facc15;
+      }
+      .cycle-match-chip .match-teams { font-weight: 600; }
+      .cycle-match-chip .match-stage {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+      }
+      .cycle-match-chip.cycle-match-empty {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-style: italic;
+        background: transparent;
+        border-style: dashed;
+      }
+      /* Last-updated footer */
+      .cycle-meta-footer {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 8px;
+        font-style: italic;
+      }
+
       @media print {
         body {
           background: #fff !important;
@@ -3703,7 +3796,19 @@
         #cycleScheduleTable th:last-child,
         #cycleScheduleTable td:last-child,
         #vacationScheduleTable th:last-child,
-        #vacationScheduleTable td:last-child {
+        #vacationScheduleTable td:last-child,
+        #cycleScheduleTable th:first-child,
+        #cycleScheduleTable td:first-child,
+        #vacationScheduleTable th:first-child,
+        #vacationScheduleTable td:first-child {
+          display: none !important;
+        }
+        /* Don't show NOW pill in PDFs */
+        #cycleScheduleBody tr.cycle-row-now > td {
+          background: #fff !important;
+          box-shadow: none !important;
+        }
+        #cycleScheduleBody tr.cycle-row-now > td:nth-child(2)::before {
           display: none !important;
         }
         #panel-cycle {
@@ -5317,10 +5422,13 @@
             reactive moment goes from signal → posted asset without a scramble.
           </p>
 
+          <div id="cycleTodayMatches"></div>
+
           <div class="form-card glass" style="padding: 0; overflow: hidden">
             <table class="data-table" id="cycleScheduleTable">
               <thead>
                 <tr>
+                  <th style="width: 26px" aria-label="Drag"></th>
                   <th style="width: 110px">Hour (ET)</th>
                   <th>Task</th>
                   <th style="width: 200px">Owner</th>
@@ -5328,10 +5436,12 @@
                 </tr>
               </thead>
               <tbody id="cycleScheduleBody">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
               </tbody>
             </table>
           </div>
+
+          <div id="cycleMetaFooter" class="cycle-meta-footer"></div>
 
           <div
             style="
@@ -5393,6 +5503,7 @@
             <table class="data-table" id="vacationScheduleTable">
               <thead>
                 <tr>
+                  <th style="width: 26px" aria-label="Drag"></th>
                   <th style="width: 180px">Person</th>
                   <th style="width: 220px">Dates</th>
                   <th>Notes</th>
@@ -5400,10 +5511,12 @@
                 </tr>
               </thead>
               <tbody id="vacationScheduleBody">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
               </tbody>
             </table>
           </div>
+
+          <div id="vacationMetaFooter" class="cycle-meta-footer"></div>
 
           <div
             style="
@@ -10124,6 +10237,236 @@
         // /api/sb-write so the wcc_mfg_gate cookie gates mutations.
         const CYCLE_TABLE = "reactive_cycle";
         const CYCLE_ROW_ID = "default";
+
+        let cycleMeta = { updated_at: null, updated_by: null };
+        let vacationMeta = { updated_at: null, updated_by: null };
+
+        function getCycleUserLabel() {
+          try {
+            return (
+              localStorage.getItem("mfg_user_label") ||
+              sessionStorage.getItem("mfg_user_label") ||
+              null
+            );
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function fmtRelativeTs(iso) {
+          if (!iso) return "";
+          try {
+            const d = new Date(iso);
+            const diff = Date.now() - d.getTime();
+            const m = Math.round(diff / 60000);
+            if (m < 1) return "just now";
+            if (m < 60) return m + "m ago";
+            const h = Math.round(m / 60);
+            if (h < 24) return h + "h ago";
+            return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          } catch (e) {
+            return "";
+          }
+        }
+
+        function renderCycleMetaFooter() {
+          const el = document.getElementById("cycleMetaFooter");
+          if (!el) return;
+          if (!cycleMeta.updated_at) { el.textContent = ""; return; }
+          const who = cycleMeta.updated_by ? "by " + cycleMeta.updated_by + " " : "";
+          el.textContent = "Last edited " + who + fmtRelativeTs(cycleMeta.updated_at) + ".";
+        }
+        function renderVacationMetaFooter() {
+          const el = document.getElementById("vacationMetaFooter");
+          if (!el) return;
+          if (!vacationMeta.updated_at) { el.textContent = ""; return; }
+          const who = vacationMeta.updated_by ? "by " + vacationMeta.updated_by + " " : "";
+          el.textContent = "Last edited " + who + fmtRelativeTs(vacationMeta.updated_at) + ".";
+        }
+
+        // ── Hour parsing + now-row highlight ──
+        function parseHourString(s) {
+          const m = String(s || "").match(/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)/i);
+          if (!m) return null;
+          let h = parseInt(m[1], 10);
+          const min = m[2] ? parseInt(m[2], 10) : 0;
+          const mer = m[3].toUpperCase();
+          if (mer === "PM" && h !== 12) h += 12;
+          if (mer === "AM" && h === 12) h = 0;
+          return h * 60 + min;
+        }
+        function getCurrentETMinutes() {
+          try {
+            const fmt = new Intl.DateTimeFormat("en-US", {
+              timeZone: "America/New_York",
+              hour12: false, hour: "2-digit", minute: "2-digit",
+            });
+            const parts = fmt.formatToParts(new Date());
+            const h = parseInt(parts.find((p) => p.type === "hour").value, 10);
+            const m = parseInt(parts.find((p) => p.type === "minute").value, 10);
+            return h * 60 + m;
+          } catch (e) {
+            const d = new Date();
+            return d.getHours() * 60 + d.getMinutes();
+          }
+        }
+        function getTodayET() {
+          try {
+            return new Intl.DateTimeFormat("en-CA", {
+              timeZone: "America/New_York",
+              year: "numeric", month: "2-digit", day: "2-digit",
+            }).format(new Date());
+          } catch (e) {
+            return new Date().toISOString().slice(0, 10);
+          }
+        }
+        function getNowRowIndex(rows) {
+          if (!Array.isArray(rows) || !rows.length) return -1;
+          const nowMin = getCurrentETMinutes();
+          let bestIdx = -1, bestStart = -1;
+          rows.forEach((r, i) => {
+            const start = parseHourString(r.hour);
+            if (start == null) return;
+            if (start <= nowMin && start > bestStart) {
+              bestStart = start;
+              bestIdx = i;
+            }
+          });
+          return bestIdx;
+        }
+        function updateNowHighlight() {
+          if (!Array.isArray(cycleRowsState)) return;
+          const idx = getNowRowIndex(cycleRowsState);
+          document
+            .querySelectorAll("#cycleScheduleBody tr[data-cycle-idx]")
+            .forEach((tr) => {
+              tr.classList.toggle(
+                "cycle-row-now",
+                parseInt(tr.dataset.cycleIdx, 10) === idx,
+              );
+            });
+        }
+
+        // ── Owner role coloring ──
+        function ownerRoleClass(owner) {
+          const o = String(owner || "").replace(/<[^>]+>/g, "").toLowerCase();
+          if (/cron|auto.?refresh|🤖/.test(o)) return "cycle-owner-cron";
+          if (/meta\b/.test(o)) return "cycle-owner-meta";
+          if (/michelle|chris\b/.test(o)) return "cycle-owner-review";
+          if (/mfg\s*creative/.test(o)) return "cycle-owner-mfg-creative";
+          if (/mfg/.test(o)) return "cycle-owner-mfg";
+          if (/creative/.test(o)) return "cycle-owner-creative";
+          if (/strategist/.test(o)) return "cycle-owner-strategist";
+          return "";
+        }
+
+        // ── Vacation parsing + lookup ──
+        const _CYCLE_MONTH_MAP = {
+          jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
+          apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
+          aug: 7, august: 7, sep: 8, sept: 8, september: 8,
+          oct: 9, october: 9, nov: 10, november: 10, dec: 11, december: 11,
+        };
+        function parseSingleDate(s, defaultYear) {
+          const t = String(s || "").trim();
+          if (!t) return null;
+          // ISO YYYY-MM-DD
+          let m = t.match(/(\d{4})-(\d{2})-(\d{2})/);
+          if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+          // "Jun 10" or "June 10, 2026" or "Jun 10 2026"
+          m = t.match(/([A-Za-z]+)\s+(\d{1,2})(?:[,\s]+(\d{4}))?/);
+          if (m && _CYCLE_MONTH_MAP[m[1].toLowerCase()] !== undefined) {
+            const month = _CYCLE_MONTH_MAP[m[1].toLowerCase()];
+            const day = parseInt(m[2], 10);
+            const yr = m[3] ? parseInt(m[3], 10) : defaultYear;
+            return new Date(yr, month, day);
+          }
+          // "6/10/2026" or "6/10"
+          m = t.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+          if (m) {
+            const mo = parseInt(m[1], 10) - 1;
+            const day = parseInt(m[2], 10);
+            let yr = m[3] ? parseInt(m[3], 10) : defaultYear;
+            if (yr < 100) yr += 2000;
+            return new Date(yr, mo, day);
+          }
+          return null;
+        }
+        function parseVacationRange(s) {
+          const raw = String(s || "").replace(/<[^>]+>/g, "").trim();
+          if (!raw) return null;
+          const yr = new Date().getFullYear();
+          // Split on dash/em-dash/en-dash/"to"
+          const parts = raw.split(/\s*(?:–|—|-|to)\s*/i).map((p) => p.trim()).filter(Boolean);
+          const start = parseSingleDate(parts[0], yr);
+          const end = parts.length > 1 ? parseSingleDate(parts[parts.length - 1], yr) : start;
+          if (!start) return null;
+          return { start, end: end || start };
+        }
+        function getOnVacationNamesToday() {
+          if (!Array.isArray(vacationRowsState) || !vacationRowsState.length) return [];
+          const todayStr = getTodayET();
+          const today = new Date(todayStr + "T12:00:00");
+          today.setHours(0, 0, 0, 0);
+          const out = [];
+          vacationRowsState.forEach((v) => {
+            if (!v || !v.person) return;
+            const range = parseVacationRange(v.dates);
+            if (!range) return;
+            const s = new Date(range.start); s.setHours(0, 0, 0, 0);
+            const e = new Date(range.end); e.setHours(23, 59, 59, 999);
+            if (today >= s && today <= e) {
+              const name = String(v.person).replace(/<[^>]+>/g, "").trim();
+              if (name) out.push(name);
+            }
+          });
+          return out;
+        }
+        function ownerHasOoo(ownerHtml) {
+          const ooo = getOnVacationNamesToday();
+          if (!ooo.length) return false;
+          const plain = String(ownerHtml || "").replace(/<[^>]+>/g, "").toLowerCase();
+          return ooo.some((name) =>
+            name
+              .toLowerCase()
+              .split(/\s+/)
+              .some((tok) => tok.length > 1 && plain.includes(tok)),
+          );
+        }
+
+        // ── Today's matches strip ──
+        function renderTodayMatchesStrip() {
+          const el = document.getElementById("cycleTodayMatches");
+          if (!el) return;
+          const dd = window.DASHBOARD_DATA;
+          const matches = dd && Array.isArray(dd.matches) ? dd.matches : [];
+          if (!matches.length) { el.innerHTML = ""; return; }
+          const today = getTodayET();
+          const todays = matches.filter((m) => m && m.date === today);
+          if (!todays.length) {
+            el.innerHTML =
+              '<div class="cycle-match-chip cycle-match-empty">No matches today (' +
+              today +
+              ").</div>";
+            return;
+          }
+          el.innerHTML = todays
+            .sort((a, b) => String(a.kickoff || "").localeCompare(String(b.kickoff || "")))
+            .map((m) => {
+              const homeFlag = m.home && m.home.flag ? m.home.flag : "";
+              const awayFlag = m.away && m.away.flag ? m.away.flag : "";
+              const homeCode = m.home && m.home.code ? m.home.code : "";
+              const awayCode = m.away && m.away.code ? m.away.code : "";
+              return (
+                '<div class="cycle-match-chip">' +
+                '<span class="match-time">' + (m.kickoff || "?") + " ET</span>" +
+                '<span class="match-teams">' + homeFlag + " " + homeCode + " v " + awayCode + " " + awayFlag + "</span>" +
+                '<span class="match-stage">' + (m.stage || "") + "</span>" +
+                "</div>"
+              );
+            })
+            .join("");
+        }
         const CYCLE_DEFAULT_ROWS = [
           { hour: "8:00 AM", task: "HQ auto-refreshes — Vercel Cron pulls overnight WC2026 news / social / ticker into <code>live_updates</code> via Gemini + Google Search grounding. No human in the loop.", owner: "🤖 Vercel Cron" },
           { hour: "9:00 AM", task: "Run WPP Open Agentic Team — manually upload <strong>Burson</strong> and <strong>EAFC</strong> (WIP) data so signals are enriched with brand + audience context. In parallel, scan the HQ's auto-refreshed content for anything interesting and confirm the Agentic Team's output.", owner: "Strategist" },
@@ -10161,28 +10504,27 @@
           if (!tbody) return;
           if (!Array.isArray(cycleRowsState) || cycleRowsState.length === 0) {
             tbody.innerHTML =
-              '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">No rows yet — click <strong>+ Add row</strong> to start.</td></tr>';
+              '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">No rows yet — click <strong>+ Add row</strong> to start.</td></tr>';
             return;
           }
           tbody.innerHTML = cycleRowsState
-            .map(
-              (r, i) =>
-                '<tr data-cycle-idx="' +
-                i +
-                '">' +
-                '<td contenteditable="true" data-cycle-field="hour">' +
-                (r.hour || "") +
-                "</td>" +
-                '<td contenteditable="true" data-cycle-field="task">' +
-                (r.task || "") +
-                "</td>" +
-                '<td contenteditable="true" data-cycle-field="owner">' +
-                (r.owner || "") +
-                "</td>" +
+            .map((r, i) => {
+              const ownerClasses = [ownerRoleClass(r.owner)];
+              if (ownerHasOoo(r.owner)) ownerClasses.push("cycle-owner-ooo");
+              return (
+                '<tr data-cycle-idx="' + i + '">' +
+                '<td class="cycle-grip" draggable="true" title="Drag to reorder">≡</td>' +
+                '<td contenteditable="true" data-cycle-field="hour">' + (r.hour || "") + "</td>" +
+                '<td contenteditable="true" data-cycle-field="task">' + (r.task || "") + "</td>" +
+                '<td contenteditable="true" data-cycle-field="owner" class="' +
+                ownerClasses.filter(Boolean).join(" ") + '">' +
+                (r.owner || "") + "</td>" +
                 '<td style="text-align: center"><button type="button" class="cycle-del-btn" title="Delete row" aria-label="Delete row" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px">×</button></td>' +
-                "</tr>",
-            )
+                "</tr>"
+              );
+            })
             .join("");
+          updateNowHighlight();
         }
 
         function readCycleFromDom() {
@@ -10208,17 +10550,22 @@
           cycleSaveInFlight = true;
           setCycleStatus("Saving…", "");
           try {
+            const nowIso = new Date().toISOString();
+            const who = getCycleUserLabel();
             const { error } = await sbWriteFn(CYCLE_TABLE, "upsert", {
               values: {
                 id: CYCLE_ROW_ID,
                 data: { rows: cycleRowsState },
-                updated_at: new Date().toISOString(),
+                updated_at: nowIso,
+                updated_by: who,
               },
               onConflict: "id",
             });
             if (error) {
               setCycleStatus("Save failed: " + error.message, "err");
             } else {
+              cycleMeta = { updated_at: nowIso, updated_by: who };
+              renderCycleMetaFooter();
               setCycleStatus("Saved.", "ok");
               setTimeout(() => {
                 const el = document.getElementById("cycleSaveStatus");
@@ -10244,18 +10591,22 @@
             if (sb) {
               const { data, error } = await sb
                 .from(CYCLE_TABLE)
-                .select("data")
+                .select("data, updated_at, updated_by")
                 .eq("id", CYCLE_ROW_ID)
                 .maybeSingle();
-              if (
-                !error &&
-                data &&
-                data.data &&
-                Array.isArray(data.data.rows) &&
-                data.data.rows.length > 0
-              ) {
-                cycleRowsState = data.data.rows;
-                return;
+              if (!error && data) {
+                cycleMeta = {
+                  updated_at: data.updated_at || null,
+                  updated_by: data.updated_by || null,
+                };
+                if (
+                  data.data &&
+                  Array.isArray(data.data.rows) &&
+                  data.data.rows.length > 0
+                ) {
+                  cycleRowsState = data.data.rows;
+                  return;
+                }
               }
             }
           } catch (e) {
@@ -10267,9 +10618,27 @@
         window.initCycleTab = async function () {
           if (cycleInitStarted) return;
           cycleInitStarted = true;
-          await loadCycleRowsFromCloud();
+          // Load both in parallel so cycle rows can flag OOO owners on first paint.
+          await Promise.all([
+            loadCycleRowsFromCloud(),
+            loadVacationRowsFromCloud(),
+          ]);
           renderCycleRows();
+          renderVacationRows();
+          renderTodayMatchesStrip();
+          renderCycleMetaFooter();
+          renderVacationMetaFooter();
+          updateNowHighlight();
         };
+
+        // Tick the now-highlight + today's matches strip every minute so the
+        // page stays accurate without manual reload.
+        setInterval(function () {
+          if (!cycleInitStarted) return;
+          updateNowHighlight();
+          // Today's date may have rolled over (rare but possible if left open).
+          renderTodayMatchesStrip();
+        }, 60000);
 
         // Event delegation: editable cells, delete buttons, add-row button.
         document.addEventListener("input", (e) => {
@@ -10360,7 +10729,7 @@
             vacationRowsState.length === 0
           ) {
             tbody.innerHTML =
-              '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px">No vacations on file — click <strong>+ Add row</strong> to add one.</td></tr>';
+              '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">No vacations on file — click <strong>+ Add row</strong> to add one.</td></tr>';
             return;
           }
           tbody.innerHTML = vacationRowsState
@@ -10369,6 +10738,7 @@
                 '<tr data-vac-idx="' +
                 i +
                 '">' +
+                '<td class="cycle-grip" draggable="true" title="Drag to reorder">≡</td>' +
                 '<td contenteditable="true" data-vac-field="person">' +
                 (r.person || "") +
                 "</td>" +
@@ -10411,18 +10781,25 @@
           vacationSaveInFlight = true;
           setVacationStatus("Saving…", "");
           try {
+            const nowIso = new Date().toISOString();
+            const who = getCycleUserLabel();
             const { error } = await sbWriteFn(VAC_TABLE, "upsert", {
               values: {
                 id: VAC_ROW_ID,
                 data: { rows: vacationRowsState },
-                updated_at: new Date().toISOString(),
+                updated_at: nowIso,
+                updated_by: who,
               },
               onConflict: "id",
             });
             if (error) {
               setVacationStatus("Save failed: " + error.message, "err");
             } else {
+              vacationMeta = { updated_at: nowIso, updated_by: who };
+              renderVacationMetaFooter();
               setVacationStatus("Saved.", "ok");
+              // Vacations changed → re-render cycle so OOO badges stay in sync.
+              if (Array.isArray(cycleRowsState)) renderCycleRows();
               setTimeout(() => {
                 const el = document.getElementById("vacationSaveStatus");
                 if (el && el.textContent === "Saved.")
@@ -10448,17 +10825,18 @@
             if (sb) {
               const { data, error } = await sb
                 .from(VAC_TABLE)
-                .select("data")
+                .select("data, updated_at, updated_by")
                 .eq("id", VAC_ROW_ID)
                 .maybeSingle();
-              if (
-                !error &&
-                data &&
-                data.data &&
-                Array.isArray(data.data.rows)
-              ) {
-                vacationRowsState = data.data.rows;
-                return;
+              if (!error && data) {
+                vacationMeta = {
+                  updated_at: data.updated_at || null,
+                  updated_by: data.updated_by || null,
+                };
+                if (data.data && Array.isArray(data.data.rows)) {
+                  vacationRowsState = data.data.rows;
+                  return;
+                }
               }
             }
           } catch (e) {
@@ -10467,19 +10845,112 @@
           vacationRowsState = [];
         }
 
-        // Extend initCycleTab so opening the One Reactive Cycle tab also
-        // loads the vacation rows. (initCycleTab is defined above and is
-        // idempotent via cycleInitStarted.)
-        const _origInitCycleTab = window.initCycleTab;
-        window.initCycleTab = async function () {
-          if (typeof _origInitCycleTab === "function") {
-            await _origInitCycleTab();
+        // ── Drag-to-reorder for both schedule tables (HTML5 native) ──
+        // Same pattern as the Triage board: a grip cell with draggable=true
+        // initiates; the row provides drop targeting. Above/below midpoint
+        // decides insert position. After drop, state array is reordered,
+        // re-rendered, and saved.
+        let _cycleDrag = null;
+        function clearCycleDragMarkers() {
+          document
+            .querySelectorAll(
+              "#cycleScheduleBody tr.cycle-row-drop-above, #cycleScheduleBody tr.cycle-row-drop-below, #vacationScheduleBody tr.cycle-row-drop-above, #vacationScheduleBody tr.cycle-row-drop-below",
+            )
+            .forEach((tr) =>
+              tr.classList.remove("cycle-row-drop-above", "cycle-row-drop-below"),
+            );
+        }
+        document.addEventListener("dragstart", (e) => {
+          const grip = e.target.closest("#cycleScheduleBody .cycle-grip");
+          if (grip) {
+            const tr = grip.closest("tr[data-cycle-idx]");
+            if (!tr) return;
+            _cycleDrag = { kind: "cycle", idx: parseInt(tr.dataset.cycleIdx, 10), el: tr };
+            tr.classList.add("cycle-row-dragging");
+            try {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", "cycle-row");
+            } catch (_) {}
+            return;
           }
-          if (vacationRowsState === null) {
-            await loadVacationRowsFromCloud();
+          const vgrip = e.target.closest("#vacationScheduleBody .cycle-grip");
+          if (vgrip) {
+            const tr = vgrip.closest("tr[data-vac-idx]");
+            if (!tr) return;
+            _cycleDrag = { kind: "vac", idx: parseInt(tr.dataset.vacIdx, 10), el: tr };
+            tr.classList.add("cycle-row-dragging");
+            try {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", "vac-row");
+            } catch (_) {}
+          }
+        });
+        document.addEventListener("dragend", () => {
+          if (_cycleDrag && _cycleDrag.el) {
+            _cycleDrag.el.classList.remove("cycle-row-dragging");
+          }
+          clearCycleDragMarkers();
+          _cycleDrag = null;
+        });
+        document.addEventListener("dragover", (e) => {
+          if (!_cycleDrag) return;
+          const selector =
+            _cycleDrag.kind === "cycle"
+              ? "#cycleScheduleBody tr[data-cycle-idx]"
+              : "#vacationScheduleBody tr[data-vac-idx]";
+          const tr = e.target.closest(selector);
+          if (!tr) return;
+          e.preventDefault();
+          const rect = tr.getBoundingClientRect();
+          const before = e.clientY - rect.top < rect.height / 2;
+          clearCycleDragMarkers();
+          tr.classList.toggle("cycle-row-drop-above", before);
+          tr.classList.toggle("cycle-row-drop-below", !before);
+        });
+        document.addEventListener("drop", (e) => {
+          if (!_cycleDrag) return;
+          const selector =
+            _cycleDrag.kind === "cycle"
+              ? "#cycleScheduleBody tr[data-cycle-idx]"
+              : "#vacationScheduleBody tr[data-vac-idx]";
+          const tr = e.target.closest(selector);
+          if (!tr) return;
+          e.preventDefault();
+          const rect = tr.getBoundingClientRect();
+          const before = e.clientY - rect.top < rect.height / 2;
+          const dstIdx = parseInt(
+            tr.dataset[_cycleDrag.kind === "cycle" ? "cycleIdx" : "vacIdx"],
+            10,
+          );
+          const srcIdx = _cycleDrag.idx;
+          const stateArr =
+            _cycleDrag.kind === "cycle" ? cycleRowsState : vacationRowsState;
+          if (
+            !Array.isArray(stateArr) ||
+            isNaN(srcIdx) ||
+            isNaN(dstIdx) ||
+            srcIdx === dstIdx
+          ) {
+            clearCycleDragMarkers();
+            _cycleDrag = null;
+            return;
+          }
+          const [moved] = stateArr.splice(srcIdx, 1);
+          let insertAt = dstIdx;
+          if (srcIdx < dstIdx) insertAt -= 1;
+          if (!before) insertAt += 1;
+          insertAt = Math.max(0, Math.min(insertAt, stateArr.length));
+          stateArr.splice(insertAt, 0, moved);
+          clearCycleDragMarkers();
+          if (_cycleDrag.kind === "cycle") {
+            renderCycleRows();
+            saveCycleRowsNow();
+          } else {
             renderVacationRows();
+            saveVacationRowsNow();
           }
-        };
+          _cycleDrag = null;
+        });
 
         document.addEventListener("input", (e) => {
           const td = e.target.closest(
@@ -11307,6 +11778,7 @@
         }
       })();
     </script>
+    <script src="data.js"></script>
     <script src="calendar-data.js"></script>
     <script src="countdown.js" defer></script>
     <script src="gemini-assistant.js" defer></script>
