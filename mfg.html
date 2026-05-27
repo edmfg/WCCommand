@@ -5425,12 +5425,12 @@
                 padding: 6px 14px;
               "
             >
-              🎧 Listening Days · July 7 Tue, 8 Wed, 9 Thu, 10 Fri, <s style="opacity: 0.45; text-decoration: line-through">11 Sat</s> (Quarterfinals · 2 matches), 14 Tue, 15 Wed
+              🎧 Listening Days · Tues, July 7 · Wed, July 8 · Thurs, July 9 · Fri, July 10 · <s style="opacity: 0.45; text-decoration: line-through">Sat, July 11</s> (QFs · 2 matches) · Tues, July 14 · Wed, July 15
             </div>
             <button
               type="button"
               id="cyclePrintBtn"
-              title="Open the browser print dialog — choose 'Save as PDF' as destination."
+              title="Export the One Reactive Cycle tab as a JPEG image."
               style="
                 margin-left: auto;
                 background: rgba(255, 255, 255, 0.06);
@@ -5443,7 +5443,7 @@
                 font-weight: 600;
               "
             >
-              📄 Export PDF
+              🖼️ Export JPEG
             </button>
           </div>
           <div id="cycleTodayMatches"></div>
@@ -10566,6 +10566,82 @@
                 : "var(--text-muted)";
         }
 
+        // ── JPEG export for the One Reactive Cycle tab ──
+        // Lazy-loads html2canvas from jsdelivr (already CSP-allowed), then
+        // rasterises #panel-cycle at 2× and triggers a download. Falls back
+        // to window.print() if the script can't load.
+        let html2canvasLoadPromise = null;
+        function loadHtml2Canvas() {
+          if (window.html2canvas) return Promise.resolve(window.html2canvas);
+          if (html2canvasLoadPromise) return html2canvasLoadPromise;
+          html2canvasLoadPromise = new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src =
+              "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+            s.onload = () => resolve(window.html2canvas);
+            s.onerror = () => reject(new Error("html2canvas failed to load"));
+            document.head.appendChild(s);
+          });
+          return html2canvasLoadPromise;
+        }
+        async function exportCycleJpeg() {
+          const panel = document.getElementById("panel-cycle");
+          const btn = document.getElementById("cyclePrintBtn");
+          if (!panel) return;
+          const originalLabel = btn ? btn.textContent : "";
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = "Rendering…";
+          }
+          try {
+            const html2canvas = await loadHtml2Canvas();
+            const bg =
+              getComputedStyle(document.body).backgroundColor || "#0b0b0f";
+            const canvas = await html2canvas(panel, {
+              backgroundColor: bg,
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              windowWidth: document.documentElement.scrollWidth,
+            });
+            const blob = await new Promise((resolve) =>
+              canvas.toBlob(resolve, "image/jpeg", 0.92),
+            );
+            if (!blob) throw new Error("toBlob returned null");
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, "0");
+            const stamp =
+              d.getFullYear() +
+              pad(d.getMonth() + 1) +
+              pad(d.getDate()) +
+              "-" +
+              pad(d.getHours()) +
+              pad(d.getMinutes());
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "one-reactive-cycle-" + stamp + ".jpg";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              URL.revokeObjectURL(a.href);
+              a.remove();
+            }, 1000);
+          } catch (err) {
+            console.error("[cycle] JPEG export failed", err);
+            alert(
+              "JPEG export failed (" +
+                (err && err.message ? err.message : "unknown") +
+                "). Falling back to print dialog — choose Save as Image / PDF.",
+            );
+            window.print();
+          } finally {
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = originalLabel;
+            }
+          }
+        }
+
         function renderCycleRows() {
           const tbody = document.getElementById("cycleScheduleBody");
           if (!tbody) return;
@@ -10751,8 +10827,8 @@
             });
           }
           if (e.target && e.target.closest("#cyclePrintBtn")) {
-            // Flush any pending debounced edit before printing so the PDF
-            // never lags behind on-screen state.
+            // Flush any pending debounced edits so the JPEG never lags
+            // behind on-screen state.
             if (cycleSaveTimer) {
               clearTimeout(cycleSaveTimer);
               readCycleFromDom();
@@ -10763,7 +10839,7 @@
               readVacationFromDom();
               renderVacationRows();
             }
-            window.print();
+            exportCycleJpeg();
           }
         });
 
