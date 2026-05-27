@@ -5416,22 +5416,6 @@
             >
               🎯 Listening 8 Days to Try to Make ~5 Reactive Assets
             </div>
-            <div
-              style="
-                font-family: var(--font-display);
-                font-size: 11px;
-                font-weight: 700;
-                letter-spacing: 1.5px;
-                text-transform: uppercase;
-                color: var(--text);
-                background: rgba(80, 200, 255, 0.1);
-                border: 1px solid rgba(80, 200, 255, 0.3);
-                border-radius: 999px;
-                padding: 6px 14px;
-              "
-            >
-              🎧 Listening Days · Tues, July 7 · Wed, July 8 · Thurs, July 9 · Fri, July 10 · <s style="opacity: 0.45; text-decoration: line-through">Sat, July 11</s> (QFs · 2 matches) · Tues, July 14 · Wed, July 15
-            </div>
             <button
               type="button"
               id="cyclePrintBtn"
@@ -5451,6 +5435,50 @@
               🖼️ Export JPEG
             </button>
           </div>
+
+          <div
+            class="form-card glass"
+            style="padding: 0; overflow: hidden; margin-bottom: 16px"
+          >
+            <table
+              class="data-table"
+              id="listeningDaysTable"
+              style="width: 100%; border-collapse: collapse"
+            >
+              <thead>
+                <tr>
+                  <th style="width: 80px">Day</th>
+                  <th style="width: 110px">Date</th>
+                  <th style="width: 160px">Stage</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Tues</td><td>July 7</td><td>Round of 16</td><td>Final 2 R16 matches — Atlanta + Vancouver</td>
+                </tr>
+                <tr>
+                  <td>Wed</td><td>July 8</td><td>Rest day</td><td>No matches — full listening + ideation day</td>
+                </tr>
+                <tr>
+                  <td>Thurs</td><td>July 9</td><td>Quarterfinal</td><td>1 QF match</td>
+                </tr>
+                <tr>
+                  <td>Fri</td><td>July 10</td><td>Quarterfinal</td><td>1 QF match</td>
+                </tr>
+                <tr style="opacity: 0.4; text-decoration: line-through">
+                  <td>Sat</td><td>July 11</td><td>Quarterfinals</td><td>2 QF matches — weekend, skipped</td>
+                </tr>
+                <tr>
+                  <td>Tues</td><td>July 14</td><td>Semifinal</td><td>1 SF match</td>
+                </tr>
+                <tr>
+                  <td>Wed</td><td>July 15</td><td>Semifinal</td><td>1 SF match</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <div id="cycleTodayMatches"></div>
 
           <div class="form-card glass" style="padding: 0; overflow: hidden">
