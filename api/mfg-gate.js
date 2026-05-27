@@ -18,9 +18,10 @@ const {
 
 const COOKIE_NAME = "wcc_mfg_gate";
 const SCOPE = "mfg";
-const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
+const SESSION_MS = 8 * 60 * 60 * 1000; // 8 hours (default)
+const REMEMBER_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (remember-me)
 
-function setCookie(res, value) {
+function setCookie(res, value, maxAgeMs) {
   res.setHeader(
     "Set-Cookie",
     [
@@ -29,7 +30,7 @@ function setCookie(res, value) {
       "HttpOnly",
       "Secure",
       "SameSite=Lax",
-      "Max-Age=" + Math.floor(SESSION_MS / 1000),
+      "Max-Age=" + Math.floor(maxAgeMs / 1000),
     ].join("; "),
   );
 }
@@ -74,6 +75,7 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "invalid json" });
     }
     const submitted = String(body.password || "");
+    const remember = !!body.remember;
     const submittedBuf = Buffer.from(submitted, "utf8");
     const expectedBuf = Buffer.from(password, "utf8");
     const ok =
@@ -85,8 +87,9 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ ok: false, error: "wrong password" });
     }
     await clearFailures(SCOPE, ip);
-    setCookie(res, makeToken(secret, SESSION_MS));
-    return res.status(200).json({ ok: true });
+    const ttl = remember ? REMEMBER_MS : SESSION_MS;
+    setCookie(res, makeToken(secret, ttl), ttl);
+    return res.status(200).json({ ok: true, ttl_ms: ttl });
   }
 
   if (req.method === "DELETE") {

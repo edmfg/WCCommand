@@ -3879,7 +3879,27 @@
           placeholder="Password"
           autofocus
         />
-        <button class="gate-btn" id="gateBtn">Enter</button>
+        <label
+          for="gateRemember"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-dim);
+            cursor: pointer;
+            user-select: none;
+          "
+        >
+          <input
+            type="checkbox"
+            id="gateRemember"
+            style="cursor: pointer"
+          />
+          <span>Remember me for 7 days</span>
+        </label>
+        <button class="gate-btn" id="gateBtn" style="margin-top: 14px">Enter</button>
         <div class="gate-error" id="gateError">
           Incorrect password. Access denied.
         </div>
@@ -5383,29 +5403,13 @@
                 letter-spacing: 1.5px;
                 text-transform: uppercase;
                 color: var(--text);
-                background: rgba(255, 215, 0, 0.1);
-                border: 1px solid rgba(255, 215, 0, 0.3);
-                border-radius: 999px;
-                padding: 6px 14px;
-              "
-            >
-              🏆 Knockout Stage · June 28 → Final · July 19
-            </div>
-            <div
-              style="
-                font-family: var(--font-display);
-                font-size: 11px;
-                font-weight: 700;
-                letter-spacing: 1.5px;
-                text-transform: uppercase;
-                color: var(--text);
                 background: rgba(80, 200, 255, 0.1);
                 border: 1px solid rgba(80, 200, 255, 0.3);
                 border-radius: 999px;
                 padding: 6px 14px;
               "
             >
-              🎧 Listening Days · July 7, 8, 9, 10, <s style="opacity: 0.45; text-decoration: line-through">11</s>, 14, 15
+              🎧 Listening Days · July 7, 8, 9, 10, <s style="opacity: 0.45; text-decoration: line-through">11</s> (Quarterfinals · 2 matches), 14, 15
             </div>
             <button
               type="button"
@@ -5426,18 +5430,6 @@
               📄 Export PDF
             </button>
           </div>
-          <p
-            style="
-              color: var(--text-muted);
-              font-size: 13px;
-              margin: 0 0 16px;
-            "
-          >
-            A typical match-day cadence from <strong>Round of 32 through the
-            Final</strong>. Hour-by-hour, 8am–5pm ET, who's doing what so a
-            reactive moment goes from signal → posted asset without a scramble.
-          </p>
-
           <div id="cycleTodayMatches"></div>
 
           <div class="form-card glass" style="padding: 0; overflow: hidden">
@@ -5919,20 +5911,38 @@
           });
         }
 
+        // Remember-me hint: when checked, we record an expiry in localStorage
+        // so the next visit can skip the password prompt entirely while the
+        // signed wcc_mfg_gate cookie is still valid (cookie TTL also 7 days).
+        const MFG_REMEMBER_LS_KEY = "wcc_mfg_gate_remember_until";
+        const MFG_REMEMBER_MS = 7 * 24 * 60 * 60 * 1000;
+        const gateRemember = document.getElementById("gateRemember");
+
         // Server-side gate. Falls back to GATE_PASSWORD if MFG_KEY isn't set
         // on Vercel yet, so this keeps working during the env-var migration.
         async function tryAuth() {
           const pw = gateInput.value;
+          const remember = !!(gateRemember && gateRemember.checked);
           gateBtn.disabled = true;
           try {
             const res = await fetch("/api/mfg-gate", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "same-origin",
-              body: JSON.stringify({ password: pw }),
+              body: JSON.stringify({ password: pw, remember }),
             });
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.ok) {
+              try {
+                if (remember) {
+                  localStorage.setItem(
+                    MFG_REMEMBER_LS_KEY,
+                    String(Date.now() + MFG_REMEMBER_MS),
+                  );
+                } else {
+                  localStorage.removeItem(MFG_REMEMBER_LS_KEY);
+                }
+              } catch (e) {}
               if (currentMarket && currentUserLabel) showApp();
               else showMarketGate();
             } else {
@@ -5958,11 +5968,36 @@
           }
         });
 
-        // Always require a fresh password submission on every visit to
-        // mfg.html. The wcc_mfg_gate cookie still gets set on successful
-        // login so the /api/sb-write proxy can authorize this session's
-        // mutations, but the UX never auto-skips the prompt.
-        (async function clearStaleSession() {
+        // On load: if the user opted into Remember me and the window hasn't
+        // expired, ask /api/mfg-gate (GET) whether the cookie is still valid.
+        // If yes, auto-skip the password prompt. Otherwise (or if the hint
+        // has expired), clear any stale cookie so the user must re-auth.
+        (async function maybeAutoUnlock() {
+          let rememberUntil = 0;
+          try {
+            rememberUntil = parseInt(
+              localStorage.getItem(MFG_REMEMBER_LS_KEY) || "0",
+              10,
+            );
+          } catch (e) {}
+          const remembered = rememberUntil > Date.now();
+          if (remembered) {
+            try {
+              const res = await fetch("/api/mfg-gate", {
+                method: "GET",
+                credentials: "same-origin",
+              });
+              const data = await res.json().catch(() => ({}));
+              if (res.ok && data.ok) {
+                if (gateRemember) gateRemember.checked = true;
+                if (currentMarket && currentUserLabel) showApp();
+                else showMarketGate();
+                return;
+              }
+            } catch (e) {}
+            // Cookie expired even though hint says remember — clear the hint.
+            try { localStorage.removeItem(MFG_REMEMBER_LS_KEY); } catch (e) {}
+          }
           try {
             await fetch("/api/mfg-gate", {
               method: "DELETE",
