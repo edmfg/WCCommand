@@ -82,7 +82,7 @@ function buildPrompt() {
     "  9.  Visa & travel friction (US travel ban, $15K bond, Iran, Mexico cartel)",
     "  10. Reddit / X / TikTok chatter (search 'site:reddit.com r/soccer WC2026',",
     "      'site:reddit.com r/worldcup', 'site:reddit.com r/USMNT',",
-    "      'site:reddit.com r/MLS', 'site:reddit.com r/3lions',",
+    "      'site:reddit.com r/MLS', 'site:reddit.com r/futebol',",
     "      'site:reddit.com r/MexicoSoccer', 'site:reddit.com r/Canada')",
     "  11. Memes, fan culture, Panini stickers, fashion / kit drops",
     "  12. Politics / regulatory / Congress coverage of the tournament",
@@ -99,7 +99,7 @@ function buildPrompt() {
     '      "source": "string (publication name)",',
     '      "summary": "2–3 sentence summary, useful detail at end",',
     '      "url": "string (full URL)",',
-    '      "tag": "Canada" | "USA" | "Germany" | "UK" | "Macro" | "Global"',
+    '      "tag": "Canada" | "USA" | "Germany" | "Brazil" | "Macro" | "Global"',
     "    }",
     "  ],",
     '  "social": [',
@@ -162,7 +162,7 @@ function safeText(s) {
 // can produce identical row shapes without going through the browser.
 function normalizeNews(it, now) {
   if (!it || typeof it !== "object") return null;
-  const validTags = ["Canada", "USA", "Germany", "UK", "Macro", "Global"];
+  const validTags = ["Canada", "USA", "Germany", "Brazil", "Macro", "Global"];
   const tag = validTags.indexOf(it.tag) >= 0 ? it.tag : "Global";
   if (!it.headline || !it.summary) return null;
   return {

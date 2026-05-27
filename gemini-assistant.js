@@ -76,10 +76,10 @@
     "## How World Cup HQ works (use this to answer 'how do I…' questions)\n" +
     "World Cup HQ is MFG's command centre for the 2026 FIFA World Cup (Jun 11 – Jul 19, hosts Canada / Mexico / USA). Two surfaces, one system, one password (separate cookies per gate).\n\n" +
     "### Public Dashboard (index.html)\n" +
-    "- **Live tab**: breaking ticker, pinned bookmarks bar, sentiment heatmap (volume × sentiment per market), multi-select filter pills (All / Recent 72h / Canada / Germany / UK / USA / Game / Culture), News carousel (tags Canada/USA/Germany/UK/Macro/Global), Social Trends carousel (categories game/food/music/fashion/fandom/memes with platform pills X/TikTok/IG/Reddit/YouTube + volume/sentiment), entity auto-linking (clicking a player/coach/team filters every surface).\n" +
+    "- **Live tab**: breaking ticker, pinned bookmarks bar, sentiment heatmap (volume × sentiment per market), multi-select filter pills (All / Recent 72h / Canada / Germany / Brazil / USA / Game / Culture), News carousel (tags Canada/USA/Germany/Brazil/Macro/Global), Social Trends carousel (categories game/food/music/fashion/fandom/memes with platform pills X/TikTok/IG/Reddit/YouTube + volume/sentiment), entity auto-linking (clicking a player/coach/team filters every surface).\n" +
     "- **Fixtures tab**: Calendar / By Date / Standings (live recompute), stage filter + ⏱ Next 24h toggle, TODAY badge.\n" +
     "- **Creative tab** (gated separately, 12h cookie): WC Engine / YT × Genius / Fox S2 sub-tabs. Cards from Supabase + hardcoded. Sort + market filter pills. Drive videos play inline.\n" +
-    "- **Today's Reactive**: red pill on Live → market chooser → per-market briefing (Cultural read + Match read + 3 iPhone storyboards). Canada is live; USA/UK/Germany show 'Soon'.\n" +
+    "- **Today's Reactive**: red pill on Live → market chooser → per-market briefing (Cultural read + Match read + 3 iPhone storyboards). Canada is live; USA/Brazil/Germany show 'Soon'.\n" +
     "- **Floating**: Gemini button (G to open), countdown pill (drag), Cmd+K global search, ? for shortcuts.\n\n" +
     "### MFG Cockpit (mfg.html) — production tools\n" +
     "- 🔄 **Refresh Content** — Gemini sweeps WC2026 news/Reddit/social, writes to Supabase live_updates. Public dashboard's 'Refreshed Xm ago' chip ticks forward automatically. Also runs daily at 5am NY via Vercel cron.\n" +
@@ -91,7 +91,7 @@
     "### How to upload new creative (step-by-step)\n" +
     "1. Open mfg.html, unlock with the MFG password (same as the dashboard password).\n" +
     "2. Click the 🎬 Creative Uploads tab.\n" +
-    "3. Pick one or more **Markets** (Canada / USA / Germany / UK / Global) — multi-select.\n" +
+    "3. Pick one or more **Markets** (Canada / USA / Germany / Brazil / Global) — multi-select.\n" +
     "4. Optional: pick a **Bento** slot (BENTO 1 Long/Results/16, BENTO 2 Query/Result/Query/23, BENTO 3 Query/Query/16, or ELSE).\n" +
     "5. Optional: **Title** (auto-generated as 'Creative — <markets>' if blank).\n" +
     "6. Optional: **Live-from** and **Live-until** dates.\n" +
@@ -115,7 +115,7 @@
     "- Delete: × on a card → 5-second toast with Undo before it's gone for good.\n" +
     "- Snapshot history panel is collapsed by default; expand it to roll back to a saved state.\n\n" +
     "### Markets — how each gets fed\n" +
-    "- 5 markets: 🇨🇦 Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, 🌍 Macro/Global.\n" +
+    "- 5 markets: 🇨🇦 Canada, 🇺🇸 USA, 🇧🇷 Brazil, 🇩🇪 Germany, 🌍 Macro/Global.\n" +
     "- News/social tagged by market; multi-market creative comma-joined and surfaces under each pill.\n" +
     "- Today's Reactive and Content Calendar are per-market (Canada live, others 'Soon').\n" +
     "- Fixtures, standings, ticker are shared.\n\n" +
@@ -128,7 +128,9 @@
 
   // Expose the how-to block so the dashboard's inline Gemini panel (which has
   // its own system instruction built in index.html) can append it too.
-  try { window.WCC_HOW_TO_GUIDE = HOW_TO_GUIDE; } catch (e) {}
+  try {
+    window.WCC_HOW_TO_GUIDE = HOW_TO_GUIDE;
+  } catch (e) {}
 
   function buildSystemInstruction(mode) {
     var modeBlock =

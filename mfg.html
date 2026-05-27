@@ -3655,13 +3655,28 @@
       /* Print stylesheet — landscape, no UI chrome, full grid */
       /* ─── One Reactive Cycle (cycle + vacation tables) ─── */
       /* Role color-coding on the Owner cell */
-      .cycle-owner-strategist { color: #60a5fa !important; }
-      .cycle-owner-creative { color: #c084fc !important; }
-      .cycle-owner-mfg-creative { color: #fb923c !important; }
-      .cycle-owner-mfg { color: #f87171 !important; }
-      .cycle-owner-review { color: #facc15 !important; }
-      .cycle-owner-cron { color: #94a3b8 !important; font-style: italic; }
-      .cycle-owner-meta { color: #34d399 !important; }
+      .cycle-owner-strategist {
+        color: #60a5fa !important;
+      }
+      .cycle-owner-creative {
+        color: #c084fc !important;
+      }
+      .cycle-owner-mfg-creative {
+        color: #fb923c !important;
+      }
+      .cycle-owner-mfg {
+        color: #f87171 !important;
+      }
+      .cycle-owner-review {
+        color: #facc15 !important;
+      }
+      .cycle-owner-cron {
+        color: #94a3b8 !important;
+        font-style: italic;
+      }
+      .cycle-owner-meta {
+        color: #34d399 !important;
+      }
       /* Michelle/Chris review rows — entire row bold red */
       #cycleScheduleBody tr.cycle-row-review > td {
         color: #ef4444 !important;
@@ -3700,10 +3715,18 @@
         user-select: none;
         font-size: 16px;
       }
-      .cycle-grip:active { cursor: grabbing; }
-      tr.cycle-row-dragging > td { opacity: 0.45; }
-      tr.cycle-row-drop-above > td { box-shadow: inset 0 2px 0 0 #facc15; }
-      tr.cycle-row-drop-below > td { box-shadow: inset 0 -2px 0 0 #facc15; }
+      .cycle-grip:active {
+        cursor: grabbing;
+      }
+      tr.cycle-row-dragging > td {
+        opacity: 0.45;
+      }
+      tr.cycle-row-drop-above > td {
+        box-shadow: inset 0 2px 0 0 #facc15;
+      }
+      tr.cycle-row-drop-below > td {
+        box-shadow: inset 0 -2px 0 0 #facc15;
+      }
       /* Today's matches strip */
       #cycleTodayMatches {
         display: flex;
@@ -3729,7 +3752,9 @@
         letter-spacing: 1px;
         color: #facc15;
       }
-      .cycle-match-chip .match-teams { font-weight: 600; }
+      .cycle-match-chip .match-teams {
+        font-weight: 600;
+      }
       .cycle-match-chip .match-stage {
         font-size: 11px;
         text-transform: uppercase;
@@ -3897,14 +3922,12 @@
             user-select: none;
           "
         >
-          <input
-            type="checkbox"
-            id="gateRemember"
-            style="cursor: pointer"
-          />
+          <input type="checkbox" id="gateRemember" style="cursor: pointer" />
           <span>Remember me for 7 days</span>
         </label>
-        <button class="gate-btn" id="gateBtn" style="margin-top: 14px">Enter</button>
+        <button class="gate-btn" id="gateBtn" style="margin-top: 14px">
+          Enter
+        </button>
         <div class="gate-error" id="gateError">
           Incorrect password. Access denied.
         </div>
@@ -3936,8 +3959,8 @@
           <strong>How this works</strong>
           <ol>
             <li>
-              Pick the market you're responsible for (Canada, Germany, UK, USA,
-              or Global).
+              Pick the market you're responsible for (Canada, Germany, Brazil,
+              USA, or Global).
             </li>
             <li>
               Enter your name — it shows up in the audit log so the team knows
@@ -3958,7 +3981,7 @@
           <option value="">— Select your market —</option>
           <option value="Canada">🇨🇦 Canada</option>
           <option value="Germany">🇩🇪 Germany</option>
-          <option value="UK">🇬🇧 UK</option>
+          <option value="Brazil">🇧🇷 Brazil</option>
           <option value="USA">🇺🇸 USA</option>
           <option value="Global">🌍 Global</option>
         </select>
@@ -4148,11 +4171,12 @@
                   </li>
                   <li>
                     <strong>Filter pills</strong> — All / Recent (72h) / Canada
-                    / Germany / UK / USA / Game / Culture. Multi-select with OR.
+                    / Germany / Brazil / USA / Game / Culture. Multi-select with
+                    OR.
                   </li>
                   <li>
                     <strong>News carousel</strong> — tagged Canada / USA /
-                    Germany / UK / Macro / Global. Each card links out.
+                    Germany / Brazil / Macro / Global. Each card links out.
                   </li>
                   <li>
                     <strong>Social Trends carousel</strong> — tagged game / food
@@ -4221,8 +4245,8 @@
               <li>
                 <strong>📅 Content Calendar</strong> — per-market production
                 calendar across Lead Up → Group Stage → Knockouts → Final.
-                Social / Reactive / Digital OOH slots. Canada is live; USA / UK
-                / Germany on the way.
+                Social / Reactive / Digital OOH slots. Canada is live; USA /
+                Brazil / Germany on the way.
               </li>
               <li>
                 <strong>🧯 Global Triage</strong> — drag-and-drop kanban for
@@ -4255,7 +4279,7 @@
             <ul>
               <li>
                 World Cup HQ runs <strong>five markets in parallel</strong>: 🇨🇦
-                Canada, 🇺🇸 USA, 🇬🇧 UK, 🇩🇪 Germany, and 🌍 Macro / Global
+                Canada, 🇺🇸 USA, 🇧🇷 Brazil, 🇩🇪 Germany, and 🌍 Macro / Global
                 (cross-market stories — FIFA news, pricing, broadcast,
                 regulation).
               </li>
@@ -4269,7 +4293,7 @@
                 <ul>
                   <li>
                     <strong>News & social</strong> — filtered by tag (<code
-                      >Canada / USA / Germany / UK / Macro / Global</code
+                      >Canada / USA / Germany / Brazil / Macro / Global</code
                     >). A Canada-tagged article only shows under "All" or under
                     the 🇨🇦 pill.
                   </li>
@@ -4303,7 +4327,8 @@
                     <strong>Auto-refresh (5am NY cron)</strong> — one Gemini
                     sweep covers all five markets at once. The prompt explicitly
                     instructs Gemini to spread items across Canada / USA /
-                    Germany / UK / Macro / Global so no one market dominates.
+                    Germany / Brazil / Macro / Global so no one market
+                    dominates.
                   </li>
                   <li>
                     <strong>Manual Refresh Content button</strong> — same Gemini
@@ -4339,7 +4364,7 @@
                     briefing + Content Calendar both populated.
                   </li>
                   <li>
-                    🇺🇸 <strong>USA</strong>, 🇬🇧 <strong>UK</strong>, 🇩🇪
+                    🇺🇸 <strong>USA</strong>, 🇧🇷 <strong>Brazil</strong>, 🇩🇪
                     <strong>Germany</strong> — exist as filter pills, receive
                     News / Social / Creative items, but Today's Reactive and
                     Content Calendar are marked "Soon" until the team produces
@@ -4856,8 +4881,12 @@
                   >
                     🇩🇪 Germany
                   </button>
-                  <button type="button" class="creative-chip" data-market="UK">
-                    🇬🇧 UK
+                  <button
+                    type="button"
+                    class="creative-chip"
+                    data-market="Brazil"
+                  >
+                    🇧🇷 Brazil
                   </button>
                   <button
                     type="button"
@@ -5273,7 +5302,7 @@
                 <select id="reactiveMarketSelect" class="gate-input">
                   <option value="">— Pick a market —</option>
                   <option value="Canada">🇨🇦 Canada</option>
-                  <option value="UK">🇬🇧 UK</option>
+                  <option value="Brazil">🇧🇷 Brazil</option>
                   <option value="Germany">🇩🇪 Germany</option>
                   <option value="USA">🇺🇸 USA</option>
                   <option value="Global">🌍 Global</option>
@@ -5455,25 +5484,46 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Tues</td><td>July 7</td><td>Round of 16</td><td>Final 2 R16 matches — Atlanta + Vancouver</td>
+                  <td>Tues</td>
+                  <td>July 7</td>
+                  <td>Round of 16</td>
+                  <td>Final 2 R16 matches — Atlanta + Vancouver</td>
                 </tr>
                 <tr>
-                  <td>Wed</td><td>July 8</td><td>Rest day</td><td>No matches — full listening + ideation day</td>
+                  <td>Wed</td>
+                  <td>July 8</td>
+                  <td>Rest day</td>
+                  <td>No matches — full listening + ideation day</td>
                 </tr>
                 <tr>
-                  <td>Thurs</td><td>July 9</td><td>Quarterfinal</td><td>1 QF match</td>
+                  <td>Thurs</td>
+                  <td>July 9</td>
+                  <td>Quarterfinal</td>
+                  <td>1 QF match</td>
                 </tr>
                 <tr>
-                  <td>Fri</td><td>July 10</td><td>Quarterfinal</td><td>1 QF match</td>
+                  <td>Fri</td>
+                  <td>July 10</td>
+                  <td>Quarterfinal</td>
+                  <td>1 QF match</td>
                 </tr>
                 <tr style="opacity: 0.4; text-decoration: line-through">
-                  <td>Sat</td><td>July 11</td><td>Quarterfinals</td><td>2 QF matches — weekend, skipped</td>
+                  <td>Sat</td>
+                  <td>July 11</td>
+                  <td>Quarterfinals</td>
+                  <td>2 QF matches — weekend, skipped</td>
                 </tr>
                 <tr>
-                  <td>Tues</td><td>July 14</td><td>Semifinal</td><td>1 SF match</td>
+                  <td>Tues</td>
+                  <td>July 14</td>
+                  <td>Semifinal</td>
+                  <td>1 SF match</td>
                 </tr>
                 <tr>
-                  <td>Wed</td><td>July 15</td><td>Semifinal</td><td>1 SF match</td>
+                  <td>Wed</td>
+                  <td>July 15</td>
+                  <td>Semifinal</td>
+                  <td>1 SF match</td>
                 </tr>
               </tbody>
             </table>
@@ -5489,11 +5539,25 @@
                   <th style="width: 110px">Hour (ET)</th>
                   <th>Task</th>
                   <th style="width: 200px">Owner</th>
-                  <th style="width: 44px; text-align: center" aria-label="Actions"></th>
+                  <th
+                    style="width: 44px; text-align: center"
+                    aria-label="Actions"
+                  ></th>
                 </tr>
               </thead>
               <tbody id="cycleScheduleBody">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
+                <tr>
+                  <td
+                    colspan="5"
+                    style="
+                      text-align: center;
+                      color: var(--text-muted);
+                      padding: 28px;
+                    "
+                  >
+                    Loading…
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -5528,24 +5592,27 @@
             </button>
             <div
               id="cycleSaveStatus"
-              style="font-size: 12px; color: var(--text-muted); min-height: 16px"
+              style="
+                font-size: 12px;
+                color: var(--text-muted);
+                min-height: 16px;
+              "
               aria-live="polite"
             ></div>
           </div>
 
           <p
             id="cycleEditHint"
-            style="
-              color: var(--text-muted);
-              font-size: 12px;
-              margin: 12px 0 0;
-            "
+            style="color: var(--text-muted); font-size: 12px; margin: 12px 0 0"
           >
-            Click any cell to edit. Changes save automatically and sync to everyone with MFG access.
+            Click any cell to edit. Changes save automatically and sync to
+            everyone with MFG access.
           </p>
 
           <!-- ─────── Vacation Schedule sub-section ─────── -->
-          <div class="section-title" style="margin-top: 36px">🏖️ Vacation Schedule</div>
+          <div class="section-title" style="margin-top: 36px">
+            🏖️ Vacation Schedule
+          </div>
           <p
             style="
               color: var(--text-muted);
@@ -5564,11 +5631,25 @@
                   <th style="width: 180px">Person</th>
                   <th style="width: 220px">Dates</th>
                   <th>Notes</th>
-                  <th style="width: 44px; text-align: center" aria-label="Actions"></th>
+                  <th
+                    style="width: 44px; text-align: center"
+                    aria-label="Actions"
+                  ></th>
                 </tr>
               </thead>
               <tbody id="vacationScheduleBody">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px">Loading…</td></tr>
+                <tr>
+                  <td
+                    colspan="5"
+                    style="
+                      text-align: center;
+                      color: var(--text-muted);
+                      padding: 28px;
+                    "
+                  >
+                    Loading…
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -5603,7 +5684,11 @@
             </button>
             <div
               id="vacationSaveStatus"
-              style="font-size: 12px; color: var(--text-muted); min-height: 16px"
+              style="
+                font-size: 12px;
+                color: var(--text-muted);
+                min-height: 16px;
+              "
               aria-live="polite"
             ></div>
           </div>
@@ -5719,11 +5804,11 @@
               <button
                 class="cal-market-card"
                 type="button"
-                data-cal-market="uk"
+                data-cal-market="brazil"
                 disabled
               >
-                <span class="cal-market-flag">🦁</span>
-                <span class="cal-market-name">UK</span>
+                <span class="cal-market-flag">🇧🇷</span>
+                <span class="cal-market-name">Brazil</span>
                 <span class="cal-market-sub cal-soon">Soon</span>
               </button>
               <button
@@ -5880,9 +5965,13 @@
           const b = document.getElementById("marketBadge");
           if (!b) return;
           const flag =
-            { Canada: "🇨🇦", Germany: "🇩🇪", UK: "🇬🇧", USA: "🇺🇸", Global: "🌍" }[
-              currentMarket
-            ] || "";
+            {
+              Canada: "🇨🇦",
+              Germany: "🇩🇪",
+              Brazil: "🇧🇷",
+              USA: "🇺🇸",
+              Global: "🌍",
+            }[currentMarket] || "";
           b.textContent = `${flag} ${currentMarket}${currentUserLabel ? " · " + currentUserLabel : ""}`;
         }
 
@@ -6045,7 +6134,9 @@
               }
             } catch (e) {}
             // Cookie expired even though hint says remember — clear the hint.
-            try { localStorage.removeItem(MFG_REMEMBER_LS_KEY); } catch (e) {}
+            try {
+              localStorage.removeItem(MFG_REMEMBER_LS_KEY);
+            } catch (e) {}
           }
           try {
             await fetch("/api/mfg-gate", {
@@ -9376,7 +9467,7 @@
             "Canada",
             "USA",
             "Germany",
-            "UK",
+            "Brazil",
             "Macro",
             "Global",
           ];
@@ -9686,7 +9777,7 @@
         }
         const FLAG = {
           Canada: "🇨🇦",
-          UK: "🇬🇧",
+          Brazil: "🇧🇷",
           Germany: "🇩🇪",
           USA: "🇺🇸",
           Global: "🌍",
@@ -10363,7 +10454,10 @@
             if (m < 60) return m + "m ago";
             const h = Math.round(m / 60);
             if (h < 24) return h + "h ago";
-            return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+            return d.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            });
           } catch (e) {
             return "";
           }
@@ -10372,16 +10466,28 @@
         function renderCycleMetaFooter() {
           const el = document.getElementById("cycleMetaFooter");
           if (!el) return;
-          if (!cycleMeta.updated_at) { el.textContent = ""; return; }
-          const who = cycleMeta.updated_by ? "by " + cycleMeta.updated_by + " " : "";
-          el.textContent = "Last edited " + who + fmtRelativeTs(cycleMeta.updated_at) + ".";
+          if (!cycleMeta.updated_at) {
+            el.textContent = "";
+            return;
+          }
+          const who = cycleMeta.updated_by
+            ? "by " + cycleMeta.updated_by + " "
+            : "";
+          el.textContent =
+            "Last edited " + who + fmtRelativeTs(cycleMeta.updated_at) + ".";
         }
         function renderVacationMetaFooter() {
           const el = document.getElementById("vacationMetaFooter");
           if (!el) return;
-          if (!vacationMeta.updated_at) { el.textContent = ""; return; }
-          const who = vacationMeta.updated_by ? "by " + vacationMeta.updated_by + " " : "";
-          el.textContent = "Last edited " + who + fmtRelativeTs(vacationMeta.updated_at) + ".";
+          if (!vacationMeta.updated_at) {
+            el.textContent = "";
+            return;
+          }
+          const who = vacationMeta.updated_by
+            ? "by " + vacationMeta.updated_by + " "
+            : "";
+          el.textContent =
+            "Last edited " + who + fmtRelativeTs(vacationMeta.updated_at) + ".";
         }
 
         // ── Hour parsing + now-row highlight ──
@@ -10399,11 +10505,16 @@
           try {
             const fmt = new Intl.DateTimeFormat("en-US", {
               timeZone: "America/New_York",
-              hour12: false, hour: "2-digit", minute: "2-digit",
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
             });
             const parts = fmt.formatToParts(new Date());
             const h = parseInt(parts.find((p) => p.type === "hour").value, 10);
-            const m = parseInt(parts.find((p) => p.type === "minute").value, 10);
+            const m = parseInt(
+              parts.find((p) => p.type === "minute").value,
+              10,
+            );
             return h * 60 + m;
           } catch (e) {
             const d = new Date();
@@ -10414,7 +10525,9 @@
           try {
             return new Intl.DateTimeFormat("en-CA", {
               timeZone: "America/New_York",
-              year: "numeric", month: "2-digit", day: "2-digit",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
             }).format(new Date());
           } catch (e) {
             return new Date().toISOString().slice(0, 10);
@@ -10423,7 +10536,8 @@
         function getNowRowIndex(rows) {
           if (!Array.isArray(rows) || !rows.length) return -1;
           const nowMin = getCurrentETMinutes();
-          let bestIdx = -1, bestStart = -1;
+          let bestIdx = -1,
+            bestStart = -1;
           rows.forEach((r, i) => {
             const start = parseHourString(r.hour);
             if (start == null) return;
@@ -10449,7 +10563,9 @@
 
         // ── Owner role coloring ──
         function ownerRoleClass(owner) {
-          const o = String(owner || "").replace(/<[^>]+>/g, "").toLowerCase();
+          const o = String(owner || "")
+            .replace(/<[^>]+>/g, "")
+            .toLowerCase();
           if (/cron|auto.?refresh|🤖/.test(o)) return "cycle-owner-cron";
           if (/meta\b/.test(o)) return "cycle-owner-meta";
           if (/michelle|chris\b/.test(o)) return "cycle-owner-review";
@@ -10462,17 +10578,38 @@
 
         // ── Vacation parsing + lookup ──
         const _CYCLE_MONTH_MAP = {
-          jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
-          apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
-          aug: 7, august: 7, sep: 8, sept: 8, september: 8,
-          oct: 9, october: 9, nov: 10, november: 10, dec: 11, december: 11,
+          jan: 0,
+          january: 0,
+          feb: 1,
+          february: 1,
+          mar: 2,
+          march: 2,
+          apr: 3,
+          april: 3,
+          may: 4,
+          jun: 5,
+          june: 5,
+          jul: 6,
+          july: 6,
+          aug: 7,
+          august: 7,
+          sep: 8,
+          sept: 8,
+          september: 8,
+          oct: 9,
+          october: 9,
+          nov: 10,
+          november: 10,
+          dec: 11,
+          december: 11,
         };
         function parseSingleDate(s, defaultYear) {
           const t = String(s || "").trim();
           if (!t) return null;
           // ISO YYYY-MM-DD
           let m = t.match(/(\d{4})-(\d{2})-(\d{2})/);
-          if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+          if (m)
+            return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
           // "Jun 10" or "June 10, 2026" or "Jun 10 2026"
           m = t.match(/([A-Za-z]+)\s+(\d{1,2})(?:[,\s]+(\d{4}))?/);
           if (m && _CYCLE_MONTH_MAP[m[1].toLowerCase()] !== undefined) {
@@ -10493,18 +10630,27 @@
           return null;
         }
         function parseVacationRange(s) {
-          const raw = String(s || "").replace(/<[^>]+>/g, "").trim();
+          const raw = String(s || "")
+            .replace(/<[^>]+>/g, "")
+            .trim();
           if (!raw) return null;
           const yr = new Date().getFullYear();
           // Split on dash/em-dash/en-dash/"to"
-          const parts = raw.split(/\s*(?:–|—|-|to)\s*/i).map((p) => p.trim()).filter(Boolean);
+          const parts = raw
+            .split(/\s*(?:–|—|-|to)\s*/i)
+            .map((p) => p.trim())
+            .filter(Boolean);
           const start = parseSingleDate(parts[0], yr);
-          const end = parts.length > 1 ? parseSingleDate(parts[parts.length - 1], yr) : start;
+          const end =
+            parts.length > 1
+              ? parseSingleDate(parts[parts.length - 1], yr)
+              : start;
           if (!start) return null;
           return { start, end: end || start };
         }
         function getOnVacationNamesToday() {
-          if (!Array.isArray(vacationRowsState) || !vacationRowsState.length) return [];
+          if (!Array.isArray(vacationRowsState) || !vacationRowsState.length)
+            return [];
           const todayStr = getTodayET();
           const today = new Date(todayStr + "T12:00:00");
           today.setHours(0, 0, 0, 0);
@@ -10513,10 +10659,14 @@
             if (!v || !v.person) return;
             const range = parseVacationRange(v.dates);
             if (!range) return;
-            const s = new Date(range.start); s.setHours(0, 0, 0, 0);
-            const e = new Date(range.end); e.setHours(23, 59, 59, 999);
+            const s = new Date(range.start);
+            s.setHours(0, 0, 0, 0);
+            const e = new Date(range.end);
+            e.setHours(23, 59, 59, 999);
             if (today >= s && today <= e) {
-              const name = String(v.person).replace(/<[^>]+>/g, "").trim();
+              const name = String(v.person)
+                .replace(/<[^>]+>/g, "")
+                .trim();
               if (name) out.push(name);
             }
           });
@@ -10525,7 +10675,9 @@
         function ownerHasOoo(ownerHtml) {
           const ooo = getOnVacationNamesToday();
           if (!ooo.length) return false;
-          const plain = String(ownerHtml || "").replace(/<[^>]+>/g, "").toLowerCase();
+          const plain = String(ownerHtml || "")
+            .replace(/<[^>]+>/g, "")
+            .toLowerCase();
           return ooo.some((name) =>
             name
               .toLowerCase()
@@ -10540,7 +10692,10 @@
           if (!el) return;
           const dd = window.DASHBOARD_DATA;
           const matches = dd && Array.isArray(dd.matches) ? dd.matches : [];
-          if (!matches.length) { el.innerHTML = ""; return; }
+          if (!matches.length) {
+            el.innerHTML = "";
+            return;
+          }
           const today = getTodayET();
           const todays = matches.filter((m) => m && m.date === today);
           if (!todays.length) {
@@ -10551,7 +10706,9 @@
             return;
           }
           el.innerHTML = todays
-            .sort((a, b) => String(a.kickoff || "").localeCompare(String(b.kickoff || "")))
+            .sort((a, b) =>
+              String(a.kickoff || "").localeCompare(String(b.kickoff || "")),
+            )
             .map((m) => {
               const homeFlag = m.home && m.home.flag ? m.home.flag : "";
               const awayFlag = m.away && m.away.flag ? m.away.flag : "";
@@ -10559,27 +10716,87 @@
               const awayCode = m.away && m.away.code ? m.away.code : "";
               return (
                 '<div class="cycle-match-chip">' +
-                '<span class="match-time">' + (m.kickoff || "?") + " ET</span>" +
-                '<span class="match-teams">' + homeFlag + " " + homeCode + " v " + awayCode + " " + awayFlag + "</span>" +
-                '<span class="match-stage">' + (m.stage || "") + "</span>" +
+                '<span class="match-time">' +
+                (m.kickoff || "?") +
+                " ET</span>" +
+                '<span class="match-teams">' +
+                homeFlag +
+                " " +
+                homeCode +
+                " v " +
+                awayCode +
+                " " +
+                awayFlag +
+                "</span>" +
+                '<span class="match-stage">' +
+                (m.stage || "") +
+                "</span>" +
                 "</div>"
               );
             })
             .join("");
         }
         const CYCLE_DEFAULT_ROWS = [
-          { hour: "8:00 AM", task: "HQ auto-refreshes — Vercel Cron pulls overnight WC2026 news / social / ticker into <code>live_updates</code> via Gemini + Google Search grounding. No human in the loop.", owner: "🤖 Vercel Cron" },
-          { hour: "9:00 AM", task: "Run WPP Open Agentic Team — manually upload <strong>Burson</strong> and <strong>EAFC</strong> (WIP) data so signals are enriched with brand + audience context. In parallel, scan the HQ's auto-refreshed content for anything interesting and confirm the Agentic Team's output.", owner: "Strategist" },
-          { hour: "9:30 AM", task: "Beautify the Agentic Team output using <strong>Today's Reactive</strong> and send <strong>max 3 creative options</strong> to Creative. Strategist may recommend one, but Creative picks which to pursue.", owner: "Strategist → Creative" },
-          { hour: "10:00 AM", task: "Creative starts ideation on <strong>0–3 potential assets</strong> — descriptions of Veo clip, post copy, etc. Only <strong>BENTO 3</strong> is available for reactive (one long query, no results).", owner: "Creative" },
-          { hour: "11:00 AM", task: "MFG Creative sends <strong>0–3 options</strong> to Michelle / Chris Henry for review. <em>(0 if truly nothing interesting happened yesterday.)</em>", owner: "MFG Creative → Michelle / Chris Henry" },
-          { hour: "11:30 AM", task: "Michelle / Chris Henry choose <strong>0 or 1 asset</strong> to proceed into production.", owner: "Michelle / Chris Henry" },
-          { hour: "12:00 PM", task: "<strong>Production block (12:00 – 2:00 PM).</strong> Veo clips generated, copy drafted, post mocked up.", owner: "Creative" },
-          { hour: "1:00 PM", task: "Production continues — finalising clip, copy, and post layout.", owner: "Creative" },
-          { hour: "2:00 PM", task: "MFG sends the finished asset to <strong>Michelle / Chris Henry for legal review</strong>.", owner: "MFG → Michelle / Chris Henry" },
-          { hour: "3:00 PM", task: "Legal review in progress — team stays on standby and continues monitoring the next signal.", owner: "Michelle / Chris Henry (review) · MFG (standby)" },
-          { hour: "4:00 PM", task: "Michelle / Chris return with <strong>approval and/or feedback</strong> — outcomes range from \"ship it\" to revisions to \"do not run\". MFG actions any revisions immediately.", owner: "Michelle / Chris Henry → MFG" },
-          { hour: "5:00 PM", task: "Asset is sent to <strong>Meta for approval / activation</strong>. Goes live that same night.", owner: "MFG → Meta" },
+          {
+            hour: "8:00 AM",
+            task: "HQ auto-refreshes — Vercel Cron pulls overnight WC2026 news / social / ticker into <code>live_updates</code> via Gemini + Google Search grounding. No human in the loop.",
+            owner: "🤖 Vercel Cron",
+          },
+          {
+            hour: "9:00 AM",
+            task: "Run WPP Open Agentic Team — manually upload <strong>Burson</strong> and <strong>EAFC</strong> (WIP) data so signals are enriched with brand + audience context. In parallel, scan the HQ's auto-refreshed content for anything interesting and confirm the Agentic Team's output.",
+            owner: "Strategist",
+          },
+          {
+            hour: "9:30 AM",
+            task: "Beautify the Agentic Team output using <strong>Today's Reactive</strong> and send <strong>max 3 creative options</strong> to Creative. Strategist may recommend one, but Creative picks which to pursue.",
+            owner: "Strategist → Creative",
+          },
+          {
+            hour: "10:00 AM",
+            task: "Creative starts ideation on <strong>0–3 potential assets</strong> — descriptions of Veo clip, post copy, etc. Only <strong>BENTO 3</strong> is available for reactive (one long query, no results).",
+            owner: "Creative",
+          },
+          {
+            hour: "11:00 AM",
+            task: "MFG Creative sends <strong>0–3 options</strong> to Michelle / Chris Henry for review. <em>(0 if truly nothing interesting happened yesterday.)</em>",
+            owner: "MFG Creative → Michelle / Chris Henry",
+          },
+          {
+            hour: "11:30 AM",
+            task: "Michelle / Chris Henry choose <strong>0 or 1 asset</strong> to proceed into production.",
+            owner: "Michelle / Chris Henry",
+          },
+          {
+            hour: "12:00 PM",
+            task: "<strong>Production block (12:00 – 2:00 PM).</strong> Veo clips generated, copy drafted, post mocked up.",
+            owner: "Creative",
+          },
+          {
+            hour: "1:00 PM",
+            task: "Production continues — finalising clip, copy, and post layout.",
+            owner: "Creative",
+          },
+          {
+            hour: "2:00 PM",
+            task: "MFG sends the finished asset to <strong>Michelle / Chris Henry for legal review</strong>.",
+            owner: "MFG → Michelle / Chris Henry",
+          },
+          {
+            hour: "3:00 PM",
+            task: "Legal review in progress — team stays on standby and continues monitoring the next signal.",
+            owner: "Michelle / Chris Henry (review) · MFG (standby)",
+          },
+          {
+            hour: "4:00 PM",
+            task: 'Michelle / Chris return with <strong>approval and/or feedback</strong> — outcomes range from "ship it" to revisions to "do not run". MFG actions any revisions immediately.',
+            owner: "Michelle / Chris Henry → MFG",
+          },
+          {
+            hour: "5:00 PM",
+            task: "Asset is sent to <strong>Meta for approval / activation</strong>. Goes live that same night.",
+            owner: "MFG → Meta",
+          },
         ];
 
         let cycleRowsState = null;
@@ -10692,13 +10909,23 @@
               );
               const rowClass = isReview ? ' class="cycle-row-review"' : "";
               return (
-                "<tr" + rowClass + ' data-cycle-idx="' + i + '">' +
+                "<tr" +
+                rowClass +
+                ' data-cycle-idx="' +
+                i +
+                '">' +
                 '<td class="cycle-grip" draggable="true" title="Drag to reorder">≡</td>' +
-                '<td contenteditable="true" data-cycle-field="hour">' + (r.hour || "") + "</td>" +
-                '<td contenteditable="true" data-cycle-field="task">' + (r.task || "") + "</td>" +
+                '<td contenteditable="true" data-cycle-field="hour">' +
+                (r.hour || "") +
+                "</td>" +
+                '<td contenteditable="true" data-cycle-field="task">' +
+                (r.task || "") +
+                "</td>" +
                 '<td contenteditable="true" data-cycle-field="owner" class="' +
-                ownerClasses.filter(Boolean).join(" ") + '">' +
-                (r.owner || "") + "</td>" +
+                ownerClasses.filter(Boolean).join(" ") +
+                '">' +
+                (r.owner || "") +
+                "</td>" +
                 '<td style="text-align: center"><button type="button" class="cycle-del-btn" title="Delete row" aria-label="Delete row" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px">×</button></td>' +
                 "</tr>"
               );
@@ -10716,7 +10943,11 @@
               const td = tr.querySelector('[data-cycle-field="' + field + '"]');
               return td ? td.innerHTML.trim() : "";
             };
-            return { hour: cell("hour"), task: cell("task"), owner: cell("owner") };
+            return {
+              hour: cell("hour"),
+              task: cell("task"),
+              owner: cell("owner"),
+            };
           });
         }
 
@@ -10822,22 +11053,24 @@
 
         // Event delegation: editable cells, delete buttons, add-row button.
         document.addEventListener("input", (e) => {
-          const td = e.target.closest(
-            "#cycleScheduleBody [data-cycle-field]",
-          );
+          const td = e.target.closest("#cycleScheduleBody [data-cycle-field]");
           if (!td) return;
           queueCycleSave();
         });
-        document.addEventListener("blur", (e) => {
-          const td = e.target.closest(
-            "#cycleScheduleBody [data-cycle-field]",
-          );
-          if (!td) return;
-          // force immediate save on blur (skip the debounce)
-          if (cycleSaveTimer) clearTimeout(cycleSaveTimer);
-          readCycleFromDom();
-          saveCycleRowsNow();
-        }, true);
+        document.addEventListener(
+          "blur",
+          (e) => {
+            const td = e.target.closest(
+              "#cycleScheduleBody [data-cycle-field]",
+            );
+            if (!td) return;
+            // force immediate save on blur (skip the debounce)
+            if (cycleSaveTimer) clearTimeout(cycleSaveTimer);
+            readCycleFromDom();
+            saveCycleRowsNow();
+          },
+          true,
+        );
         document.addEventListener("click", (e) => {
           const delBtn = e.target.closest("#cycleScheduleBody .cycle-del-btn");
           if (delBtn) {
@@ -10858,7 +11091,7 @@
             // focus the new hour cell
             requestAnimationFrame(() => {
               const last = document.querySelector(
-                "#cycleScheduleBody tr:last-child [data-cycle-field=\"hour\"]",
+                '#cycleScheduleBody tr:last-child [data-cycle-field="hour"]',
               );
               if (last) last.focus();
             });
@@ -11037,7 +11270,10 @@
               "#cycleScheduleBody tr.cycle-row-drop-above, #cycleScheduleBody tr.cycle-row-drop-below, #vacationScheduleBody tr.cycle-row-drop-above, #vacationScheduleBody tr.cycle-row-drop-below",
             )
             .forEach((tr) =>
-              tr.classList.remove("cycle-row-drop-above", "cycle-row-drop-below"),
+              tr.classList.remove(
+                "cycle-row-drop-above",
+                "cycle-row-drop-below",
+              ),
             );
         }
         document.addEventListener("dragstart", (e) => {
@@ -11045,7 +11281,11 @@
           if (grip) {
             const tr = grip.closest("tr[data-cycle-idx]");
             if (!tr) return;
-            _cycleDrag = { kind: "cycle", idx: parseInt(tr.dataset.cycleIdx, 10), el: tr };
+            _cycleDrag = {
+              kind: "cycle",
+              idx: parseInt(tr.dataset.cycleIdx, 10),
+              el: tr,
+            };
             tr.classList.add("cycle-row-dragging");
             try {
               e.dataTransfer.effectAllowed = "move";
@@ -11057,7 +11297,11 @@
           if (vgrip) {
             const tr = vgrip.closest("tr[data-vac-idx]");
             if (!tr) return;
-            _cycleDrag = { kind: "vac", idx: parseInt(tr.dataset.vacIdx, 10), el: tr };
+            _cycleDrag = {
+              kind: "vac",
+              idx: parseInt(tr.dataset.vacIdx, 10),
+              el: tr,
+            };
             tr.classList.add("cycle-row-dragging");
             try {
               e.dataTransfer.effectAllowed = "move";
@@ -11133,9 +11377,7 @@
         });
 
         document.addEventListener("input", (e) => {
-          const td = e.target.closest(
-            "#vacationScheduleBody [data-vac-field]",
-          );
+          const td = e.target.closest("#vacationScheduleBody [data-vac-field]");
           if (!td) return;
           queueVacationSave();
         });
@@ -11173,7 +11415,7 @@
             saveVacationRowsNow();
             requestAnimationFrame(() => {
               const last = document.querySelector(
-                "#vacationScheduleBody tr:last-child [data-vac-field=\"person\"]",
+                '#vacationScheduleBody tr:last-child [data-vac-field="person"]',
               );
               if (last) last.focus();
             });
@@ -11617,7 +11859,7 @@
                 <span class="cal-filter-label">Filter</span>
                 ${filterChips}
               </div>
-              <div class="cal-overlay-note" id="calOverlayNote">Overlay: no other markets have calendar data yet — USA / UK / Germany TBD.</div>
+              <div class="cal-overlay-note" id="calOverlayNote">Overlay: no other markets have calendar data yet — USA / Brazil / Germany TBD.</div>
               <div class="cal-scroll">
                 <div class="cal-grid" style="grid-template-columns: var(--cal-channel-w) repeat(${totalDays}, var(--cal-col-w));">
                   <div class="cal-cell cal-channel-cell cal-channel-head" style="grid-column: 1; grid-row: 1;">Phase</div>
@@ -11653,7 +11895,7 @@
               window.print();
             });
 
-          // Overlay toggle (USA/UK/DE currently have no data → show note).
+          // Overlay toggle (USA/Brazil/DE currently have no data → show note).
           const overlayBtn = document.getElementById("calOverlayBtn");
           const overlayNote = document.getElementById("calOverlayNote");
           overlayBtn.addEventListener("click", () => {

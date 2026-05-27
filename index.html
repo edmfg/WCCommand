@@ -6453,7 +6453,7 @@
               <select id="assetMarket">
                 <option>Canada</option>
                 <option>Germany</option>
-                <option>UK</option>
+                <option>Brazil</option>
                 <option>USA</option>
                 <option>Global</option>
               </select>
@@ -6565,7 +6565,7 @@
     </div>
 
     <!-- Today's Reactive market chooser. Opens before the iframe loads so
-         the user picks Canada / UK / Germany / USA. Only Canada is wired
+         the user picks Canada / Brazil / Germany / USA. Only Canada is wired
          up today; the others are visible but disabled. -->
     <div class="card-modal-overlay" id="reactiveMarketOverlay">
       <div
@@ -6595,13 +6595,13 @@
           </button>
           <button
             class="market-card disabled"
-            data-market="uk"
+            data-market="brazil"
             type="button"
             disabled
             aria-disabled="true"
           >
-            <span class="market-flag" aria-hidden="true">🇬🇧</span>
-            <span class="market-name">United Kingdom</span>
+            <span class="market-flag" aria-hidden="true">🇧🇷</span>
+            <span class="market-name">Brazil</span>
             <span class="market-tag">Soon</span>
           </button>
           <button
@@ -6963,7 +6963,7 @@
         { id: "24h", label: "⏱ RECENT" },
         { id: "canada", label: "🇨🇦 Canada" },
         { id: "germany", label: "🇩🇪 Germany" },
-        { id: "uk", label: "🇬🇧 UK" },
+        { id: "brazil", label: "🇧🇷 Brazil" },
         { id: "usa", label: "🇺🇸 USA" },
         { id: "game", label: "⚽ Game" },
         { id: "culture", label: "🎵 Culture" },
@@ -7031,16 +7031,22 @@
             t.includes("america")
           );
         },
-        uk: (item, type) => {
-          if (type === "news") return item.tag === "UK";
+        brazil: (item, type) => {
+          if (type === "news") return item.tag === "Brazil";
           const t = (item.topic + " " + item.summary).toLowerCase();
           return (
-            t.includes("england") ||
-            t.includes("🏴") ||
-            t.includes("tuchel") ||
-            t.includes("bellingham") ||
-            t.includes("kane") ||
-            t.includes("three lions")
+            t.includes("brazil") ||
+            t.includes("brasil") ||
+            t.includes("🇧🇷") ||
+            t.includes("seleção") ||
+            t.includes("selecao") ||
+            t.includes("neymar") ||
+            t.includes("vinicius") ||
+            t.includes("vini jr") ||
+            t.includes("rodrygo") ||
+            t.includes("endrick") ||
+            t.includes("ancelotti") ||
+            t.includes("canarinho")
           );
         },
         game: (item, type) => {
@@ -7628,13 +7634,18 @@
         )
           return "Germany";
         if (
-          t.includes("🏴") ||
-          t.includes("england") ||
-          t.includes("tuchel") ||
-          t.includes("bellingham") ||
-          t.includes("kane")
+          t.includes("🇧🇷") ||
+          t.includes("brazil") ||
+          t.includes("brasil") ||
+          t.includes("seleção") ||
+          t.includes("selecao") ||
+          t.includes("neymar") ||
+          t.includes("vinicius") ||
+          t.includes("rodrygo") ||
+          t.includes("endrick") ||
+          t.includes("ancelotti")
         )
-          return "UK";
+          return "Brazil";
         if (
           t.includes("🇺🇸") ||
           t.includes("usmnt") ||
@@ -7653,7 +7664,7 @@
       function renderSentimentHeatmap() {
         const el = document.getElementById("sentimentHeatmap");
         if (!el) return;
-        const markets = ["Canada", "Germany", "UK", "USA", "Global"];
+        const markets = ["Canada", "Germany", "Brazil", "USA", "Global"];
         const sentiments = ["positive", "mixed", "negative"];
         const grid = {};
         markets.forEach(
@@ -8496,7 +8507,7 @@
           Canada: "🇨🇦",
           USA: "🇺🇸",
           Germany: "🇩🇪",
-          UK: "🇬🇧",
+          Brazil: "🇧🇷",
           Global: "🌐",
         };
         const marketPills = (a.market || "")
@@ -8661,7 +8672,7 @@
         grid.innerHTML = uploadCard + cards;
 
         const bar = document.getElementById("filterBar");
-        const markets = ["All", "Canada", "Germany", "UK", "USA", "Global"];
+        const markets = ["All", "Canada", "Germany", "Brazil", "USA", "Global"];
         bar.innerHTML = markets
           .map(
             (m) =>
@@ -8986,7 +8997,7 @@
       // Map dataset.market key → today_reactive.market label (case-sensitive in the DB).
       const REACTIVE_MARKET_LABEL = {
         ca: "Canada",
-        uk: "UK",
+        brazil: "Brazil",
         de: "Germany",
         usa: "USA",
         global: "Global",
@@ -10090,7 +10101,7 @@
 # About this tool
 - **Purpose**: real-time intelligence + creative pipeline tracking for the team running MFG's IG content during the WC.
 - **Tabs the user can navigate**:
-  • **Live** — Breaking news ticker, News carousel, Social Trends carousel. Filter by market (All / Canada / Germany / USA / UK) or theme (Game / Culture / Trending). Cards auto-rotate; click any card to expand.
+  • **Live** — Breaking news ticker, News carousel, Social Trends carousel. Filter by market (All / Canada / Germany / USA / Brazil) or theme (Game / Culture / Trending). Cards auto-rotate; click any card to expand.
   • **Fixtures** — All 104 matches across 12 groups + knockouts. Sort by date or group; filter by stage.
   • **Creative** — Three sub-tabs: ⚽ WC Engine (active asset pipeline with market/status/format/deploy date), ▶️ YT x Genius, 📺 Fox S2 (planned).
 - **MFG Mode** (mfg.html, password-gated) is the production cockpit: 🔄 Refresh Content (Gemini sweep → live_updates), 🔥 Today's Reactive (brief → structured briefing → publish), 📅 Content Calendar, 🧯 Global Triage (kanban), 🎬 Creative Uploads (Drive links → public Creative tab), 📋 Audit Log. See the How-To block below for step-by-step recipes.
