@@ -3662,6 +3662,11 @@
       .cycle-owner-review { color: #facc15 !important; }
       .cycle-owner-cron { color: #94a3b8 !important; font-style: italic; }
       .cycle-owner-meta { color: #34d399 !important; }
+      /* Michelle/Chris review rows — entire row bold red */
+      #cycleScheduleBody tr.cycle-row-review > td {
+        color: #ef4444 !important;
+        font-weight: 700 !important;
+      }
       /* Out-of-office badge appended to owner cells */
       td.cycle-owner-ooo::after {
         content: " 🏖️";
@@ -10654,8 +10659,12 @@
             .map((r, i) => {
               const ownerClasses = [ownerRoleClass(r.owner)];
               if (ownerHasOoo(r.owner)) ownerClasses.push("cycle-owner-ooo");
+              const isReview = /michelle|chris\b/i.test(
+                (r.owner || "").replace(/<[^>]*>/g, ""),
+              );
+              const rowClass = isReview ? ' class="cycle-row-review"' : "";
               return (
-                '<tr data-cycle-idx="' + i + '">' +
+                "<tr" + rowClass + ' data-cycle-idx="' + i + '">' +
                 '<td class="cycle-grip" draggable="true" title="Drag to reorder">≡</td>' +
                 '<td contenteditable="true" data-cycle-field="hour">' + (r.hour || "") + "</td>" +
                 '<td contenteditable="true" data-cycle-field="task">' + (r.task || "") + "</td>" +
