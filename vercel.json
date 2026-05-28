@@ -2,6 +2,7 @@
   "redirects": [
     {
       "source": "/((?!api/).*)",
+      "missing": [{ "type": "host", "value": "mfgworldcup.com" }],
       "destination": "https://mfgworldcup.com",
       "permanent": true
     }
