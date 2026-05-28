@@ -10031,13 +10031,13 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         const title = document.getElementById("introTitle");
         overlay.style.display = "flex";
 
-        // Timeline (3-sec clip):
+        // Timeline (4.4-sec clip — goal scoring + bear-hug celebration):
         // 0.00s — overlay visible, video starts (muted autoplay), title fades in
         // 0.25s — title visible (CSS introTitleIn at 0.25s delay)
-        // 2.55s — dashboard reveals (header/ticker/main stagger in behind overlay)
-        // 2.75s — start title-collapse-to-header transition; video begins fade
-        // 3.50s — title invisible (real brand visible); overlay fades
-        // 3.90s — overlay removed from DOM
+        // 3.80s — dashboard reveals (header/ticker/main stagger in behind overlay)
+        // 4.00s — start title-collapse-to-header transition; video begins fade
+        // 4.80s — title invisible (real brand visible); overlay fades
+        // 5.20s — overlay removed from DOM
 
         // Kick off video playback. If muted autoplay is blocked (rare with
         // muted+playsinline), the timeline still runs — user just sees a
@@ -10050,13 +10050,13 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           });
         }
 
-        // 2.55s: reveal header (invisible brand) so we can measure position
+        // 3.80s: reveal header (invisible brand) so we can measure position
         setTimeout(() => {
           document.body.classList.remove("dashboard-hidden");
           document.body.classList.add("dashboard-reveal");
-        }, 2550);
+        }, 3800);
 
-        // 2.75s: start the collapse — lock title position, then animate to brand
+        // 4.00s: start the collapse — lock title position, then animate to brand
         setTimeout(() => {
           // Fade out the clip so the title is the only thing flying up
           video.classList.add("fading");
@@ -10090,22 +10090,22 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           // Animate to the brand text's exact position (0.9s cubic-bezier)
           title.style.top = brandRect.top + "px";
           title.style.left = brandRect.left + "px";
-        }, 2750);
+        }, 4000);
 
-        // 3.50s: title fades out, real brand crossfades in
+        // 4.80s: title fades out, real brand crossfades in
         setTimeout(() => {
           title.style.opacity = "0";
-        }, 3500);
+        }, 4800);
 
-        // 3.70s: overlay fades
+        // 5.00s: overlay fades
         setTimeout(() => {
           overlay.classList.add("done");
-        }, 3700);
+        }, 5000);
 
-        // 4.10s: cleanup
+        // 5.40s: cleanup
         setTimeout(() => {
           overlay.remove();
-        }, 4100);
+        }, 5400);
       }
 
       // The whole dashboard boot — intro animation, theme, data init, MFG
