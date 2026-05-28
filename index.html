@@ -5083,327 +5083,91 @@
         z-index: 1;
       }
 
-      /* The pitch — 3D perspective */
-      .intro-pitch {
-        width: 560px;
-        max-width: 85vw;
-        aspect-ratio: 1.5/1;
-        position: relative;
-        transform: rotateX(58deg) scale(0.85);
-        transform-origin: center 60%;
-        transition:
-          transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-          opacity 0.8s ease;
-      }
-
-      /* Neon pitch lines */
-      .pitch-outline {
+      /* Intro video — full-bleed Messi goal clip behind the title overlay */
+      .intro-video {
         position: absolute;
         inset: 0;
-        border: 1.5px solid transparent;
-        box-shadow: none;
-        animation: neonDraw 0.8s 0.2s forwards;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        background: #000;
       }
-      @keyframes neonDraw {
-        0% {
-          border-color: transparent;
-          box-shadow: none;
-        }
-        50% {
-          border-color: rgba(255, 255, 255, 0.9);
-          box-shadow:
-            0 0 15px rgba(255, 255, 255, 0.3),
-            inset 0 0 15px rgba(255, 255, 255, 0.05);
-        }
-        100% {
-          border-color: rgba(255, 255, 255, 0.6);
-          box-shadow:
-            0 0 8px rgba(255, 255, 255, 0.15),
-            inset 0 0 8px rgba(255, 255, 255, 0.03);
-        }
+      .intro-video.playing {
+        opacity: 1;
       }
-
-      .pitch-half {
+      .intro-video.fading {
+        opacity: 0;
+      }
+      /* Dim the video slightly so the WORLD CUP HQ overlay reads cleanly */
+      .intro-overlay .intro-video::after {
+        content: "";
         position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        width: 1.5px;
-        background: transparent;
-        box-shadow: none;
-        animation: neonLine 0.5s 0.6s forwards;
-      }
-      @keyframes neonLine {
-        0% {
-          background: transparent;
-          box-shadow: none;
-        }
-        50% {
-          background: rgba(255, 255, 255, 0.9);
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-        }
-        100% {
-          background: rgba(255, 255, 255, 0.6);
-          box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
-        }
-      }
-
-      .pitch-circle {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 110px;
-        height: 110px;
-        transform: translate(-50%, -50%) scale(0);
-        border: 1.5px solid transparent;
-        border-radius: 50%;
-        animation: neonCircle 0.6s 0.9s forwards;
-      }
-      @keyframes neonCircle {
-        0% {
-          border-color: transparent;
-          transform: translate(-50%, -50%) scale(0);
-          box-shadow: none;
-        }
-        50% {
-          border-color: rgba(255, 255, 255, 0.9);
-          box-shadow:
-            0 0 20px rgba(255, 255, 255, 0.3),
-            inset 0 0 20px rgba(255, 255, 255, 0.1);
-        }
-        100% {
-          border-color: rgba(255, 255, 255, 0.6);
-          transform: translate(-50%, -50%) scale(1);
-          box-shadow:
-            0 0 8px rgba(255, 255, 255, 0.12),
-            inset 0 0 8px rgba(255, 255, 255, 0.05);
-        }
-      }
-
-      .pitch-center-dot {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        background: transparent;
-        animation: neonDot 0.4s 1.2s forwards;
-      }
-      @keyframes neonDot {
-        0% {
-          background: transparent;
-          transform: translate(-50%, -50%) scale(0);
-          box-shadow: none;
-        }
-        50% {
-          background: #fff;
-          box-shadow:
-            0 0 16px rgba(255, 255, 255, 0.8),
-            0 0 40px rgba(204, 0, 0, 0.4);
-        }
-        100% {
-          background: rgba(255, 255, 255, 0.9);
-          transform: translate(-50%, -50%) scale(1);
-          box-shadow:
-            0 0 8px rgba(255, 255, 255, 0.4),
-            0 0 20px rgba(204, 0, 0, 0.2);
-        }
-      }
-
-      /* Penalty boxes */
-      .pitch-box {
-        position: absolute;
-        width: 28%;
-        height: 38%;
-        border: 1.5px solid transparent;
-        animation: neonDraw 0.5s 0.7s forwards;
-      }
-      .pitch-box.left {
-        top: 31%;
-        left: 0;
-        border-left: none;
-      }
-      .pitch-box.right {
-        top: 31%;
-        right: 0;
-        border-right: none;
-      }
-
-      /* Goal arcs */
-      .pitch-arc {
-        position: absolute;
-        width: 14%;
-        height: 16%;
-        border: 1.5px solid transparent;
-        border-radius: 50%;
-        animation: neonDraw 0.4s 1s forwards;
-      }
-      .pitch-arc.left {
-        top: 42%;
-        left: 0;
-        border-left: none;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-      .pitch-arc.right {
-        top: 42%;
-        right: 0;
-        border-right: none;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-
-      /* Center pulse — dramatic energy burst when lines complete */
-      .pitch-pulse {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(
-          circle,
-          rgba(204, 0, 0, 0.5),
-          rgba(255, 215, 0, 0.2) 40%,
-          transparent 70%
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.25) 0%,
+          rgba(0, 0, 0, 0.45) 100%
         );
-        animation: centerPulse 0.8s 1.5s forwards;
+        pointer-events: none;
+      }
+      .intro-overlay .intro-scrim {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(0, 0, 0, 0.15) 0%,
+          rgba(0, 0, 0, 0.55) 75%
+        );
+        pointer-events: none;
         z-index: 1;
       }
-      @keyframes centerPulse {
-        0% {
-          width: 0;
-          height: 0;
-          opacity: 1;
-        }
-        100% {
-          width: 600px;
-          height: 600px;
-          opacity: 0;
-        }
-      }
 
-      /* Laser sweep across pitch */
-      .pitch-sweep {
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 40%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.06),
-          rgba(204, 0, 0, 0.08),
-          transparent
-        );
-        animation: laserSweep 0.8s 1.3s forwards;
-        z-index: 2;
-      }
-      @keyframes laserSweep {
-        0% {
-          left: -40%;
-        }
-        100% {
-          left: 140%;
-        }
-      }
-
-      /* Ground turf texture */
-      .pitch-turf {
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 48%,
-          rgba(255, 255, 255, 0.01) 48%,
-          rgba(255, 255, 255, 0.01) 52%
-        );
-        opacity: 0;
-        animation: turfReveal 0.6s 0.3s forwards;
-      }
-      @keyframes turfReveal {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      /* Brand title */
+      /* WORLD CUP HQ — bold header overlay sitting on top of the video */
       .intro-title {
         position: absolute;
         font-family:
           "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
           "Twemoji Mozilla", sans-serif;
         font-weight: 900;
-        font-size: clamp(26px, 5.5vw, 48px);
+        font-size: clamp(34px, 8vw, 84px);
         text-transform: uppercase;
-        letter-spacing: 8px;
+        letter-spacing: 10px;
         opacity: 0;
-        background: linear-gradient(
-          135deg,
-          #fff,
-          var(--gold),
-          var(--red),
-          var(--gold)
-        );
-        background-size: 200% 200%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation:
-          introTitleIn 0.6s 2s forwards,
-          introTitleShimmer 1.5s 2s ease-in-out;
+        color: #fff;
+        text-shadow:
+          0 2px 12px rgba(0, 0, 0, 0.85),
+          0 0 30px rgba(0, 0, 0, 0.7),
+          0 0 60px rgba(204, 0, 0, 0.35);
+        animation: introTitleIn 0.5s 0.25s forwards;
         z-index: 5;
-        filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.3))
-          drop-shadow(0 0 60px rgba(204, 0, 0, 0.15));
-        will-change: transform, top, left, font-size, letter-spacing, filter;
+        will-change: transform, top, left, font-size, letter-spacing;
         transition:
           top 0.9s cubic-bezier(0.22, 1, 0.36, 1),
           left 0.9s cubic-bezier(0.22, 1, 0.36, 1),
           font-size 0.9s cubic-bezier(0.22, 1, 0.36, 1),
           letter-spacing 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-          filter 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+          text-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+          color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
           opacity 0.4s ease 0.85s;
       }
       .intro-title.collapsing {
         animation: none !important;
         opacity: 1 !important;
+        /* shed the video-legibility shadow as the title flies into the header */
+        text-shadow: none;
       }
       @keyframes introTitleIn {
         0% {
           opacity: 0;
-          transform: translateY(24px) scale(0.9);
-          filter: blur(8px) drop-shadow(0 0 0 transparent);
-        }
-        60% {
-          opacity: 1;
-          filter: blur(0) drop-shadow(0 0 24px rgba(255, 215, 0, 0.3));
+          transform: translateY(24px) scale(0.94);
         }
         100% {
           opacity: 1;
           transform: translateY(0) scale(1);
         }
-      }
-      @keyframes introTitleShimmer {
-        0% {
-          background-position: 0% 50%;
-        }
-        100% {
-          background-position: 100% 50%;
-        }
-      }
-
-      /* Pullback */
-      .intro-pitch.pullback {
-        transform: rotateX(58deg) scale(0.1);
-        opacity: 0;
       }
 
       /* Dashboard hidden until intro done */
@@ -5843,21 +5607,17 @@
           });
       })();
     </script>
-    <!-- STADIUM FLYOVER INTRO -->
+    <!-- MESSI GOAL INTRO -->
     <div class="intro-overlay" id="introOverlay" style="display: none">
-      <div class="intro-pitch" id="introPitch">
-        <div class="pitch-turf"></div>
-        <div class="pitch-outline"></div>
-        <div class="pitch-half"></div>
-        <div class="pitch-circle"></div>
-        <div class="pitch-center-dot"></div>
-        <div class="pitch-box left"></div>
-        <div class="pitch-box right"></div>
-        <div class="pitch-arc left"></div>
-        <div class="pitch-arc right"></div>
-        <div class="pitch-sweep"></div>
-        <div class="pitch-pulse"></div>
-      </div>
+      <video
+        class="intro-video"
+        id="introVideo"
+        muted
+        playsinline
+        preload="auto"
+        src="/assets/messi-goal.mp4"
+      ></video>
+      <div class="intro-scrim"></div>
       <div class="intro-title" id="introTitle">World Cup HQ</div>
     </div>
 
@@ -10253,7 +10013,7 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         });
       }
 
-      // ── Stadium Flyover Intro (plays every 5th visit) ──
+      // ── Messi Goal Intro (plays every 5th visit) ──
       function runIntro() {
         const VISIT_KEY = "wc-visit-count";
         const count =
@@ -10267,28 +10027,39 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
         }
 
         const overlay = document.getElementById("introOverlay");
-        const pitch = document.getElementById("introPitch");
+        const video = document.getElementById("introVideo");
         const title = document.getElementById("introTitle");
         overlay.style.display = "flex";
 
-        // Timeline:
-        // 0.0s — Pitch lines draw in (CSS: outline 0.2s, half 0.5s, circle 0.8s, boxes 0.6s, dot 1.1s)
-        // 1.5s — Ball drops onto center with bounce (CSS)
-        // 1.8s — Gold glow pulse from center (CSS)
-        // 2.2s — Title appears with shimmer (CSS)
-        // 3.0s — Pitch pulls back (shrinks + fades), title collapses to header
-        // 3.5s — Dashboard reveals (header, ticker, main stagger in)
-        // 4.0s — Cleanup
+        // Timeline (3-sec clip):
+        // 0.00s — overlay visible, video starts (muted autoplay), title fades in
+        // 0.25s — title visible (CSS introTitleIn at 0.25s delay)
+        // 2.55s — dashboard reveals (header/ticker/main stagger in behind overlay)
+        // 2.75s — start title-collapse-to-header transition; video begins fade
+        // 3.50s — title invisible (real brand visible); overlay fades
+        // 3.90s — overlay removed from DOM
 
-        // 2.8s: reveal header (invisible brand) so we can measure position
+        // Kick off video playback. If muted autoplay is blocked (rare with
+        // muted+playsinline), the timeline still runs — user just sees a
+        // black frame with the title overlay.
+        video.classList.add("playing");
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            /* autoplay blocked; ignore — intro still works visually */
+          });
+        }
+
+        // 2.55s: reveal header (invisible brand) so we can measure position
         setTimeout(() => {
           document.body.classList.remove("dashboard-hidden");
           document.body.classList.add("dashboard-reveal");
-        }, 2800);
+        }, 2550);
 
-        // 3.0s: start the collapse — lock title position, then animate to brand
+        // 2.75s: start the collapse — lock title position, then animate to brand
         setTimeout(() => {
-          pitch.classList.add("pullback");
+          // Fade out the clip so the title is the only thing flying up
+          video.classList.add("fading");
 
           // Measure where title is right now (center screen)
           const titleRect = title.getBoundingClientRect();
@@ -10303,9 +10074,7 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
 
           // Target the actual "World Cup HQ" text node inside the brand
           // (the <span> sibling of .brand-logo, .beta-badge, and
-          // .limited-badge), not the .brand container — otherwise the
-          // title lands at the container's left edge, which sits behind
-          // the logo image.
+          // .limited-badge), not the .brand container.
           const brandText =
             document.querySelector(
               ".brand > span:not(.beta-badge):not(.limited-badge)",
@@ -10321,23 +10090,22 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
           // Animate to the brand text's exact position (0.9s cubic-bezier)
           title.style.top = brandRect.top + "px";
           title.style.left = brandRect.left + "px";
-          title.style.filter = "drop-shadow(0 0 0px transparent)";
-        }, 3000);
+        }, 2750);
 
-        // 3.9s: crossfade — title fades out, real brand fades in (CSS handles brand at 0.6s delay)
+        // 3.50s: title fades out, real brand crossfades in
         setTimeout(() => {
           title.style.opacity = "0";
-        }, 3900);
+        }, 3500);
 
-        // 4.1s: overlay gone
+        // 3.70s: overlay fades
         setTimeout(() => {
           overlay.classList.add("done");
-        }, 4100);
+        }, 3700);
 
-        // 4.5s: cleanup
+        // 4.10s: cleanup
         setTimeout(() => {
           overlay.remove();
-        }, 4500);
+        }, 4100);
       }
 
       // The whole dashboard boot — intro animation, theme, data init, MFG
