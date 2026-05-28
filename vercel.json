@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "https://mfgworldcup.com",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     { "source": "/api/gemini", "destination": "/api/gemini" },
     { "source": "/api/gate", "destination": "/api/gate" },
