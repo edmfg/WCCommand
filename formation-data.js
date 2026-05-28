@@ -10,7 +10,7 @@
 //    match            briefing (same shape)
 //    storyboards[]    storyboard { number, title, revised, sourceSignal, sourceDetail, audienceCut, bucket, prompt, whyPrompt, ipCheck, beats[] }
 //
-//  UK / DE / USA are intentionally null — the market chooser disables them
+//  Brazil / DE / USA are intentionally null — the market chooser disables them
 //  until briefings are wired up. Add the same shape as `ca` to enable.
 // ============================================================================
 
@@ -293,7 +293,7 @@ window.FORMATION_DATA = {
     ],
   },
 
-  uk: null,
+  brazil: null,
   de: null,
   usa: null,
 };
