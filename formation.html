@@ -1012,47 +1012,397 @@
         color: var(--gold);
       }
 
-      /* ===== storyboards ===== */
-      .storyboards-grid {
+      /* ===== plays grid — 3 query-first cards ===== */
+      .plays-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 36px;
+        gap: 22px;
       }
       @media (max-width: 1100px) {
-        .storyboards-grid {
+        .plays-grid {
           grid-template-columns: 1fr;
-          gap: 64px;
+          gap: 18px;
         }
       }
 
-      .storyboard {
+      .play-card {
+        background: linear-gradient(180deg, var(--surface-2), var(--surface));
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        cursor: pointer;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-      .sb-header {
+        gap: 18px;
+        transition:
+          border-color 0.2s var(--t),
+          transform 0.2s var(--t),
+          background 0.2s var(--t);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
         width: 100%;
-        text-align: center;
+        font: inherit;
+        color: var(--text);
       }
-      .sb-num {
+      .play-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--purple),
+          rgba(94, 199, 212, 0.6) 60%,
+          transparent
+        );
+        opacity: 0.65;
+      }
+      .play-card:hover {
+        border-color: var(--border-2);
+        transform: translateY(-3px);
+        background: linear-gradient(180deg, var(--surface-3), var(--surface-2));
+      }
+      .play-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .play-card-num {
         font-family: "Oswald", sans-serif;
-        font-size: 11px;
+        font-size: 10px;
         color: var(--gold);
         letter-spacing: 0.18em;
-        margin-bottom: 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .play-card-source {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
         font-weight: 600;
       }
-      .sb-title {
+      .play-card-title {
         font-family: "Oswald", sans-serif;
         font-weight: 500;
-        font-size: 24px;
-        margin-bottom: 6px;
+        font-size: 20px;
         line-height: 1.2;
         letter-spacing: -0.005em;
+        color: var(--text);
+      }
+      .play-card-query {
+        font-size: 15px;
+        line-height: 1.45;
+        color: rgba(255, 255, 255, 0.96);
+        font-weight: 500;
+        padding: 14px 16px;
+        background: rgba(180, 142, 245, 0.08);
+        border: 1px solid rgba(180, 142, 245, 0.22);
+        border-radius: 12px;
+        position: relative;
+      }
+      .play-card-query::before {
+        content: "“";
+        position: absolute;
+        top: -4px;
+        left: 6px;
+        color: rgba(180, 142, 245, 0.5);
+        font-family: "Oswald", sans-serif;
+        font-size: 36px;
+        line-height: 1;
+      }
+      .play-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .play-card-cta {
+        margin-top: auto;
+        align-self: stretch;
+        background: linear-gradient(
+          135deg,
+          rgba(180, 142, 245, 0.95),
+          rgba(180, 142, 245, 0.75)
+        );
+        color: #0a0c14;
+        border: 0;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        padding: 14px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        box-shadow: 0 6px 22px rgba(180, 142, 245, 0.28);
+        transition:
+          transform 0.2s var(--t),
+          box-shadow 0.2s var(--t),
+          filter 0.2s var(--t);
+      }
+      .play-card-cta:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.08);
+        box-shadow: 0 10px 28px rgba(180, 142, 245, 0.4);
+      }
+      .play-card-cta .arrow {
+        font-size: 16px;
+        transition: transform 0.2s var(--t);
+      }
+      .play-card:hover .play-card-cta .arrow {
+        transform: translateX(3px);
       }
 
-      /* iPhone */
+      /* ===== Storyboard modal (full mock view) ===== */
+      .sb-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 7, 12, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        z-index: 250;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .sb-modal-overlay.open {
+        display: flex;
+        animation: fadeIn 0.22s;
+      }
+      .sb-modal {
+        background: linear-gradient(180deg, #14181f, #0a0d14);
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 980px;
+        max-height: 92vh;
+        overflow-y: auto;
+        position: relative;
+        animation: rise 0.32s var(--t);
+      }
+      .sb-modal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--purple),
+          rgba(94, 199, 212, 0.7) 50%,
+          transparent
+        );
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      }
+      .sb-modal-head {
+        padding: 32px 36px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .sb-modal-num {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        color: var(--gold);
+        letter-spacing: 0.2em;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .sb-modal-title {
+        font-family: "Oswald", sans-serif;
+        font-weight: 500;
+        font-size: 28px;
+        line-height: 1.15;
+        margin-bottom: 16px;
+        letter-spacing: -0.005em;
+      }
+      .sb-modal-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .sb-modal-body {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 36px;
+        padding: 28px 36px 36px;
+        align-items: flex-start;
+      }
+      @media (max-width: 880px) {
+        .sb-modal-body {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          padding: 24px 20px 28px;
+        }
+        .sb-modal-head {
+          padding: 24px 20px 16px;
+        }
+      }
+      .sb-modal-phone-col {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        justify-self: center;
+        min-width: 0;
+      }
+      .sb-modal-right {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+      .sb-arrow {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        line-height: 1;
+        transition: all 0.18s var(--t);
+        font-family: inherit;
+        flex-shrink: 0;
+      }
+      .sb-arrow:hover:not(:disabled) {
+        background: var(--surface-3);
+        border-color: var(--border-2);
+        transform: scale(1.06);
+      }
+      .sb-arrow:disabled {
+        opacity: 0.28;
+        cursor: not-allowed;
+      }
+      .sb-modal-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 20px;
+        line-height: 1;
+        z-index: 5;
+        transition: all 0.18s var(--t);
+      }
+      .sb-modal-close:hover {
+        color: var(--text);
+        border-color: var(--border-2);
+        background: var(--surface-2);
+      }
+
+      /* Footage direction block — always visible, prominent in the modal.
+         When frame 3 (query) is active in the phone, the block lights up
+         to show the strategist the footage that pairs with this frame. */
+      .footage-block {
+        background: linear-gradient(
+          180deg,
+          rgba(94, 199, 212, 0.1),
+          rgba(94, 199, 212, 0.04)
+        );
+        border: 1px solid rgba(94, 199, 212, 0.32);
+        border-radius: 12px;
+        padding: 16px 18px;
+        transition:
+          background 0.3s var(--t),
+          border-color 0.3s var(--t),
+          box-shadow 0.3s var(--t),
+          transform 0.3s var(--t);
+        position: relative;
+      }
+      .sb-modal[data-current-beat="query"] .footage-block {
+        background: linear-gradient(
+          180deg,
+          rgba(94, 199, 212, 0.22),
+          rgba(94, 199, 212, 0.08)
+        );
+        border-color: rgba(94, 199, 212, 0.85);
+        box-shadow:
+          0 0 0 1px rgba(94, 199, 212, 0.45),
+          0 18px 48px rgba(94, 199, 212, 0.22);
+        transform: translateY(-1px);
+      }
+      .footage-block-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .footage-block-head .glyph {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: rgba(94, 199, 212, 0.18);
+        color: #8fdce6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        transition: background 0.3s var(--t);
+      }
+      .sb-modal[data-current-beat="query"] .footage-block-head .glyph {
+        background: rgba(94, 199, 212, 0.45);
+        color: #e8fafe;
+      }
+      .footage-block-head .lbl {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #8fdce6;
+        font-weight: 700;
+        flex: 1;
+      }
+      .footage-block-head .now-showing {
+        font-family: "Oswald", sans-serif;
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #051014;
+        background: #5ec7d4;
+        padding: 3px 8px;
+        border-radius: 99px;
+        font-weight: 800;
+        display: none;
+        align-items: center;
+        gap: 5px;
+      }
+      .footage-block-head .now-showing::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #051014;
+        animation: pulse 1.2s infinite;
+      }
+      .sb-modal[data-current-beat="query"] .footage-block-head .now-showing {
+        display: inline-flex;
+      }
+      .footage-block-body {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--text);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+
+      /* iPhone (lives inside the storyboard modal) */
       .phone {
         width: 280px;
         height: 580px;
@@ -1064,6 +1414,7 @@
           0 0 0 1.5px rgba(255, 255, 255, 0.06),
           inset 0 0 0 2px rgba(255, 255, 255, 0.04);
         position: relative;
+        flex-shrink: 0;
       }
       .phone-screen {
         width: 100%;
@@ -1115,41 +1466,6 @@
         width: 100%;
       }
 
-      .reels-meta {
-        position: absolute;
-        top: 64px;
-        left: 12px;
-        right: 12px;
-        z-index: 18;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: white;
-      }
-      .reels-avatar {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--red), var(--gold));
-        border: 1.5px solid white;
-        flex-shrink: 0;
-      }
-      .reels-username {
-        font-size: 12px;
-        font-weight: 600;
-        color: white;
-      }
-      .reels-time {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.7);
-      }
-      .reels-menu {
-        margin-left: auto;
-        color: white;
-        font-size: 18px;
-        line-height: 0.5;
-      }
-
       .reels-rail {
         position: absolute;
         right: 10px;
@@ -1159,6 +1475,13 @@
         flex-direction: column;
         gap: 16px;
         align-items: center;
+        transition: opacity 0.25s var(--t);
+      }
+      /* Query frame is a clean search lockup — hide the social rail so it
+         doesn't cover the search bar or the today's-query label. */
+      .phone-screen[data-current-beat="query"] .reels-rail {
+        opacity: 0;
+        pointer-events: none;
       }
       .reels-rail-item {
         display: flex;
@@ -1180,23 +1503,6 @@
         font-size: 10px;
         color: white;
         font-weight: 600;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-      }
-
-      .reels-bottom {
-        position: absolute;
-        left: 12px;
-        right: 60px;
-        bottom: 18px;
-        z-index: 18;
-      }
-      .reels-bottom .audio {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 500;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
       }
 
@@ -1226,206 +1532,91 @@
         inset: 0;
         z-index: -1;
       }
-      .frame[data-beat="intro"] .frame-bg {
-        background:
-          radial-gradient(
-            circle at 30% 25%,
-            rgba(204, 0, 0, 0.55),
-            transparent 60%
-          ),
-          radial-gradient(
-            circle at 80% 80%,
-            rgba(255, 215, 0, 0.4),
-            transparent 60%
-          ),
-          linear-gradient(180deg, #1a1018, #0a0c14);
+      /* Static image frames (1, 2, 4) — full-bleed brand visuals */
+      .frame[data-beat="image"] {
+        padding: 0;
       }
-      .frame[data-beat="prompt"] .frame-bg {
+      .frame[data-beat="image"] .frame-bg {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      /* Frame 3 — query hero with footage-direction popup */
+      .frame[data-beat="query"] {
+        padding: 96px 24px 110px 24px;
+        align-items: center;
+        text-align: center;
+      }
+      .frame[data-beat="query"] .frame-bg {
         background:
           radial-gradient(
             circle at 50% 30%,
-            rgba(180, 142, 245, 0.3),
+            rgba(180, 142, 245, 0.35),
             transparent 60%
           ),
-          linear-gradient(180deg, #14182a, #0a0c14);
-      }
-      .frame[data-beat="results"] .frame-bg {
-        background: linear-gradient(180deg, #0c1418, #050a0e);
-      }
-      .frame[data-beat="payoff"] .frame-bg {
-        background:
           radial-gradient(
-            circle at 50% 60%,
-            rgba(180, 142, 245, 0.45),
-            transparent 70%
-          ),
-          radial-gradient(
-            circle at 20% 20%,
-            rgba(255, 215, 0, 0.25),
+            circle at 50% 90%,
+            rgba(94, 199, 212, 0.18),
             transparent 60%
           ),
-          linear-gradient(180deg, #1a1126, #0a0c14);
+          linear-gradient(180deg, #14182a, #07090f);
       }
-      .frame-tag {
+      .query-label {
         font-family: "Oswald", sans-serif;
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--gold);
-        margin-bottom: 14px;
-        font-weight: 600;
-      }
-      .frame-body {
-        font-size: 15px;
-        line-height: 1.5;
-        color: white;
-      }
-      .frame[data-beat="intro"] .frame-body {
-        font-style: italic;
-        color: rgba(255, 255, 255, 0.97);
-        font-size: 18px;
-        font-family: "Oswald", sans-serif;
-        font-weight: 400;
-        line-height: 1.3;
-        letter-spacing: 0.005em;
-      }
-
-      .ai-mode-bar {
-        background: rgba(255, 255, 255, 0.96);
-        color: #1f1f1f;
-        border-radius: 16px;
-        padding: 12px 14px;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
-      }
-      .ai-mode-bar .sparkle {
-        color: var(--purple);
-        font-size: 16px;
-        flex-shrink: 0;
-      }
-      .ai-mode-bar .label {
         font-size: 9px;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: #888;
-        margin-bottom: 2px;
-        font-weight: 600;
-      }
-      .ai-mode-bar .text {
-        font-size: 12.5px;
-        color: #1f1f1f;
-        line-height: 1.4;
-        font-weight: 500;
-      }
-
-      .ai-results {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 12px;
-        padding: 14px;
-        backdrop-filter: blur(8px);
-      }
-      .ai-results-head {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 9px;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        color: var(--purple);
-        margin-bottom: 10px;
+        color: rgba(180, 142, 245, 0.95);
+        margin-bottom: 14px;
         font-weight: 700;
       }
-      .ai-results-head .shimmer {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--purple);
-        animation: pulse 1.4s infinite;
-      }
-      .ai-results-body {
-        font-size: 13px;
-        line-height: 1.5;
-        color: rgba(255, 255, 255, 0.95);
-      }
-      .ai-results-cards {
+      .query-search {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 22px;
+        padding: 14px 16px;
         display: flex;
-        gap: 6px;
-        margin-top: 10px;
+        gap: 10px;
+        align-items: flex-start;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+        margin-bottom: 14px;
       }
-      .ai-results-cards .mini {
+      .query-search .g-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 2px;
+        background: conic-gradient(
+          from -45deg,
+          #4285f4 0% 25%,
+          #34a853 25% 50%,
+          #fbbc05 50% 75%,
+          #ea4335 75% 100%
+        );
+        position: relative;
+      }
+      .query-search .g-icon::after {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background: white;
+      }
+      .query-search .q-text {
         flex: 1;
-        height: 38px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: #1f1f1f;
+        font-weight: 500;
       }
-
-      .payoff-poster {
-        text-align: center;
-        padding: 8px;
-      }
-      .payoff-poster .text {
-        font-family: "Oswald", sans-serif;
-        font-size: 19px;
-        line-height: 1.25;
-        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
-        font-weight: 400;
-        letter-spacing: 0.005em;
-      }
-
-      /* phone nav */
-      .phone-nav {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-top: 6px;
-      }
-      .phone-nav-btn {
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        color: var(--text);
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        transition: all 0.2s;
-        font-family: inherit;
-      }
-      .phone-nav-btn:hover:not(:disabled) {
-        border-color: var(--border-2);
-        background: var(--surface-3);
-        transform: scale(1.05);
-      }
-      .phone-nav-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-      .phone-nav-counter {
-        font-family: "Oswald", sans-serif;
-        font-size: 13px;
-        letter-spacing: 0.1em;
-        color: var(--text-dim);
-        font-variant-numeric: tabular-nums;
-        min-width: 100px;
-        text-align: center;
-        font-weight: 600;
-      }
-      .phone-nav-counter .beat-name {
-        display: block;
-        font-size: 9px;
-        color: var(--text-mid);
+      .query-caret {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.78);
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        letter-spacing: 0.14em;
-        margin-top: 3px;
-        font-family: "Inter", sans-serif;
         font-weight: 600;
       }
 
@@ -1486,64 +1677,135 @@
         text-transform: uppercase;
         letter-spacing: 0.06em;
         font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
       }
       .chip strong {
-        color: var(--text-dim);
-        font-weight: 600;
-        margin-right: 5px;
-      }
-
-      .spec-why {
-        font-size: 11.5px;
-        color: var(--text-dim);
-        line-height: 1.5;
-        border-top: 1px dashed var(--border);
-        padding-top: 12px;
-        margin-bottom: 12px;
-      }
-      .spec-why::before {
-        content: "Why this prompt — ";
-        color: var(--text-mid);
+        font-size: 9px;
         font-weight: 700;
+        letter-spacing: 0.12em;
+        opacity: 0.85;
+      }
+      /* SOURCE — cyan/data origin */
+      .chip[data-kind="source"] {
+        background: rgba(94, 199, 212, 0.18);
+        border-color: rgba(94, 199, 212, 0.5);
+        color: #d8f1f5;
+      }
+      .chip[data-kind="source"] strong {
+        color: #5ec7d4;
+      }
+      /* AUDIENCE — coral/human */
+      .chip[data-kind="audience"] {
+        background: rgba(244, 138, 130, 0.18);
+        border-color: rgba(244, 138, 130, 0.5);
+        color: #fcdedb;
+      }
+      .chip[data-kind="audience"] strong {
+        color: #f48a82;
+      }
+      /* BUCKET — gold/categorical */
+      .chip[data-kind="bucket"] {
+        background: rgba(255, 215, 0, 0.18);
+        border-color: rgba(255, 215, 0, 0.5);
+        color: #f9efbc;
+      }
+      .chip[data-kind="bucket"] strong {
+        color: var(--gold);
       }
 
-      .ip-check {
+      /* Dropdown row — neutral card with colored LEFT-EDGE accent +
+         chevron caret to clearly distinguish from the filled pill chips. */
+      .spec-drop {
+        --accent: var(--purple);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        overflow: hidden;
+        transition:
+          background 0.18s var(--t),
+          border-color 0.18s var(--t);
+      }
+      .spec-drop:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--border-2);
+        border-left-color: var(--accent);
+      }
+      .spec-drop > summary {
+        list-style: none;
+        cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 9px 12px;
-        border-radius: 8px;
-        font-size: 11px;
-        border: 1px solid;
+        gap: 10px;
+        padding: 12px 14px;
+        user-select: none;
       }
-      .ip-check[data-status="clear"] {
-        border-color: rgba(74, 222, 128, 0.3);
-        background: rgba(74, 222, 128, 0.06);
-        color: var(--green);
+      .spec-drop > summary::-webkit-details-marker {
+        display: none;
       }
-      .ip-check[data-status="watch"] {
-        border-color: rgba(251, 191, 36, 0.3);
-        background: rgba(251, 191, 36, 0.06);
-        color: var(--amber);
-      }
-      .ip-check .dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: currentColor;
-        flex-shrink: 0;
-      }
-      .ip-check .ip-tag {
-        font-weight: 700;
+      .spec-drop > summary .drop-label {
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
         font-size: 10px;
         flex-shrink: 0;
+        color: var(--accent);
       }
-      .ip-check .ip-body {
-        color: var(--text-mid);
+      .spec-drop > summary .drop-peek {
         flex: 1;
-        line-height: 1.45;
+        font-size: 11.5px;
+        color: var(--text-dim);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .spec-drop > summary .drop-caret {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        transition: transform 0.18s var(--t);
+      }
+      .spec-drop[open] > summary .drop-caret {
+        transform: rotate(180deg);
+      }
+      .spec-drop .drop-body {
+        padding: 4px 14px 14px 14px;
+        font-size: 12px;
+        line-height: 1.55;
+        color: var(--text);
+        border-top: 1px dashed var(--border);
+        margin-top: 2px;
+      }
+      .spec-drop .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* Why this prompt — purple */
+      .spec-why {
+        --accent: var(--purple);
+      }
+      /* IP — green (clear) / amber (watch) */
+      .ip-check[data-status="clear"] {
+        --accent: var(--green);
+      }
+      .ip-check[data-status="watch"] {
+        --accent: var(--amber);
       }
 
       footer {
@@ -1654,12 +1916,7 @@
           <span class="section-num">02 ·</span>
           <h2 class="section-title">Today's plays</h2>
         </div>
-        <p class="section-sub">
-          Three storyboards engineered from today's spikes. Click through the
-          frames like a Reels storyboard, or tap the right side of the phone to
-          advance.
-        </p>
-        <div class="storyboards-grid" id="storyboards"></div>
+        <div class="plays-grid" id="storyboards"></div>
       </section>
     </main>
 
@@ -1684,12 +1941,23 @@
       </article>
     </div>
 
+    <!-- Storyboard "play" modal — full phone mock + footage direction -->
+    <div class="sb-modal-overlay" id="sbModal"></div>
+
     <script src="formation-data.js"></script>
     <script>
       // ============================================================================
       //  Gate check — inherits dashboard wcc_gate cookie. Redirect to / if missing.
       // ============================================================================
       (async function gateCheck() {
+        // Localhost dev bypass — skip the gate when serving from a dev server
+        // so we can preview the page without standing up /api/gate.
+        const host = window.location.hostname;
+        if (host === "localhost" || host === "127.0.0.1" || host === "") {
+          document.body.classList.remove("gated");
+          boot();
+          return;
+        }
         try {
           const r = await fetch("/api/gate", {
             method: "GET",
@@ -1781,20 +2049,6 @@
             )
             .join("");
 
-          const watchHTML = b.watchlist
-            .map(
-              (w) => `
-            <div class="watch-item">
-              <span class="dot"></span>
-              <div class="watch-item-body">
-                <div class="watch-title">${w.title}</div>
-                <div class="watch-note">${w.note}</div>
-              </div>
-            </div>
-          `,
-            )
-            .join("");
-
           const sigId = b.agentName.toUpperCase().replace(/ /g, "_");
           const sigDate = FORMATION.date.toLowerCase().replace(/[, ]+/g, "-");
 
@@ -1814,13 +2068,6 @@
               <h3 class="briefing-headline">${b.headline}</h3>
               <div class="spikes-label">Top spikes — ${b.spikes.length}</div>
               <div class="spikes">${spikesHTML}</div>
-              <div class="accordion open">
-                <div class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
-                  <span><span class="lbl">Watchlist</span><span class="count">${b.watchlist.length}</span></span>
-                  <span class="accordion-toggle">+</span>
-                </div>
-                <div class="accordion-body"><div class="accordion-inner">${watchHTML}</div></div>
-              </div>
               <div class="briefing-sig">// ${sigId} · run_${sigDate}</div>
             </article>
           `;
@@ -1862,161 +2109,180 @@
           if (e.key === "Escape") window.closeModal();
         });
 
-        function beatTypeFor(name) {
-          const lc = name.toLowerCase();
-          if (lc.includes("intro")) return "intro";
-          if (lc.includes("prompt")) return "prompt";
-          if (lc.includes("result")) return "results";
-          return "payoff";
-        }
+        // Every storyboard has the same 4-frame structure:
+        // 1 — Google Search lockup (static)
+        // 2 — "One country, many fans, many questions" (static)
+        // 3 — Query hero + footage direction popup (dynamic per storyboard)
+        // 4 — "Ask more with Google Search" (static)
+        const STORYBOARD_BEATS = [
+          {
+            kind: "image",
+            name: "Google Search lockup",
+            src: "assets/storyboard/frame-1-search-lockup.png",
+          },
+          {
+            kind: "image",
+            name: "One Country. Many Fans. Many Questions.",
+            src: "assets/storyboard/frame-2-many-questions.png",
+          },
+          { kind: "query", name: "Query" },
+          {
+            kind: "image",
+            name: "Ask more with Google Search",
+            src: "assets/storyboard/frame-4-ask-more.png",
+          },
+        ];
 
-        function renderFrame(beat, sb, idx) {
-          const type = beatTypeFor(beat.name);
-          const tagText = `${String(idx + 1).padStart(2, "0")} · ${beat.name}`;
-
-          let inner = "";
-          if (type === "intro") {
-            inner = `
-              <div class="frame-tag">${tagText}</div>
-              <div class="frame-body">${beat.body}</div>
-            `;
-          } else if (type === "prompt") {
-            inner = `
-              <div class="frame-tag">${tagText}</div>
-              <div class="ai-mode-bar">
-                <span class="sparkle">✦</span>
-                <div style="flex:1">
-                  <div class="label">AI Mode</div>
-                  <div class="text">${sb.prompt}</div>
-                </div>
+        function renderFrame(beat, sb, sbIdx) {
+          if (beat.kind === "image") {
+            return `
+              <div class="frame" data-beat="image">
+                <div class="frame-bg" style="background-image:url('${beat.src}')"></div>
               </div>
-              <div class="frame-body" style="font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5">${beat.body}</div>
-            `;
-          } else if (type === "results") {
-            inner = `
-              <div class="frame-tag">${tagText}</div>
-              <div class="ai-results">
-                <div class="ai-results-head"><span class="shimmer"></span> AI Mode · Generated</div>
-                <div class="ai-results-body">${beat.body}</div>
-                <div class="ai-results-cards">
-                  <div class="mini"></div>
-                  <div class="mini"></div>
-                  <div class="mini"></div>
-                </div>
-              </div>
-            `;
-          } else {
-            inner = `
-              <div class="frame-tag" style="text-align:center">${tagText}</div>
-              <div class="payoff-poster"><div class="text">${beat.body}</div></div>
             `;
           }
-
-          return `<div class="frame" data-beat="${type}"><div class="frame-bg"></div>${inner}</div>`;
-        }
-
-        function renderStoryboard(sb, idx) {
-          const framesHTML = sb.beats
-            .map((b, i) => renderFrame(b, sb, i))
-            .join("");
-          const segments = sb.beats
-            .map(
-              (_, i) =>
-                `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
-            )
-            .join("");
-
+          // query frame — pure search-bar mock; footage direction lives in
+          // the modal's right column (always visible there).
           return `
-            <div class="storyboard" data-sb="${idx}">
-              <div class="spec">
-                <div class="spec-prompt">
-                  <span class="sp">✦</span>
-                  <div class="sp-body">
-                    <span class="sp-label">Prompt direction</span>
-                    ${sb.prompt}
-                  </div>
-                </div>
-                <div class="spec-row">
-                  <span class="chip"><strong>Source</strong>${sb.sourceSignal}</span>
-                  <span class="chip"><strong>Audience</strong>${sb.audienceCut}</span>
-                  <span class="chip"><strong>Bucket</strong>${sb.bucket}</span>
-                </div>
-                <div class="spec-why">${sb.whyPrompt}</div>
-                <div class="ip-check" data-status="${sb.ipCheck.status}">
-                  <span class="dot"></span>
-                  <span class="ip-tag">IP — ${sb.ipCheck.status}</span>
-                  <span class="ip-body">${sb.ipCheck.note}</span>
-                </div>
-              </div>
-              <div class="sb-header">
-                <div class="sb-num">STORYBOARD ${sb.number}</div>
-                <div class="sb-title">${sb.title}</div>
-              </div>
-              <div class="phone">
-                <div class="phone-island"></div>
-                <div class="phone-screen">
-                  <div class="reels-progress">${segments}</div>
-                  <div class="reels-meta">
-                    <div class="reels-avatar"></div>
-                    <div>
-                      <div class="reels-username">@google</div>
-                    </div>
-                    <div class="reels-time">· now</div>
-                    <div class="reels-menu">⋯</div>
-                  </div>
-                  <div class="frames">${framesHTML}</div>
-                  <div class="reels-rail">
-                    <div class="reels-rail-item"><div class="reels-rail-icon">♥</div><div class="reels-rail-label">12.4K</div></div>
-                    <div class="reels-rail-item"><div class="reels-rail-icon">💬</div><div class="reels-rail-label">247</div></div>
-                    <div class="reels-rail-item"><div class="reels-rail-icon">↗</div><div class="reels-rail-label">Share</div></div>
-                    <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
-                  </div>
-                  <div class="reels-bottom">
-                    <div class="audio">♫ Original · @google</div>
-                  </div>
-                </div>
-              </div>
-              <div class="phone-nav">
-                <button class="phone-nav-btn" onclick="frameStep(${idx},-1)">‹</button>
-                <span class="phone-nav-counter">
-                  <span id="counter-${idx}">01 / 0${sb.beats.length}</span>
-                  <span class="beat-name" id="beatname-${idx}">${sb.beats[0].name}</span>
-                </span>
-                <button class="phone-nav-btn" onclick="frameStep(${idx},1)">›</button>
+            <div class="frame" data-beat="query">
+              <div class="frame-bg"></div>
+              <div class="query-label">Today's query</div>
+              <div class="query-search">
+                <span class="g-icon"></span>
+                <span class="q-text">${sb.prompt}</span>
               </div>
             </div>
           `;
         }
 
+        // Collapsed view — query-first play card. Why + IP dropdowns live here
+        // (not inside the mock modal) so the strategist can scan them up front.
+        function renderPlayCard(sb, idx) {
+          return `
+            <div class="play-card" data-sb="${idx}">
+              <div class="play-card-head">
+                <span class="play-card-num">Play ${sb.number}</span>
+                <span class="play-card-source">${sb.sourceSignal}</span>
+              </div>
+              <div class="play-card-title">${sb.title}</div>
+              <div class="play-card-query">${sb.prompt}</div>
+              <div class="play-card-meta">
+                <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
+                <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
+              </div>
+              <details class="spec-drop spec-why">
+                <summary>
+                  <span class="drop-label">Why this prompt</span>
+                  <span class="drop-peek">${sb.whyPrompt}</span>
+                  <span class="drop-caret">▾</span>
+                </summary>
+                <div class="drop-body">${sb.whyPrompt}</div>
+              </details>
+              <details class="spec-drop ip-check" data-status="${sb.ipCheck.status}">
+                <summary>
+                  <span class="dot"></span>
+                  <span class="drop-label">IP — ${sb.ipCheck.status}</span>
+                  <span class="drop-peek">${sb.ipCheck.note}</span>
+                  <span class="drop-caret">▾</span>
+                </summary>
+                <div class="drop-body">${sb.ipCheck.note}</div>
+              </details>
+              <button class="play-card-cta" onclick="openStoryboardModal(${idx})">
+                <span>Open the mock</span>
+                <span class="arrow">→</span>
+              </button>
+            </div>
+          `;
+        }
+
+        // Expanded view — full storyboard modal with phone mock + spec details
+        function renderStoryboardModal(sb, idx) {
+          const framesHTML = STORYBOARD_BEATS.map((b) =>
+            renderFrame(b, sb, idx),
+          ).join("");
+          const segments = STORYBOARD_BEATS.map(
+            (_, i) =>
+              `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
+          ).join("");
+
+          return `
+            <div class="sb-modal" data-sb="${idx}" onclick="event.stopPropagation()">
+              <button class="sb-modal-close" onclick="closeStoryboardModal()" aria-label="Close">×</button>
+              <div class="sb-modal-head">
+                <div class="sb-modal-num">Play ${sb.number} · ${sb.sourceSignal}</div>
+                <div class="sb-modal-title">${sb.title}</div>
+                <div class="sb-modal-pills">
+                  <span class="chip" data-kind="source"><strong>Source</strong>${sb.sourceDetail || sb.sourceSignal}</span>
+                  <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
+                  <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
+                </div>
+              </div>
+              <div class="sb-modal-body">
+                <div class="sb-modal-phone-col">
+                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous frame">‹</button>
+                  <div class="phone">
+                    <div class="phone-island"></div>
+                    <div class="phone-screen">
+                      <div class="reels-progress">${segments}</div>
+                      <div class="frames">${framesHTML}</div>
+                      <div class="reels-rail">
+                        <div class="reels-rail-item"><div class="reels-rail-icon">♥</div><div class="reels-rail-label">12.4K</div></div>
+                        <div class="reels-rail-item"><div class="reels-rail-icon">💬</div><div class="reels-rail-label">247</div></div>
+                        <div class="reels-rail-item"><div class="reels-rail-icon">↗</div><div class="reels-rail-label">Share</div></div>
+                        <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next frame">›</button>
+                </div>
+                <div class="sb-modal-right">
+                  <div class="footage-block">
+                    <div class="footage-block-head">
+                      <span class="glyph">▣</span>
+                      <span class="lbl">Footage direction · Frame 3</span>
+                      <span class="now-showing">Now showing</span>
+                    </div>
+                    <div class="footage-block-body">${sb.footage}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Render collapsed play cards on first paint.
         document.getElementById("storyboards").innerHTML = STORYBOARDS.map(
-          (sb, i) => renderStoryboard(sb, i),
+          (sb, i) => renderPlayCard(sb, i),
         ).join("");
 
-        const frameState = STORYBOARDS.map((sb) => ({
+        const frameState = STORYBOARDS.map(() => ({
           idx: 0,
-          total: sb.beats.length,
+          total: STORYBOARD_BEATS.length,
         }));
+        let activeSbIdx = -1;
 
         function setFrames() {
-          document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
-            const state = frameState[i];
-            const sb = STORYBOARDS[i];
-            sbEl
-              .querySelectorAll(".frame")
-              .forEach((f, j) => f.classList.toggle("active", j === state.idx));
-            sbEl.querySelectorAll(".reels-progress .seg").forEach((s, j) => {
-              s.classList.toggle("active", j === state.idx);
-              s.classList.toggle("done", j < state.idx);
-            });
-            const counter = document.getElementById(`counter-${i}`);
-            if (counter)
-              counter.textContent = `0${state.idx + 1} / 0${state.total}`;
-            const beatName = document.getElementById(`beatname-${i}`);
-            if (beatName) beatName.textContent = sb.beats[state.idx].name;
-            const btns = sbEl.querySelectorAll(".phone-nav-btn");
-            btns[0].disabled = state.idx === 0;
-            btns[1].disabled = state.idx === state.total - 1;
+          const modalEl = document.getElementById("sbModal");
+          if (!modalEl) return;
+          const sbEl = modalEl.querySelector(".sb-modal");
+          if (!sbEl || activeSbIdx < 0) return;
+          const state = frameState[activeSbIdx];
+          const currentBeat = STORYBOARD_BEATS[state.idx].kind;
+          sbEl.setAttribute("data-current-beat", currentBeat);
+          const phoneScreen = sbEl.querySelector(".phone-screen");
+          if (phoneScreen)
+            phoneScreen.setAttribute("data-current-beat", currentBeat);
+          sbEl
+            .querySelectorAll(".frame")
+            .forEach((f, j) => f.classList.toggle("active", j === state.idx));
+          sbEl.querySelectorAll(".reels-progress .seg").forEach((s, j) => {
+            s.classList.toggle("active", j === state.idx);
+            s.classList.toggle("done", j < state.idx);
           });
+          const prevBtn = sbEl.querySelector(".sb-arrow.prev");
+          const nextBtn = sbEl.querySelector(".sb-arrow.next");
+          if (prevBtn) prevBtn.disabled = state.idx === 0;
+          if (nextBtn) nextBtn.disabled = state.idx === state.total - 1;
         }
 
         window.frameStep = function (sbIdx, dir) {
@@ -2025,27 +2291,46 @@
           setFrames();
         };
 
-        document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
-          const screen = sbEl.querySelector(".phone-screen");
-          screen.addEventListener("click", (e) => {
-            if (e.target.closest(".reels-rail, .reels-meta")) return;
-            const rect = screen.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            if (x > rect.width / 2) window.frameStep(i, 1);
-            else window.frameStep(i, -1);
+        window.openStoryboardModal = function (sbIdx) {
+          activeSbIdx = sbIdx;
+          const overlay = document.getElementById("sbModal");
+          overlay.innerHTML = renderStoryboardModal(STORYBOARDS[sbIdx], sbIdx);
+          overlay.classList.add("open");
+          document.body.style.overflow = "hidden";
+          // Wire up the in-phone tap-to-advance for the freshly-mounted phone.
+          const screen = overlay.querySelector(".phone-screen");
+          if (screen) {
+            screen.addEventListener("click", (e) => {
+              if (e.target.closest(".reels-rail")) return;
+              const rect = screen.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              if (x > rect.width / 2) window.frameStep(sbIdx, 1);
+              else window.frameStep(sbIdx, -1);
+            });
+          }
+          setFrames();
+        };
+
+        window.closeStoryboardModal = function () {
+          const overlay = document.getElementById("sbModal");
+          overlay.classList.remove("open");
+          overlay.innerHTML = "";
+          document.body.style.overflow = "";
+          activeSbIdx = -1;
+        };
+
+        document
+          .getElementById("sbModal")
+          .addEventListener("click", (e) => {
+            if (e.target.id === "sbModal") window.closeStoryboardModal();
           });
-        });
 
-        let lastHovered = 0;
-        document.querySelectorAll(".storyboard").forEach((sbEl, i) => {
-          sbEl.addEventListener("mouseenter", () => (lastHovered = i));
-        });
         document.addEventListener("keydown", (e) => {
-          if (e.key === "ArrowRight") window.frameStep(lastHovered, 1);
-          if (e.key === "ArrowLeft") window.frameStep(lastHovered, -1);
+          if (activeSbIdx < 0) return;
+          if (e.key === "Escape") return window.closeStoryboardModal();
+          if (e.key === "ArrowRight") window.frameStep(activeSbIdx, 1);
+          if (e.key === "ArrowLeft") window.frameStep(activeSbIdx, -1);
         });
-
-        setFrames();
       }
 
       // ============================================================================

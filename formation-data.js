@@ -6,9 +6,18 @@
 //
 //  Each market entry contains:
 //    formation        { date, market, window }
-//    cultural         briefing { agentName, agentId, flag, watermark, headline, spikes[], watchlist[], flags[] }
+//    cultural         briefing { agentName, agentId, flag, watermark, headline, spikes[], flags[] }
 //    match            briefing (same shape)
-//    storyboards[]    storyboard { number, title, revised, sourceSignal, sourceDetail, audienceCut, bucket, prompt, whyPrompt, ipCheck, beats[] }
+//    storyboards[]    storyboard {
+//                       number, title, sourceSignal, sourceDetail, audienceCut, bucket,
+//                       prompt,        // the daily query — also drives frame 3
+//                       whyPrompt,
+//                       ipCheck: { status, note },
+//                       footage        // creative direction for frame 3's footage popup
+//                     }
+//
+//  Frames 1, 2, 4 are static brand visuals defined in formation.html
+//  (STORYBOARD_BEATS). Only frame 3 is data-driven per storyboard.
 //
 //  Brazil / DE / USA are intentionally null — the market chooser disables them
 //  until briefings are wired up. Add the same shape as `ca` to enable.
@@ -17,7 +26,7 @@
 window.FORMATION_DATA = {
   ca: {
     formation: {
-      date: "May 6, 2026",
+      date: "May 28, 2026",
       market: "Canada",
       window: "Last 24h",
     },
@@ -27,77 +36,58 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "01",
       headline:
-        "Diaspora pride and localized kit fashion define the 2026 countdown as Montreal and Vancouver solidify distinct cultural identities.",
+        "Diaspora communities are driving the cultural conversation — fusing music, fashion, and national pride ahead of the World Cup.",
       spikes: [
         {
-          title: "The “Grenadiers” Glow-Up in Montreal",
-          type: "Cultural Pride",
-          signal:
-            "Volume up sharply, with “Haitian Culture” accounting for 16% of hot topics and maintaining a 92% sentiment score.",
-          context:
-            "A viral piece of digital art by Lyne Lucien, featured by FOX Soccer, has triggered a massive wave of pride within the Haitian diaspora in Quebec — celebrating the community's integral role in Montreal's cultural fabric.",
-          voice:
-            "Haitian diaspora is such an integral component of Montreal culture; this needs to be a season-long show.",
-          volume: 16,
-          sentiment: 92,
-          tone: "positive",
-        },
-        {
-          title: "Vancouver “After Dark” Kit Fever",
+          title: "Drake × Canada Soccer Kit Fusion",
           type: "Kit Fashion",
           signal:
-            "“Jersey” is the top keyword (48% of mentions) with a 3x baseline spike in Vancouver-specific fashion conversation over the last 12 hours.",
+            "Sudden, high-velocity X (Twitter) spike around a potential Drake × Canada Soccer collaboration on the 2026 World Cup kits.",
           context:
-            "The “Vancouver Rise 2026 After Dark” jersey has entered “Best Kit” brackets, coinciding with high engagement around packed local theaters and merch sell-outs.",
+            "The integration of homegrown streetwear aesthetic with national sports identity has electrified local fans, who see the crossover as the ultimate cultural fusion.",
           voice:
-            "The merch flew again… the energy, the love, the way you all showed up was unforgettable.",
-          volume: 48,
-          sentiment: 86,
+            "The crossover between Canadian music, streetwear, and football is getting insane — having Drake design for the World Cup is the ultimate cultural fusion.",
+          volume: 38,
+          sentiment: 85,
           tone: "positive",
         },
         {
-          title: "Moroccan Diaspora Travel Mapping",
-          type: "Diaspora Mobilization",
+          title: "Francophone Diaspora Anthems & Base-Camp Pride",
+          type: "Cultural Pride",
           signal:
-            "Massive emoji usage (🇲🇦 at 18.4%) and “Coupe du Monde” keywords (40.7%) trending among Canadian-Moroccan accounts.",
+            "Massive surge in volume across Francophone Canadian channels, driven by Montreal's large Haitian and West African diaspora communities.",
           context:
-            "Following the announcement of Morocco's training base in New Jersey, Canadian fans are already mapping out cross-border travel plans and “base camp” watch parties.",
+            "Following announcements that Senegal and Haiti are establishing nearby training camps, major cultural music drops have resonated deeply — diaspora fans are scripting a “home tournament” feel for Montreal.",
           voice:
-            "The FRMF chose an elite base; the diaspora is ready to show up for the Atlas Lions across the border.",
-          volume: 40,
+            "These anthems bring our deep cultural heritage straight to the pitch — the diaspora in Montreal is going to make this feel like a home tournament.",
+          volume: 42,
+          sentiment: 91,
+          tone: "positive",
+        },
+        {
+          title: "African Kit Aesthetics as Premium Streetwear",
+          type: "Kit Aesthetics",
+          signal:
+            "Reveal of new kits for the DRC Leopards and Nigeria has shifted the conversation from athletic wear to high-fashion appreciation.",
+          context:
+            "High engagement and emotional aesthetic appreciation — fans are celebrating the jerseys as “pure wearable art” that puts culture “right in your face rather than playing it safe.”",
+          voice:
+            "Pure wearable art — right in your face rather than playing it safe.",
+          volume: 28,
           sentiment: 88,
           tone: "positive",
         },
       ],
-      watchlist: [
-        {
-          title: "Poutine Staples",
-          note: "Growing interest in “Comptoir Poutine” and the perfecting of Montreal street food specifically for match-day hosting.",
-        },
-        {
-          title: "Toronto's “Transplant” Divide",
-          note: "Early-stage debates regarding whether Toronto's fan zones will be dominated by “overachieving transplants” or “legacy families.”",
-        },
-        {
-          title: "Draft Lottery Superstitions",
-          note: "Fans are starting to link NHL lottery luck (Canucks/Leafs) to their cities' general “sporting energy” ahead of the World Cup.",
-        },
-      ],
       flags: [
-        {
-          tag: "Brand IP",
-          color: "amber",
-          note: "High engagement with “Vancouver Rise” and “Puma King” kits; ensure campaign creative avoids direct replication of these trademarked designs.",
-        },
         {
           tag: "Sensitive Territory",
           color: "red",
-          note: "Avoid the “immigrant gang” and “extortion crime” discourse appearing in localized Toronto/Edmonton threads — politically charged and violates the campaign's neutral-to-positive filter.",
+          note: "FIFA ticket-pricing investigation — NY and NJ prosecutors have issued subpoenas regarding “unprecedented” ticket pricing. Avoid referencing ticket availability, pricing, or official purchasing channels in campaign creative.",
         },
         {
           tag: "Player IP",
-          color: "blue",
-          note: "Discussion of the “McKenna” jersey in Vancouver involves personal fan sentiment — exercise caution with name-and-likeness in user-generated content features.",
+          color: "amber",
+          note: "Diaspora selection drama — high-tension debates around player exclusions are dividing diaspora communities. Avoid framing campaigns around specific national-team squad selections that trigger this friction.",
         },
       ],
     },
@@ -107,188 +97,135 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "02",
       headline:
-        "The Trionda match-ball reveal marks the 40-day countdown — generating significant fan excitement and fresh discussion around host-nation pride.",
+        "A multi-sport crossover dominates — a 4–0 hockey rout of the US ignites national pride and reshapes expectations for Canada's June 12 opener.",
       spikes: [
         {
-          title: "The “Trionda” Unveiling",
-          type: "Equipment Reveal",
+          title: "Moïse Bombito's “100%” Fitness Declaration",
+          type: "Player Narrative",
           signal:
-            "High interest (10% of total volume) with a 70% sentiment value. Significant visual engagement across social platforms following Adidas's reveal of the official match ball.",
+            "Twitter/X, high magnitude, positive trajectory — hot-topic volume up 20% in early hours, sustaining 85–90% optimistic sentiment across the 24-hour cycle.",
           context:
-            "Adidas unveiled the Trionda (Tri-wave), the official ball for the 2026 FIFA World Cup. The four-panel wave structure represents the host trio (Canada, Mexico, USA). Canadian fans are specifically latching onto the “host soil” narrative.",
+            "After missing eight months with a broken leg, defender Moïse Bombito declared himself “100%” ready for Canada's June 12 opener against Bosnia and Herzegovina in an interview with Kristian Jack on TSN. The declaration injected confidence into tactical discussion of Jesse Marsch's defensive structure — even as reports surface that Bombito, Ali Ahmed, and Richie Laryea are on managed training loads in the 32-degree Charlotte heat.",
           voice:
-            "The thermal-bonded design looks sleek, but the wave patterns finally make the 2026 tournament feel like it's actually arriving on our home soil.",
-          hook: "Will the unique four-panel “wave” design create unpredictable flight paths for keepers like Crepeau at BMO Field?",
-          volume: 10,
-          sentiment: 70,
+            "Seeing Bombito back and declaring himself 100% is the absolute physical boost we needed — he is the prototype CB for a Jesse Marsch high-pressing system.",
+          hook: "Will Bombito's aggressive recovery timeline pay off, or will the heat-management protocols in North Carolina force Marsch to hold his star defender back until the final whistle?",
+          volume: 20,
+          sentiment: 87,
           tone: "positive",
         },
         {
-          title: "“Gaucho” at BMO Field (Nostalgia Spike)",
-          type: "Venue / Nostalgia",
+          title: "Estadio Vancouver Rebrand & BMO Field's Digital Debut",
+          type: "Venue & Atmosphere",
           signal:
-            "Peak sentiment spike (90% positive). Massive engagement regarding venue atmosphere and “legend” status.",
+            "Twitter/X and Reddit, moderate magnitude, upward growth — content count change factor +1.2 at 16:00 UTC on May 28.",
           context:
-            "Announcement of Ronaldinho playing at BMO Field for a Brazil Legends vs. Toronto FC Legends clash on May 8. This has hijacked the local conversation, blending TFC history with World Cup fever.",
+            "Double-wave venue spike: BC Place was officially rebranded to “Estadio Vancouver” for the tournament, immediately followed by the viral announcement that Toronto's BMO Field is launching in EA Sports FC 26's upcoming World Cup update. Supporters are fiercely correcting users who mislabel BMO Field as “BMO Stadium,” asserting the distinct local identity of the Toronto landmark.",
           voice:
-            "Seeing Ronaldinho at BMO is the perfect appetizer for the World Cup. The atmosphere in Toronto is finally reaching a boiling point.",
-          hook: "Can the “Legends” energy translate into ticket momentum for the younger generation of Voyageurs this summer?",
+            "BMO Field finally getting its proper rebrand in EAFC makes this home-soil tournament feel incredibly real — time to win the World Cup in our own backyard.",
+          hook: "Can a virtual stadium rendering spark a real-world ticket rush as fans scramble to see Les Rouges play in the concrete versions of their favorite digital arenas?",
+          volume: 22,
+          sentiment: 78,
+          tone: "positive",
+        },
+        {
+          title: "The 4–0 USA Shutout Sparking Soccer Rivalry",
+          type: "Multi-Sport Crossover",
+          signal:
+            "Twitter/X, massive magnitude, peak positive sentiment — sentiment value hit 100 at 17:00 UTC on May 28.",
+          context:
+            "Canada's dominant 4–0 hockey victory over the United States in the IIHF World Championship quarterfinals ignited intense national pride. Soccer fans immediately hijacked the celebration to draw comparisons to upcoming soccer matchups, demanding that the Men's National Team bring that exact clinical, “no-mercy” energy to the pitch when facing regional Concacaf rivals.",
+          voice:
+            "We just absolutely embarrassed the US on ice — now it's time to do the same on turf. Canada is becoming a multi-sport powerhouse.",
+          hook: "How will this wave of anti-USA sporting bravado translate to digital fan engagement when the soccer tournament officially kicks off on home soil?",
+          volume: 48,
+          sentiment: 100,
+          tone: "positive",
+        },
+        {
+          title: "Vancouver Fan Festival Ticket Price Backlash",
+          type: "Supporter Group Activity",
+          signal:
+            "Twitter/X, moderate magnitude, negative/anxious direction — sentiment value dropped to 30 on May 27 at 21:00 UTC under the “World Cup Ticket Pricing” trend.",
+          context:
+            "Members of #LesRouges and general Canadian soccer supporters are voicing intense frustration with ticket pricing. While Vancouver's FIFA Fan Festival is largely free to enter, fans discovered it costs $126.95 to watch the Canada vs. Bosnia match on the big screens at the local Amphitheatre. Supporter groups are actively contrasting this cost against “free” viewings in other host cities, raising concerns about corporate exclusion.",
+          voice:
+            "Charging fans over $120 just to sit in a park and watch Canada vs. Bosnia on a screen is absolute madness — it completely ruins the organic, working-class supporter culture we are trying to build here.",
+          hook: "Will these premium price tags alienate the loud, passionate local supporters needed to fuel the city's tournament atmosphere?",
           volume: 18,
-          sentiment: 90,
-          tone: "positive",
-        },
-        {
-          title: "The 40-Day Countdown & Logo Backlash",
-          type: "Countdown",
-          signal:
-            "Volume spike (35% of hot topics). High emotion (Joy/Optimism) mixed with aesthetic criticism.",
-          context:
-            "Today marks the sub-40-day countdown to the World Cup. While excitement is high, a secondary spike of “design criticism” has emerged with fans mocking the official logo's simplicity.",
-          voice:
-            "I can't believe this is the logo we're stuck with; it looks like it was made in Paint. But J-37… we are almost there!",
-          hook: "Will the “ugly logo” become a meme that defines the fan-made kit and merch for the Voyageurs this summer?",
-          volume: 35,
-          sentiment: 58,
-          tone: "neutral",
-        },
-      ],
-      watchlist: [
-        {
-          title: "CanChamp Fever",
-          note: "Jonathan Osorio and Richie Laryea trending in Southern Ontario as fans discuss the importance of the TELUS Canadian Championship to the domestic game.",
-        },
-        {
-          title: "BC Place Logistics",
-          note: "Discussions regarding end-zone lengths and venue modifications at BC Place and BMO Field surfacing among “stadium nerds” and long-time fans.",
-        },
-        {
-          title: "The “Italy” Hypothetical",
-          note: "Nostalgic conversation about the massive Italian population in Ontario and what an Italy vs. Canada match would have done to the streets of Little Italy.",
+          sentiment: 30,
+          tone: "caution",
         },
       ],
       flags: [
         {
-          tag: "Likeness",
-          color: "amber",
-          note: "High usage of Ronaldinho's likeness in unofficial promotional “hype” edits.",
-        },
-        {
-          tag: "Trademarks",
-          color: "amber",
-          note: "Rapidly increasing use of the Adidas “Trionda” name and “FIFA World Cup” official marks in fan-generated content; monitor for brand infringement in digital ads.",
-        },
-        {
-          tag: "Sensitivity",
+          tag: "Sensitive Territory",
           color: "red",
-          note: "Minor fan frustration (though low volume) regarding FIFA's meeting with the Iranian Federation in Zurich; ensure ad placement avoids political commentary threads.",
+          note: "Public spending vs. housing-crisis backlash — a highly viral, politically charged conversation is developing (sentiment dropped to 0 at 02:00 UTC on May 28 under #cdnpoli) criticizing Canada for spending an estimated $82M per World Cup match while failing to address the national housing crisis.",
+        },
+        {
+          tag: "Sensitive Territory",
+          color: "red",
+          note: "FIFA ticketing investigations — news that the attorneys general of New York and New Jersey have subpoenaed FIFA over World Cup ticketing practices is fueling domestic anger about Canadian pricing. Keep ticket and price messaging out of campaign creative.",
         },
       ],
     },
     storyboards: [
       {
         number: "01",
-        title: "The Art of Pride",
-        revised: true,
+        title: "Wearing the Diaspora",
         sourceSignal: "Cultural Conversation",
-        sourceDetail: "Viral Haitian digital art in Quebec",
+        sourceDetail:
+          "African kit aesthetics as premium streetwear — DRC Leopards reveal",
         audienceCut: "Diaspora Fan",
         bucket: "Cultural Pride + Team Lore",
         prompt:
-          "What's the story behind the Haitian pride art I'm seeing all over Montreal for the World Cup?",
+          "My family is from DR Congo, how can I use the new national team jersey to explain our culture to my Canadian friends?",
         whyPrompt:
-          "Connects a specific, emotional digital trend to a real-world community — showing how fandom is expressed beyond the stadium.",
+          "Transforms a piece of merchandise into a tool for cultural storytelling — taps directly into the “Be a Fan of the World” strategy and the emotional need for connection felt by diaspora communities.",
         ipCheck: {
           status: "clear",
-          note: "Avoids naming the specific artist or artwork. Visuals will be authentic and licensed.",
+          note: "Prompt avoids the Umbro brand and the official team crest. Execution focuses on abstracted cultural patterns and human connection, not the specific licensed product.",
         },
-        beats: [
-          {
-            name: "Intro Sequence",
-            body: "Quick cuts of vibrant Montreal street scenes, murals, and people wearing soccer jerseys of various nations — focusing on the blue and red of the Haitian flag.",
-          },
-          {
-            name: "Initial Prompt",
-            body: "The prompt is typed over a shot of a phone screen, with a colourful, abstract piece of digital art glowing on it, held up against a backdrop of a bustling Montreal market.",
-          },
-          {
-            name: "Results",
-            body: "AI Mode returns a visually rich result — a carousel of images showing the original artwork, user-generated content inspired by it, and a map highlighting Haitian community hubs in Montreal, with text explaining the symbolism in the art.",
-          },
-          {
-            name: "Visual Payoff",
-            body: "A montage of commissioned, licensed work from Haitian-Canadian artists — showing them creating their art and celebrating in their communities.",
-          },
-        ],
+        footage:
+          "Close-ups of vibrant, abstract textile patterns inspired by Congolese art. Quick cuts of a family in a Canadian living room looking at a tablet together, smiling. Shots of bright fabrics and ingredients in a bustling market.",
       },
       {
         number: "02",
-        title: "Speaking the Local Game",
-        revised: true,
-        sourceSignal: "Cultural Conversation",
-        sourceDetail: "Debate on Quebecois vs. Parisian French",
-        audienceCut: "Bandwagon Fan",
+        title: "Not Broken Anymore",
+        sourceSignal: "Match Event",
+        sourceDetail:
+          "Moïse Bombito's “100%” fitness declaration on TSN",
+        audienceCut: "Core Fan",
         bucket: "Soccer Fandom + Canadian Fan Preparedness",
         prompt:
-          "I'm heading to Toronto for the game. What are the key 'Les Rouges' chants I need to know in French and English?",
+          "What's the science behind getting a professional soccer player from a broken leg to World Cup ready in just eight months?",
         whyPrompt:
-          "Relatable, slightly vulnerable prompt that turns a divisive linguistic debate into a practical tool for inclusion and participation.",
+          "Channels the massive fan optimism around a player's comeback into a fascinating, complex question about sports science and human resilience that AI Mode is perfectly suited to answer.",
         ipCheck: {
           status: "clear",
-          note: "No specific team or player names are used. Focus is on the general fan experience.",
+          note: "Prompt is generic and focuses on the science of athletic recovery — no mention of Moïse Bombito, his club, or specific medical details.",
         },
-        beats: [
-          {
-            name: "Intro Sequence",
-            body: "A first-person POV shot of someone packing a suitcase with a Quebec flag and a red jersey.",
-          },
-          {
-            name: "Initial Prompt",
-            body: "The prompt is typed over a shot of a train ticket from Montreal to Toronto.",
-          },
-          {
-            name: "Results",
-            body: "AI Mode generates a clean, useful list — a few key Quebecois fan chants, with phonetic spellings and simple English translations, and a small audio clip icon next to each.",
-          },
-          {
-            name: "Visual Payoff",
-            body: "A sequence of shots showing the fan arriving in Toronto, meeting up with other fans at the Fan Festival, and confidently joining in the chants.",
-          },
-        ],
+        footage:
+          "Stylized, abstract animations of bone and muscle healing. A player doing underwater treadmill training. A physical therapist stretching an athlete's leg. A shot of a pristine, empty soccer pitch at dawn.",
       },
       {
         number: "03",
-        title: "Decoding the Ball",
-        revised: false,
+        title: "Better Than Brooklyn",
         sourceSignal: "Match Event",
-        sourceDetail: "Unveiling of the Trionda match ball",
-        audienceCut: "Core Fan",
-        bucket: "Predictions & Reactions",
+        sourceDetail:
+          "BMO Field's EA Sports FC 26 debut & supporters defending the Toronto landmark identity",
+        audienceCut: "Bandwagon Fan",
+        bucket: "Cultural Pride + Team Lore",
         prompt:
-          "Why does the new World Cup ball have those weird little dimples and ridges all over it?",
+          "I'm visiting for a World Cup match, help me plan a food tour of Toronto that proves its immigrant kitchens are better than New York's.",
         whyPrompt:
-          "Takes a major piece of tournament news and flips it to a childlike, tactile curiosity — making complex aerodynamics feel accessible.",
+          "Captures the viral, competitive pride of a city on the global stage and turns it into a fun, multi-layered planning query that expands the mental model of search.",
         ipCheck: {
           status: "clear",
-          note: "Avoids the official name “Trionda” and focuses on the generic physical characteristics of a new ball.",
+          note: "Prompt avoids naming any specific restaurants or food brands. The comparison to New York is a broad cultural rivalry, not a targeted attack on a specific entity.",
         },
-        beats: [
-          {
-            name: "Intro Sequence",
-            body: "Slow-motion, detailed macro shots of a soccer ball spinning. We see the texture, the seams, the panels.",
-          },
-          {
-            name: "Initial Prompt",
-            body: "The prompt is typed over a shot of a new, unbranded soccer ball with a unique texture sitting on pristine grass in the centre circle of an empty stadium.",
-          },
-          {
-            name: "Results",
-            body: "AI Mode delivers a breakdown with diagrams. It shows how the texture affects airflow — comparing it to a golf ball and explaining concepts like “knuckleball effect” and “true flight” with simple animations.",
-          },
-          {
-            name: "Visual Payoff",
-            body: "A dynamic montage created with Veo/Gemini — an animated visualization of wind flowing over the textured ball, contrasted with a smooth ball, followed by a shot of a ball curving perfectly into the top corner of a goal in a generic, non-IP stadium.",
-          },
-        ],
+        footage:
+          "Mouth-watering, slow-motion shots of diverse street food: a flame-grilled sausage in a bun, steam rising from dumplings, fresh toppings being added to a taco. Quick cuts of vibrant, multicultural Toronto neighborhoods.",
       },
     ],
   },
