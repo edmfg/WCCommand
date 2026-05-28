@@ -6995,6 +6995,22 @@
       // Per-pill match predicates. Each returns true if `item` (a news or
       // social object) matches that single pill. matchesLiveFilter() ORs the
       // results across whatever pills are currently selected.
+      // Country text-matchers run against (headline+summary) for news and
+      // (topic+summary) for social — so a Global-tagged news item that's
+      // obviously about Brazil (🇧🇷 in the headline, Rodrygo, etc.) still
+      // surfaces under the Brazil pill.
+      const COUNTRY_TEXT_MATCHERS = {
+        canada: /canada|🇨🇦|davies|marsch|bombito|toronto fan/i,
+        germany: /germany|🇩🇪|nagelsmann|wirtz|musiala|kimmich/i,
+        usa: /\busa\b|usmnt|🇺🇸|pochettino|diego luna|tolkin|\bamerica\b/i,
+        brazil: /brazil|brasil|🇧🇷|seleç|selecao|neymar|vinici|vini jr|rodrygo|endrick|ancelotti|canarinho|militã|militao|estêvão|estevao|raphinha/i,
+      };
+      function newsText(item) {
+        return (item.headline || "") + " " + (item.summary || "");
+      }
+      function socialText(item) {
+        return (item.topic || "") + " " + (item.summary || "");
+      }
       const LIVE_PILL_MATCHERS = {
         all: () => true,
         "24h": (item, type) => {
@@ -7002,52 +7018,24 @@
           return withinLast24h(socialItemTimestamp(item));
         },
         canada: (item, type) => {
-          if (type === "news") return item.tag === "Canada";
-          return !!(
-            item.topic?.toLowerCase().includes("canada") ||
-            item.summary?.toLowerCase().includes("canada")
-          );
+          const text = type === "news" ? newsText(item) : socialText(item);
+          if (type === "news" && item.tag === "Canada") return true;
+          return COUNTRY_TEXT_MATCHERS.canada.test(text);
         },
         germany: (item, type) => {
-          if (type === "news") return item.tag === "Germany";
-          return !!(
-            item.topic?.toLowerCase().includes("germany") ||
-            item.summary?.toLowerCase().includes("germany") ||
-            item.summary?.toLowerCase().includes("nagelsmann") ||
-            item.summary?.toLowerCase().includes("wirtz") ||
-            item.summary?.toLowerCase().includes("musiala")
-          );
+          const text = type === "news" ? newsText(item) : socialText(item);
+          if (type === "news" && item.tag === "Germany") return true;
+          return COUNTRY_TEXT_MATCHERS.germany.test(text);
         },
         usa: (item, type) => {
-          if (type === "news") return item.tag === "USA";
-          const t = (item.topic + " " + item.summary).toLowerCase();
-          return (
-            t.includes("usmnt") ||
-            t.includes(" usa ") ||
-            t.includes("🇺🇸") ||
-            t.includes("pochettino") ||
-            t.includes("diego luna") ||
-            t.includes("tolkin") ||
-            t.includes("america")
-          );
+          const text = type === "news" ? newsText(item) : socialText(item);
+          if (type === "news" && item.tag === "USA") return true;
+          return COUNTRY_TEXT_MATCHERS.usa.test(text);
         },
         brazil: (item, type) => {
-          if (type === "news") return item.tag === "Brazil";
-          const t = (item.topic + " " + item.summary).toLowerCase();
-          return (
-            t.includes("brazil") ||
-            t.includes("brasil") ||
-            t.includes("🇧🇷") ||
-            t.includes("seleção") ||
-            t.includes("selecao") ||
-            t.includes("neymar") ||
-            t.includes("vinicius") ||
-            t.includes("vini jr") ||
-            t.includes("rodrygo") ||
-            t.includes("endrick") ||
-            t.includes("ancelotti") ||
-            t.includes("canarinho")
-          );
+          const text = type === "news" ? newsText(item) : socialText(item);
+          if (type === "news" && item.tag === "Brazil") return true;
+          return COUNTRY_TEXT_MATCHERS.brazil.test(text);
         },
         game: (item, type) => {
           if (type === "news") return true; // every news item is game-related
