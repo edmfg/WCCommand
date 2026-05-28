@@ -1011,6 +1011,30 @@
         border-color: var(--red);
         box-shadow: 0 0 12px rgba(204, 0, 0, 0.2);
       }
+      /* "🔥 Top" pill — warm tint at rest, hot glow when active */
+      .live-filter.live-filter-top {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 140, 0, 0.18),
+          rgba(255, 69, 0, 0.14)
+        );
+        border-color: rgba(255, 120, 0, 0.45);
+        color: #ffd9a8;
+      }
+      .live-filter.live-filter-top:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 140, 0, 0.3),
+          rgba(255, 69, 0, 0.24)
+        );
+        color: #fff;
+      }
+      .live-filter.live-filter-top.active {
+        background: linear-gradient(135deg, #ff8c00, #ff3d00);
+        border-color: #ff6a00;
+        color: #fff;
+        box-shadow: 0 0 14px rgba(255, 105, 0, 0.45);
+      }
       body.light .live-filter {
         background: rgba(0, 0, 0, 0.04);
         color: #666;
@@ -6798,6 +6822,7 @@
         configurable: true,
       });
       const liveFilterDefs = [
+        { id: "top", label: "🔥 Top" },
         { id: "all", label: "🌐 All" },
         { id: "24h", label: "⏱ RECENT" },
         { id: "canada", label: "🇨🇦 Canada" },
@@ -6850,8 +6875,29 @@
       function socialText(item) {
         return (item.topic || "") + " " + (item.summary || "");
       }
+      // "Top" = most talked-about right now. Social items with volume
+      // ≥ 4 fires (🔥🔥🔥🔥+) qualify; news items qualify if a top-social
+      // item references them via sourceUrl. URL set built lazily on first
+      // call so order-of-definition with DASHBOARD_DATA doesn't matter.
+      const _topMatcher = (() => {
+        let topUrls = null;
+        function fires(item) {
+          return ((item.volume || "").match(/🔥/g) || []).length;
+        }
+        return (item, type) => {
+          if (type === "social") return fires(item) >= 4;
+          if (topUrls === null) {
+            topUrls = new Set();
+            for (const s of window.DASHBOARD_DATA?.social || []) {
+              if (fires(s) >= 4 && s.sourceUrl) topUrls.add(s.sourceUrl);
+            }
+          }
+          return !!(item.url && topUrls.has(item.url));
+        };
+      })();
       const LIVE_PILL_MATCHERS = {
         all: () => true,
+        top: _topMatcher,
         "24h": (item, type) => {
           if (type === "news") return withinLast24h(item.timestamp);
           return withinLast24h(socialItemTimestamp(item));
@@ -6921,10 +6967,16 @@
       function renderLiveFilters() {
         const bar = document.getElementById("liveFilters");
         bar.innerHTML = liveFilterDefs
-          .map(
-            (f) =>
-              `<button class="live-filter${liveFilters.has(f.id) ? " active" : ""}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`,
-          )
+          .map((f) => {
+            const cls = [
+              "live-filter",
+              f.id === "top" ? "live-filter-top" : "",
+              liveFilters.has(f.id) ? "active" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+            return `<button class="${cls}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`;
+          })
           .join("");
       }
 
