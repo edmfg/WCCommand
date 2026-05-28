@@ -2987,26 +2987,26 @@ window.FORMATION_DATA = {
         }
         function applyPayload(payload, marketKey) {
           if (!payload || typeof payload !== "object") return;
+          // ANY old-shape signal means the entire payload is stale — keep
+          // bundled defaults rather than partially overwriting today's brief
+          // with a mix of old briefings + new bundled storyboards.
+          const sbs = Array.isArray(payload.storyboards)
+            ? payload.storyboards
+            : [];
+          const hasOldShapeStoryboards =
+            sbs.length > 0 && !sbs.every(isNewShape);
+          if (hasOldShapeStoryboards) {
+            console.warn(
+              "today_reactive payload is old-shape; dropping the entire override and using bundled defaults.",
+            );
+            return;
+          }
           const fd = (window.FORMATION_DATA = window.FORMATION_DATA || {});
           const entry = (fd[marketKey] = fd[marketKey] || {});
           if (payload.formation) entry.formation = payload.formation;
           if (payload.cultural) entry.cultural = payload.cultural;
           if (payload.match) entry.match = payload.match;
-          if (
-            Array.isArray(payload.storyboards) &&
-            payload.storyboards.length &&
-            payload.storyboards.every(isNewShape)
-          ) {
-            entry.storyboards = payload.storyboards;
-          } else if (
-            Array.isArray(payload.storyboards) &&
-            payload.storyboards.length
-          ) {
-            console.warn(
-              "today_reactive payload has old-shape storyboards; using bundled defaults instead.",
-            );
-          }
-          // Re-boot the page so the new data renders cleanly.
+          if (sbs.length) entry.storyboards = sbs;
           if (typeof window.boot === "function") window.boot();
         }
         const marketKey = (params.get("market") || "ca").toLowerCase();
