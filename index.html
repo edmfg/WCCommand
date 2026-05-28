@@ -8356,7 +8356,13 @@
             id: "sa_" + r.id,
             sharedId: r.id,
             headline: r.headline || "Untitled creative",
-            market: r.market,
+            // Map legacy "UK" market tags forward to "Brazil" (comma-joined,
+            // so a row like "UK,Canada" becomes "Brazil,Canada").
+            market: (r.market || "")
+              .split(",")
+              .map((m) => (m.trim() === "UK" ? "Brazil" : m.trim()))
+              .filter(Boolean)
+              .join(","),
             format: r.format,
             status: r.status,
             deployDate: r.deploy_date,
@@ -9671,6 +9677,12 @@
             fresh.forEach((row) => {
               if (_liveSeen.has(row.id)) return;
               _liveSeen.add(row.id);
+              // Legacy rows from before the UK→Brazil rename still carry
+              // `tag: "UK"`. Map them forward at ingestion so every renderer
+              // (filters, heatmap, pill text) sees the new label.
+              if (row.payload && row.payload.tag === "UK") {
+                row.payload.tag = "Brazil";
+              }
               if (row.kind === "news" && row.payload) {
                 _liveCache.news.unshift(row.payload);
                 _liveFreshCount += 1;

@@ -8461,6 +8461,21 @@
         const allSearch = document.getElementById("creativeAllSearch");
         let _allUploadsCache = [];
         let _allSearchTimer = null;
+        // Legacy creative_assets rows from before the UK→Brazil rename still
+        // store `market: "UK"` (sometimes comma-joined like "UK,Canada").
+        // Map forward so every render path shows "Brazil".
+        function normalizeAssetMarket(rows) {
+          if (!Array.isArray(rows)) return rows;
+          rows.forEach((r) => {
+            if (!r || typeof r.market !== "string") return;
+            r.market = r.market
+              .split(",")
+              .map((m) => (m.trim() === "UK" ? "Brazil" : m.trim()))
+              .filter(Boolean)
+              .join(",");
+          });
+          return rows;
+        }
         if (allSearch) {
           allSearch.addEventListener("input", function () {
             clearTimeout(_allSearchTimer);
@@ -8908,7 +8923,7 @@
               recentList.innerHTML =
                 '<p style="color:var(--text-muted);font-size:13px">No Drive uploads yet. Add your first link above.</p>';
             } else {
-              const sorted = sortUploads(data);
+              const sorted = sortUploads(normalizeAssetMarket(data));
               recentList.innerHTML = sorted.map(renderUploadCard).join("");
               wireDeleteButtons(recentList);
             }
@@ -8939,7 +8954,7 @@
             if (error) throw error;
             if (allCountEl)
               allCountEl.textContent = (data ? data.length : 0) + " total";
-            _allUploadsCache = data || [];
+            _allUploadsCache = normalizeAssetMarket(data || []);
             renderAllFiltered();
           } catch (err) {
             console.error("all uploads load failed", err);
@@ -9945,14 +9960,16 @@
             return;
           }
           list.innerHTML = data
-            .map(
-              (r) =>
+            .map((r) => {
+              // Forward-map legacy "UK" reactive rows to "Brazil".
+              const m = r.market === "UK" ? "Brazil" : r.market;
+              return (
                 '<div class="reactive-history-row">' +
                 '<span class="h-flag">' +
-                (FLAG[r.market] || "🌐") +
+                (FLAG[m] || "🌐") +
                 "</span>" +
                 "<div><div>" +
-                escHtml(r.market) +
+                escHtml(m) +
                 " · live " +
                 escHtml(r.live_date || "") +
                 "</div>" +
@@ -9961,8 +9978,9 @@
                 " · " +
                 escHtml(r.uploaded_by || "—") +
                 "</div></div>" +
-                "</div>",
-            )
+                "</div>"
+              );
+            })
             .join("");
         }
 
@@ -10389,6 +10407,8 @@
           }
           feed.innerHTML = rows
             .map((r) => {
+              // Forward-map legacy "UK" audit rows to "Brazil".
+              if (r.market === "UK") r.market = "Brazil";
               const flag = FLAG[r.market] || (r.market ? "🌐" : "");
               return (
                 '<div class="audit-row">' +
