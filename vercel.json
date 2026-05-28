@@ -3,7 +3,7 @@
     {
       "source": "/((?!api/).*)",
       "destination": "https://mfgworldcup.com",
-      "permanent": false
+      "permanent": true
     }
   ],
   "rewrites": [
