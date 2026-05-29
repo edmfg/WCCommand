@@ -6375,6 +6375,13 @@
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#39;");
       }
+      // Lightweight Vercel Web Analytics custom-event helper. No-ops if
+      // analytics isn't loaded or the plan doesn't support custom events.
+      function trackEvent(name, data) {
+        try {
+          if (window.va) window.va("event", { name: name, data: data || {} });
+        } catch (e) {}
+      }
       // Card headlines use a gradient text-fill (background-clip:text +
       // transparent fill). That clips emoji glyphs too, blanking them to the
       // gradient. Wrap each emoji in a span that restores normal colour fill
@@ -8675,6 +8682,7 @@
             const key = card.dataset.market;
             if (!key) return;
             window._reactiveMarket = key;
+            trackEvent("reactive_open", { market: key });
             const fr = document.getElementById("reactiveFrame");
             if (fr) {
               fr.src = "social.html?embed=1&market=" + encodeURIComponent(key);
@@ -8956,6 +8964,7 @@
           panel.style.animation = "";
         }
         history.replaceState(null, "", `#${tab}`);
+        trackEvent("tab_view", { tab: tab });
       }
 
       // ── Creative tab view gate ──
@@ -9873,6 +9882,7 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
               },
             };
 
+            trackEvent("assistant_ask", {});
             const res = await fetch("/api/gemini", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
