@@ -5666,6 +5666,9 @@
               hidden
             ></span>
           </button>
+          <!-- ARCHIVED 2026-05-29: Creative tab hidden for now. Panel markup and
+               all logic remain below; un-comment this button (and the keyboard
+               shortcut + help-overlay line) to re-enable.
           <button class="tab-btn" data-tab="creative">
             Creative<span
               class="whats-new-badge"
@@ -5673,6 +5676,7 @@
               hidden
             ></span>
           </button>
+          -->
         </nav>
         <div class="header-actions">
           <button class="help-link" id="helpBtn" type="button">
@@ -6175,7 +6179,9 @@
         <ul class="shortcuts-list">
           <li><kbd>1</kbd><span>Live tab</span></li>
           <li><kbd>2</kbd><span>Fixtures tab</span></li>
+          <!-- ARCHIVED 2026-05-29: Creative tab hidden.
           <li><kbd>3</kbd><span>Creative tab</span></li>
+          -->
           <li><kbd>G</kbd><span>Open Gemini chat</span></li>
           <li><kbd>⌘</kbd><kbd>K</kbd><span>Focus search</span></li>
           <li><kbd>?</kbd><span>Toggle this help</span></li>
@@ -9895,7 +9901,8 @@ ${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
             return;
           if (e.key === "1") switchTab("live");
           else if (e.key === "2") switchTab("calendar");
-          else if (e.key === "3") switchTab("creative");
+          // ARCHIVED 2026-05-29: Creative tab hidden. Restore to re-enable "3".
+          // else if (e.key === "3") switchTab("creative");
           else if (e.key === "?") {
             e.preventDefault();
             toggleShortcutsOverlay();
