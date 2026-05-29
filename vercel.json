@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/((?!api/).*)",
-      "missing": [{ "type": "host", "value": "mfgworldcup.com" }],
+      "has": [{ "type": "host", "value": "wccommand.vercel.app" }],
       "destination": "https://mfgworldcup.com",
       "permanent": true
     }
