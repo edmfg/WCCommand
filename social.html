@@ -1161,6 +1161,59 @@
         transform: translateX(3px);
       }
 
+      /* ===== Inline play mockups — phone shown by default in each card ===== */
+      .play-card {
+        cursor: default;
+      }
+      .play-phone-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .play-phone-wrap .phone {
+        margin: 0 auto;
+      }
+      .phone-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .phone-controls .sb-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+      }
+      .phone-hint {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+      /* Footage block lights up on the query frame — inline variant
+         (mirrors the modal's .sb-modal[data-current-beat="query"] rules). */
+      .play-card[data-current-beat="query"] .footage-block {
+        background: linear-gradient(
+          180deg,
+          rgba(94, 199, 212, 0.22),
+          rgba(94, 199, 212, 0.08)
+        );
+        border-color: rgba(94, 199, 212, 0.85);
+        box-shadow:
+          0 0 0 1px rgba(94, 199, 212, 0.45),
+          0 18px 48px rgba(94, 199, 212, 0.22);
+        transform: translateY(-1px);
+      }
+      .play-card[data-current-beat="query"] .footage-block-head .glyph {
+        background: rgba(94, 199, 212, 0.45);
+        color: #e8fafe;
+      }
+      .play-card[data-current-beat="query"] .footage-block-head .now-showing {
+        display: inline-flex;
+      }
+
       /* ===== Storyboard modal (full mock view) ===== */
       .sb-modal-overlay {
         position: fixed;
@@ -2510,9 +2563,17 @@ window.FORMATION_DATA = {
           `;
         }
 
-        // Collapsed view — query-first play card. Why + IP dropdowns live here
-        // (not inside the mock modal) so the strategist can scan them up front.
+        // Inline play card — the phone mock is shown by default (no modal).
+        // Query + Why + IP dropdowns sit alongside the mock so the strategist
+        // can scan the rationale while looking at the creative.
         function renderPlayCard(sb, idx) {
+          const framesHTML = STORYBOARD_BEATS.map((b) =>
+            renderFrame(b, sb, idx),
+          ).join("");
+          const segments = STORYBOARD_BEATS.map(
+            (_, i) =>
+              `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
+          ).join("");
           return `
             <div class="play-card" data-sb="${idx}">
               <div class="play-card-head">
@@ -2521,6 +2582,37 @@ window.FORMATION_DATA = {
               </div>
               <div class="play-card-title">${sb.title}</div>
               <div class="play-card-query">${sb.prompt}</div>
+
+              <div class="play-phone-wrap">
+                <div class="phone">
+                  <div class="phone-island"></div>
+                  <div class="phone-screen" data-sb="${idx}">
+                    <div class="reels-progress">${segments}</div>
+                    <div class="frames">${framesHTML}</div>
+                    <div class="reels-rail">
+                      <div class="reels-rail-item"><div class="reels-rail-icon">♥</div><div class="reels-rail-label">12.4K</div></div>
+                      <div class="reels-rail-item"><div class="reels-rail-icon">💬</div><div class="reels-rail-label">247</div></div>
+                      <div class="reels-rail-item"><div class="reels-rail-icon">↗</div><div class="reels-rail-label">Share</div></div>
+                      <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="phone-controls">
+                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous frame">‹</button>
+                  <span class="phone-hint">Tap mock to advance</span>
+                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next frame">›</button>
+                </div>
+              </div>
+
+              <div class="footage-block">
+                <div class="footage-block-head">
+                  <span class="glyph">▣</span>
+                  <span class="lbl">Footage direction · Frame 3</span>
+                  <span class="now-showing">Now showing</span>
+                </div>
+                <div class="footage-block-body">${sb.footage}</div>
+              </div>
+
               <div class="play-card-meta">
                 <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
                 <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
@@ -2542,10 +2634,6 @@ window.FORMATION_DATA = {
                 </summary>
                 <div class="drop-body">${sb.ipCheck.note}</div>
               </details>
-              <button class="play-card-cta" onclick="openStoryboardModal(${idx})">
-                <span>Open the mock</span>
-                <span class="arrow">→</span>
-              </button>
             </div>
           `;
         }
@@ -2616,26 +2704,27 @@ window.FORMATION_DATA = {
         }));
         let activeSbIdx = -1;
 
-        function setFrames() {
-          const modalEl = document.getElementById("sbModal");
-          if (!modalEl) return;
-          const sbEl = modalEl.querySelector(".sb-modal");
-          if (!sbEl || activeSbIdx < 0) return;
-          const state = frameState[activeSbIdx];
+        function setFrames(sbIdx) {
+          if (sbIdx == null) return;
+          const card = document.querySelector(
+            `.play-card[data-sb="${sbIdx}"]`,
+          );
+          if (!card) return;
+          const state = frameState[sbIdx];
           const currentBeat = STORYBOARD_BEATS[state.idx].kind;
-          sbEl.setAttribute("data-current-beat", currentBeat);
-          const phoneScreen = sbEl.querySelector(".phone-screen");
+          card.setAttribute("data-current-beat", currentBeat);
+          const phoneScreen = card.querySelector(".phone-screen");
           if (phoneScreen)
             phoneScreen.setAttribute("data-current-beat", currentBeat);
-          sbEl
+          card
             .querySelectorAll(".frame")
             .forEach((f, j) => f.classList.toggle("active", j === state.idx));
-          sbEl.querySelectorAll(".reels-progress .seg").forEach((s, j) => {
+          card.querySelectorAll(".reels-progress .seg").forEach((s, j) => {
             s.classList.toggle("active", j === state.idx);
             s.classList.toggle("done", j < state.idx);
           });
-          const prevBtn = sbEl.querySelector(".sb-arrow.prev");
-          const nextBtn = sbEl.querySelector(".sb-arrow.next");
+          const prevBtn = card.querySelector(".sb-arrow.prev");
+          const nextBtn = card.querySelector(".sb-arrow.next");
           if (prevBtn) prevBtn.disabled = state.idx === 0;
           if (nextBtn) nextBtn.disabled = state.idx === state.total - 1;
         }
@@ -2643,8 +2732,25 @@ window.FORMATION_DATA = {
         window.frameStep = function (sbIdx, dir) {
           const s = frameState[sbIdx];
           s.idx = Math.max(0, Math.min(s.total - 1, s.idx + dir));
-          setFrames();
+          setFrames(sbIdx);
         };
+
+        // Mount all three phones inline: wire tap-to-advance + paint frame 0.
+        STORYBOARDS.forEach((sb, i) => {
+          const card = document.querySelector(`.play-card[data-sb="${i}"]`);
+          if (!card) return;
+          const screen = card.querySelector(".phone-screen");
+          if (screen) {
+            screen.addEventListener("click", (e) => {
+              if (e.target.closest(".reels-rail")) return;
+              const rect = screen.getBoundingClientRect();
+              if (e.clientX - rect.left > rect.width / 2)
+                window.frameStep(i, 1);
+              else window.frameStep(i, -1);
+            });
+          }
+          setFrames(i);
+        });
 
         window.openStoryboardModal = function (sbIdx) {
           activeSbIdx = sbIdx;
