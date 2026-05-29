@@ -1345,6 +1345,16 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
+      /* Emoji inside gradient-text card headlines: opt back out of the
+         transparent text-fill so they render as full-colour glyphs, not
+         blanked-out silhouettes. (Wrapped by wrapEmoji() at render time.) */
+      .news-card h3 .hl-emoji,
+      .social-card .topic .hl-emoji {
+        -webkit-text-fill-color: initial;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        background: none;
+      }
       .news-card .meta {
         font-size: 0.72rem;
         color: var(--text-dim);
@@ -6363,6 +6373,22 @@
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#39;");
       }
+      // Card headlines use a gradient text-fill (background-clip:text +
+      // transparent fill). That clips emoji glyphs too, blanking them to the
+      // gradient. Wrap each emoji in a span that restores normal colour fill
+      // (see .hl-emoji CSS). Regex covers flag pairs + pictographic/ZWJ/VS
+      // sequences; guarded so an engine without \p{} just no-ops.
+      let _EMOJI_RE = null;
+      try {
+        _EMOJI_RE =
+          /(?:[\u{1F1E6}-\u{1F1FF}]{2})|(?:\p{Extended_Pictographic}(?:\u{FE0F}|\u{200D}\p{Extended_Pictographic})*)/gu;
+      } catch (e) {
+        _EMOJI_RE = null;
+      }
+      function wrapEmoji(html) {
+        if (!_EMOJI_RE || !html) return html;
+        return html.replace(_EMOJI_RE, '<span class="hl-emoji">$&</span>');
+      }
       function safeUrl(u) {
         if (!u) return "";
         const s = String(u).trim();
@@ -7058,7 +7084,7 @@
           return `<div class="carousel-card"><div class="news-card glass" data-card-type="news" data-card-id="${escapeHtml(n.id)}">
       <button class="card-pin${isPinned ? " pinned" : ""}" data-pin-id="${escapeHtml(n.id)}" title="${isPinned ? "Unpin" : "Pin"} card">${isPinned ? "\u2605" : "\u2606"}</button>
       <span class="tag ${tagClass}">${escapeHtml(tagLabel)}</span>
-      <h3>${autoLinkEntities(escapeHtml(n.headline))}</h3>
+      <h3>${wrapEmoji(autoLinkEntities(escapeHtml(n.headline)))}</h3>
       <p class="meta">${escapeHtml(n.source)} \u2022 ${timeStr}</p>
       <p class="summary">${autoLinkEntities(escapeHtml(n.summary))}</p>
       ${cardSourceLinks(n)}
@@ -7189,7 +7215,7 @@
           return `<div class="carousel-card"><div class="social-card glass" data-card-type="social" data-card-id="${escapeHtml(s.id)}">
       <button class="card-pin${isPinned ? " pinned" : ""}" data-pin-id="${escapeHtml(s.id)}" title="${isPinned ? "Unpin" : "Pin"} card">${isPinned ? "★" : "☆"}</button>
       <span class="sentiment-badge ${sentClass}">${escapeHtml(s.sentiment)}</span>
-      <h3 class="topic">${autoLinkEntities(escapeHtml(s.topic))}</h3>
+      <h3 class="topic">${wrapEmoji(autoLinkEntities(escapeHtml(s.topic)))}</h3>
       <p class="volume">${escapeHtml(s.volume)}${trendDateShort(s.id) ? `<span class="trend-date">📅 trending ${trendDateShort(s.id)}</span>` : ""}</p>
       <p class="summary">${autoLinkEntities(escapeHtml(s.summary))}</p>
       ${quoteHtml}
