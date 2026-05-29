@@ -1469,6 +1469,14 @@
         position: relative;
         flex-shrink: 0;
       }
+      /* Shrink the phone on small screens so the inline mockup never forces
+         horizontal scroll on a narrow device (e.g. iPhone SE ~320px). */
+      @media (max-width: 420px) {
+        .phone {
+          width: 240px;
+          height: 497px;
+        }
+      }
       .phone-screen {
         width: 100%;
         height: 100%;
