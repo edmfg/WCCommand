@@ -208,7 +208,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const upstream = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
       {
         method: "POST",
         headers: {
@@ -241,7 +241,7 @@ module.exports = async function handler(req, res) {
 
 module.exports.config = { maxDuration: 60 };
 
-// (The SSE pass-through to gemini-2.5-flash:streamGenerateContent that lived
+// (The SSE pass-through to gemini-3.5-flash:streamGenerateContent that lived
 // here was never wired up on the client because Vercel's Node serverless
 // runtime buffers responses, breaking SSE. Removed in favor of the non-
 // streaming path above; bring it back behind Edge runtime if a real streaming

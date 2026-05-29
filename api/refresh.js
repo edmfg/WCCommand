@@ -25,7 +25,7 @@ const {
   clientIp,
 } = require("./_gate-shared");
 
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.5-flash";
 // Manual button path only: cap Gemini-grounded refreshes per IP per window.
 // One refresh consumes ~12 Google Search queries + a Gemini generation, so
 // even a leaked MFG cookie can only burn so much quota.
