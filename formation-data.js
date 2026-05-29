@@ -172,60 +172,60 @@ window.FORMATION_DATA = {
     storyboards: [
       {
         number: "01",
-        title: "More Than a Cheese Board",
+        title: "The Loudest Anthem",
         sourceSignal: "Cultural Conversation",
         sourceDetail:
-          "Spike around “lucky snacks” + pre-game food rituals — Argentinian picada platters",
+          "Montreal Playoff Energy & Anthem Harmonization — viral four-women harmony at the Bell Centre",
         audienceCut: "Diaspora Fan",
         bucket: "Cultural Pride + Team Lore",
         prompt:
-          "My Argentinian friends are making something called a 'picada' for the match — why is it more than just a cheese board?",
+          "My family came to Canada in the 90s — what role do diaspora communities play in making a national anthem actually feel national?",
         whyPrompt:
-          "Takes a simple, observable fan behaviour and asks about its deeper cultural meaning — perfectly aligned with the “Be a Fan of the World” strategy.",
+          "Channels the viral Montreal anthem-harmony moment into a question about how Canada's diaspora communities literally shape what “home soil” sounds like — inverts the usual outsider framing of diaspora fandom into authorship of the tournament's atmosphere.",
         ipCheck: {
           status: "clear",
-          note: "Prompt avoids specific brand names for foods or drinks and focuses on a general, traditional platter.",
+          note: "No specific players, songs, or league trademarks. Focuses on cultural ritual and community.",
         },
         footage:
-          "Quick cuts of diverse, colourful platters of meats, cheeses, and olives being shared among friends in blue-and-white jerseys. Close-ups on hands arranging the food with care.",
+          "Slow montage — community-hall choirs (Filipino, Haitian, Punjabi, Polish), hands on hearts in stadium light, an anthem rehearsal at a Montreal high school. Audio crossfades layered languages resolving into a single chorus.",
       },
       {
         number: "02",
-        title: "Beautiful Chaos",
+        title: "Clean Slate",
         sourceSignal: "Match Event",
         sourceDetail:
-          "Japan vs. Spain upset — “shocking,” “dramatic,” “unbelievable” emotional spike",
-        audienceCut: "Bandwagon Fan",
-        bucket: "Predictions & Reactions",
-        prompt:
-          "How do I explain to my friends that the underdog winning is actually the best part of the World Cup?",
-        whyPrompt:
-          "Taps directly into the emotional fallout of a major upset and gives new fans the language to appreciate the beautiful chaos of the tournament.",
-        ipCheck: {
-          status: "clear",
-          note: "Prompt is about a general tournament dynamic, not specific teams, players, or the outcome of a single match.",
-        },
-        footage:
-          "A montage of fans moving through a progression of emotions — tension, shock, disbelief, then explosive joy. Mix of living-room and public-viewing scenes; cameras hold on faces and reactions.",
-      },
-      {
-        number: "03",
-        title: "Watching the Samba",
-        sourceSignal: "Match Event + Cultural Conversation",
-        sourceDetail:
-          "Brazil's “rhythmic, dance-like” passing + music as national identity",
+          "Buchanan's appeal triumph — the first violent-misconduct red card overturned this cycle",
         audienceCut: "Core Fan",
         bucket: "Soccer Fandom + Canadian Fan Preparedness",
         prompt:
-          "Why does the Brazilian national team's playing style look and feel so much like they are dancing samba?",
+          "What's the actual standard a national federation has to meet to get a violent-misconduct red card overturned on appeal?",
         whyPrompt:
-          "Connects an on-pitch observation to a famous cultural export — sparking curiosity about how a country's culture can physically manifest in its style of play.",
+          "Turns the wave of optimism around the Buchanan clearance into a procedural curiosity question — lets core fans appreciate the legal masterclass without re-litigating the incident itself.",
         ipCheck: {
           status: "clear",
-          note: "“Samba” is a cultural style, not a trademark. The prompt refers to the national team in a general sense, not specific players.",
+          note: "Avoids the elbow-incident imagery and doesn't name the opponent. Procedural framing on disciplinary process, not the play that triggered it.",
         },
         footage:
-          "Abstract, stylized shots of footwork. Intercut stock footage of soccer players' feet moving a ball with close-ups of dancers' feet on a dance floor — match cuts highlight the similar rhythm and flow.",
+          "Animated disciplinary timeline. Close-ups on stamped paperwork, a legal team's whiteboard, redacted match-report excerpts. Final beat: a tactics whiteboard with the full 26-man squad back in play, one name slotted into a starting XI.",
+      },
+      {
+        number: "03",
+        title: "On the Lake",
+        sourceSignal: "Cultural Conversation + Match Event",
+        sourceDetail:
+          "Host City Showcase rivalry + BMO Field's lakeside Toronto identity",
+        audienceCut: "Bandwagon Fan",
+        bucket: "Cultural Pride + Team Lore",
+        prompt:
+          "I'm flying into Toronto for a match — what's the one detail about BMO Field that locals brag about that no one outside the city knows?",
+        whyPrompt:
+          "Channels the host-city friendly-rivalry surge into a curiosity-driven question that hands bandwagon fans local talking points and sets up Toronto's lakeside identity as a feature, not just a venue.",
+        ipCheck: {
+          status: "clear",
+          note: "Names BMO Field (the public venue name) but avoids EA Sports / FIFA trademarks and avoids direct host-city comparisons.",
+        },
+        footage:
+          "Drone shot rising from Lake Ontario toward BMO Field with the CN Tower and skyline behind. Cut to ferry commuters watching the stadium light up at sunset. Quick cut to a street-corner sandwich shop's match-day chalkboard. End on the grass field meeting the water.",
       },
     ],
   },
