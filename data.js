@@ -2,8 +2,15 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-12T18:00:00.000Z",
+  lastUpdated: "2026-05-29T17:00:00.000Z",
   ticker: [
+    "🇨🇦 Canada name their final 26 today — Marsch locks the host roster ahead of the June 12 opener vs Bosnia at BMO (May 29)",
+    "🇺🇸 USMNT final 26 revealed at Pier 17 NYC — Pochettino's World Cup roster is locked (May 26)",
+    "🇧🇷 Neymar suffers a grade-2 calf tear — out of Brazil's warm-ups vs Panama & Egypt, cleared in 2-3 weeks (May 28)",
+    "🌎 Netherlands & South Africa drop final squads; all 48 rosters lock June 1 (May 27)",
+    "🎟️ Dallas Fan Fest concerts on sale today from $26; LA Fan Fest GA is just $10, kids free (May 29)",
+    "💸 Cheapest FIFA tickets still ~$380 as some resale Final seats hit $2M apiece (May 28)",
+    "🏟️ Arrowhead becomes 'Kansas City Stadium' for the WC — 6 games, kickoff in under 3 weeks (May 28)",
     "🇧🇦 Bosnia first to announce full 26 — Dzeko, 40, leads the Dragons back to the WC (May 11)",
     "🇦🇷 Scaloni's 55 named: Messi in, Di María and Dybala OUT — r/soccer in flames (May 11)",
     "🇧🇷 Ancelotti recalls Neymar to Brazil's 55; Estêvão ruled out injured (May 11)",
@@ -70,6 +77,72 @@ window.DASHBOARD_DATA = {
     "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
   ],
   news: [
+    {
+      id: "n136",
+      headline:
+        "🇺🇸 Pochettino Locks USMNT's Final 26 at Pier 17 — Host Nation's World Cup Roster Is Set",
+      source: "ESPN",
+      timestamp: "2026-05-26T19:00:00Z",
+      summary:
+        "Mauricio Pochettino unveiled the United States' final 26-man World Cup squad at a Pier 17 event in New York on May 26 — the last major reveal before FIFA's June 1 lock. As hosts, the USMNT carry the home-soil spotlight, and Pochettino's selection (and his omissions) immediately set the tone for the opening narrative. Expect creator feeds to swing between hype reels and snub debates over the next 72 hours 🇺🇸",
+      url: "https://www.espn.com/soccer/story/_/id/48757621/2026-world-cup-squad-lists-players-announced-all-48-teams",
+      tag: "USA",
+    },
+    {
+      id: "n137",
+      headline:
+        "🇨🇦 Canada Name Their Final 26 Today — Host Roster Set for the June 12 Opener",
+      source: "Yahoo Sports",
+      timestamp: "2026-05-29T14:00:00Z",
+      summary:
+        "Canada confirm their final 26-man squad today, May 29 — the same day as Egypt and just ahead of FIFA's June 1 deadline. Jesse Marsch's group builds toward the June 12 opener vs Bosnia & Herzegovina at BMO Field in Toronto, with Alphonso Davies' fitness the headline storyline for the co-hosts. A clean moment for Canada-market reactive content: 'this is our team' energy 🇨🇦",
+      url: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-tracker-squad-announcements-injuries-key-storylines-and-latest-updates-200000056.html",
+      tag: "Canada",
+    },
+    {
+      id: "n138",
+      headline:
+        "🇧🇷 Neymar Suffers Grade-2 Calf Tear — Brazil Opener Now a Race Against the Clock",
+      source: "Yahoo Sports",
+      timestamp: "2026-05-28T16:00:00Z",
+      summary:
+        "Brazil team doctor Rodrigo Lasmar confirmed Neymar suffered a grade-2 calf injury — 'not just swelling' — ruling the 34-year-old out of the Seleção's warm-up matches against Panama and Egypt and putting his availability for the opener in doubt. 'He is expected to be cleared in two to three weeks,' Lasmar said. Latam social is split between 'protect him for the knockouts' and full-blown fatalism 🇧🇷",
+      url: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-tracker-squad-announcements-injuries-key-storylines-and-latest-updates-200000056.html",
+      tag: "Brazil",
+    },
+    {
+      id: "n139",
+      headline:
+        "🌎 Netherlands & South Africa Reveal Final Squads — All 48 Rosters Lock June 1",
+      source: "Sky Sports",
+      timestamp: "2026-05-27T18:00:00Z",
+      summary:
+        "The Netherlands and South Africa both confirmed their final 26-man squads on May 27, joining Brazil (May 18), Germany (May 21) and USA and Morocco (May 26) on the board. With Canada and Egypt revealing on May 29, the picture is nearly complete — but FIFA rules mean nothing is final until June 1, so injury-forced swaps remain in play. Squad-reveal graphics are the dominant content format this week 🌎",
+      url: "https://www.skysports.com/football/news/11095/13543070/world-cup-2026-squad-lists-england-scotland-brazil-usa-spain-france-germany-netherlands-argentina-portugal-and-more",
+      tag: "Global",
+    },
+    {
+      id: "n140",
+      headline:
+        "💸 Cheapest WC Tickets Still ~$380 as Resale Finals Hit $2M — Pricing Backlash Builds",
+      source: "Al Jazeera",
+      timestamp: "2026-05-28T12:00:00Z",
+      summary:
+        "With under three weeks to kickoff, the cheapest tickets on FIFA's official site still start around $380, while unregulated US resale and dynamic pricing have pushed some Final seats as high as $2M apiece. The affordability gap is now the defining off-pitch story of the tournament and is driving fans toward free and low-cost alternatives. Brand-safe angle: lean into access and community, not the price outrage itself 💸",
+      url: "https://www.aljazeera.com/sports/2026/5/11/fan-festivals-panini-tickets-what-are-fifa-world-cup-fans-talking-about",
+      tag: "Macro",
+    },
+    {
+      id: "n141",
+      headline:
+        "🎉 Fan Fests Become the Affordable World Cup — LA GA $10, Dallas Concerts From $26",
+      source: "CBS News Texas",
+      timestamp: "2026-05-29T15:00:00Z",
+      summary:
+        "As ticket prices climb, host-city FIFA Fan Festivals are emerging as the accessible way to experience WC2026. Los Angeles set GA at just $10 (kids under 12 free); Dallas opens free but ticketed its three Fair Park concerts from $26, on sale today, May 29. Atlanta, Philadelphia, Kansas City, Mexico City and Vancouver are among cities offering free general admission. This is the feel-good, shareable counter-narrative to the ticket story 🎉",
+      url: "https://www.cbsnews.com/texas/news/2026-world-cup-dallas-fan-fest-music-acts/",
+      tag: "USA",
+    },
     {
       id: "n127",
       headline:
@@ -3026,6 +3099,106 @@ window.DASHBOARD_DATA = {
     },
   ],
   social: [
+    {
+      id: "s130",
+      topic: "🐐 Messi's Sixth & Final World Cup — 'The Last Dance' Takes Over Feeds",
+      category: "fandom",
+      volume: "🔥🔥🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "With Argentina's squad confirmed and Messi set for a record sixth World Cup, 'Last Dance' nostalgia content is dominating fan feeds. Edits of 2022 Lusail set to emotional audio, 'watch him one more time' captions, and cross-generational 'I saw his first, now his last' posts are the meta. Huge opportunity for legacy/farewell-coded creative — keep it about the football, not the GOAT debate. Skews older-millennial and global 🐐",
+      sampleQuote:
+        '"Telling my kids I got to watch the best ever play his last World Cup."',
+      quotes: [
+        { platform: "X", text: "Six World Cups. Let that sink in. We are not watching this again." },
+        { platform: "TikTok", text: "the last dance edits are going to destroy me all summer" },
+        { platform: "Reddit", text: "r/soccer agreeing on something for once: enjoy Messi while he's here" },
+        { platform: "IG", text: "saw his first WC in 2006, watching his last in 2026. football is time travel" },
+      ],
+      platforms: ["X", "TikTok", "Reddit", "IG"],
+      sourceUrl:
+        "https://sports.yahoo.com/soccer/article/every-2026-world-cup-squad-announced-so-far--and-when-teams-will-reveal-their-rosters-170018776.html",
+      timestamp: "2026-05-27T10:00:00Z",
+    },
+    {
+      id: "s131",
+      topic: "🇺🇸 Pochettino's 26 Drops — USMNT Snub Debate Erupts on Home Soil",
+      category: "game",
+      volume: "🔥🔥🔥🔥",
+      sentiment: "neutral",
+      summary:
+        "The USMNT final-squad reveal at Pier 17 lit up American soccer feeds with the usual snub discourse — who's in, who's robbed, and whether Pochettino's calls hint at his opening XI. Hot-take threads, tier lists, and 'this is the guy who decides our summer' edits are everywhere. Engagement is high but sentiment is split; keep reactive content celebratory rather than picking sides 🇺🇸",
+      sampleQuote:
+        '"This roster is either genius or a disaster and there is no in between."',
+      quotes: [
+        { platform: "Reddit", text: "r/ussoccer megathread already at 6k comments, everyone's a selector today" },
+        { platform: "X", text: "Pochettino looked at the depth chart and chose violence" },
+        { platform: "TikTok", text: "POV: your guy got snubbed and now you're emotionally invested in spite" },
+      ],
+      platforms: ["Reddit", "X", "TikTok"],
+      sourceUrl:
+        "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-tracker-squad-announcements-injuries-key-storylines-and-latest-updates-200000056.html",
+      timestamp: "2026-05-26T22:00:00Z",
+    },
+    {
+      id: "s132",
+      topic: "🎉 '$10 Fan Fest > $2M Final Ticket' — The Affordable-WC Flex",
+      category: "fandom",
+      volume: "🔥🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "Fans are turning the ticket-price gap into a positive flex: LA's $10 Fan Festival GA and free-entry fests in Atlanta, Philly, Kansas City, Mexico City and Vancouver are framed as the 'real' World Cup experience versus inaccessible stadium seats. 'Big screen, free entry, 40,000 strangers screaming' content is outperforming the outrage posts. Strong, brand-safe lane: community, access, and the public-viewing atmosphere 🎉",
+      sampleQuote:
+        '"$10 fan fest with 40k people beats a $2,000 nosebleed any day of the week."',
+      quotes: [
+        { platform: "TikTok", text: "the fan fest IS the world cup if you're normal about money" },
+        { platform: "IG", text: "free entry, face paint, churros, big screen. this is the dream actually" },
+        { platform: "X", text: "FIFA accidentally made the best part of the WC free" },
+      ],
+      platforms: ["TikTok", "IG", "X"],
+      sourceUrl:
+        "https://www.aljazeera.com/sports/2026/5/11/fan-festivals-panini-tickets-what-are-fifa-world-cup-fans-talking-about",
+      timestamp: "2026-05-29T11:00:00Z",
+    },
+    {
+      id: "s133",
+      topic: "🇧🇷 Neymar's Calf Tear Splits Brazil — 'Protect Him' vs Fatalism",
+      category: "game",
+      volume: "🔥🔥🔥",
+      sentiment: "negative",
+      summary:
+        "News of Neymar's grade-2 calf tear sent Brazilian social into its two familiar camps: 'rest him, save him for the knockouts' optimism and 'here we go again' fatalism about his tournament injury record. Memes about the 2-3 week timeline landing right at the group stage are spreading fast. Sensitive topic — avoid dunking; keep any reactive content sympathetic and squad-focused 🇧🇷",
+      sampleQuote:
+        '"Two to three weeks means he plays game three and we all pretend that was the plan."',
+      quotes: [
+        { platform: "X", text: "Neymar injury news dropping right on schedule, set your watch to it" },
+        { platform: "Reddit", text: "r/soccer: genuinely hope he gets fit, the tournament's better with him in it" },
+      ],
+      platforms: ["X", "Reddit"],
+      sourceUrl:
+        "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-tracker-squad-announcements-injuries-key-storylines-and-latest-updates-200000056.html",
+      timestamp: "2026-05-28T17:00:00Z",
+    },
+    {
+      id: "s134",
+      topic: "📸 Squad-Reveal Season — Federation Graphics Are the Content Format",
+      category: "memes",
+      volume: "🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "With a dozen nations dropping final 26s in a single week, the federation squad-reveal graphic has become the dominant creative format — and fans rate the designs as hard as the selections. 'Whoever did that reveal deserves a raise' and 'best/worst squad drop' threads are everywhere. Easy, brand-safe participation lane: react to the design trend, run a 'rate the reveal' format, lean into motion graphics 📸",
+      sampleQuote:
+        '"I don\'t even care about the players, I care that this squad announcement goes hard."',
+      quotes: [
+        { platform: "X", text: "the real World Cup is which federation has the best graphic designer" },
+        { platform: "IG", text: "squad reveal carousels are the new kit reveals, I don't make the rules" },
+        { platform: "TikTok", text: "rating every nation's squad announcement graphic, day 4" },
+      ],
+      platforms: ["X", "IG", "TikTok"],
+      sourceUrl:
+        "https://www.skysports.com/football/news/11095/13543070/world-cup-2026-squad-lists-england-scotland-brazil-usa-spain-france-germany-netherlands-argentina-portugal-and-more",
+      timestamp: "2026-05-27T13:00:00Z",
+    },
     {
       id: "s125",
       topic: "🃏 'Got Got Need' — Panini Sticker Swap Mania Eats Every FYP",
