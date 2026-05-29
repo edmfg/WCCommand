@@ -385,6 +385,33 @@
       return html;
     }
 
+    // Render Google Search grounding sources as clickable links (mirrors the
+    // dashboard panel's citations). Returns "" when the model didn't search.
+    function buildCitations(cand) {
+      var gm = cand && cand.groundingMetadata;
+      var chunks = (gm && gm.groundingChunks) || [];
+      var cites = [];
+      for (var i = 0; i < chunks.length; i++) {
+        var w = chunks[i] && chunks[i].web;
+        if (w && w.uri) cites.push({ uri: w.uri, title: w.title || w.uri });
+      }
+      if (!cites.length) return "";
+      var html =
+        '<div class="gemini-citations-shared">' +
+        '<div class="gemini-citations-label-shared">🌐 Sources from web search</div>';
+      for (var j = 0; j < Math.min(cites.length, 6); j++) {
+        html +=
+          '<a href="' +
+          escHtml(cites[j].uri) +
+          '" target="_blank" rel="noopener" class="gemini-citation-shared">[' +
+          (j + 1) +
+          "] " +
+          escHtml(cites[j].title) +
+          "</a>";
+      }
+      return html + "</div>";
+    }
+
     // Sticky-bottom autoscroll: only follow if the user is near the bottom
     // (within 80px). If they've scrolled up to read history, leave them put.
     function autoScroll() {
@@ -475,7 +502,9 @@
           thinking.innerHTML = "<em>(empty response)</em>";
           return;
         }
-        thinking.innerHTML = renderMd(reply);
+        thinking.innerHTML =
+          renderMd(reply) +
+          buildCitations(data && data.candidates && data.candidates[0]);
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
       } catch (err) {
         thinking.innerHTML =
@@ -534,6 +563,10 @@
       ".gemini-close-shared:hover{color:#fff}" +
       ".gemini-messages-shared{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}" +
       ".gemini-msg-shared{padding:10px 14px;border-radius:10px;font-size:0.88rem;line-height:1.5;max-width:92%}" +
+      ".gemini-citations-shared{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:4px}" +
+      ".gemini-citations-label-shared{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:2px}" +
+      ".gemini-citation-shared{font-size:0.78rem;color:#7fb0ff;text-decoration:none;line-height:1.35;word-break:break-word}" +
+      ".gemini-citation-shared:hover{text-decoration:underline;color:#a9caff}" +
       ".gemini-typing-shared{padding:12px 16px}" +
       ".typing-dots-shared{display:inline-flex;align-items:center;gap:5px}" +
       ".typing-dots-shared span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.55);display:inline-block;animation:typing-bounce-shared 1.3s infinite ease-in-out}" +
