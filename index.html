@@ -6872,6 +6872,24 @@
         }
 
         function setCards(cardHtmlArray, count) {
+          // No matches (e.g. filters exclude everything) — show a friendly
+          // empty state instead of a blank carousel.
+          if (!count || !cardHtmlArray.length) {
+            container.innerHTML =
+              '<div class="carousel-page active"><div class="empty-state glass" style="margin:auto">' +
+              '<span class="empty-icon">🔍</span>' +
+              "<h3>Nothing matches your filters</h3>" +
+              '<p>Try removing a filter, or tap 🌐 All to see everything again.</p>' +
+              "</div></div>";
+            dotsEl.innerHTML = "";
+            pageCount = 0;
+            page = 0;
+            if (timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+            return;
+          }
           pageCount = Math.ceil(count / perPage);
           page = 0;
           let pagesHtml = "";
