@@ -55,6 +55,12 @@ function ipStatus(v) {
   const t = s(v).toLowerCase();
   return ["clear", "watch", "block"].includes(t) ? t : "watch";
 }
+// Only http(s) links survive — drops javascript:/data: and other injection
+// vectors before a URL is ever rendered as an href.
+function safeUrl(v) {
+  const u = s(v).trim();
+  return /^https?:\/\//i.test(u) ? u : "";
+}
 
 // Coerce whatever Gemini returns into the exact shape social.html expects,
 // filling missing fields with safe defaults so the renderer never shows
@@ -66,12 +72,35 @@ function normalizePayload(raw, market, liveDate) {
 
   function spike(x, fallbackType) {
     const o = x && typeof x === "object" ? x : {};
+    // Multiple attributed direct quotes (each may carry a platform + link).
+    const quotes = arr(o.quotes)
+      .map((q) => {
+        const qo = q && typeof q === "object" ? q : { text: q };
+        return { text: s(qo.text), platform: s(qo.platform), url: safeUrl(qo.url) };
+      })
+      .filter((q) => q.text)
+      .slice(0, 4);
+    const voice = s(o.voice) || (quotes[0] && quotes[0].text) || "";
+    // Guarantee the lead voice always appears in the quotes list.
+    if (!quotes.length && voice) {
+      quotes.push({ text: voice, platform: "", url: "" });
+    }
+    // Citations / sources — labels (platform or outlet), links when present.
+    const sources = arr(o.sources)
+      .map((src) => {
+        const so = src && typeof src === "object" ? src : { label: src };
+        return { label: s(so.label) || s(so.name), url: safeUrl(so.url) };
+      })
+      .filter((sr) => sr.label)
+      .slice(0, 6);
     const out = {
       title: s(o.title) || "Untitled signal",
       type: s(o.type) || fallbackType,
       signal: s(o.signal),
       context: s(o.context),
-      voice: s(o.voice),
+      voice,
+      quotes,
+      sources,
       volume: clampVolume(o.volume),
       sentiment: clampVolume(o.sentiment),
       tone: validTone(o.tone),
@@ -142,5 +171,6 @@ module.exports = {
   clampVolume,
   validTone,
   ipStatus,
+  safeUrl,
   normalizePayload,
 };

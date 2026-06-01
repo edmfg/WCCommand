@@ -97,6 +97,61 @@ check("old-shape storyboard (beats, no footage) is rejected", () => {
   assert(isNewShape(oldShape) === false, "old shape unexpectedly passed — the bug guard is wrong");
 });
 
+// ── quotes[] + sources[] (citations) ──
+console.log("\nspike citations — quotes[] + sources[]:");
+const citePayload = normalizePayload(
+  {
+    cultural: {
+      headline: "h",
+      spikes: [
+        {
+          title: "Poutine wars",
+          voice: "lead quote",
+          quotes: [
+            { text: "Quebec poutine is the only real one", platform: "X", url: "https://x.com/a/1" },
+            { text: "Ontario gravy is watery", platform: "TikTok", url: "javascript:alert(1)" }, // must be stripped
+            { text: "" }, // empty → dropped
+          ],
+          sources: [
+            { label: "r/canada", url: "https://reddit.com/r/canada" },
+            "TSN", // bare string → {label}
+            { label: "evil", url: "data:text/html,x" }, // url stripped, label kept
+          ],
+        },
+      ],
+    },
+  },
+  "Canada",
+  "June 1, 2026",
+);
+const cspike = citePayload.cultural.spikes[0];
+
+check("quotes are normalized to {text,platform,url} and empties dropped", () => {
+  assert(cspike.quotes.length === 2, "expected 2 quotes, got " + cspike.quotes.length);
+  assert(cspike.quotes[0].text === "Quebec poutine is the only real one");
+  assert(cspike.quotes[0].platform === "X");
+});
+
+check("non-http(s) quote/source URLs are sanitized to empty", () => {
+  assert(cspike.quotes[1].url === "", "javascript: URL should be stripped");
+  const evil = cspike.sources.find((s) => s.label === "evil");
+  assert(evil && evil.url === "", "data: URL should be stripped");
+});
+
+check("valid http(s) links survive", () => {
+  assert(cspike.quotes[0].url === "https://x.com/a/1");
+  assert(cspike.sources.find((s) => s.label === "r/canada").url === "https://reddit.com/r/canada");
+});
+
+check("bare-string sources become {label}", () => {
+  assert(cspike.sources.some((s) => s.label === "TSN" && s.url === ""));
+});
+
+check("when no quotes given, the lead voice seeds quotes[]", () => {
+  const sp = payload.cultural.spikes[0]; // from earlier geminiRaw (voice only)
+  assert(sp.quotes.length >= 1 && sp.quotes[0].text === sp.voice);
+});
+
 if (failures) {
   console.error("\n" + failures + " check(s) FAILED");
   process.exit(1);

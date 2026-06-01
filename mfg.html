@@ -10217,6 +10217,13 @@
                   escHtml(s.voice) +
                   '"</div>'
                 : "") +
+              ((s.quotes && s.quotes.length) || (s.sources && s.sources.length)
+                ? '<div class="pv-meta" style="margin-top:6px">' +
+                  ((s.quotes && s.quotes.length) || 0) +
+                  " voices · " +
+                  ((s.sources && s.sources.length) || 0) +
+                  " sources</div>"
+                : "") +
               "</div>"
             );
           }

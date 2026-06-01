@@ -1023,6 +1023,133 @@
       .modal-block.hook .lbl {
         color: var(--gold);
       }
+      /* ===== richer spike voices + sources ===== */
+      .modal-block.voices .voice-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .voice-item {
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--text);
+        border-left: 2px solid var(--accent);
+        padding-left: 14px;
+      }
+      .voice-item .voice-text {
+        font-style: italic;
+      }
+      .voice-plat {
+        font-style: normal;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        color: var(--text-dim);
+        white-space: nowrap;
+      }
+      .voice-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .voice-link:hover {
+        text-decoration: underline;
+      }
+      .modal-block.sources .source-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .source-chip {
+        font-size: 12px;
+        padding: 4px 11px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--text-mid);
+        background: var(--surface-2);
+        text-decoration: none;
+      }
+      a.source-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* ===== RAW DATA button + outline modal ===== */
+      .raw-data-btn {
+        margin-left: auto;
+        align-self: center;
+        font-family: "Oswald", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-mid);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition:
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .raw-data-btn:hover {
+        color: var(--gold);
+        border-color: rgba(255, 215, 0, 0.4);
+      }
+      .raw-data-btn::before {
+        content: "▤ ";
+        opacity: 0.7;
+      }
+      .raw-outline {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-mid);
+        max-height: 62vh;
+        overflow-y: auto;
+      }
+      .raw-outline .ro-h {
+        font-family: "Oswald", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--gold);
+        margin: 18px 0 8px;
+      }
+      .raw-outline .ro-h:first-child {
+        margin-top: 0;
+      }
+      .raw-outline .ro-li {
+        position: relative;
+        padding-left: 18px;
+        margin: 5px 0;
+        color: var(--text);
+      }
+      .raw-outline .ro-li::before {
+        content: "•";
+        position: absolute;
+        left: 4px;
+        color: var(--red);
+      }
+      .raw-outline .ro-li.lvl2 {
+        padding-left: 36px;
+      }
+      .raw-outline .ro-li.lvl2::before {
+        left: 22px;
+        content: "◦";
+      }
+      .raw-outline .ro-p {
+        margin: 8px 0;
+      }
+      .raw-outline .ro-empty {
+        color: var(--text-dim);
+        font-style: italic;
+      }
 
       /* ===== plays grid — 3 query-first cards ===== */
       .plays-grid {
@@ -2115,6 +2242,15 @@
         <div class="section-head">
           <span class="section-num">01 ·</span>
           <h2 class="section-title">Today's intelligence</h2>
+          <button
+            id="rawDataBtn"
+            class="raw-data-btn"
+            type="button"
+            hidden
+            onclick="openRawModal()"
+          >
+            Raw data
+          </button>
         </div>
         <p class="section-sub">
           Hover any spike to surface the fan voice. Click for the full read.
@@ -2149,6 +2285,15 @@
       <article class="modal" id="modal-content">
         <button class="modal-close" onclick="closeModal()">×</button>
         <div id="modal-body"></div>
+      </article>
+    </div>
+
+    <!-- RAW DATA — the MFG-processed input behind today's briefing, as outline -->
+    <div class="modal-overlay" id="rawModal" onclick="closeRawOnBg(event)">
+      <article class="modal" id="raw-content" style="--accent: var(--red)">
+        <button class="modal-close" onclick="closeRawModal()">×</button>
+        <div class="modal-tag">Raw data · processed in MFG mode</div>
+        <div id="raw-body" class="raw-outline"></div>
       </article>
     </div>
 
@@ -2476,6 +2621,143 @@ window.FORMATION_DATA = {
         });
       }
 
+      // ── shared render helpers (escaping + safe links) ──
+      function escHtml(str) {
+        return String(str == null ? "" : str).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+      function safeHref(u) {
+        const v = String(u || "").trim();
+        return /^https?:\/\//i.test(v) ? v : "";
+      }
+
+      // Representative voices — multiple attributed quotes, link when present.
+      function voicesHtml(s) {
+        const qs =
+          Array.isArray(s.quotes) && s.quotes.length
+            ? s.quotes
+            : s.voice
+              ? [{ text: s.voice }]
+              : [];
+        if (!qs.length) return "";
+        const items = qs
+          .map((q) => {
+            const href = safeHref(q.url);
+            const plat = q.platform
+              ? ' <span class="voice-plat">— ' + escHtml(q.platform) + "</span>"
+              : "";
+            const link = href
+              ? ' <a class="voice-link" href="' +
+                escHtml(href) +
+                '" target="_blank" rel="noopener noreferrer">↗</a>'
+              : "";
+            return (
+              '<li class="voice-item"><span class="voice-text">' +
+              escHtml(q.text) +
+              "</span>" +
+              plat +
+              link +
+              "</li>"
+            );
+          })
+          .join("");
+        const lbl = qs.length > 1 ? "Representative voices" : "Representative voice";
+        return (
+          '<div class="modal-block voices"><div class="lbl">' +
+          lbl +
+          '</div><ul class="voice-list">' +
+          items +
+          "</ul></div>"
+        );
+      }
+      // Sources / citations — chips, clickable when a link is present.
+      function sourcesHtml(s) {
+        const src = Array.isArray(s.sources) ? s.sources : [];
+        if (!src.length) return "";
+        const items = src
+          .map((x) => {
+            const href = safeHref(x.url);
+            return href
+              ? '<a class="source-chip" href="' +
+                  escHtml(href) +
+                  '" target="_blank" rel="noopener noreferrer">' +
+                  escHtml(x.label) +
+                  " ↗</a>"
+              : '<span class="source-chip">' + escHtml(x.label) + "</span>";
+          })
+          .join("");
+        return (
+          '<div class="modal-block sources"><div class="lbl">Sources</div>' +
+          '<div class="source-row">' +
+          items +
+          "</div></div>"
+        );
+      }
+
+      // ── RAW DATA outline (the MFG-processed input behind the briefing) ──
+      function setReactiveRawData(text) {
+        window._wccRawInput = typeof text === "string" ? text : "";
+        const btn = document.getElementById("rawDataBtn");
+        if (btn) btn.hidden = !window._wccRawInput.trim();
+      }
+      function renderRawOutline(text) {
+        const lines = String(text || "")
+          .replace(/\r\n?/g, "\n")
+          .split("\n");
+        let html = "";
+        for (const rawLine of lines) {
+          const line = rawLine.trim();
+          if (!line) continue;
+          const bullet = line.match(/^([-*•·]|\d+[.)])\s+(.*)$/);
+          const indented = /^(\s{2,}|\t)/.test(rawLine);
+          if (bullet) {
+            html +=
+              '<div class="ro-li' +
+              (indented ? " lvl2" : "") +
+              '">' +
+              escHtml(bullet[2]) +
+              "</div>";
+            continue;
+          }
+          const isHeading =
+            (/[A-Z]/.test(line) && line === line.toUpperCase() && line.length > 2) ||
+            /:$/.test(line);
+          html += isHeading
+            ? '<div class="ro-h">' + escHtml(line.replace(/:$/, "")) + "</div>"
+            : '<div class="ro-p">' + escHtml(line) + "</div>";
+        }
+        return (
+          html ||
+          '<div class="ro-empty">No raw input recorded for this briefing.</div>'
+        );
+      }
+      window.openRawModal = function () {
+        const body = document.getElementById("raw-body");
+        if (body) body.innerHTML = renderRawOutline(window._wccRawInput || "");
+        const m = document.getElementById("rawModal");
+        if (m) m.classList.add("open");
+      };
+      window.closeRawModal = function () {
+        const m = document.getElementById("rawModal");
+        if (m) m.classList.remove("open");
+      };
+      window.closeRawOnBg = function (e) {
+        if (e.target.id === "rawModal") window.closeRawModal();
+      };
+      // Bound once (boot() runs repeatedly; this script runs once).
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") window.closeRawModal();
+      });
+
       function boot() {
         const key = getMarketKey();
         const market = (window.FORMATION_DATA || {})[key];
@@ -2569,7 +2851,8 @@ window.FORMATION_DATA = {
             </div>
             <div class="modal-block"><div class="lbl">The signal</div><div class="body">${s.signal}</div></div>
             <div class="modal-block"><div class="lbl">The context</div><div class="body">${s.context}</div></div>
-            <div class="modal-block voice"><div class="lbl">Representative voice</div><div class="body">${s.voice}</div></div>
+            ${voicesHtml(s)}
+            ${sourcesHtml(s)}
             ${s.hook ? `<div class="modal-block hook"><div class="lbl">Curiosity hook</div><div class="body">${s.hook}</div></div>` : ""}
           `;
           document.getElementById("modal").classList.add("open");
@@ -3181,7 +3464,7 @@ window.FORMATION_DATA = {
         function buildUrl() {
           const base =
             SB_URL +
-            "/rest/v1/today_reactive?select=payload,market,uploaded_by,live_date,created_at";
+            "/rest/v1/today_reactive?select=payload,raw_input,market,uploaded_by,live_date,created_at";
           if (recordId) {
             return base + "&id=eq." + encodeURIComponent(recordId) + "&limit=1";
           }
@@ -3234,6 +3517,7 @@ window.FORMATION_DATA = {
               }
               if (applyPayload(row.payload)) {
                 lastAppliedAt = row.created_at || lastAppliedAt;
+                setReactiveRawData(row.raw_input);
                 boot();
                 return;
               }

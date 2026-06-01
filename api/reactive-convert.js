@@ -122,7 +122,20 @@ Schema:
         "volume": "integer — 1..100 (share of conversation)",
         "sentiment": "integer — 1..100 (% positive)",
         "tone": "string — 'positive' or 'neutral' or 'caution'",
-        "hook": "string — optional one-line curiosity question"
+        "hook": "string — optional one-line curiosity question",
+        "quotes": [
+          {
+            "text": "string — verbatim-style direct quote",
+            "platform": "string — e.g. 'X' / 'TikTok' / 'Reddit' / 'r/soccer' / outlet name",
+            "url": "string — link ONLY if that exact URL appears in the raw input; omit otherwise"
+          }
+        ],
+        "sources": [
+          {
+            "label": "string — platform or outlet backing the spike",
+            "url": "string — link ONLY if that exact URL appears in the raw input; omit otherwise"
+          }
+        ]
       }
     ]
   },
@@ -155,8 +168,11 @@ Schema:
 
 Return exactly:
 - 2 cultural spikes and 2 match spikes (or as many as the input clearly supports, up to 4 each)
+- 2-3 "quotes" per spike (verbatim-style, each tagged with its platform) plus a few "sources" backing it
 - exactly 3 storyboards
 - a vivid one-to-two-sentence "footage" direction for every storyboard (never omit it)
+
+Citations rule: include a "url" on a quote or source ONLY when that exact link is present in the raw input. NEVER invent URLs, and never cite a named outlet that does not appear in the input — synthesize platform tags (X / TikTok / Reddit / etc.) instead.
 
 Do not include the markets or flag for any market other than ${market}.
 
