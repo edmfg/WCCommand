@@ -11,6 +11,13 @@
 //   502 { error }            → upstream Gemini error
 
 const { verifyToken, readCookie, signingSecret } = require("./_gate-shared");
+// Single source of truth for the payload shape, shared with the unit test and
+// kept in lock-step with social.html's renderer + isNewShape guard.
+const {
+  MARKET_FLAGS,
+  todayLabel,
+  normalizePayload,
+} = require("./_reactive-shape.js");
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
@@ -85,23 +92,6 @@ function clientIp(req) {
   return req.socket?.remoteAddress || "unknown";
 }
 
-const MARKET_FLAGS = {
-  Canada: "🇨🇦",
-  UK: "🇬🇧",
-  Germany: "🇩🇪",
-  USA: "🇺🇸",
-  Global: "🌍",
-};
-
-function todayLabel() {
-  const d = new Date();
-  return d.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 function buildPrompt(rawInput, market, liveDate) {
   const flag = MARKET_FLAGS[market] || "🌍";
   const dateLabel = liveDate || todayLabel();
@@ -129,7 +119,10 @@ Schema:
         "signal": "string — quantified or directional read",
         "context": "string — why it's spiking",
         "voice": "string — verbatim-style fan quote (single short line)",
-        "volume": "integer — 1..100"
+        "volume": "integer — 1..100 (share of conversation)",
+        "sentiment": "integer — 1..100 (% positive)",
+        "tone": "string — 'positive' or 'neutral' or 'caution'",
+        "hook": "string — optional one-line curiosity question"
       }
     ]
   },
@@ -145,18 +138,17 @@ Schema:
     {
       "number": "string — '01', '02', '03'",
       "title": "string — short evocative storyboard title",
-      "prompt": "string — Reels-style first-person creative prompt for AI Mode",
       "sourceSignal": "string — short label e.g. 'Cultural Conversation' or 'Match Event'",
+      "sourceDetail": "string — one short line on the underlying signal",
       "audienceCut": "string — short audience descriptor",
       "bucket": "string — short content-bucket label",
+      "prompt": "string — Reels-style first-person creative prompt for AI Mode",
       "whyPrompt": "string — one short paragraph explaining the strategic why",
       "ipCheck": {
-        "status": "string — 'CLEAR' or 'WATCH' or 'BLOCK'",
+        "status": "string — 'clear' or 'watch' or 'block'",
         "note": "string — brief IP / brand-safety note"
       },
-      "beats": [
-        { "name": "string — short beat label e.g. 'Hook', 'Reveal', 'Payoff'" }
-      ]
+      "footage": "string — creative direction for the storyboard's footage frame (what B-roll/visuals pair with the on-screen query)"
     }
   ]
 }
@@ -164,7 +156,7 @@ Schema:
 Return exactly:
 - 2 cultural spikes and 2 match spikes (or as many as the input clearly supports, up to 4 each)
 - exactly 3 storyboards
-- 4 beats per storyboard
+- a vivid one-to-two-sentence "footage" direction for every storyboard (never omit it)
 
 Do not include the markets or flag for any market other than ${market}.
 
@@ -172,92 +164,6 @@ Live date: ${dateLabel}.
 
 Raw input:
 ${rawInput}`;
-}
-
-function clampVolume(n) {
-  const v = parseInt(n, 10);
-  if (!Number.isFinite(v)) return 50;
-  return Math.max(1, Math.min(100, v));
-}
-function s(v) {
-  return typeof v === "string" ? v : v == null ? "" : String(v);
-}
-function arr(v) {
-  return Array.isArray(v) ? v : [];
-}
-
-// Coerce whatever Gemini returns into the exact shape social.html expects,
-// fill in missing fields with safe defaults so the renderer never crashes.
-function normalizePayload(raw, market, liveDate) {
-  const flag = MARKET_FLAGS[market] || "🌍";
-  const dateLabel = liveDate || todayLabel();
-  const rs = raw && typeof raw === "object" ? raw : {};
-  function spike(x, fallbackType) {
-    const o = x && typeof x === "object" ? x : {};
-    return {
-      title: s(o.title) || "Untitled signal",
-      type: s(o.type) || fallbackType,
-      signal: s(o.signal),
-      context: s(o.context),
-      voice: s(o.voice),
-      volume: clampVolume(o.volume),
-    };
-  }
-  function brief(o, watermark, defaultName, agentId, defaultType) {
-    const b = o && typeof o === "object" ? o : {};
-    return {
-      agentName: s(b.agentName) || defaultName,
-      agentId: s(b.agentId) || agentId,
-      flag,
-      watermark,
-      headline: s(b.headline),
-      spikes: arr(b.spikes)
-        .slice(0, 4)
-        .map((x) => spike(x, defaultType)),
-    };
-  }
-  function ip(o) {
-    const x = o && typeof o === "object" ? o : {};
-    const status = s(x.status).toUpperCase();
-    return {
-      status: ["CLEAR", "WATCH", "BLOCK"].includes(status) ? status : "WATCH",
-      note: s(x.note),
-    };
-  }
-  function beat(b) {
-    const o = b && typeof b === "object" ? b : {};
-    return { name: s(o.name) || "Beat" };
-  }
-  function story(o, idx) {
-    const x = o && typeof o === "object" ? o : {};
-    return {
-      number: s(x.number) || String(idx + 1).padStart(2, "0"),
-      title: s(x.title) || "Untitled storyboard",
-      prompt: s(x.prompt),
-      sourceSignal: s(x.sourceSignal) || "Cultural Conversation",
-      audienceCut: s(x.audienceCut) || "Core fan",
-      bucket: s(x.bucket) || "Reactive",
-      whyPrompt: s(x.whyPrompt),
-      ipCheck: ip(x.ipCheck),
-      beats: arr(x.beats).slice(0, 6).map(beat),
-    };
-  }
-  return {
-    formation: {
-      date: s((rs.formation || {}).date) || dateLabel,
-      market,
-      window: s((rs.formation || {}).window) || "Last 24h",
-    },
-    cultural: brief(
-      rs.cultural,
-      "01",
-      "Cultural Conversation Reader",
-      "ccr",
-      "Cultural Pride",
-    ),
-    match: brief(rs.match, "02", "Match-Event Pulse Reader", "mpr", "Match"),
-    storyboards: arr(rs.storyboards).slice(0, 3).map(story),
-  };
 }
 
 function tryParseJson(text) {
@@ -330,7 +236,9 @@ export default async function handler(req, res) {
   if (!MARKET_FLAGS[market]) {
     res
       .status(400)
-      .json({ error: "market must be Canada / UK / Germany / USA / Global" });
+      .json({
+        error: "market must be Canada / Brazil / Germany / USA / Global",
+      });
     return;
   }
 

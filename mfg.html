@@ -9933,6 +9933,46 @@
           );
         }
 
+        // Market label (as stored in today_reactive.market) → social.html key.
+        const MARKET_LABEL_TO_KEY = {
+          Canada: "ca",
+          Brazil: "brazil",
+          Germany: "de",
+          USA: "usa",
+          Global: "global",
+        };
+
+        // Open a specific archived Today's Reactive record in the public view.
+        // today_reactive keeps every publish, so a log row deep-links straight
+        // to that exact row (?record=<id>), market-scoped so it can't render a
+        // different market's data.
+        function openReactiveRecord(marketLabel, recordId) {
+          if (!recordId) return;
+          const key = MARKET_LABEL_TO_KEY[marketLabel] || "ca";
+          const url =
+            "social.html?market=" +
+            encodeURIComponent(key) +
+            "&record=" +
+            encodeURIComponent(recordId);
+          window.open(url, "_blank", "noopener");
+        }
+
+        // Tell any open Today's Reactive view for THIS market to refresh live.
+        // Market-scoped: the message carries the market label and social.html
+        // only re-fetches when it matches, so other markets stay untouched.
+        function notifyReactivePublished(marketLabel, recordId) {
+          const msg = { market: marketLabel, id: recordId || null, t: Date.now() };
+          try {
+            const ch = new BroadcastChannel("wcc_reactive");
+            ch.postMessage(msg);
+            ch.close();
+          } catch (_) {}
+          // Fallback for cross-tab / no-BroadcastChannel browsers.
+          try {
+            localStorage.setItem("wcc_reactive_ping", JSON.stringify(msg));
+          } catch (_) {}
+        }
+
         async function loadReactiveHistory() {
           const list = reactiveEls.reactiveHistoryList;
           if (!list) return;
@@ -9964,7 +10004,13 @@
               // Forward-map legacy "UK" reactive rows to "Brazil".
               const m = r.market === "UK" ? "Brazil" : r.market;
               return (
-                '<div class="reactive-history-row">' +
+                '<div class="reactive-history-row" role="button" tabindex="0"' +
+                ' style="cursor:pointer"' +
+                ' data-record-id="' +
+                escHtml(r.id) +
+                '" data-market="' +
+                escHtml(m) +
+                '" title="Open this published briefing in the public view">' +
                 '<span class="h-flag">' +
                 (FLAG[m] || "🌐") +
                 "</span>" +
@@ -10058,6 +10104,28 @@
           });
           e.reactiveRerunBtn.addEventListener("click", executeReactive);
           e.reactivePublishBtn.addEventListener("click", publishReactive);
+
+          // Click (or Enter/Space) a publish-history row → open that exact
+          // archived record in the public Today's Reactive view.
+          if (e.reactiveHistoryList) {
+            const openFromRow = (row) => {
+              if (!row) return;
+              openReactiveRecord(
+                row.getAttribute("data-market"),
+                row.getAttribute("data-record-id"),
+              );
+            };
+            e.reactiveHistoryList.addEventListener("click", (ev) => {
+              openFromRow(ev.target.closest("[data-record-id]"));
+            });
+            e.reactiveHistoryList.addEventListener("keydown", (ev) => {
+              if (ev.key !== "Enter" && ev.key !== " ") return;
+              const row = ev.target.closest("[data-record-id]");
+              if (!row) return;
+              ev.preventDefault();
+              openFromRow(row);
+            });
+          }
         }
 
         async function executeReactive() {
@@ -10276,7 +10344,7 @@
             }
           }
           setReactiveStatus("Publishing…");
-          const { error } = await window.__mfgSbWrite(
+          const { data, error } = await window.__mfgSbWrite(
             "today_reactive",
             "insert",
             {
@@ -10287,7 +10355,7 @@
                 uploaded_by: id.user || "MFG",
                 live_date: liveDate,
               },
-              returnRows: false,
+              returnRows: true,
             },
           );
           e.reactivePublishBtn.disabled = false;
@@ -10295,8 +10363,12 @@
             setReactiveStatus("Publish failed: " + error.message, "err");
             return;
           }
+          const newId = (Array.isArray(data) && data[0] && data[0].id) || null;
+          // Push the new briefing live to this market's open Today's Reactive
+          // view (no manual reload), scoped so other markets stay untouched.
+          notifyReactivePublished(market, newId);
           setReactiveStatus(
-            "Published. Live at /#reactive on the public dashboard.",
+            "Published & pushed live to " + market + "'s Today's Reactive.",
             "ok",
           );
           reactivePayload = null;
@@ -10386,6 +10458,27 @@
         function renderAudit() {
           const feed = document.getElementById("auditFeed");
           if (!feed) return;
+          // Bind once: clicking a reactive audit row opens that archived record.
+          if (!feed._reactiveClickBound) {
+            feed._reactiveClickBound = true;
+            const openFromRow = (row) => {
+              if (!row) return;
+              openReactiveRecord(
+                row.getAttribute("data-reactive-market"),
+                row.getAttribute("data-reactive-id"),
+              );
+            };
+            feed.addEventListener("click", (ev) => {
+              openFromRow(ev.target.closest("[data-reactive-id]"));
+            });
+            feed.addEventListener("keydown", (ev) => {
+              if (ev.key !== "Enter" && ev.key !== " ") return;
+              const row = ev.target.closest("[data-reactive-id]");
+              if (!row) return;
+              ev.preventDefault();
+              openFromRow(row);
+            });
+          }
           let rows = auditCache;
           if (auditFilter !== "all") {
             rows = rows.filter((r) => r.source === auditFilter);
@@ -10410,8 +10503,20 @@
               // Forward-map legacy "UK" audit rows to "Brazil".
               if (r.market === "UK") r.market = "Brazil";
               const flag = FLAG[r.market] || (r.market ? "🌐" : "");
+              // Today's Reactive rows deep-link to that exact archived record.
+              const isReactive = r.source === "reactive" && r.ref;
+              const reactiveId = isReactive ? r.ref.split(":")[1] : "";
               return (
-                '<div class="audit-row">' +
+                "<div class=\"audit-row\"" +
+                (isReactive
+                  ? ' role="button" tabindex="0" style="cursor:pointer"' +
+                    ' data-reactive-id="' +
+                    escHtml(reactiveId) +
+                    '" data-reactive-market="' +
+                    escHtml(r.market || "") +
+                    "\" title=\"Open this Today's Reactive record\""
+                  : "") +
+                ">" +
                 '<div class="a-time">' +
                 escHtml(fmtTime(r.time)) +
                 "</div>" +

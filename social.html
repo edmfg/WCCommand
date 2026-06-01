@@ -2387,17 +2387,57 @@ window.FORMATION_DATA = {
       //  Gate check — inherits dashboard wcc_gate cookie. Redirect to / if missing.
       // ============================================================================
       // No gate in social.html — embedded inside the gated parent.
-      boot();
+      // boot() is kicked off by the live-data override script at the bottom of
+      // the page. That lets non-CA markets (which ship no bundled defaults)
+      // wait for their own Supabase row instead of flashing Canada or bouncing
+      // home before the fetch resolves.
 
       // ============================================================================
-      //  Market routing — reads ?market=<key> from URL, falls back to ca.
+      //  Market routing — canonical market key from ?market=<key>.
+      //  Aliases collapse to the bundled keys (ca / brazil / de / usa / global)
+      //  so a market's data is ALWAYS stored and read under exactly one key —
+      //  one market's briefing can never leak into another's view.
       // ============================================================================
+      const MARKET_KEY = {
+        ca: "ca",
+        canada: "ca",
+        brazil: "brazil",
+        br: "brazil",
+        de: "de",
+        germany: "de",
+        usa: "usa",
+        us: "usa",
+        global: "global",
+      };
       function getMarketKey() {
         const u = new URL(window.location.href);
-        const m = (u.searchParams.get("market") || "ca").toLowerCase();
-        const data = window.FORMATION_DATA || {};
-        if (data[m]) return m;
-        return "ca";
+        const raw = (u.searchParams.get("market") || "ca").toLowerCase();
+        return MARKET_KEY[raw] || "ca";
+      }
+
+      // Lightweight placeholder shown while a market without bundled defaults
+      // waits for its Supabase override row.
+      function showReactiveLoading(key) {
+        const LABEL = {
+          ca: "Canada",
+          brazil: "Brazil",
+          de: "Germany",
+          usa: "USA",
+          global: "Global",
+        };
+        const set = (id, txt) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = txt;
+        };
+        set("hero-market", LABEL[key] || "—");
+        set("hero-date", "Loading today's reactive…");
+        set("hero-window", "");
+        const b = document.getElementById("briefings");
+        if (b)
+          b.innerHTML =
+            '<div style="padding:48px 24px;text-align:center;color:var(--text-dim);font-size:14px">Loading today’s reactive briefing…</div>';
+        const s = document.getElementById("storyboards");
+        if (s) s.innerHTML = "";
       }
 
       function wireMarketSwitcher(currentKey) {
@@ -2428,7 +2468,14 @@ window.FORMATION_DATA = {
         const key = getMarketKey();
         const market = (window.FORMATION_DATA || {})[key];
         if (!market) {
-          // No data for the requested market — bounce home rather than render blank.
+          // Non-CA markets ship no bundled defaults — their briefing arrives
+          // from the Supabase override. While that fetch is in flight, show a
+          // loading state instead of bouncing home or flashing another market.
+          if (window._wccOverridePending) {
+            showReactiveLoading(key);
+            return;
+          }
+          // Fetch resolved with no data for this market — bounce home.
           window.location.href = "index.html";
           return;
         }
@@ -3054,33 +3101,91 @@ window.FORMATION_DATA = {
       })();
     </script>
     <script>
-      // Live data override — fetch latest today_reactive row from Supabase and
-      // re-paint if found. If the payload's storyboards lack the new `footage`
-      // field, they're old-shape; ignore them and keep the bundled defaults.
+      // ============================================================================
+      //  Live data override + market-scoped auto-refresh.
+      //
+      //  Pulls THIS market's today_reactive row from Supabase and paints it. Each
+      //  market is fully isolated: we only ever query this view's market label and
+      //  only ever write into FORMATION_DATA[thisMarketKey], so a publish for one
+      //  market can never change another market's view.
+      //
+      //  ?record=<id> pins the view to one archived row (deep-link from the MFG
+      //  publish log / audit log) and disables live auto-refresh so the archive
+      //  stays put.
+      //
+      //  isNewShape guard: a payload whose storyboards lack `footage` is pre-
+      //  migration; it's ignored in favour of the bundled defaults.
+      // ============================================================================
       (function () {
         const SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
         const SB_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
         const params = new URLSearchParams(window.location.search);
-        const marketParam = (params.get("market") || "").toLowerCase();
-        const MARKET_KEY_TO_LABEL = {
-          ca: "Canada", canada: "Canada",
+        const recordId = (params.get("record") || "").trim();
+        const KEY_TO_LABEL = {
+          ca: "Canada",
           brazil: "Brazil",
-          de: "Germany", germany: "Germany",
-          usa: "USA", us: "USA",
+          de: "Germany",
+          usa: "USA",
           global: "Global",
         };
-        const market = MARKET_KEY_TO_LABEL[marketParam] || "Canada";
-        async function fetchLatest() {
-          const url = SB_URL +
-            "/rest/v1/today_reactive?select=payload,uploaded_by,live_date,created_at&market=eq." +
-            encodeURIComponent(market) +
-            "&order=created_at.desc&limit=1";
+        const marketKey = getMarketKey(); // canonical, URL-derived
+        const marketLabel = KEY_TO_LABEL[marketKey] || "Canada";
+
+        // Tell boot() a fetch is in flight so markets without bundled defaults
+        // show a loading state instead of bouncing home.
+        window._wccOverridePending = true;
+        let lastAppliedAt = null;
+
+        function isNewShape(sb) {
+          return (
+            sb &&
+            typeof sb === "object" &&
+            typeof sb.footage === "string" &&
+            typeof sb.prompt === "string"
+          );
+        }
+
+        function applyPayload(payload) {
+          if (!payload || typeof payload !== "object") return false;
+          const sbs = Array.isArray(payload.storyboards)
+            ? payload.storyboards
+            : [];
+          // ANY old-shape storyboard => treat the whole payload as stale.
+          if (sbs.length > 0 && !sbs.every(isNewShape)) {
+            console.warn(
+              "today_reactive payload is old-shape (no footage); keeping bundled defaults.",
+            );
+            return false;
+          }
+          const fd = (window.FORMATION_DATA = window.FORMATION_DATA || {});
+          const entry = (fd[marketKey] = fd[marketKey] || {}); // THIS market only
+          if (payload.formation) entry.formation = payload.formation;
+          if (payload.cultural) entry.cultural = payload.cultural;
+          if (payload.match) entry.match = payload.match;
+          if (sbs.length) entry.storyboards = sbs;
+          return true;
+        }
+
+        function buildUrl() {
+          const base =
+            SB_URL +
+            "/rest/v1/today_reactive?select=payload,market,uploaded_by,live_date,created_at";
+          if (recordId) {
+            return base + "&id=eq." + encodeURIComponent(recordId) + "&limit=1";
+          }
+          return (
+            base +
+            "&market=eq." +
+            encodeURIComponent(marketLabel) +
+            "&order=created_at.desc&limit=1"
+          );
+        }
+
+        async function fetchRow() {
           try {
-            const res = await fetch(url, {
-              headers: {
-                apikey: SB_KEY,
-                Authorization: "Bearer " + SB_KEY,
-              },
+            const res = await fetch(buildUrl(), {
+              headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY },
+              cache: "no-store",
             });
             if (!res.ok) return null;
             const rows = await res.json();
@@ -3089,44 +3194,75 @@ window.FORMATION_DATA = {
             return null;
           }
         }
-        function isNewShape(sb) {
-          // New-shape storyboards have `footage` and `prompt`; old shape has
-          // `beats[]` plus per-beat `body`. Bail out when we detect old shape.
-          return (
-            sb &&
-            typeof sb === "object" &&
-            typeof sb.footage === "string" &&
-            typeof sb.prompt === "string"
-          );
-        }
-        function applyPayload(payload, marketKey) {
-          if (!payload || typeof payload !== "object") return;
-          // ANY old-shape signal means the entire payload is stale — keep
-          // bundled defaults rather than partially overwriting today's brief
-          // with a mix of old briefings + new bundled storyboards.
-          const sbs = Array.isArray(payload.storyboards)
-            ? payload.storyboards
-            : [];
-          const hasOldShapeStoryboards =
-            sbs.length > 0 && !sbs.every(isNewShape);
-          if (hasOldShapeStoryboards) {
-            console.warn(
-              "today_reactive payload is old-shape; dropping the entire override and using bundled defaults.",
-            );
-            return;
+
+        let refreshing = false;
+        async function refreshReactive() {
+          if (refreshing) return;
+          refreshing = true;
+          try {
+            const row = await fetchRow();
+            window._wccOverridePending = false;
+            if (row && row.payload) {
+              // Already showing this exact row — skip the re-render (avoids
+              // stacking listeners on every visibility flip / broadcast).
+              if (lastAppliedAt && row.created_at === lastAppliedAt) return;
+              // Inter-market safety: a record fetched by id must belong to this
+              // view's market. If it doesn't, refuse rather than render a mix.
+              if (recordId && row.market && row.market !== marketLabel) {
+                console.warn(
+                  "record " +
+                    recordId +
+                    " is market '" +
+                    row.market +
+                    "' but this view is '" +
+                    marketLabel +
+                    "' — ignoring to avoid an inter-market mix.",
+                );
+                return;
+              }
+              if (applyPayload(row.payload)) {
+                lastAppliedAt = row.created_at || lastAppliedAt;
+                boot();
+                return;
+              }
+            }
+            // No usable override. If this market also has no bundled defaults,
+            // boot() now bounces home (fetch has resolved).
+            if (!(window.FORMATION_DATA || {})[marketKey]) boot();
+          } finally {
+            refreshing = false;
           }
-          const fd = (window.FORMATION_DATA = window.FORMATION_DATA || {});
-          const entry = (fd[marketKey] = fd[marketKey] || {});
-          if (payload.formation) entry.formation = payload.formation;
-          if (payload.cultural) entry.cultural = payload.cultural;
-          if (payload.match) entry.match = payload.match;
-          if (sbs.length) entry.storyboards = sbs;
-          if (typeof window.boot === "function") window.boot();
         }
-        const marketKey = (params.get("market") || "ca").toLowerCase();
-        fetchLatest().then((row) => {
-          if (row && row.payload) applyPayload(row.payload, marketKey);
-        });
+        window.refreshReactive = refreshReactive;
+
+        // First paint: bundled-instant for CA, loading-state for the rest.
+        boot();
+        // Then pull this market's live row.
+        refreshReactive();
+
+        // ── Market-scoped live refresh ──────────────────────────────────────
+        // A publish in MFG mode broadcasts { market } on the "wcc_reactive"
+        // channel; we re-fetch ONLY when it's our market. Pinned archive views
+        // (?record=) never auto-refresh.
+        if (!recordId) {
+          const maybeRefresh = (msgMarket) => {
+            if (!msgMarket || msgMarket === marketLabel) refreshReactive();
+          };
+          try {
+            const ch = new BroadcastChannel("wcc_reactive");
+            ch.onmessage = (ev) =>
+              maybeRefresh(ev && ev.data && ev.data.market);
+          } catch (_) {}
+          window.addEventListener("storage", (ev) => {
+            if (ev.key !== "wcc_reactive_ping" || !ev.newValue) return;
+            try {
+              maybeRefresh(JSON.parse(ev.newValue).market);
+            } catch (_) {}
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) refreshReactive();
+          });
+        }
       })();
     </script>
 </body>
