@@ -6225,8 +6225,8 @@
           Today's Reactive
         </h2>
         <p class="reactive-market-sub">
-          Canada's daily briefing is live now — more markets roll out across
-          the tournament.
+          Canada's daily briefing is live now — more markets roll out across the
+          tournament.
         </p>
         <div class="reactive-market-grid">
           <button class="market-card" data-market="ca" type="button">
@@ -6629,6 +6629,7 @@
         { id: "canada", label: "🇨🇦 Canada" },
         { id: "germany", label: "🇩🇪 Germany" },
         { id: "brazil", label: "🇧🇷 Brazil" },
+        { id: "uk", label: "🇬🇧 UK" },
         { id: "usa", label: "🇺🇸 USA" },
         { id: "game", label: "⚽ Game" },
         { id: "culture", label: "🎵 Culture" },
@@ -6668,7 +6669,9 @@
         canada: /canada|🇨🇦|davies|marsch|bombito|toronto fan/i,
         germany: /germany|🇩🇪|nagelsmann|wirtz|musiala|kimmich/i,
         usa: /\busa\b|usmnt|🇺🇸|pochettino|diego luna|tolkin|\bamerica\b/i,
-        brazil: /brazil|brasil|🇧🇷|seleç|selecao|neymar|vinici|vini jr|rodrygo|endrick|ancelotti|canarinho|militã|militao|estêvão|estevao|raphinha/i,
+        brazil:
+          /brazil|brasil|🇧🇷|seleç|selecao|neymar|vinici|vini jr|rodrygo|endrick|ancelotti|canarinho|militã|militao|estêvão|estevao|raphinha/i,
+        uk: /\buk\b|england|english|🏴|🇬🇧|tuchel|bellingham|\bkane\b|three lions|foden|saka|rashford|rice|stones/i,
       };
       function newsText(item) {
         return (item.headline || "") + " " + (item.summary || "");
@@ -6722,6 +6725,11 @@
           const text = type === "news" ? newsText(item) : socialText(item);
           if (type === "news" && item.tag === "Brazil") return true;
           return COUNTRY_TEXT_MATCHERS.brazil.test(text);
+        },
+        uk: (item, type) => {
+          const text = type === "news" ? newsText(item) : socialText(item);
+          if (type === "news" && item.tag === "UK") return true;
+          return COUNTRY_TEXT_MATCHERS.uk.test(text);
         },
         game: (item, type) => {
           if (type === "news") return true; // every news item is game-related
@@ -6886,7 +6894,7 @@
               '<div class="carousel-page active"><div class="empty-state glass" style="margin:auto">' +
               '<span class="empty-icon">🔍</span>' +
               "<h3>Nothing matches your filters</h3>" +
-              '<p>Try removing a filter, or tap 🌐 All to see everything again.</p>' +
+              "<p>Try removing a filter, or tap 🌐 All to see everything again.</p>" +
               "</div></div>";
             dotsEl.innerHTML = "";
             pageCount = 0;
