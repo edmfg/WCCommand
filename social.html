@@ -354,6 +354,18 @@
       body.exporting #bootGate {
         visibility: hidden !important;
       }
+      /* html2canvas can't clip a gradient to text (background-clip: text), so
+         gradient words like the hero "REACTIVE." rasterize as a solid colour
+         block. During export, fall back to a solid on-brand fill so the actual
+         letters render in the PDF / JPG. */
+      body.exporting .hero h1 .stroke,
+      body.exporting .brand .sub {
+        background: none !important;
+        -webkit-background-clip: border-box !important;
+        background-clip: border-box !important;
+        color: var(--gold) !important;
+        -webkit-text-fill-color: var(--gold) !important;
+      }
       .live-dot {
         width: 6px;
         height: 6px;
