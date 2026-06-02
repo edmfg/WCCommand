@@ -3817,6 +3817,247 @@
         margin-bottom: 22px;
         border-radius: 12px;
         overflow: hidden;
+        border: 2px solid var(--gold);
+      }
+      /* ── Live Briefing overlay (opened by the 🔥 Top pill) ── */
+      .briefing-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 16px;
+        background: rgba(8, 8, 14, 0.74);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        overflow-y: auto;
+      }
+      .briefing-overlay.open {
+        display: flex;
+      }
+      .briefing-modal {
+        width: 100%;
+        max-width: 880px;
+        background: linear-gradient(
+          180deg,
+          rgba(24, 24, 34, 0.98),
+          rgba(14, 15, 22, 0.98)
+        );
+        border: 1px solid rgba(255, 215, 0, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+        padding: 24px 28px 30px;
+        animation: briefingIn 0.28s ease;
+      }
+      @keyframes briefingIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.99);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .briefing-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 2px;
+      }
+      .briefing-head h2 {
+        font-family: "Oswald", sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 1.45rem;
+        margin: 0;
+        border-left: 4px solid var(--gold);
+        padding-left: 12px;
+      }
+      .briefing-live {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+      .briefing-live .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #34d399;
+        animation: briefPulse 2.2s infinite;
+      }
+      @keyframes briefPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+        }
+        70% {
+          box-shadow: 0 0 0 7px rgba(52, 211, 153, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+        }
+      }
+      .briefing-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 1.6rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0 4px;
+      }
+      .briefing-close:hover {
+        color: #fff;
+      }
+      .briefing-lead {
+        margin: 16px 0 20px;
+        padding: 16px 18px;
+        background: rgba(255, 215, 0, 0.06);
+        border: 1px solid rgba(255, 215, 0, 0.22);
+        border-radius: 12px;
+      }
+      .briefing-kicker {
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 700;
+      }
+      .briefing-lead h3 {
+        font-size: 1.25rem;
+        line-height: 1.32;
+        margin: 8px 0;
+        color: var(--text);
+      }
+      .briefing-dek {
+        color: var(--text-dim);
+        line-height: 1.5;
+        margin: 0 0 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .briefing-lead-meta {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .briefing-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+      }
+      @media (max-width: 680px) {
+        .briefing-cols {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+      }
+      .briefing-col-head {
+        font-family: "Oswald", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .briefing-list,
+      .briefing-pulse {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .briefing-list li {
+        margin-bottom: 14px;
+      }
+      .briefing-list a,
+      .briefing-list .briefing-headline {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+        line-height: 1.35;
+        display: block;
+      }
+      .briefing-list a:hover {
+        color: var(--gold);
+      }
+      .briefing-sub {
+        font-size: 0.73rem;
+        color: var(--text-dim);
+        margin-top: 4px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .briefing-tagdot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex: none;
+      }
+      .briefing-pulse li {
+        display: grid;
+        grid-template-columns: 11px 1fr;
+        align-items: start;
+        gap: 10px;
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .briefing-pulse a,
+      .briefing-pulse .briefing-headline {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .briefing-pulse a:hover {
+        color: var(--gold);
+      }
+      .briefing-sent {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        margin-top: 4px;
+      }
+      .briefing-sent.pos {
+        background: #34d399;
+      }
+      .briefing-sent.neg {
+        background: #f87171;
+      }
+      .briefing-sent.mix {
+        background: #fbbf24;
+      }
+      .briefing-bar {
+        height: 5px;
+        border-radius: 3px;
+        margin-top: 6px;
+        background: linear-gradient(90deg, var(--red), var(--gold));
+      }
+      .briefing-fires {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin-top: 4px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .briefing-modal,
+        .briefing-live .dot {
+          animation: none;
+        }
       }
       .heatmap-header {
         width: 100%;
@@ -6207,6 +6448,28 @@
       </div>
     </div>
 
+    <!-- Live Briefing overlay (Concept 1) — opened by the 🔥 Top filter pill. -->
+    <div
+      class="briefing-overlay"
+      id="briefingOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Live briefing"
+    >
+      <div class="briefing-modal">
+        <div class="briefing-head">
+          <h2>Live Briefing</h2>
+          <span class="briefing-live"
+            ><span class="dot"></span><span id="briefingUpdated">live</span></span
+          >
+          <button class="briefing-close" id="briefingClose" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div id="briefingBody"></div>
+      </div>
+    </div>
+
     <!-- Today's Reactive market chooser. Opens before the iframe loads so
          the user picks Canada / Brazil / Germany / USA. Only Canada is wired
          up today; the others are visible but disabled. -->
@@ -6787,7 +7050,9 @@
             ]
               .filter(Boolean)
               .join(" ");
-            return `<button class="${cls}" onclick="setLiveFilter('${f.id}')">${f.label}</button>`;
+            const action =
+              f.id === "top" ? "openBriefing()" : `setLiveFilter('${f.id}')`;
+            return `<button class="${cls}" onclick="${action}">${f.label}</button>`;
           })
           .join("");
       }
@@ -6800,6 +7065,186 @@
         }
         return false;
       }
+
+      // ── Live Briefing (Concept 1) — opened by the 🔥 Top pill ──
+      // A calm, scannable digest of what's hottest right now: one lead story,
+      // a ranked news list, and a social "pulse". Reads DASHBOARD_DATA only;
+      // the carousels / filters below are untouched.
+      function _fireCount(v) {
+        return ((v || "").match(/🔥/g) || []).length;
+      }
+      function buildBriefing() {
+        const news = (window.DASHBOARD_DATA && DASHBOARD_DATA.news) || [];
+        const social = (window.DASHBOARD_DATA && DASHBOARD_DATA.social) || [];
+        // Hottest social first.
+        const pulse = [...social].sort(
+          (a, b) => _fireCount(b.volume) - _fireCount(a.volume),
+        );
+        // News referenced by the hottest social = "top" news; the rest keeps
+        // feed order (newest-first).
+        const hotUrls = new Set(
+          pulse
+            .filter((s) => _fireCount(s.volume) >= 4 && s.sourceUrl)
+            .map((s) => s.sourceUrl),
+        );
+        const topNews = news.filter((n) => n.url && hotUrls.has(n.url));
+        const rankedNews = [
+          ...topNews,
+          ...news.filter((n) => !topNews.includes(n)),
+        ];
+        const lead = rankedNews[0] || null;
+        const newsList = rankedNews.filter((n) => n !== lead).slice(0, 5);
+        const pulseTop = pulse.slice(0, 5);
+        const maxFires =
+          pulseTop.reduce((m, s) => Math.max(m, _fireCount(s.volume)), 0) || 1;
+
+        const tagColor = (tag) =>
+          tag === "Canada"
+            ? "#e85d5d"
+            : tag === "Germany"
+              ? "#d4af37"
+              : tag === "USA"
+                ? "#5d8fe8"
+                : tag === "UK"
+                  ? "#9d6de8"
+                  : tag === "Brazil"
+                    ? "#4caf50"
+                    : "#8a8fa0";
+        const fmtTime = (ts) => {
+          if (!ts) return "";
+          const d = new Date(ts);
+          if (isNaN(d)) return "";
+          return (
+            d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
+            " · " +
+            d.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            })
+          );
+        };
+
+        let html = "";
+        if (lead) {
+          const link = safeUrl(lead.url);
+          html +=
+            '<div class="briefing-lead">' +
+            '<span class="briefing-kicker">★ Lead story</span>' +
+            "<h3>" +
+            wrapEmoji(autoLinkEntities(escapeHtml(lead.headline))) +
+            "</h3>" +
+            '<p class="briefing-dek">' +
+            autoLinkEntities(escapeHtml(lead.summary || "")) +
+            "</p>" +
+            '<div class="briefing-lead-meta"><span>' +
+            escapeHtml(lead.source || "") +
+            (fmtTime(lead.timestamp) ? " · " + fmtTime(lead.timestamp) : "") +
+            "</span>" +
+            (link
+              ? '<a href="' +
+                link +
+                '" target="_blank" rel="noopener" style="color:var(--gold)">Read ↗</a>'
+              : "") +
+            "</div></div>";
+        }
+
+        html += '<div class="briefing-cols">';
+        // News column
+        html +=
+          '<div class="briefing-col"><h4 class="briefing-col-head">News</h4><ul class="briefing-list">';
+        if (!newsList.length)
+          html += '<li style="color:var(--text-dim)">No headlines yet.</li>';
+        for (const n of newsList) {
+          const link = safeUrl(n.url);
+          const head = wrapEmoji(autoLinkEntities(escapeHtml(n.headline)));
+          const inner = link
+            ? '<a href="' +
+              link +
+              '" target="_blank" rel="noopener">' +
+              head +
+              "</a>"
+            : '<span class="briefing-headline">' + head + "</span>";
+          html +=
+            "<li>" +
+            inner +
+            '<div class="briefing-sub"><span class="briefing-tagdot" style="background:' +
+            tagColor(n.tag) +
+            '"></span>' +
+            escapeHtml(n.tag || "General") +
+            (fmtTime(n.timestamp) ? " · " + fmtTime(n.timestamp) : "") +
+            "</div></li>";
+        }
+        html += "</ul></div>";
+        // Social pulse column
+        html +=
+          '<div class="briefing-col"><h4 class="briefing-col-head">Social Pulse</h4><ul class="briefing-pulse">';
+        if (!pulseTop.length)
+          html += '<li style="color:var(--text-dim)">Quiet right now.</li>';
+        for (const s of pulseTop) {
+          const fires = _fireCount(s.volume);
+          const sentCls =
+            s.sentiment === "positive"
+              ? "pos"
+              : s.sentiment === "negative"
+                ? "neg"
+                : "mix";
+          const link = safeUrl(s.sourceUrl || s.url);
+          const topic = wrapEmoji(autoLinkEntities(escapeHtml(s.topic)));
+          const inner = link
+            ? '<a href="' +
+              link +
+              '" target="_blank" rel="noopener">' +
+              topic +
+              "</a>"
+            : '<span class="briefing-headline">' + topic + "</span>";
+          const pct = Math.max(12, Math.round((fires / maxFires) * 100));
+          html +=
+            '<li><span class="briefing-sent ' +
+            sentCls +
+            '"></span><div>' +
+            inner +
+            '<div class="briefing-bar" style="width:' +
+            pct +
+            '%"></div>' +
+            (s.volume
+              ? '<div class="briefing-fires">' + escapeHtml(s.volume) + "</div>"
+              : "") +
+            "</div></li>";
+        }
+        html += "</ul></div></div>";
+        return html;
+      }
+      function openBriefing() {
+        const overlay = document.getElementById("briefingOverlay");
+        if (!overlay) return;
+        try {
+          document.getElementById("briefingBody").innerHTML = buildBriefing();
+        } catch (e) {
+          console.error("briefing build failed", e);
+        }
+        const upd = document.getElementById("lastUpdated");
+        const u = document.getElementById("briefingUpdated");
+        if (u) u.textContent = (upd && upd.textContent.trim()) || "live";
+        overlay.classList.add("open");
+        if (typeof trackEvent === "function") trackEvent("briefing_open", {});
+      }
+      function closeBriefing() {
+        const overlay = document.getElementById("briefingOverlay");
+        if (overlay) overlay.classList.remove("open");
+      }
+      (function wireBriefing() {
+        const overlay = document.getElementById("briefingOverlay");
+        if (!overlay) return;
+        const closeBtn = document.getElementById("briefingClose");
+        if (closeBtn) closeBtn.addEventListener("click", closeBriefing);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeBriefing();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("open"))
+            closeBriefing();
+        });
+      })();
 
       // ── Card Carousel Engine (3 per page, slide motion, pin + hover-pause) ──
       const PINNED_LS_KEY = "wc_pinned_cards";
