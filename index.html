@@ -2275,6 +2275,39 @@
         background: rgba(0, 0, 0, 0.05);
         color: #000;
       }
+      /* Creative Drive vault panel */
+      .creative-vault {
+        max-width: 560px;
+        margin: 56px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+      .creative-vault-title {
+        justify-content: center;
+      }
+      .creative-vault-copy {
+        color: var(--text-muted);
+        line-height: 1.55;
+        margin: 14px 0 30px;
+      }
+      .creative-vault-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        transition: filter 0.15s ease, box-shadow 0.15s ease;
+      }
+      .creative-vault-btn:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 6px 22px rgba(99, 102, 241, 0.5);
+      }
       .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -5677,6 +5710,9 @@
               hidden
             ></span>
           </button>
+          <button class="tab-btn" data-tab="creativevault" type="button">
+            Creative
+          </button>
           <!-- ARCHIVED 2026-05-29: Creative tab hidden for now. Panel markup and
                all logic remain below; un-comment this button (and the keyboard
                shortcut + help-overlay line) to re-enable.
@@ -5964,6 +6000,27 @@
         </div>
         <div class="sub-panel" id="sub-fox-s2" data-subtab="s2">
           <div class="assets-grid" id="foxS2Grid"></div>
+        </div>
+      </div>
+
+      <!-- CREATIVE (Drive vault, gated by CREATIVE_PASSWORD) -->
+      <div class="tab-panel" id="panel-creativevault">
+        <div class="creative-vault">
+          <h2 class="section-title creative-vault-title">Creative library</h2>
+          <p class="creative-vault-copy">
+            The MFG World Cup creative assets live in Google Drive. Open the
+            folder in a new tab — you'll sign in with your Google account, and
+            Drive confirms you have access before anything loads.
+          </p>
+          <a
+            class="creative-vault-btn"
+            href="https://drive.google.com/drive/folders/1zFuC3AkrD34Gy8JhVN0tRaSysd8ia98w"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span aria-hidden="true">📁</span> Open Creative Drive
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
 
@@ -8909,7 +8966,7 @@
       function switchTab(tab, opts) {
         opts = opts || {};
         if (
-          tab === "creative" &&
+          tab === "creativevault" &&
           !window._creativeViewUnlocked &&
           !opts.suppressGate
         ) {
@@ -8920,7 +8977,7 @@
         // suppressGate=true. If the user isn't unlocked, silently fall back
         // to the Live tab instead of yelling at them with a modal.
         if (
-          tab === "creative" &&
+          tab === "creativevault" &&
           !window._creativeViewUnlocked &&
           opts.suppressGate
         ) {
@@ -8978,7 +9035,7 @@
       // ── Creative tab view gate ──
       // Separate cookie / endpoint from the dashboard-level gate. Verifies a
       // session cookie on first attempt to enter the Creative tab, prompts
-      // for password if missing/expired. CREATIVE_KEY env var on Vercel.
+      // for password if missing/expired. CREATIVE_PASSWORD env var on Vercel.
       function openCreativeViewGate() {
         const overlay = document.getElementById("creativeViewGateOverlay");
         const input = document.getElementById("creativeViewGateInput");
@@ -8999,7 +9056,7 @@
       window.__wccUnlockCreativeGate = function () {
         window._creativeViewUnlocked = true;
         closeCreativeViewGate();
-        if (typeof switchTab === "function") switchTab("creative");
+        if (typeof switchTab === "function") switchTab("creativevault");
         return true;
       };
       function setupCreativeViewGate() {
@@ -9034,11 +9091,12 @@
             if (res.ok && data.ok) {
               window._creativeViewUnlocked = true;
               closeCreativeViewGate();
-              switchTab("creative");
+              switchTab("creativevault");
             } else {
               if (err) {
                 err.textContent =
-                  data && data.error === "CREATIVE_KEY env var not configured"
+                  data &&
+                  data.error === "CREATIVE_PASSWORD env var not configured"
                     ? "Creative gate not configured on the server. Contact Ed."
                     : "Wrong password.";
                 err.classList.add("shown");

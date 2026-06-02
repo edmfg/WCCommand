@@ -1,5 +1,7 @@
-// Creative-tab view gate. Same shape as api/gate.js. Cookie
-// wcc_creative_view, 12-hour or 7-day TTL.
+// Creative tab view gate. Same shape as api/gate.js. Cookie
+// wcc_creative_view, 12-hour or 7-day TTL. Reads its own CREATIVE_PASSWORD
+// env var (separate from the dashboard's GATE_PASSWORD) so the Creative
+// Drive tab has an independent password.
 
 const {
   GATE_RL_MAX,
@@ -44,11 +46,11 @@ function clearCookie(res) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  const password = process.env.GATE_PASSWORD;
+  const password = process.env.CREATIVE_PASSWORD;
   if (!password) {
     return res
       .status(500)
-      .json({ error: "GATE_PASSWORD env var not configured" });
+      .json({ error: "CREATIVE_PASSWORD env var not configured" });
   }
   const secret = signingSecret();
 
