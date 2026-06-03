@@ -273,6 +273,14 @@
         opacity: 0.9;
         animation: tileGlow 7s ease-in-out infinite;
       }
+      /* World Cup Engine — extra-thick outline so the eye lands here first */
+      .a-hero::before {
+        padding: 5px;
+      }
+      .a-hero {
+        box-shadow: 0 0 0 1px rgba(155, 114, 203, 0.25),
+          0 16px 40px rgba(123, 104, 200, 0.28);
+      }
       @keyframes tileGlow {
         0%,
         100% {
