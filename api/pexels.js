@@ -15,7 +15,7 @@ const TILE_QUERIES = {
   culture: "diverse soccer fans flags faces celebration",
   gemini: "abstract glowing gradient light blue purple",
   ocr: "soccer fan dancing celebration flag crowd",
-  agentic: "sunrise over empty stadium",
+  agentic: "artificial intelligence glowing neural network abstract",
   reactive: "soccer goal celebration crowd eruption",
   dashboard: "analytics dashboard screen dark",
   halo: "data visualization glowing network",
