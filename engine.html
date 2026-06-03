@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -244,14 +244,22 @@
       .insight .tile-scrim {
         background: var(--scrim-heavy);
       }
-      /* thin rainbow (Gemini gradient) border on EVERY tile */
+      /* thin rainbow border on EVERY tile — gently animated so it feels alive */
       .tile::before {
         content: "";
         position: absolute;
         inset: 0;
         border-radius: inherit;
         padding: 1.6px;
-        background: var(--gemini);
+        background: linear-gradient(
+          74deg,
+          #4285f4,
+          #9b72cb,
+          #d96570,
+          #9b72cb,
+          #4285f4
+        );
+        background-size: 300% 100%;
         -webkit-mask:
           linear-gradient(#000 0 0) content-box,
           linear-gradient(#000 0 0);
@@ -259,7 +267,32 @@
         mask-composite: exclude;
         pointer-events: none;
         z-index: 5;
+        opacity: 0.8;
+        animation: tileGlow 7s ease-in-out infinite;
       }
+      @keyframes tileGlow {
+        0%,
+        100% {
+          background-position: 0% 50%;
+          opacity: 0.7;
+          filter: saturate(1) brightness(1);
+        }
+        50% {
+          background-position: 100% 50%;
+          opacity: 1;
+          filter: saturate(1.25) brightness(1.18);
+        }
+      }
+      /* desync the glow so the board feels alive, not in lockstep */
+      .tile:nth-child(2)::before { animation-delay: -1.2s; }
+      .tile:nth-child(3)::before { animation-delay: -2.4s; }
+      .tile:nth-child(4)::before { animation-delay: -3.6s; }
+      .tile:nth-child(5)::before { animation-delay: -0.8s; }
+      .tile:nth-child(6)::before { animation-delay: -2s; }
+      .tile:nth-child(7)::before { animation-delay: -3.1s; }
+      .tile:nth-child(8)::before { animation-delay: -1.6s; }
+      .tile:nth-child(9)::before { animation-delay: -2.8s; }
+      .tile:nth-child(10)::before { animation-delay: -4.2s; }
 
       .tile-body {
         position: absolute;
@@ -273,16 +306,17 @@
       }
       .tile-head {
         margin: 0;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        line-height: 1.06;
-        font-size: clamp(18px, 1.55vw, 23px);
-        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.02;
+        font-size: clamp(22px, 2vw, 28px);
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
       }
       .a-hero .tile-head {
-        font-size: clamp(28px, 3.4vw, 46px);
+        font-size: clamp(34px, 4vw, 56px);
         font-weight: 900;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.035em;
+        line-height: 0.98;
       }
       /* hero "story" copy */
       .hero-story .tile-scrim {
@@ -326,37 +360,39 @@
       }
       /* long headlines in thin tiles — keep them from overflowing */
       .a-reac .tile-head {
-        font-size: clamp(15px, 1.35vw, 19px);
-        line-height: 1.16;
+        font-size: clamp(19px, 1.8vw, 25px);
+        line-height: 1.08;
       }
       .a-dash .tile-head,
       .a-mark .tile-head {
-        font-size: 17px;
-        line-height: 1.14;
-      }
-      /* dynamic headline rhythm — varied sizes per tile, kept tidy
-         (same weight family, colour, and bottom alignment throughout) */
-      .a-gpc .tile-head {
-        font-size: clamp(26px, 2.7vw, 40px);
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        line-height: 1.04;
-      }
-      .a-ocr .tile-head {
-        font-size: clamp(22px, 2vw, 31px);
-        line-height: 1.07;
-      }
-      .a-copt .tile-head {
-        font-size: clamp(20px, 1.85vw, 28px);
+        font-size: clamp(18px, 1.6vw, 23px);
         line-height: 1.08;
       }
+      /* big, bold headlines — the dominant element on each tile */
+      .a-gpc .tile-head {
+        font-size: clamp(30px, 3.2vw, 47px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 0.99;
+      }
+      .a-ocr .tile-head {
+        font-size: clamp(23px, 2.3vw, 33px);
+        letter-spacing: -0.025em;
+        line-height: 1.02;
+      }
+      .a-copt .tile-head {
+        font-size: clamp(26px, 2.5vw, 36px);
+        letter-spacing: -0.028em;
+        line-height: 1;
+      }
       .a-agen .tile-head {
-        font-size: clamp(19px, 1.7vw, 25px);
-        line-height: 1.1;
+        font-size: clamp(25px, 2.4vw, 35px);
+        letter-spacing: -0.028em;
+        line-height: 1;
       }
       .a-halo .tile-head {
-        font-size: clamp(16px, 1.4vw, 20px);
-        line-height: 1.12;
+        font-size: clamp(20px, 1.9vw, 27px);
+        line-height: 1.04;
       }
       .tile-sub b {
         color: #fff;
@@ -416,8 +452,9 @@
       }
       /* culture tile — cultural-exchange category chips */
       .a-cult .tile-head {
-        font-size: clamp(18px, 1.7vw, 24px);
-        line-height: 1.12;
+        font-size: clamp(23px, 2.2vw, 32px);
+        letter-spacing: -0.02em;
+        line-height: 1.02;
       }
       .culture-tags {
         display: flex;
@@ -510,6 +547,10 @@
           animation: none;
           opacity: 1;
         }
+        .tile::before {
+          animation: none;
+          opacity: 0.85;
+        }
       }
 
       /* ============ responsive ============ */
@@ -568,7 +609,7 @@
         </svg>
         World Cup HQ
       </a>
-      <span class="wordmark"><b>Gemini</b> × MFG</span>
+      <span class="wordmark"><b>Search</b> × MFG</span>
     </header>
 
     <main class="bento">
@@ -636,8 +677,14 @@
         <img class="tile-photo" src="/api/pexels?t=ocr" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">First to <i>See + Hear</i> Social</h2>
-          <p class="tile-sub">Uses Burson OCR to See + Hear TikTok &amp; Meta</p>
+          <div class="social-logos">
+            <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram" />
+            <img src="https://cdn.simpleicons.org/tiktok/white" alt="TikTok" />
+          </div>
+          <h2 class="tile-head">
+            Seeing &amp; Hearing Fans Dance, Sing, Scream, Cook
+          </h2>
+          <p class="tile-sub">Using Burson OCR technology on Meta and TikTok</p>
         </div>
       </article>
 
