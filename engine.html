@@ -852,5 +852,80 @@
         }
       })();
     </script>
+
+    <!-- TEMP live-text editor — active only with ?edit=1. Remove when done. -->
+    <script>
+      (function () {
+        if (new URLSearchParams(location.search).get("edit") !== "1") return;
+        const SEL =
+          ".tile-head, .tile-sub, .kick, .hero-stats, .hero-copy, .culture-tags span";
+        const KEY = "wce_edit_v1";
+        function start() {
+          const els = [...document.querySelectorAll(SEL)];
+          let saved = {};
+          try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+          const save = () => {
+            const out = {};
+            els.forEach((el, i) => (out[i] = el.innerHTML));
+            localStorage.setItem(KEY, JSON.stringify(out));
+          };
+          els.forEach((el, i) => {
+            if (saved[i] != null) el.innerHTML = saved[i];
+            el.setAttribute("contenteditable", "true");
+            el.style.outline = "1px dashed rgba(155,114,203,0.55)";
+            el.style.outlineOffset = "2px";
+            el.style.cursor = "text";
+            el.addEventListener("input", save);
+          });
+          // don't navigate away from link tiles while editing
+          document.querySelectorAll("a.tile").forEach((a) =>
+            a.addEventListener("click", (e) => e.preventDefault())
+          );
+          // floating toolbar
+          const bar = document.createElement("div");
+          bar.style.cssText =
+            "position:fixed;right:18px;bottom:18px;z-index:99999;display:flex;gap:8px;align-items:center;background:#13131a;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 10px 8px 16px;font:600 12px/1 system-ui;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.5)";
+          bar.innerHTML =
+            '<span style="letter-spacing:.12em;color:#c7a6e0">✎ EDIT MODE</span>';
+          const copyBtn = document.createElement("button");
+          copyBtn.textContent = "Copy edits";
+          copyBtn.style.cssText =
+            "border:0;border-radius:999px;padding:7px 14px;font:700 12px system-ui;color:#fff;cursor:pointer;background:linear-gradient(74deg,#4285f4,#9b72cb,#d96570)";
+          copyBtn.onclick = () => {
+            const lines = els.map((el) => {
+              const tile = el.closest("[class*='a-']");
+              const area = tile
+                ? [...tile.classList].find((c) => c.startsWith("a-")) || "?"
+                : "?";
+              const kind =
+                el.className
+                  .split(" ")
+                  .find((c) =>
+                    ["tile-head", "tile-sub", "kick", "hero-stats", "hero-copy"].includes(c)
+                  ) || "chip";
+              return `${area} · ${kind}: ${el.textContent.trim().replace(/\s+/g, " ")}`;
+            });
+            const text = lines.join("\n");
+            navigator.clipboard.writeText(text);
+            console.log(text);
+            copyBtn.textContent = "Copied — paste to Claude";
+            setTimeout(() => (copyBtn.textContent = "Copy edits"), 1800);
+          };
+          const resetBtn = document.createElement("button");
+          resetBtn.textContent = "Reset";
+          resetBtn.style.cssText =
+            "border:1px solid rgba(255,255,255,.2);background:transparent;border-radius:999px;padding:7px 12px;font:600 12px system-ui;color:#bbb;cursor:pointer";
+          resetBtn.onclick = () => {
+            localStorage.removeItem(KEY);
+            location.reload();
+          };
+          bar.appendChild(copyBtn);
+          bar.appendChild(resetBtn);
+          document.body.appendChild(bar);
+        }
+        if (document.readyState !== "loading") start();
+        else document.addEventListener("DOMContentLoaded", start);
+      })();
+    </script>
   </body>
 </html>
