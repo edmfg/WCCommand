@@ -381,6 +381,96 @@
           0 12px 28px rgba(204, 0, 0, 0.5),
           inset 0 1px 0 rgba(255, 255, 255, 0.45);
       }
+      /* ── Shiny "What is World Cup Engine?" pill (Gemini gradient) ── */
+      .tab-btn.engine-pill {
+        text-decoration: none;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        background: linear-gradient(
+          74deg,
+          #4285f4 0%,
+          #9b72cb 50%,
+          #d96570 100%
+        );
+        background-size: 220% 100%;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+        box-shadow:
+          0 6px 18px rgba(155, 114, 203, 0.45),
+          0 2px 8px rgba(217, 101, 112, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        animation:
+          engineHue 9s linear infinite,
+          enginePulse 3.2s ease-in-out infinite;
+      }
+      .tab-btn.engine-pill::before {
+        opacity: 0.22;
+      }
+      /* sweeping light sheen */
+      .tab-btn.engine-pill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 42%;
+        height: 100%;
+        pointer-events: none;
+        background: linear-gradient(
+          100deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.85) 50%,
+          transparent 100%
+        );
+        transform: skewX(-18deg);
+        animation: engineSheen 3.8s ease-in-out infinite;
+      }
+      .tab-btn.engine-pill:hover {
+        transform: translateY(-1px) scale(1.03);
+        color: #fff;
+        box-shadow:
+          0 12px 30px rgba(155, 114, 203, 0.6),
+          0 4px 14px rgba(217, 101, 112, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+      @keyframes engineHue {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 220% 50%;
+        }
+      }
+      @keyframes enginePulse {
+        0%,
+        100% {
+          box-shadow:
+            0 6px 18px rgba(155, 114, 203, 0.4),
+            0 2px 8px rgba(217, 101, 112, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        50% {
+          box-shadow:
+            0 9px 26px rgba(155, 114, 203, 0.62),
+            0 3px 12px rgba(217, 101, 112, 0.52),
+            inset 0 1px 0 rgba(255, 255, 255, 0.62);
+        }
+      }
+      @keyframes engineSheen {
+        0% {
+          left: -60%;
+        }
+        55%,
+        100% {
+          left: 130%;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tab-btn.engine-pill {
+          animation: none;
+        }
+        .tab-btn.engine-pill::after {
+          display: none;
+        }
+      }
       .header-actions {
         display: flex;
         align-items: center;
@@ -5921,6 +6011,14 @@
           <button class="tab-btn" data-tab="creativevault" type="button">
             Creative
           </button>
+          <a
+            class="tab-btn engine-pill"
+            href="/engine.html"
+            target="_blank"
+            rel="noopener"
+          >
+            What is World Cup Engine?
+          </a>
           <!-- ARCHIVED 2026-05-29: Creative tab hidden for now. Panel markup and
                all logic remain below; un-comment this button (and the keyboard
                shortcut + help-overlay line) to re-enable.

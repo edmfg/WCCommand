@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>World Cup Engine — AI Creativity at the Speed of Sport</title>
+    <meta
+      name="description"
+      content="World Cup Engine — Gemini × MFG. AI creativity at the speed of sport."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============ design tokens ============ */
+      :root {
+        --g-blue: #4285f4;
+        --g-red: #ea4335;
+        --g-yellow: #fbbc04;
+        --g-green: #34a853;
+        --gemini: linear-gradient(74deg, #4285f4 0%, #9b72cb 50%, #d96570 100%);
+
+        --ink: #202124;
+        --bg: #ffffff;
+        --radius: 24px;
+        --gap: 14px;
+        --pad: 28px;
+
+        --scrim: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.72) 0%,
+          rgba(0, 0, 0, 0.15) 45%,
+          transparent 75%
+        );
+        --scrim-heavy: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.82) 0%,
+          rgba(0, 0, 0, 0.4) 55%,
+          rgba(0, 0, 0, 0.2) 100%
+        );
+        --elev: 0 12px 28px rgba(60, 64, 67, 0.28);
+        --font:
+          "Google Sans Text", "Google Sans", "Product Sans", "Roboto",
+          system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      /* ============ masthead ============ */
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px var(--pad) 6px;
+        max-width: 1480px;
+        margin: 0 auto;
+      }
+      .back {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        color: var(--ink);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 9px 15px 9px 12px;
+        border: 1px solid #e3e5e8;
+        border-radius: 999px;
+        background: #fff;
+        transition:
+          box-shadow 0.18s ease,
+          transform 0.18s ease,
+          border-color 0.18s ease;
+      }
+      .back:hover {
+        box-shadow: 0 6px 16px rgba(60, 64, 67, 0.16);
+        transform: translateY(-1px);
+        border-color: #d2d5da;
+      }
+      .back svg {
+        width: 15px;
+        height: 15px;
+      }
+      .wordmark {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #5f6368;
+      }
+      .wordmark b {
+        background: var(--gemini);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      /* ============ lede ============ */
+      .lede {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 10px var(--pad) 4px;
+      }
+      .lede h1 {
+        margin: 6px 0 2px;
+        font-size: clamp(26px, 3.4vw, 46px);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        line-height: 1.02;
+      }
+      .lede h1 .grad {
+        background: var(--gemini);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lede p {
+        margin: 0;
+        color: #5f6368;
+        font-size: clamp(14px, 1.3vw, 17px);
+        max-width: 64ch;
+      }
+
+      /* ============ bento grid ============ */
+      .bento {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 18px var(--pad) var(--pad);
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-auto-rows: 140px;
+        gap: var(--gap);
+        grid-auto-flow: dense;
+      }
+
+      /* size classes (cols x rows) */
+      .hero {
+        grid-column: 5 / span 4;
+        grid-row: 1 / span 3;
+      }
+      .wide {
+        grid-column: span 4;
+      }
+      .square {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+      .tall {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+      .small {
+        grid-column: span 2;
+      }
+      .banner {
+        grid-column: span 6;
+      }
+
+      /* ============ photo card ============ */
+      .tile {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius);
+        /* fallback bg shows if the photo is missing — never a broken grid */
+        background: linear-gradient(
+          145deg,
+          var(--accent, #3c4043) 0%,
+          color-mix(in srgb, var(--accent, #3c4043) 60%, #1a1a1a) 100%
+        );
+        color: #fff;
+        text-decoration: none;
+        cursor: default;
+        transform: translateY(0);
+        transition:
+          transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+          box-shadow 0.22s ease;
+        /* staggered load-in */
+        opacity: 0;
+        animation: rise 0.62s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+      }
+      .tile.gemini {
+        background: var(--gemini);
+      }
+      a.tile {
+        cursor: pointer;
+      }
+      .tile:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--elev);
+      }
+      .tile-photo {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+      .tile-photo.failed {
+        display: none;
+      }
+      .tile-scrim {
+        position: absolute;
+        inset: 0;
+        background: var(--scrim);
+      }
+      .stat .tile-scrim,
+      .gemini .tile-scrim {
+        background: var(--scrim-heavy);
+      }
+      /* top accent bar */
+      .tile::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--accent, transparent);
+        opacity: 0.95;
+        z-index: 3;
+      }
+      .tile.gemini::after {
+        background: var(--gemini);
+        height: 5px;
+      }
+      .tile.nobar::after {
+        display: none;
+      }
+
+      .tile-body {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 20px;
+        gap: 4px;
+      }
+      .tile-head {
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        line-height: 1.06;
+        font-size: clamp(18px, 1.6vw, 24px);
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+      }
+      .hero .tile-head {
+        font-size: clamp(30px, 4.2vw, 60px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+      }
+      .tile-sub {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.3;
+        color: rgba(255, 255, 255, 0.85);
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+      }
+      .hero .tile-sub {
+        font-size: clamp(13px, 1.2vw, 17px);
+        color: rgba(255, 255, 255, 0.92);
+      }
+      .tile-sub b {
+        color: #fff;
+        font-weight: 700;
+      }
+
+      /* the ⚡ "first" flag */
+      .flag-first {
+        position: absolute;
+        top: 13px;
+        left: 16px;
+        z-index: 3;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+      }
+
+      /* stat chips */
+      .stat .tile-body {
+        justify-content: center;
+        gap: 2px;
+      }
+      .stat-num {
+        font-size: clamp(30px, 3.2vw, 44px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        background: var(--gemini);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 2px 10px rgba(217, 101, 112, 0.35));
+      }
+      .stat-phrase {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.25;
+      }
+
+      .arrow {
+        display: inline-block;
+        transition: transform 0.18s ease;
+      }
+      a.tile:hover .arrow {
+        transform: translate(2px, -2px);
+      }
+
+      /* footer */
+      .foot {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 4px var(--pad) 40px;
+        color: #9aa0a6;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .foot a {
+        color: #9aa0a6;
+      }
+      .dots {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .dots i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      /* stagger: source-order delays */
+      .tile:nth-child(1) { animation-delay: 0.02s; }
+      .tile:nth-child(2) { animation-delay: 0.06s; }
+      .tile:nth-child(3) { animation-delay: 0.10s; }
+      .tile:nth-child(4) { animation-delay: 0.14s; }
+      .tile:nth-child(5) { animation-delay: 0.18s; }
+      .tile:nth-child(6) { animation-delay: 0.22s; }
+      .tile:nth-child(7) { animation-delay: 0.26s; }
+      .tile:nth-child(8) { animation-delay: 0.30s; }
+      .tile:nth-child(9) { animation-delay: 0.34s; }
+      .tile:nth-child(10) { animation-delay: 0.38s; }
+      .tile:nth-child(11) { animation-delay: 0.42s; }
+      .tile:nth-child(12) { animation-delay: 0.46s; }
+      .tile:nth-child(13) { animation-delay: 0.50s; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .tile {
+          animation: none;
+          opacity: 1;
+        }
+      }
+
+      /* ============ responsive ============ */
+      @media (max-width: 900px) {
+        .bento {
+          grid-template-columns: repeat(6, 1fr);
+        }
+        .hero {
+          grid-column: 1 / span 6;
+          grid-row: auto;
+          min-height: 300px;
+        }
+        .hero,
+        .wide,
+        .banner {
+          grid-column: span 6;
+        }
+        .square,
+        .tall,
+        .small {
+          grid-column: span 3;
+        }
+      }
+      @media (max-width: 600px) {
+        :root {
+          --pad: 16px;
+        }
+        .bento {
+          grid-template-columns: 1fr;
+          grid-auto-rows: 150px;
+        }
+        .hero {
+          order: -1;
+          min-height: 240px;
+          grid-row: span 2;
+        }
+        .hero,
+        .wide,
+        .square,
+        .tall,
+        .small,
+        .banner {
+          grid-column: 1 / -1;
+        }
+        .square,
+        .tall {
+          grid-row: span 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="back" href="/" aria-label="Back to World Cup HQ">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M15 5l-7 7 7 7"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        World Cup HQ
+      </a>
+      <span class="wordmark"><b>Gemini</b> × MFG</span>
+    </header>
+
+    <section class="lede">
+      <h1>What is the <span class="grad">World Cup Engine?</span></h1>
+      <p>
+        One campaign, built to turn the planet's biggest cultural moment into
+        creative — at the speed of sport. Every tile below is one piece of the
+        engine; the bigger the tile, the bigger the idea.
+      </p>
+    </section>
+
+    <main class="bento">
+      <!-- 3 · Veo -->
+      <article class="tile square gemini" style="--accent: var(--g-blue)">
+        <img class="tile-photo" src="./images/veo.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Veo</h2>
+          <p class="tile-sub">generates the video clips</p>
+        </div>
+      </article>
+
+      <!-- 4 · Gemini -->
+      <article class="tile square gemini" style="--accent: var(--g-blue)">
+        <img class="tile-photo" src="./images/gemini.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Gemini</h2>
+          <p class="tile-sub">inspires the prompts</p>
+        </div>
+      </article>
+
+      <!-- 1 · HERO -->
+      <article class="tile hero gemini">
+        <img class="tile-photo" src="./images/hero.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">World Cup Engine</h2>
+          <p class="tile-sub">AI Creativity at the Speed of Sport</p>
+        </div>
+      </article>
+
+      <!-- 11 · Stat — name -->
+      <article class="tile small stat nobar" style="--accent: var(--g-red)">
+        <img class="tile-photo" src="./images/mbappe.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <span class="stat-num">+300%</span>
+          <span class="stat-phrase">“how to pronounce Mbappé”</span>
+        </div>
+      </article>
+
+      <!-- 12 · Stat — food -->
+      <article class="tile small stat nobar" style="--accent: var(--g-green)">
+        <img class="tile-photo" src="./images/food.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <span class="stat-num">+250%</span>
+          <span class="stat-phrase">“Argentinian food” after the final</span>
+        </div>
+      </article>
+
+      <!-- 9 · Halo BLS (first ⚡) -->
+      <article class="tile square gemini" style="--accent: var(--g-blue)">
+        <span class="flag-first">⚡ A first</span>
+        <img class="tile-photo" src="./images/halo.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">First halo BLS: Search × Gemini</h2>
+          <p class="tile-sub">measurement flex</p>
+        </div>
+      </article>
+
+      <!-- 13 · Stat — language -->
+      <article class="tile small stat nobar" style="--accent: var(--g-yellow)">
+        <img class="tile-photo" src="./images/arabic.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <span class="stat-num">+85%</span>
+          <span class="stat-phrase">“learn Arabic” during Qatar</span>
+        </div>
+      </article>
+
+      <!-- 10 · Markets -->
+      <article class="tile small" style="--accent: var(--g-yellow)">
+        <img class="tile-photo" src="./images/markets.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head" style="font-size: 18px">🇨🇦 🇺🇸 🇧🇷 · 3 markets</h2>
+          <p class="tile-sub">Canada · USA · Brazil</p>
+        </div>
+      </article>
+
+      <!-- 2 · The insight -->
+      <article class="tile wide" style="--accent: var(--g-blue)">
+        <img class="tile-photo" src="./images/culture.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">The biggest cultural exchange moment</h2>
+          <p class="tile-sub">
+            not just the biggest sporting event · <b>71%</b> grow their interest
+            in other cultures
+          </p>
+        </div>
+      </article>
+
+      <!-- 5 · OCR (first ⚡) -->
+      <article class="tile wide gemini" style="--accent: var(--g-blue)">
+        <span class="flag-first">⚡ A first</span>
+        <img class="tile-photo" src="./images/ocr.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">First to <i>see + hear</i> TikTok &amp; Meta</h2>
+          <p class="tile-sub">innovation flex</p>
+        </div>
+      </article>
+
+      <!-- 7 · Reactive timeline -->
+      <article class="tile wide" style="--accent: var(--g-red)">
+        <img class="tile-photo" src="./images/reactive.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Real-time reactive ads</h2>
+          <p class="tile-sub"><b>Jul 7 → Jul 19</b></p>
+        </div>
+      </article>
+
+      <!-- 6 · Agentic team -->
+      <article class="tile square" style="--accent: var(--g-green)">
+        <img class="tile-photo" src="./images/agentic.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">An agentic team, listening daily</h2>
+          <p class="tile-sub">insights every morning</p>
+        </div>
+      </article>
+
+      <!-- 8 · Live dashboard (link) -->
+      <a
+        class="tile small"
+        style="--accent: var(--g-green)"
+        href="https://mfgworldcup.com"
+        target="_blank"
+        rel="noopener"
+      >
+        <img class="tile-photo" src="./images/dashboard.jpg" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Live dashboard <span class="arrow">↗</span></h2>
+          <p class="tile-sub">mfgworldcup.com</p>
+        </div>
+      </a>
+    </main>
+
+    <footer class="foot">
+      <span class="dots" aria-hidden="true">
+        <i style="background: var(--g-blue)"></i>
+        <i style="background: var(--g-red)"></i>
+        <i style="background: var(--g-yellow)"></i>
+        <i style="background: var(--g-green)"></i>
+      </span>
+      <span>Photography via <a href="https://pexels.com" target="_blank" rel="noopener">Pexels</a> · Gemini × MFG · World Cup Engine</span>
+    </footer>
+  </body>
+</html>
