@@ -19,6 +19,7 @@ const TILE_QUERIES = {
   reactive: "soccer goal celebration crowd eruption",
   dashboard: "analytics dashboard screen dark",
   halo: "data visualization glowing network",
+  copt: "abstract flowing gradient light motion",
   markets: "world map glowing connections night",
 };
 

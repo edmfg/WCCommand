@@ -170,22 +170,24 @@
         padding: 20px var(--pad) var(--pad);
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(5, var(--rowh));
+        grid-template-rows: repeat(6, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero hero hero hero cult cult cult cult gpc gpc"
-          "hero hero hero hero hero hero cult cult cult cult gpc gpc"
-          "hero hero hero hero hero hero cult cult cult cult gpc gpc"
-          "ocr  ocr  ocr  ocr  halo halo halo halo reac reac reac reac"
-          "agen agen agen agen mark mark mark mark dash dash dash dash";
+          "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
+          "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
+          "hero hero hero hero hero gpc  gpc  gpc  ocr  ocr  ocr  ocr"
+          "reac reac reac reac reac gpc  gpc  gpc  ocr  ocr  ocr  ocr"
+          "agen agen agen agen copt copt copt halo halo mark mark mark"
+          "agen agen agen agen copt copt copt halo halo dash dash dash";
       }
       .a-hero { grid-area: hero; }
-      .a-cult { grid-area: cult; }
       .a-gpc  { grid-area: gpc; }
+      .a-cult { grid-area: cult; }
       .a-ocr  { grid-area: ocr; }
-      .a-halo { grid-area: halo; }
       .a-reac { grid-area: reac; }
       .a-agen { grid-area: agen; }
+      .a-copt { grid-area: copt; }
+      .a-halo { grid-area: halo; }
       .a-mark { grid-area: mark; }
       .a-dash { grid-area: dash; }
 
@@ -316,6 +318,16 @@
       .a-hero .tile-sub {
         font-size: clamp(14px, 1.2vw, 18px);
         color: rgba(255, 255, 255, 0.92);
+      }
+      /* long headlines in thin tiles — keep them from overflowing */
+      .a-reac .tile-head {
+        font-size: clamp(15px, 1.35vw, 19px);
+        line-height: 1.16;
+      }
+      .a-dash .tile-head,
+      .a-mark .tile-head {
+        font-size: 17px;
+        line-height: 1.14;
       }
       .tile-sub b {
         color: #fff;
@@ -475,15 +487,16 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(7, var(--rowh));
+          grid-template-rows: repeat(8, var(--rowh));
           grid-template-areas:
-            "hero hero hero hero gpc  gpc"
-            "hero hero hero hero gpc  gpc"
-            "cult cult cult cult gpc  gpc"
-            "cult cult cult cult halo halo"
-            "ocr  ocr  ocr  reac reac reac"
-            "agen agen agen mark mark mark"
-            "dash dash dash dash dash dash";
+            "hero hero hero gpc  gpc  gpc"
+            "hero hero hero gpc  gpc  gpc"
+            "cult cult cult gpc  gpc  gpc"
+            "cult cult cult ocr  ocr  ocr"
+            "reac reac reac ocr  ocr  ocr"
+            "agen agen agen copt copt copt"
+            "agen agen agen copt copt copt"
+            "halo halo mark mark dash dash";
         }
       }
       @media (max-width: 600px) {
@@ -558,13 +571,18 @@
             <span>Food</span><span>Fashion</span><span>Music</span><span>Memes</span><span>Dance Moves</span><span>National Pride</span>
           </div>
           <h2 class="tile-head">
-            The World Cup is the biggest fan cultural exchange moment
+            The World Cup Is the Biggest Fan Cultural Exchange Moment
           </h2>
         </div>
       </article>
 
-      <!-- 3+4 · Gemini-Powered Creativity — the example asset (video) -->
-      <article class="tile a-gpc gemini">
+      <!-- 3+4 · Gemini-Powered Creativity — video, links to Prompt Studio -->
+      <a
+        class="tile a-gpc gemini"
+        href="https://promptstudio.mfgworldcup.com"
+        target="_blank"
+        rel="noopener"
+      >
         <video
           class="tile-photo"
           src="./assets/wc-soccer-aimode.mp4"
@@ -577,10 +595,12 @@
         ></video>
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">Gemini-Powered Creativity</h2>
-          <p class="tile-sub">Veo clips and Gemini-inspired prompts</p>
+          <h2 class="tile-head">
+            Gemini-Powered Creativity <span class="arrow">↗</span>
+          </h2>
+          <p class="tile-sub">Veo Clips and Gemini-Inspired Prompts</p>
         </div>
-      </article>
+      </a>
 
       <!-- 5 · OCR (innovation) -->
       <article class="tile a-ocr gemini" style="--accent: var(--g-blue)">
@@ -588,8 +608,8 @@
         <img class="tile-photo" src="/api/pexels?t=ocr" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">First to <i>see + hear</i> social</h2>
-          <p class="tile-sub">Uses Burson OCR to see + hear TikTok &amp; Meta</p>
+          <h2 class="tile-head">First to <i>See + Hear</i> Social</h2>
+          <p class="tile-sub">Uses Burson OCR to See + Hear TikTok &amp; Meta</p>
         </div>
       </article>
 
@@ -600,7 +620,18 @@
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <h2 class="tile-head">‘Halo’ BLS Measurement</h2>
-          <p class="tile-sub">Search × Gemini lift</p>
+          <p class="tile-sub">Search × Gemini Lift</p>
+        </div>
+      </article>
+
+      <!-- 11 · Creative Optimizer (innovation) -->
+      <article class="tile a-copt gemini" style="--accent: var(--g-blue)">
+        <span class="flag-first">⚡ Innovation</span>
+        <img class="tile-photo" src="/api/pexels?t=copt" alt="" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Creative Optimizer</h2>
+          <p class="tile-sub">E2E Activation</p>
         </div>
       </article>
 
@@ -609,7 +640,9 @@
         <img class="tile-photo" src="/api/pexels?t=reactive" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">Real-time reactive ads</h2>
+          <h2 class="tile-head">
+            Real-Time, Reactive Ads: Social Listening to Ship in 12 Hours
+          </h2>
           <p class="tile-sub"><b>Jul 7 → Jul 19</b></p>
         </div>
       </article>
@@ -625,8 +658,8 @@
             <img src="https://cdn.simpleicons.org/youtube/white" alt="YouTube" />
             <img src="https://cdn.simpleicons.org/bluesky/white" alt="Bluesky" />
           </div>
-          <h2 class="tile-head">WPP Open agentic team</h2>
-          <p class="tile-sub">listening to social conversations</p>
+          <h2 class="tile-head">WPP Open Agentic Team</h2>
+          <p class="tile-sub">Listening to Social Conversations</p>
         </div>
       </article>
 
@@ -635,7 +668,7 @@
         <img class="tile-photo" src="/api/pexels?t=markets" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head" style="font-size: 19px">🇨🇦 🇺🇸 🇧🇷 · 3 markets</h2>
+          <h2 class="tile-head" style="font-size: 19px">🇨🇦 🇺🇸 🇧🇷 · 3 Markets</h2>
           <p class="tile-sub">Canada · USA · Brazil</p>
         </div>
       </article>
@@ -651,7 +684,9 @@
         <img class="tile-photo" src="/api/pexels?t=dashboard" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">Gemini-Powered Intel <span class="arrow">↗</span></h2>
+          <h2 class="tile-head">
+            Gemini-Powered Dashboard Intel <span class="arrow">↗</span>
+          </h2>
           <p class="tile-sub">mfgworldcup.com</p>
         </div>
       </a>
