@@ -173,11 +173,11 @@
         grid-template-rows: repeat(5, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "gpc  gpc  hero hero hero hero hero cult cult cult cult cult"
-          "gpc  gpc  hero hero hero hero hero cult cult cult cult cult"
-          "gpc  gpc  dooh dooh dooh dooh ocr  ocr  ocr  agen agen agen"
-          "reac reac dooh dooh dooh dooh ocr  ocr  ocr  agen agen agen"
-          "reac reac copt copt copt halo halo mark mark dash dash dash";
+          "hero hero hero hero gpc  gpc  gpc  cult cult cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  cult cult cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  agen agen ocr  ocr  ocr"
+          "dooh dooh dooh dooh reac reac copt copt copt ocr  ocr  ocr"
+          "dooh dooh dooh dooh mark mark halo halo dash dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
@@ -387,12 +387,15 @@
       }
       /* compact tiles (1-row / narrow) — sized to fit */
       .a-reac .tile-head {
-        font-size: clamp(14px, 1.4vw, 18px);
-        line-height: 1.1;
+        font-size: clamp(12px, 1.2vw, 15px);
+        line-height: 1.12;
       }
-      .a-dash .tile-head,
       .a-mark .tile-head {
         font-size: clamp(15px, 1.4vw, 19px);
+        line-height: 1.08;
+      }
+      .a-dash .tile-head {
+        font-size: clamp(16px, 1.6vw, 21px);
         line-height: 1.08;
       }
       .a-copt .tile-head {
@@ -405,7 +408,7 @@
       }
       /* feature tiles — bigger, bolder */
       .a-gpc .tile-head {
-        font-size: clamp(22px, 2.2vw, 32px);
+        font-size: clamp(24px, 2.5vw, 35px);
         font-weight: 900;
         letter-spacing: -0.03em;
         line-height: 1;
@@ -416,9 +419,9 @@
         line-height: 1.04;
       }
       .a-agen .tile-head {
-        font-size: clamp(19px, 1.9vw, 26px);
-        letter-spacing: -0.025em;
-        line-height: 1.04;
+        font-size: clamp(14px, 1.4vw, 17px);
+        letter-spacing: -0.02em;
+        line-height: 1.06;
       }
       .tile-sub b {
         color: #fff;
