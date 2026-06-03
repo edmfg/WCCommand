@@ -24,7 +24,7 @@
         --gemini: linear-gradient(74deg, #4285f4 0%, #9b72cb 50%, #d96570 100%);
 
         --ink: #202124;
-        --bg: #ffffff;
+        --bg: #07070a;
         --radius: 24px;
         --gap: 16px;
         --pad: 30px;
@@ -102,22 +102,22 @@
         align-items: center;
         gap: 9px;
         text-decoration: none;
-        color: var(--ink);
+        color: #fff;
         font-weight: 500;
         font-size: 14px;
         padding: 9px 15px 9px 12px;
-        border: 1px solid #e3e5e8;
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 999px;
-        background: #fff;
+        background: rgba(255, 255, 255, 0.06);
         transition:
-          box-shadow 0.18s ease,
           transform 0.18s ease,
-          border-color 0.18s ease;
+          border-color 0.18s ease,
+          background 0.18s ease;
       }
       .back:hover {
-        box-shadow: 0 6px 16px rgba(60, 64, 67, 0.16);
+        background: rgba(255, 255, 255, 0.12);
         transform: translateY(-1px);
-        border-color: #d2d5da;
+        border-color: rgba(255, 255, 255, 0.3);
       }
       .back svg {
         width: 15px;
@@ -128,7 +128,7 @@
         font-weight: 700;
         letter-spacing: 0.16em;
         text-transform: uppercase;
-        color: #5f6368;
+        color: #9aa0a6;
       }
       .wordmark b {
         background: var(--gemini);
@@ -170,16 +170,14 @@
         padding: 20px var(--pad) var(--pad);
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(7, var(--rowh));
+        grid-template-rows: repeat(5, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
-          "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
-          "hero hero hero hero hero gpc  gpc  gpc  ocr  ocr  ocr  ocr"
-          "reac reac reac reac reac gpc  gpc  gpc  ocr  ocr  ocr  ocr"
-          "dooh dooh dooh dooh dooh dooh agen agen agen copt copt copt"
-          "dooh dooh dooh dooh dooh dooh agen agen agen copt copt copt"
-          "halo halo halo halo mark mark mark mark dash dash dash dash";
+          "gpc  gpc  hero hero hero hero hero cult cult cult cult cult"
+          "gpc  gpc  hero hero hero hero hero cult cult cult cult cult"
+          "gpc  gpc  dooh dooh dooh dooh ocr  ocr  ocr  agen agen agen"
+          "reac reac dooh dooh dooh dooh ocr  ocr  ocr  agen agen agen"
+          "reac reac copt copt copt halo halo mark mark dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
@@ -320,9 +318,9 @@
         text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
       }
       .a-hero .tile-head {
-        font-size: clamp(34px, 4vw, 56px);
+        font-size: clamp(28px, 3vw, 44px);
         font-weight: 900;
-        letter-spacing: -0.035em;
+        letter-spacing: -0.032em;
         line-height: 0.98;
       }
       /* hero "story" copy */
@@ -365,40 +363,39 @@
         font-size: clamp(14px, 1.2vw, 18px);
         color: rgba(255, 255, 255, 0.92);
       }
-      /* long headlines in thin tiles — keep them from overflowing */
+      /* compact tiles (1-row / narrow) — sized to fit */
       .a-reac .tile-head {
-        font-size: clamp(19px, 1.8vw, 25px);
-        line-height: 1.08;
+        font-size: clamp(14px, 1.4vw, 18px);
+        line-height: 1.1;
       }
       .a-dash .tile-head,
       .a-mark .tile-head {
-        font-size: clamp(18px, 1.6vw, 23px);
+        font-size: clamp(15px, 1.4vw, 19px);
         line-height: 1.08;
       }
-      /* big, bold headlines — the dominant element on each tile */
-      .a-gpc .tile-head {
-        font-size: clamp(30px, 3.2vw, 47px);
-        font-weight: 900;
-        letter-spacing: -0.03em;
-        line-height: 0.99;
-      }
-      .a-ocr .tile-head {
-        font-size: clamp(23px, 2.3vw, 33px);
-        letter-spacing: -0.025em;
-        line-height: 1.02;
-      }
       .a-copt .tile-head {
-        font-size: clamp(26px, 2.5vw, 36px);
-        letter-spacing: -0.028em;
-        line-height: 1;
-      }
-      .a-agen .tile-head {
-        font-size: clamp(25px, 2.4vw, 35px);
-        letter-spacing: -0.028em;
-        line-height: 1;
+        font-size: clamp(16px, 1.5vw, 20px);
+        line-height: 1.05;
       }
       .a-halo .tile-head {
-        font-size: clamp(20px, 1.9vw, 27px);
+        font-size: clamp(14px, 1.4vw, 18px);
+        line-height: 1.06;
+      }
+      /* feature tiles — bigger, bolder */
+      .a-gpc .tile-head {
+        font-size: clamp(22px, 2.2vw, 32px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+      .a-ocr .tile-head {
+        font-size: clamp(19px, 1.9vw, 26px);
+        letter-spacing: -0.025em;
+        line-height: 1.04;
+      }
+      .a-agen .tile-head {
+        font-size: clamp(19px, 1.9vw, 26px);
+        letter-spacing: -0.025em;
         line-height: 1.04;
       }
       .tile-sub b {
@@ -459,9 +456,9 @@
       }
       /* culture tile — cultural-exchange category chips */
       .a-cult .tile-head {
-        font-size: clamp(23px, 2.2vw, 32px);
+        font-size: clamp(20px, 2vw, 28px);
         letter-spacing: -0.02em;
-        line-height: 1.02;
+        line-height: 1.04;
       }
       .culture-tags {
         display: flex;
