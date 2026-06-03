@@ -244,16 +244,21 @@
       .insight .tile-scrim {
         background: var(--scrim-heavy);
       }
-      /* clean Apple look: only the AI tiles wear the signature Gemini bar */
-      .tile.gemini::after {
+      /* thin rainbow (Gemini gradient) border on EVERY tile */
+      .tile::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.6px;
         background: var(--gemini);
-        z-index: 3;
+        -webkit-mask:
+          linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        z-index: 5;
       }
 
       .tile-body {
