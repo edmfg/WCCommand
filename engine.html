@@ -32,9 +32,9 @@
 
         --scrim: linear-gradient(
           to top,
-          rgba(0, 0, 0, 0.72) 0%,
-          rgba(0, 0, 0, 0.15) 45%,
-          transparent 75%
+          rgba(0, 0, 0, 0.82) 0%,
+          rgba(0, 0, 0, 0.42) 50%,
+          rgba(0, 0, 0, 0.14) 100%
         );
         --scrim-heavy: linear-gradient(
           to top,
@@ -176,7 +176,7 @@
           "hero hero hero hero hero hero cult cult cult cult gpc gpc"
           "hero hero hero hero hero hero cult cult cult cult gpc gpc"
           "hero hero hero hero hero hero cult cult cult cult gpc gpc"
-          "ocr  ocr  ocr  ocr  halo halo reac reac reac reac gpc gpc"
+          "ocr  ocr  ocr  ocr  halo halo halo halo reac reac reac reac"
           "agen agen agen agen mark mark mark mark dash dash dash dash";
       }
       .a-hero { grid-area: hero; }
@@ -227,6 +227,7 @@
         height: 100%;
         object-fit: cover;
         object-position: center;
+        filter: brightness(0.8);
       }
       .tile-photo.failed {
         display: none;
@@ -272,9 +273,38 @@
         text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
       }
       .a-hero .tile-head {
-        font-size: clamp(34px, 4.4vw, 64px);
+        font-size: clamp(28px, 3.4vw, 46px);
         font-weight: 900;
-        letter-spacing: -0.035em;
+        letter-spacing: -0.03em;
+      }
+      /* hero "story" copy */
+      .hero-story .tile-scrim {
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.9) 0%,
+          rgba(0, 0, 0, 0.68) 45%,
+          rgba(0, 0, 0, 0.42) 100%
+        );
+      }
+      .hero-stats {
+        margin: 3px 0 0;
+        font-size: clamp(12.5px, 1.1vw, 15px);
+        font-weight: 600;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.95);
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+      }
+      .hero-stats b {
+        color: #fff;
+        font-weight: 900;
+      }
+      .hero-copy {
+        margin: 9px 0 0;
+        font-size: clamp(12.5px, 1vw, 14.5px);
+        line-height: 1.45;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 54ch;
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
       }
       .tile-sub {
         margin: 0;
@@ -342,6 +372,40 @@
         font-size: 12.5px;
         color: rgba(255, 255, 255, 0.86);
         line-height: 1.22;
+      }
+      /* culture tile — cultural-exchange category chips */
+      .a-cult .tile-head {
+        font-size: clamp(17px, 1.5vw, 21px);
+        line-height: 1.14;
+      }
+      .culture-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .culture-tags span {
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        padding: 5px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      /* social-listening logos on the agentic tile */
+      .social-logos {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .social-logos img {
+        width: 21px;
+        height: 21px;
+        opacity: 0.92;
+        filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.55));
       }
 
       .arrow {
@@ -411,16 +475,15 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(8, var(--rowh));
+          grid-template-rows: repeat(7, var(--rowh));
           grid-template-areas:
-            "hero hero hero hero hero hero"
-            "hero hero hero hero hero hero"
-            "cult cult cult cult cult cult"
-            "cult cult cult cult cult cult"
-            "gpc  gpc  gpc  gpc  gpc  gpc"
-            "ocr  ocr  ocr  halo halo halo"
-            "reac reac reac agen agen agen"
-            "mark mark mark dash dash dash";
+            "hero hero hero hero gpc  gpc"
+            "hero hero hero hero gpc  gpc"
+            "cult cult cult cult gpc  gpc"
+            "cult cult cult cult halo halo"
+            "ocr  ocr  ocr  reac reac reac"
+            "agen agen agen mark mark mark"
+            "dash dash dash dash dash dash";
         }
       }
       @media (max-width: 600px) {
@@ -436,7 +499,10 @@
           min-height: 165px;
         }
         .a-hero {
-          min-height: 250px;
+          min-height: 380px;
+        }
+        .a-gpc {
+          min-height: 430px;
         }
         .a-cult {
           min-height: 300px;
@@ -463,56 +529,52 @@
       <span class="wordmark"><b>Gemini</b> × MFG</span>
     </header>
 
-    <section class="lede">
-      <h1>What is the <span class="grad">World Cup Engine?</span></h1>
-      <p>
-        One campaign, built to turn the planet's biggest cultural moment into
-        creative — at the speed of sport. Every tile is one piece of the engine;
-        the bigger the tile, the bigger the idea.
-      </p>
-    </section>
-
     <main class="bento">
-      <!-- 1 · HERO -->
-      <article class="tile a-hero gemini">
+      <!-- 1 · HERO — what the Engine is -->
+      <article class="tile a-hero gemini hero-story">
         <img class="tile-photo" src="/api/pexels?t=hero" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">World Cup Engine</h2>
-          <p class="tile-sub">AI Creativity at the Speed of Sport</p>
+          <h1 class="tile-head">World Cup Engine</h1>
+          <p class="hero-stats">
+            3 host nations · 48 teams · 104 matches · 39 days ·
+            <b>1.6B</b> global fans watching the beautiful game
+          </p>
+          <p class="hero-copy">
+            We see the most epic sports moment as an opportunity to bring
+            together AI, media and creative — and put Google at the center of
+            it all. World Cup Engine is the evolution of Sports Engine 1.0:
+            bigger, smarter, more agentic than ever possible.
+          </p>
         </div>
       </article>
 
-      <!-- 2 · The insight + the cultural-spike % data points -->
+      <!-- 2 · The insight — fan cultural exchange -->
       <article class="tile a-cult insight" style="--accent: var(--g-blue)">
         <img class="tile-photo" src="/api/pexels?t=culture" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">The biggest cultural exchange moment</h2>
-          <p class="tile-sub">
-            not just the biggest sporting event · <b>71%</b> grow their interest
-            in other cultures
-          </p>
-          <div class="spikes">
-            <div class="spike">
-              <span class="n">+300%</span>
-              <span class="l">“how to pronounce Mbappé”</span>
-            </div>
-            <div class="spike">
-              <span class="n">+250%</span>
-              <span class="l">“Argentinian food” after the final</span>
-            </div>
-            <div class="spike">
-              <span class="n">+85%</span>
-              <span class="l">“learn Arabic” during Qatar</span>
-            </div>
+          <div class="culture-tags">
+            <span>Food</span><span>Fashion</span><span>Music</span><span>Memes</span><span>Dance Moves</span><span>National Pride</span>
           </div>
+          <h2 class="tile-head">
+            The World Cup is the biggest fan cultural exchange moment
+          </h2>
         </div>
       </article>
 
-      <!-- 3+4 · Gemini-powered creativity (Veo + Gemini) -->
+      <!-- 3+4 · Gemini-Powered Creativity — the example asset (video) -->
       <article class="tile a-gpc gemini">
-        <img class="tile-photo" src="/api/pexels?t=gemini" alt="" onerror="this.classList.add('failed')" />
+        <video
+          class="tile-photo"
+          src="./assets/wc-soccer-aimode.mp4"
+          poster="./assets/wc-soccer-aimode.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <h2 class="tile-head">Gemini-Powered Creativity</h2>
@@ -537,8 +599,8 @@
         <img class="tile-photo" src="/api/pexels?t=halo" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">First halo BLS: Search × Gemini</h2>
-          <p class="tile-sub">measurement flex</p>
+          <h2 class="tile-head">‘Halo’ BLS Measurement</h2>
+          <p class="tile-sub">Search × Gemini lift</p>
         </div>
       </article>
 
@@ -557,6 +619,12 @@
         <img class="tile-photo" src="/api/pexels?t=agentic" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
+          <div class="social-logos">
+            <img src="https://cdn.simpleicons.org/x/white" alt="X" />
+            <img src="https://cdn.simpleicons.org/reddit/white" alt="Reddit" />
+            <img src="https://cdn.simpleicons.org/youtube/white" alt="YouTube" />
+            <img src="https://cdn.simpleicons.org/bluesky/white" alt="Bluesky" />
+          </div>
           <h2 class="tile-head">WPP Open agentic team</h2>
           <p class="tile-sub">listening to social conversations</p>
         </div>
@@ -583,21 +651,11 @@
         <img class="tile-photo" src="/api/pexels?t=dashboard" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <h2 class="tile-head">Live dashboard <span class="arrow">↗</span></h2>
+          <h2 class="tile-head">Gemini-Powered Intel <span class="arrow">↗</span></h2>
           <p class="tile-sub">mfgworldcup.com</p>
         </div>
       </a>
     </main>
-
-    <footer class="foot">
-      <span class="dots" aria-hidden="true">
-        <i style="background: var(--g-blue)"></i>
-        <i style="background: var(--g-red)"></i>
-        <i style="background: var(--g-yellow)"></i>
-        <i style="background: var(--g-green)"></i>
-      </span>
-      <span>Photography via <a href="https://pexels.com" target="_blank" rel="noopener">Pexels</a> · Gemini × MFG · World Cup Engine</span>
-    </footer>
 
     <script>
       // Gate check — inherits the dashboard wcc_gate cookie. Redirect to / if missing.
