@@ -13,6 +13,7 @@
     { "source": "/api/creative-gate", "destination": "/api/creative-gate" },
     { "source": "/api/mfg-gate", "destination": "/api/mfg-gate" },
     { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/api/pexels", "destination": "/api/pexels" },
     {
       "source": "/api/reactive-convert",
       "destination": "/api/reactive-convert"
