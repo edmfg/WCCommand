@@ -14,7 +14,7 @@ const TILE_QUERIES = {
   hero: "packed soccer stadium crowd floodlights night",
   culture: "diverse soccer fans flags faces celebration",
   gemini: "abstract glowing gradient light blue purple",
-  ocr: "phone filming soccer match social media",
+  ocr: "soccer fan dancing celebration flag crowd",
   agentic: "sunrise over empty stadium",
   reactive: "soccer goal celebration crowd eruption",
   dashboard: "analytics dashboard screen dark",

@@ -170,21 +170,23 @@
         padding: 20px var(--pad) var(--pad);
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(6, var(--rowh));
+        grid-template-rows: repeat(7, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
           "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
           "hero hero hero hero hero gpc  gpc  gpc  cult cult cult cult"
           "hero hero hero hero hero gpc  gpc  gpc  ocr  ocr  ocr  ocr"
           "reac reac reac reac reac gpc  gpc  gpc  ocr  ocr  ocr  ocr"
-          "agen agen agen agen copt copt copt halo halo mark mark mark"
-          "agen agen agen agen copt copt copt halo halo dash dash dash";
+          "dooh dooh dooh dooh dooh dooh agen agen agen copt copt copt"
+          "dooh dooh dooh dooh dooh dooh agen agen agen copt copt copt"
+          "halo halo halo halo mark mark mark mark dash dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
       .a-cult { grid-area: cult; }
       .a-ocr  { grid-area: ocr; }
       .a-reac { grid-area: reac; }
+      .a-dooh { grid-area: dooh; }
       .a-agen { grid-area: agen; }
       .a-copt { grid-area: copt; }
       .a-halo { grid-area: halo; }
@@ -250,7 +252,7 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        padding: 1.6px;
+        padding: 2.2px;
         background: linear-gradient(
           74deg,
           #4285f4,
@@ -264,23 +266,28 @@
           linear-gradient(#000 0 0) content-box,
           linear-gradient(#000 0 0);
         -webkit-mask-composite: xor;
+        mask:
+          linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
         mask-composite: exclude;
         pointer-events: none;
         z-index: 5;
-        opacity: 0.8;
+        opacity: 0.9;
         animation: tileGlow 7s ease-in-out infinite;
       }
       @keyframes tileGlow {
         0%,
         100% {
           background-position: 0% 50%;
-          opacity: 0.7;
-          filter: saturate(1) brightness(1);
+          opacity: 0.85;
+          filter: saturate(1.15) brightness(1)
+            drop-shadow(0 0 3px rgba(123, 104, 200, 0.35));
         }
         50% {
           background-position: 100% 50%;
           opacity: 1;
-          filter: saturate(1.25) brightness(1.18);
+          filter: saturate(1.4) brightness(1.22)
+            drop-shadow(0 0 8px rgba(160, 110, 190, 0.6));
         }
       }
       /* desync the glow so the board feels alive, not in lockstep */
@@ -557,13 +564,15 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(8, var(--rowh));
+          grid-template-rows: repeat(10, var(--rowh));
           grid-template-areas:
             "hero hero hero gpc  gpc  gpc"
             "hero hero hero gpc  gpc  gpc"
             "cult cult cult gpc  gpc  gpc"
             "cult cult cult ocr  ocr  ocr"
             "reac reac reac ocr  ocr  ocr"
+            "dooh dooh dooh dooh dooh dooh"
+            "dooh dooh dooh dooh dooh dooh"
             "agen agen agen copt copt copt"
             "agen agen agen copt copt copt"
             "halo halo mark mark dash dash";
@@ -667,14 +676,16 @@
           <h2 class="tile-head">
             Gemini-Powered Creativity <span class="arrow">↗</span>
           </h2>
-          <p class="tile-sub">Veo Clips and Gemini-Inspired Prompts</p>
+          <p class="tile-sub">
+            50+ Veo-Generated, Gemini Prompt-Inspired Social Assets
+          </p>
         </div>
       </a>
 
       <!-- 5 · OCR (innovation) -->
       <article class="tile a-ocr gemini" style="--accent: var(--g-blue)">
         <span class="flag-first">⚡ Innovation</span>
-        <img class="tile-photo" src="/api/pexels?t=ocr" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=ocr&v=2" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <div class="social-logos">
@@ -721,6 +732,20 @@
             Real-Time, Reactive Ads: Social Listening to Ship in 12 Hours
           </h2>
           <p class="tile-sub"><b>Jul 7 → Jul 19</b></p>
+        </div>
+      </article>
+
+      <!-- 12 · Digital OOH (local billboard image) -->
+      <article class="tile a-dooh" style="--accent: var(--g-blue)">
+        <img
+          class="tile-photo"
+          src="./assets/digital-ooh.jpg"
+          alt="Digital out-of-home billboard"
+          onerror="this.classList.add('failed')"
+        />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <h2 class="tile-head">Digital OOH</h2>
         </div>
       </article>
 
