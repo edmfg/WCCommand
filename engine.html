@@ -151,7 +151,7 @@
         margin: 6px 0 4px;
         font-size: clamp(30px, 4vw, 54px);
         font-weight: 900;
-        letter-spacing: -0.025em;
+        letter-spacing: -0.02em;
         line-height: 1;
       }
       .lede h1 .grad {
@@ -334,7 +334,7 @@
       .tile-head {
         margin: 0;
         font-weight: 800;
-        letter-spacing: -0.025em;
+        letter-spacing: -0.02em;
         line-height: 1.02;
         font-size: clamp(22px, 2vw, 28px);
         text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
@@ -342,7 +342,7 @@
       .a-hero .tile-head {
         font-size: clamp(28px, 3vw, 44px);
         font-weight: 800;
-        letter-spacing: -0.032em;
+        letter-spacing: -0.02em;
         line-height: 0.98;
       }
       /* hero "story" copy — same photo treatment as the other tiles */
@@ -423,12 +423,12 @@
       .a-gpc .tile-head {
         font-size: clamp(24px, 2.5vw, 35px);
         font-weight: 800;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
         line-height: 1;
       }
       .a-ocr .tile-head {
         font-size: clamp(19px, 1.9vw, 26px);
-        letter-spacing: -0.025em;
+        letter-spacing: -0.02em;
         line-height: 1.04;
       }
       .a-agen .tile-head {
@@ -978,10 +978,14 @@
           const els = [...document.querySelectorAll(SEL)];
           let saved = {};
           try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+          let saveTimer = null;
           const save = () => {
-            const out = {};
-            els.forEach((el, i) => (out[i] = el.innerHTML));
-            localStorage.setItem(KEY, JSON.stringify(out));
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+              const out = {};
+              els.forEach((el, i) => (out[i] = el.innerHTML));
+              localStorage.setItem(KEY, JSON.stringify(out));
+            }, 300);
           };
           els.forEach((el, i) => {
             if (saved[i] != null) el.innerHTML = saved[i];
