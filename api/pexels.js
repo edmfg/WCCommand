@@ -46,6 +46,17 @@ function readTileKey(req) {
   }
 }
 
+function readIndex(req) {
+  let raw = (req.query && req.query.i) || null;
+  if (raw == null) {
+    try {
+      raw = new URL(req.url, "http://localhost").searchParams.get("i");
+    } catch (_) {}
+  }
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
 module.exports = async function handler(req, res) {
   const t = readTileKey(req);
   const query = TILE_QUERIES[t];
@@ -63,14 +74,17 @@ module.exports = async function handler(req, res) {
 
   try {
     const searchRes = await fetch(
-      "https://api.pexels.com/v1/search?orientation=landscape&per_page=1&query=" +
+      "https://api.pexels.com/v1/search?orientation=landscape&per_page=20&query=" +
         encodeURIComponent(query),
       { headers: { Authorization: key } }
     );
     if (!searchRes.ok) throw new Error("pexels search " + searchRes.status);
 
     const data = await searchRes.json();
-    const photo = data.photos && data.photos[0];
+    const photos = (data.photos || []).filter(Boolean);
+    if (!photos.length) throw new Error("no photo for " + t);
+    // pick by index so tiles sharing a similar query still differ
+    const photo = photos[readIndex(req) % photos.length];
     const src =
       photo && (photo.src.large2x || photo.src.large || photo.src.original);
     if (!src) throw new Error("no photo for " + t);
