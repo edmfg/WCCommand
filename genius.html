@@ -349,10 +349,11 @@
         text-transform: uppercase;
         margin: 0 0 7px;
         line-height: 1;
-        background: var(--gemini);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        background: none;
+        -webkit-background-clip: border-box;
+        background-clip: border-box;
+        color: #ff0000;
+        -webkit-text-fill-color: #ff0000;
         filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.55));
       }
       /* partner / campaign brand lockups — white chip so the logo reads on the photo */
@@ -957,7 +958,6 @@
          in the export only; the live page keeps the gradient. */
       .exporting .wordmark b,
       .exporting .lede h1 .grad,
-      .exporting .kick,
       .exporting .spike .n {
         background: none !important;
         -webkit-background-clip: border-box !important;
