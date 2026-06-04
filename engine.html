@@ -260,7 +260,6 @@
           #9b72cb,
           #4285f4
         );
-        background-size: 300% 100%;
         -webkit-mask:
           linear-gradient(#000 0 0) content-box,
           linear-gradient(#000 0 0);
@@ -284,19 +283,14 @@
           0 0 36px rgba(123, 104, 200, 0.42),
           0 22px 54px rgba(123, 104, 200, 0.42);
       }
+      /* opacity-only pulse = GPU-cheap (no per-frame repaint / filter) */
       @keyframes tileGlow {
         0%,
         100% {
-          background-position: 0% 50%;
-          opacity: 0.85;
-          filter: saturate(1.15) brightness(1)
-            drop-shadow(0 0 3px rgba(123, 104, 200, 0.35));
+          opacity: 0.68;
         }
         50% {
-          background-position: 100% 50%;
           opacity: 1;
-          filter: saturate(1.4) brightness(1.22)
-            drop-shadow(0 0 8px rgba(160, 110, 190, 0.6));
         }
       }
       /* desync the glow so the board feels alive, not in lockstep */
@@ -516,10 +510,8 @@
         color: #fff;
         padding: 4px 9px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.18);
         border: 1px solid rgba(255, 255, 255, 0.22);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
       }
       /* social-listening logos on the agentic tile */
       .social-logos {
@@ -614,18 +606,19 @@
           transform: translate3d(0, 0, 0) rotateX(0deg) scale(1);
         }
       }
-      /* drop order: Campaign first, Insight 2nd, AI 3rd, then the rest fast */
-      .a-hero { animation-delay: 0s; }
-      .a-cult { animation-delay: 0.24s; }
-      .a-gpc  { animation-delay: 0.48s; }
-      .a-ocr  { animation-delay: 0.66s; }
-      .a-agen { animation-delay: 0.72s; }
-      .a-dooh { animation-delay: 0.78s; }
-      .a-reac { animation-delay: 0.84s; }
-      .a-copt { animation-delay: 0.9s; }
-      .a-halo { animation-delay: 0.96s; }
-      .a-mark { animation-delay: 1.02s; }
-      .a-dash { animation-delay: 1.08s; }
+      /* drop order: Campaign first (a beat longer), Insight 2nd, AI 3rd, then
+         the rest in quick succession — total opening ~2s */
+      .a-hero { animation-delay: 0s; animation-duration: 0.95s; }
+      .a-cult { animation-delay: 0.5s; }
+      .a-gpc  { animation-delay: 0.78s; }
+      .a-ocr  { animation-delay: 0.98s; }
+      .a-agen { animation-delay: 1.05s; }
+      .a-dooh { animation-delay: 1.12s; }
+      .a-reac { animation-delay: 1.19s; }
+      .a-copt { animation-delay: 1.26s; }
+      .a-halo { animation-delay: 1.33s; }
+      .a-mark { animation-delay: 1.4s; }
+      .a-dash { animation-delay: 1.47s; }
 
       @media (prefers-reduced-motion: reduce) {
         .tile {
@@ -890,6 +883,88 @@
       </a>
     </main>
 
+    <!-- Export the whole board as a JPEG (library lazy-loaded on click) -->
+    <style>
+      #exportBtn {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9000;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        color: #fff;
+        font: 700 13px/1 "Roboto", system-ui, sans-serif;
+        cursor: pointer;
+        background: linear-gradient(74deg, #4285f4, #9b72cb 50%, #d96570);
+        box-shadow: 0 8px 24px rgba(123, 104, 200, 0.45);
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+      #exportBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(123, 104, 200, 0.6);
+      }
+      #exportBtn:disabled {
+        opacity: 0.7;
+        cursor: default;
+      }
+      /* the masked gradient borders don't rasterize cleanly — hide while exporting */
+      .exporting #exportBtn,
+      .exporting .tile::before {
+        display: none;
+      }
+    </style>
+    <button id="exportBtn" type="button">⬇&nbsp; Export JPEG</button>
+    <script>
+      (function () {
+        const btn = document.getElementById("exportBtn");
+        const LIB =
+          "https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js";
+        function loadLib() {
+          return new Promise((res, rej) => {
+            if (window.html2canvas) return res();
+            const s = document.createElement("script");
+            s.src = LIB;
+            s.onload = res;
+            s.onerror = rej;
+            document.head.appendChild(s);
+          });
+        }
+        btn.addEventListener("click", async () => {
+          const label = btn.innerHTML;
+          btn.disabled = true;
+          btn.textContent = "Preparing…";
+          try {
+            await loadLib();
+            btn.textContent = "Rendering…";
+            document.body.classList.add("exporting");
+            const canvas = await window.html2canvas(document.body, {
+              backgroundColor: "#07070a",
+              useCORS: true,
+              scale: 2,
+            });
+            document.body.classList.remove("exporting");
+            const a = document.createElement("a");
+            a.href = canvas.toDataURL("image/jpeg", 0.92);
+            a.download = "world-cup-engine.jpg";
+            a.click();
+          } catch (e) {
+            console.error(e);
+            alert("Export failed — please try again.");
+          } finally {
+            document.body.classList.remove("exporting");
+            btn.disabled = false;
+            btn.innerHTML = label;
+          }
+        });
+      })();
+    </script>
+
     <!-- TEMP live-text editor — active only with ?edit=1. Remove when done. -->
     <script>
       (function () {
@@ -921,7 +996,7 @@
           // floating toolbar
           const bar = document.createElement("div");
           bar.style.cssText =
-            "position:fixed;right:18px;bottom:18px;z-index:99999;display:flex;gap:8px;align-items:center;background:#13131a;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 10px 8px 16px;font:600 12px/1 system-ui;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.5)";
+            "position:fixed;right:18px;bottom:80px;z-index:99999;display:flex;gap:8px;align-items:center;background:#13131a;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 10px 8px 16px;font:600 12px/1 system-ui;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.5)";
           bar.innerHTML =
             '<span style="letter-spacing:.12em;color:#c7a6e0">✎ EDIT MODE</span>';
           const copyBtn = document.createElement("button");
