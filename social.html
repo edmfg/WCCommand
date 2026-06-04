@@ -2553,7 +2553,7 @@ window.FORMATION_DATA = {
         prompt:
           "why are there so many unwritten rules about what makes a 'real' poutine",
         whyPrompt:
-          "This trio allows fans to engage at any level: understand the debate, find the authentic experience, or creatively remix the classic for their own party.",
+          "Poutine discourse is up 300% — this trio lets every fan enter the “real poutine” debate at their own depth: decode it, find it, or remix it.",
         ipCheck: {
           status: "clear",
           note: "Confirmed clean. All prompts are free of protected terms.",
@@ -2592,7 +2592,7 @@ window.FORMATION_DATA = {
         prompt:
           "why do some stadium chants sound so simple but are hard to get right",
         whyPrompt:
-          "It captures a real-time trend, giving fans a tool to understand the phenomenon, learn how to participate, and even build on it creatively.",
+          "The “Eh!” chant is trending off last night's broadcast — these prompts turn a viral moment into participation: understand it, learn it, build on it.",
         ipCheck: {
           status: "clear",
           note: "Confirmed clean. All prompts are free of protected terms.",
@@ -2630,7 +2630,7 @@ window.FORMATION_DATA = {
         ],
         prompt: "why is an all-denim outfit called a Canadian tuxedo anyway",
         whyPrompt:
-          "This speaks directly to the fashion-conscious fan, offering a path from cultural curiosity to practical style advice and creative personalization.",
+          "Young fans are reclaiming the Canadian Tuxedo as game-day pride — the trio moves style seekers from cultural curiosity to outfit to DIY personalization.",
         ipCheck: {
           status: "clear",
           note: "Confirmed clean. All prompts are free of protected terms.",
@@ -3050,6 +3050,19 @@ window.FORMATION_DATA = {
               </div>
               <div class="play-card-title">${sb.title}</div>
 
+              <div class="play-card-meta">
+                <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
+                <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
+              </div>
+              <details class="spec-drop spec-why">
+                <summary>
+                  <span class="drop-label">Why these prompts</span>
+                  <span class="drop-peek">${sb.whyPrompt}</span>
+                  <span class="drop-caret">▾</span>
+                </summary>
+                <div class="drop-body">${sb.whyPrompt}</div>
+              </details>
+
               <div class="play-phone-wrap">
                 <div class="phone">
                   <div class="phone-island"></div>
@@ -3075,18 +3088,6 @@ window.FORMATION_DATA = {
                 <div class="footage-block-body">${sb.footage}</div>
               </div>
 
-              <div class="play-card-meta">
-                <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
-                <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
-              </div>
-              <details class="spec-drop spec-why">
-                <summary>
-                  <span class="drop-label">Why these prompts</span>
-                  <span class="drop-peek">${sb.whyPrompt}</span>
-                  <span class="drop-caret">▾</span>
-                </summary>
-                <div class="drop-body">${sb.whyPrompt}</div>
-              </details>
               <details class="spec-drop ip-check" data-status="${sb.ipCheck.status}">
                 <summary>
                   <span class="dot"></span>

@@ -161,7 +161,7 @@ Schema:
         { "key": "B", "type": "Participatory", "text": "string — lowercase conversational search query" },
         { "key": "C", "type": "Fusion/Planning", "text": "string — lowercase conversational search query" }
       ],
-      "whyPrompt": "string — one short paragraph explaining why this prompt trio works strategically",
+      "whyPrompt": "string — ONE sharp sentence (max ~25 words) justifying the prompt trio against the cultural signal / conversation it rides",
       "ipCheck": {
         "status": "string — 'clear' or 'watch' or 'block'",
         "note": "string — brief IP / brand-safety note"
