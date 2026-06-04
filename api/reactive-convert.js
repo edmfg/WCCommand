@@ -155,13 +155,19 @@ Schema:
       "sourceDetail": "string — one short line on the underlying signal",
       "audienceCut": "string — short audience descriptor",
       "bucket": "string — short content-bucket label",
-      "prompt": "string — Reels-style first-person creative prompt for AI Mode",
-      "whyPrompt": "string — one short paragraph explaining the strategic why",
+      "unmetNeed": "string — the fan's unmet info need, phrased in their own voice (one or two sentences)",
+      "prompts": [
+        { "key": "A", "type": "Observational", "text": "string — lowercase conversational search query" },
+        { "key": "B", "type": "Participatory", "text": "string — lowercase conversational search query" },
+        { "key": "C", "type": "Fusion/Planning", "text": "string — lowercase conversational search query" }
+      ],
+      "whyPrompt": "string — ONE sharp sentence (max ~25 words) justifying the prompt trio against the cultural signal / conversation it rides",
       "ipCheck": {
         "status": "string — 'clear' or 'watch' or 'block'",
         "note": "string — brief IP / brand-safety note"
       },
-      "footage": "string — creative direction for the storyboard's footage frame (what B-roll/visuals pair with the on-screen query)"
+      "verdict": "string — optional Fan Agent verdict on fit (omit if the input has none)",
+      "footage": "string — creative direction for the storyboard's footage frame (what B-roll/visuals pair with the on-screen queries)"
     }
   ]
 }
@@ -170,6 +176,7 @@ Return exactly:
 - 2 cultural spikes and 2 match spikes (or as many as the input clearly supports, up to 4 each)
 - 2-3 "quotes" per spike (verbatim-style, each tagged with its platform) plus a few "sources" backing it
 - exactly 3 storyboards
+- exactly 3 "prompts" per storyboard — A (Observational) / B (Participatory) / C (Fusion/Planning)
 - a vivid one-to-two-sentence "footage" direction for every storyboard (never omit it)
 
 Citations rule: include a "url" on a quote or source ONLY when that exact link is present in the raw input. NEVER invent URLs, and never cite a named outlet that does not appear in the input — synthesize platform tags (X / TikTok / Reddit / etc.) instead.

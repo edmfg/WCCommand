@@ -10236,6 +10236,26 @@
             );
           }
           function storyHtml(s) {
+            // New shape carries an A/B/C prompt trio; legacy rows have a
+            // single `prompt` string.
+            const prompts =
+              Array.isArray(s.prompts) && s.prompts.length
+                ? s.prompts
+                : [{ key: "", type: "", text: s.prompt }];
+            const promptsHtml = prompts
+              .map(
+                (p) =>
+                  '<div class="pv-prompt">' +
+                  (p.key
+                    ? "<strong>" +
+                      escHtml(p.key) +
+                      (p.type ? " · " + escHtml(p.type) : "") +
+                      "</strong> — "
+                    : "") +
+                  escHtml(p.text) +
+                  "</div>",
+              )
+              .join("");
             return (
               '<div class="reactive-preview-storyboard">' +
               '<div class="pv-num">STORYBOARD ' +
@@ -10244,9 +10264,7 @@
               '<div style="font-weight:600;font-size:14px">' +
               escHtml(s.title) +
               "</div>" +
-              '<div class="pv-prompt">' +
-              escHtml(s.prompt) +
-              "</div>" +
+              promptsHtml +
               '<div class="pv-body" style="margin-top:6px;font-size:11px;color:var(--text-muted)">' +
               escHtml(s.sourceSignal) +
               " · " +

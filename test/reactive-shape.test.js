@@ -17,7 +17,9 @@ function isNewShape(sb) {
     sb &&
     typeof sb === "object" &&
     typeof sb.footage === "string" &&
-    typeof sb.prompt === "string"
+    Array.isArray(sb.prompts) &&
+    sb.prompts.length > 0 &&
+    sb.prompts.every((p) => p && typeof p.text === "string")
   );
 }
 
@@ -39,7 +41,20 @@ const geminiRaw = {
     ],
   },
   storyboards: [
-    { number: "01", title: "The Reveal", prompt: "What makes a roster feel national?", sourceSignal: "Cultural Conversation", footage: "Montage of federation graphics dropping." },
+    {
+      number: "01",
+      title: "The Reveal",
+      unmetNeed: "I want to feel like the roster is mine too.",
+      prompts: [
+        { key: "A", type: "Observational", text: "what makes a roster feel national" },
+        { key: "B", type: "Participatory", text: "help me throw a roster-reveal watch party" },
+        { key: "C", type: "Fusion/Planning", text: "fun ways to rank the 26-man squad with friends" },
+      ],
+      sourceSignal: "Cultural Conversation",
+      footage: "Montage of federation graphics dropping.",
+      verdict: "Strong Fit.",
+    },
+    // prompts omitted on purpose — legacy single-prompt upstream output.
     { number: "02", title: "Clean Slate", prompt: "How do appeals work?", sourceSignal: "Match Event" }, // footage omitted on purpose
     { number: "03", title: "On the Lake", prompt: "BMO Field secret?", sourceSignal: "Cultural Conversation", footage: "Drone over Lake Ontario." },
   ],
@@ -63,12 +78,40 @@ const payload = normalizePayload(geminiRaw, "Canada", "June 1, 2026");
 check("every storyboard passes social.html's isNewShape guard", () => {
   assert(payload.storyboards.length === 3, "expected 3 storyboards");
   payload.storyboards.forEach((sb, i) =>
-    assert(isNewShape(sb), `storyboard[${i}] failed isNewShape (footage="${sb.footage}", prompt="${sb.prompt}")`),
+    assert(isNewShape(sb), `storyboard[${i}] failed isNewShape (footage="${sb.footage}", prompts=${JSON.stringify(sb.prompts)})`),
   );
 });
 
 check("a storyboard with footage omitted upstream still gets a footage string", () => {
   assert(typeof payload.storyboards[1].footage === "string" && payload.storyboards[1].footage.length > 0);
+});
+
+check("A/B/C prompts survive with keys + types intact", () => {
+  const ps = payload.storyboards[0].prompts;
+  assert(ps.length === 3, "expected 3 prompts, got " + ps.length);
+  assert.deepStrictEqual(ps.map((p) => p.key), ["A", "B", "C"]);
+  assert.deepStrictEqual(
+    ps.map((p) => p.type),
+    ["Observational", "Participatory", "Fusion/Planning"],
+  );
+});
+
+check("legacy single-prompt storyboard becomes a one-prompt cycle", () => {
+  const sb = payload.storyboards[1]; // prompts omitted upstream
+  assert(sb.prompts.length === 1, "expected 1 fallback prompt");
+  assert(sb.prompts[0].key === "A" && sb.prompts[0].text === "How do appeals work?");
+});
+
+check("legacy `prompt` field stays in lock-step with prompts[0]", () => {
+  payload.storyboards.forEach((sb, i) =>
+    assert(sb.prompt === sb.prompts[0].text, `storyboard[${i}].prompt drifted from prompts[0].text`),
+  );
+});
+
+check("unmetNeed + optional verdict pass through; verdict omitted when absent", () => {
+  assert(payload.storyboards[0].unmetNeed === "I want to feel like the roster is mine too.");
+  assert(payload.storyboards[0].verdict === "Strong Fit.");
+  assert(!("verdict" in payload.storyboards[1]), "empty verdict should be omitted");
 });
 
 check("spikes carry sentiment (int) + tone (enum) so the view isn't undefined%", () => {

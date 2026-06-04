@@ -127,16 +127,41 @@ function normalizePayload(raw, market, liveDate) {
     const x = o && typeof o === "object" ? o : {};
     return { status: ipStatus(x.status), note: s(x.note) };
   }
+  // Canonical prompt-type ladder for the A/B/C trio on every storyboard.
+  const PROMPT_TYPES = ["Observational", "Participatory", "Fusion/Planning"];
+  function prompts(x) {
+    const ps = arr(x.prompts)
+      .map((p, i) => {
+        const po = p && typeof p === "object" ? p : { text: p };
+        return {
+          key: s(po.key) || String.fromCharCode(65 + i), // A / B / C
+          type: s(po.type) || PROMPT_TYPES[i] || "",
+          text: s(po.text),
+        };
+      })
+      .filter((p) => p.text)
+      .slice(0, 3);
+    // Legacy single-prompt payloads become a one-prompt cycle. `prompts` is
+    // REQUIRED by social.html's isNewShape guard, so never emit an empty list.
+    if (!ps.length) {
+      ps.push({ key: "A", type: PROMPT_TYPES[0], text: s(x.prompt) });
+    }
+    return ps;
+  }
   function story(o, idx) {
     const x = o && typeof o === "object" ? o : {};
-    return {
+    const ps = prompts(x);
+    const out = {
       number: s(x.number) || String(idx + 1).padStart(2, "0"),
       title: s(x.title) || "Untitled storyboard",
       sourceSignal: s(x.sourceSignal) || "Cultural Conversation",
       sourceDetail: s(x.sourceDetail),
       audienceCut: s(x.audienceCut) || "Core fan",
       bucket: s(x.bucket) || "Reactive",
-      prompt: s(x.prompt),
+      unmetNeed: s(x.unmetNeed),
+      prompts: ps,
+      // Legacy field kept in lock-step: always the lead (A) prompt.
+      prompt: ps[0].text,
       whyPrompt: s(x.whyPrompt),
       ipCheck: ip(x.ipCheck),
       // `footage` is REQUIRED by social.html's isNewShape guard. Never emit a
@@ -145,6 +170,10 @@ function normalizePayload(raw, market, liveDate) {
         s(x.footage) ||
         "On-screen search-query animation over B-roll matching the storyboard theme.",
     };
+    // Fan Agent verdict is optional in the renderer — only include when present.
+    const verdict = s(x.verdict);
+    if (verdict) out.verdict = verdict;
+    return out;
   }
 
   return {
