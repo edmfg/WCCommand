@@ -2021,6 +2021,11 @@
       .spec-drop[open] > summary .drop-caret {
         transform: rotate(180deg);
       }
+      /* Expanded = the body is fully visible, so the truncated peek in the
+         summary row is pure redundancy — keep its space, hide its text. */
+      .spec-drop[open] > summary .drop-peek {
+        opacity: 0;
+      }
       .spec-drop .drop-body {
         padding: 4px 14px 14px 14px;
         font-size: 12px;
@@ -3054,7 +3059,7 @@ window.FORMATION_DATA = {
                 <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
                 <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
               </div>
-              <details class="spec-drop spec-why">
+              <details class="spec-drop spec-why" open>
                 <summary>
                   <span class="drop-label">Why these prompts</span>
                   <span class="drop-peek">${sb.whyPrompt}</span>
@@ -3088,7 +3093,7 @@ window.FORMATION_DATA = {
                 <div class="footage-block-body">${sb.footage}</div>
               </div>
 
-              <details class="spec-drop ip-check" data-status="${sb.ipCheck.status}">
+              <details class="spec-drop ip-check" data-status="${sb.ipCheck.status}" open>
                 <summary>
                   <span class="dot"></span>
                   <span class="drop-label">IP — ${sb.ipCheck.status}</span>
@@ -3097,18 +3102,6 @@ window.FORMATION_DATA = {
                 </summary>
                 <div class="drop-body">${sb.ipCheck.note}</div>
               </details>
-              ${
-                sb.verdict
-                  ? `<details class="spec-drop spec-why">
-                <summary>
-                  <span class="drop-label">Fan Agent verdict</span>
-                  <span class="drop-peek">${escHtml(sb.verdict)}</span>
-                  <span class="drop-caret">▾</span>
-                </summary>
-                <div class="drop-body">${escHtml(sb.verdict)}</div>
-              </details>`
-                  : ""
-              }
             </div>
           `;
         }
