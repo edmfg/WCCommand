@@ -920,6 +920,28 @@
       .exporting .tile::before {
         display: none;
       }
+      /* The tileDrop entrance animation (opacity:0 at 0%, fill backwards) replays
+         from t=0 inside the html2canvas clone, so every delayed tile is captured
+         invisible — only .a-hero (delay 0) survived. Force all tiles to their
+         final visible state for the export. */
+      .exporting .tile {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      /* html2canvas can't rasterize background-clip:text — gradient text comes
+         out invisible (or as a solid gradient block). Render it as a solid colour
+         in the export only; the live page keeps the gradient. */
+      .exporting .wordmark b,
+      .exporting .lede h1 .grad,
+      .exporting .kick,
+      .exporting .spike .n {
+        background: none !important;
+        -webkit-background-clip: border-box !important;
+        background-clip: border-box !important;
+        -webkit-text-fill-color: currentColor !important;
+        color: #9b72cb !important;
+      }
     </style>
     <button id="exportBtn" type="button">⬇&nbsp; Export JPEG</button>
     <script>
