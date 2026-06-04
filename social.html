@@ -1155,7 +1155,7 @@
       .plays-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 22px;
+        gap: 18px;
       }
       @media (max-width: 1100px) {
         .plays-grid {
@@ -1168,11 +1168,11 @@
         background: linear-gradient(180deg, var(--surface-2), var(--surface));
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        padding: 24px;
+        padding: 18px;
         cursor: pointer;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 14px;
         transition:
           border-color 0.2s var(--t),
           transform 0.2s var(--t),
@@ -1233,27 +1233,6 @@
         letter-spacing: -0.005em;
         color: var(--text);
       }
-      .play-card-query {
-        font-size: 15px;
-        line-height: 1.45;
-        color: rgba(255, 255, 255, 0.96);
-        font-weight: 500;
-        padding: 14px 16px;
-        background: rgba(180, 142, 245, 0.08);
-        border: 1px solid rgba(180, 142, 245, 0.22);
-        border-radius: 12px;
-        position: relative;
-      }
-      .play-card-query::before {
-        content: "“";
-        position: absolute;
-        top: -4px;
-        left: 6px;
-        color: rgba(180, 142, 245, 0.5);
-        font-family: "Oswald", sans-serif;
-        font-size: 36px;
-        line-height: 1;
-      }
       .play-card-meta {
         display: flex;
         flex-wrap: wrap;
@@ -1313,23 +1292,63 @@
       .play-phone-wrap .phone {
         margin: 0 auto;
       }
-      .phone-controls {
+      /* In-phone prompt cycling — arrows flank the search bar inside the
+         query frame; the next arrow bobs to advertise that there are more
+         prompt options to click through. */
+      .query-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .query-row .query-search {
+        margin-bottom: 0;
+      }
+      .q-cycle {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: white;
+        font-size: 15px;
+        line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 12px;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+        pointer-events: auto;
+        transition: background 0.2s var(--t);
       }
-      .phone-controls .sb-arrow {
-        width: 34px;
-        height: 34px;
-        font-size: 18px;
+      .q-cycle:hover {
+        background: rgba(255, 255, 255, 0.32);
       }
-      .phone-hint {
+      .q-cycle.next {
+        animation: qBounce 1.5s ease-in-out infinite;
+      }
+      @keyframes qBounce {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(4px);
+        }
+      }
+      .q-cycle.next:hover {
+        animation-play-state: paused;
+      }
+      .q-more {
+        margin-top: 10px;
         font-family: "Oswald", sans-serif;
-        font-size: 10px;
-        letter-spacing: 0.16em;
+        font-size: 8.5px;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: var(--text-dim);
+        color: rgba(255, 255, 255, 0.55);
       }
       /* Footage block lights up on the query frame — inline variant
          (mirrors the modal's .sb-modal[data-current-beat="query"] rules). */
@@ -1594,13 +1613,14 @@
         overflow-wrap: break-word;
       }
 
-      /* iPhone (lives inside the storyboard modal) */
+      /* iPhone mock — sized so all three play cards read at 100% zoom
+         without scrolling inside the module. */
       .phone {
-        width: 280px;
-        height: 580px;
+        width: 216px;
+        height: 448px;
         background: linear-gradient(160deg, #1a1a1f, #08080a);
-        border-radius: 42px;
-        padding: 6px;
+        border-radius: 34px;
+        padding: 5px;
         box-shadow:
           0 30px 80px rgba(0, 0, 0, 0.6),
           0 0 0 1.5px rgba(255, 255, 255, 0.06),
@@ -1608,18 +1628,10 @@
         position: relative;
         flex-shrink: 0;
       }
-      /* Shrink the phone on small screens so the inline mockup never forces
-         horizontal scroll on a narrow device (e.g. iPhone SE ~320px). */
-      @media (max-width: 420px) {
-        .phone {
-          width: 240px;
-          height: 497px;
-        }
-      }
       .phone-screen {
         width: 100%;
         height: 100%;
-        border-radius: 36px;
+        border-radius: 29px;
         overflow: hidden;
         position: relative;
         background: #050507;
@@ -1627,11 +1639,11 @@
       }
       .phone-island {
         position: absolute;
-        top: 12px;
+        top: 9px;
         left: 50%;
         transform: translateX(-50%);
-        width: 92px;
-        height: 26px;
+        width: 72px;
+        height: 20px;
         background: #000;
         border-radius: 20px;
         z-index: 20;
@@ -1640,9 +1652,9 @@
       /* reels chrome */
       .reels-progress {
         position: absolute;
-        top: 50px;
-        left: 12px;
-        right: 12px;
+        top: 38px;
+        left: 10px;
+        right: 10px;
         z-index: 18;
         display: flex;
         gap: 4px;
@@ -1718,7 +1730,7 @@
         opacity: 0;
         transition: opacity 0.4s var(--t);
         pointer-events: none;
-        padding: 96px 60px 110px 18px;
+        padding: 64px 40px 76px 14px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -1742,9 +1754,9 @@
         background-repeat: no-repeat;
       }
 
-      /* Frame 3 — query hero with footage-direction popup */
+      /* Query frame — search-bar hero with in-phone prompt cycling */
       .frame[data-beat="query"] {
-        padding: 96px 24px 110px 24px;
+        padding: 64px 12px 76px 12px;
         align-items: center;
         text-align: center;
       }
@@ -1768,19 +1780,19 @@
         letter-spacing: 0.22em;
         text-transform: uppercase;
         color: rgba(180, 142, 245, 0.95);
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         font-weight: 700;
       }
       .query-search {
         width: 100%;
         background: rgba(255, 255, 255, 0.96);
-        border-radius: 22px;
-        padding: 14px 16px;
+        border-radius: 20px;
+        padding: 11px 13px;
         display: flex;
-        gap: 10px;
+        gap: 9px;
         align-items: flex-start;
         box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-        margin-bottom: 14px;
+        margin-bottom: 10px;
       }
       .query-search .g-icon {
         width: 18px;
@@ -1807,7 +1819,7 @@
       .query-search .q-text {
         flex: 1;
         text-align: left;
-        font-size: 13.5px;
+        font-size: 12.5px;
         line-height: 1.4;
         color: #1f1f1f;
         font-weight: 500;
@@ -2949,17 +2961,36 @@ window.FORMATION_DATA = {
           return ps.length ? ps : [{ key: "A", type: "", text: sb.prompt }];
         }
 
-        function renderPromptFrame(p, i) {
+        function renderPromptFrame(p, i, sbIdx, total) {
           const key = p.key || String.fromCharCode(65 + i);
           const kind = p.type ? " · " + escHtml(p.type) : "";
+          // Single-prompt (legacy) storyboards get a plain search bar — no
+          // cycle arrows, nothing to cycle to.
+          if (total <= 1) {
+            return `
+              <div class="frame" data-beat="query">
+                <div class="frame-bg"></div>
+                <div class="query-label">Prompt ${escHtml(key)}${kind}</div>
+                <div class="query-search">
+                  <span class="g-icon"></span>
+                  <span class="q-text">${escHtml(p.text)}</span>
+                </div>
+              </div>
+            `;
+          }
           return `
             <div class="frame" data-beat="query">
               <div class="frame-bg"></div>
               <div class="query-label">Prompt ${escHtml(key)}${kind}</div>
-              <div class="query-search">
-                <span class="g-icon"></span>
-                <span class="q-text">${escHtml(p.text)}</span>
+              <div class="query-row">
+                <button class="q-cycle prev" onclick="event.stopPropagation();frameStep(${sbIdx},-1)" aria-label="Previous prompt">‹</button>
+                <div class="query-search">
+                  <span class="g-icon"></span>
+                  <span class="q-text">${escHtml(p.text)}</span>
+                </div>
+                <button class="q-cycle next" onclick="event.stopPropagation();frameStep(${sbIdx},1)" aria-label="Next prompt">›</button>
               </div>
+              <div class="q-more">${total - 1} more prompt options · tap to cycle</div>
             </div>
           `;
         }
@@ -2969,16 +3000,15 @@ window.FORMATION_DATA = {
         // strategist can scan the rationale while looking at the creative.
         function renderPlayCard(sb, idx) {
           const prompts = promptList(sb);
-          const framesHTML = prompts.map(renderPromptFrame).join("");
+          const framesHTML = prompts
+            .map((p, i) => renderPromptFrame(p, i, idx, prompts.length))
+            .join("");
           const segments = prompts
             .map(
               (_, i) =>
                 `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
             )
             .join("");
-          const promptLetters = prompts
-            .map((p, i) => p.key || String.fromCharCode(65 + i))
-            .join(" · ");
           return `
             <div class="play-card" data-sb="${idx}">
               <div class="play-card-head">
@@ -2986,7 +3016,6 @@ window.FORMATION_DATA = {
                 <span class="play-card-source">${sb.sourceSignal}</span>
               </div>
               <div class="play-card-title">${sb.title}</div>
-              <div class="play-card-query">${escHtml(sb.unmetNeed || sb.prompt)}</div>
 
               <div class="play-phone-wrap">
                 <div class="phone">
@@ -3001,11 +3030,6 @@ window.FORMATION_DATA = {
                       <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
                     </div>
                   </div>
-                </div>
-                <div class="phone-controls">
-                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous prompt">‹</button>
-                  <span class="phone-hint">Cycle prompts ${promptLetters}</span>
-                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next prompt">›</button>
                 </div>
               </div>
 
@@ -3102,6 +3126,8 @@ window.FORMATION_DATA = {
           if (screen) {
             screen.addEventListener("click", (e) => {
               if (e.target.closest(".reels-rail")) return;
+              // In-phone cycle arrows step via their own onclick.
+              if (e.target.closest(".q-cycle")) return;
               const rect = screen.getBoundingClientRect();
               if (e.clientX - rect.left > rect.width / 2)
                 window.frameStep(i, 1);
