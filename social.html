@@ -2313,14 +2313,19 @@
 //    match            briefing (same shape)
 //    storyboards[]    storyboard {
 //                       number, title, sourceSignal, sourceDetail, audienceCut, bucket,
-//                       prompt,        // the daily query — also drives frame 3
-//                       whyPrompt,
+//                       unmetNeed,     // the fan's unmet info need, in their voice
+//                       prompts: [ { key: "A"|"B"|"C", type, text } x3 ],
+//                       prompt,        // legacy single-prompt field = prompts[0].text
+//                       whyPrompt,     // rationale for the prompt trio
 //                       ipCheck: { status, note },
-//                       footage        // creative direction for frame 3's footage popup
+//                       verdict,       // optional Fan Agent verdict on fit
+//                       footage        // creative direction paired with the prompts
 //                     }
 //
-//  Frames 1, 2, 4 are static brand visuals defined in formation.html
-//  (STORYBOARD_BEATS). Only frame 3 is data-driven per storyboard.
+//  The phone mock shows ONE screen — the query frame — and cycles through the
+//  three prompts (A → B → C) via the arrows / tap. The old static frames
+//  (search lockup / many-questions / ask-more) were identical on every
+//  storyboard and are no longer click-through frames.
 //
 //  Brazil / DE / USA are intentionally null — the market chooser disables them
 //  until briefings are wired up. Add the same shape as `ca` to enable.
@@ -2329,7 +2334,7 @@
 window.FORMATION_DATA = {
   ca: {
     formation: {
-      date: "May 29, 2026",
+      date: "June 4, 2026",
       market: "Canada",
       window: "Last 24h",
     },
@@ -2339,53 +2344,71 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "01",
       headline:
-        "A legal investigation into FIFA's 2026 ticket prices is shifting fan conversation from excitement to anger — while localized pride spikes in Montreal and other host cities.",
+        "Diaspora communities are mobilizing ahead of the World Cup — driving conversation around cultural pride and the friendly matches.",
       spikes: [
         {
-          title: "Montreal Playoff Energy & Anthem Harmonization",
+          title: "Diaspora World Cup Mobilization",
           type: "Cultural Pride",
           signal:
-            "Volume + positive sentiment spike around the Montreal Canadiens' NHL playoff run, with the in-arena atmosphere — harmonized national anthems and organic crowd chants — at the centre.",
+            "World Cup conversation is spiking on X in both French and English, with “coupe du monde” and “diaspora” leading the keywords.",
           context:
-            "Viral “four-women-harmony” anthem moments and intense crowd chants out of the Bell Centre are being framed by fans as the cultural ceiling Canada can aim for during the World Cup home-soil run.",
+            "Upcoming friendlies — Egypt vs. Brazil in Ohio, Morocco vs. Norway in New Jersey — are the key driver, with diaspora communities in Montreal and Toronto actively supporting their teams and sharing excitement and pride.",
           voice:
-            "The playoff atmosphere in Montreal is unmatched right now. Hearing four women flawlessly harmonize the national anthem gave me absolute goosebumps, and the crowd chants are incredibly intense.",
-          volume: 35,
+            "The reception the Egyptian team is getting in North America proves that the diaspora's passion is going to make this World Cup feel like a home tournament for so many visiting nations.",
+          volume: 38,
+          sentiment: 90,
+          tone: "positive",
+        },
+        {
+          title: "Toronto's Public Multiculturalism",
+          type: "Host City Pride",
+          signal:
+            "A viral video of a large South Asian community dance at Yonge-Dundas Square has led to a surge in conversation about the city's multiculturalism.",
+          context:
+            "The video — along with personal stories of new immigrants finding success — is driving a positive sentiment of joy and pride across the city's feeds.",
+          voice:
+            "Just saw this amazing video of a massive South Asian traditional street dance happening right in the middle of Yonge-Dundas Square. This is the exact cultural energy that makes Toronto so special.",
+          volume: 30,
           sentiment: 92,
           tone: "positive",
         },
         {
-          title: "Legal Investigation Into FIFA 2026 Ticket Prices",
-          type: "Ticket Pricing",
+          title: "“Fashion Week” vs. Athletic Focus",
+          type: "Fan Sentiment",
           signal:
-            "Velocity spike around French-language keywords like “coupe du monde” — driven by news of a legal investigation into FIFA's 2026 World Cup ticket pricing.",
+            "A sentiment shift is emerging as fans push back against what they see as an overemphasis on fashion and aesthetics from some national teams — “Fashion Week” used sarcastically.",
           context:
-            "Sentiment is angry. Fans in host cities like Toronto and Vancouver are venting frustration about being priced out of what they're calling an “absolute joke” of a tournament ticketing structure.",
+            "Fans are expressing a desire for teams to focus more on performance than on pre-match outfits as the tournament approaches.",
           voice:
-            "It is about time authorities stepped in. The ticket pricing for the 2026 World Cup is an absolute joke and completely locks out actual football fans.",
-          volume: 40,
-          sentiment: 18,
+            "Some of these national teams are acting like they are walking the runway at Paris Fashion Week instead of preparing for a literal World Cup. You cannot win championships with just vibes and outfits.",
+          volume: 24,
+          sentiment: 35,
           tone: "caution",
         },
         {
-          title: "Host City Showcase & Cultural Pride",
-          type: "Host City Pride",
+          title: "Canadian Culinary Identity Debate",
+          type: "Food Culture",
           signal:
-            "Emergent friendly-rivalry theme between Canadian host cities — Vancouver and Toronto in particular — with high engagement and emoji usage (🇨🇦, 🍵).",
+            "An emergent conversation among foodies and travelers is questioning whether Canada has a distinct culinary and wine identity.",
           context:
-            "Fans are sharing scenic stadium shots and local cultural anthems to showcase each city's unique vibe. BMO Field's lakeside setting + skyline backdrop is becoming a hero visual.",
+            "While acknowledging the high quality of international cuisine in cities like Toronto, the conversation is exploring the uniqueness of local Canadian food and wine.",
           voice:
-            "Toronto is going to look stunning during the World Cup. Imagine BMO Field sitting right on the lake with the city skyline behind it — the soccer culture here is going to blow people away.",
-          volume: 28,
-          sentiment: 88,
-          tone: "positive",
+            "I love visiting Canada, and the Chinese food scene in Toronto is absolutely world-class. But outside of international food, it's hard to point to a distinct local cuisine or wine identity that truly stands out globally.",
+          volume: 18,
+          sentiment: 58,
+          tone: "neutral",
         },
       ],
       flags: [
         {
-          tag: "Sensitive Territory",
+          tag: "Cultural Representation",
+          color: "amber",
+          note: "While the conversation around multiculturalism is largely positive, be aware of the potential for polarized or xenophobic comments in discussions about public cultural gatherings.",
+        },
+        {
+          tag: "FIFA World Cup 2026 IP",
           color: "red",
-          note: "Tragic passing of NHL legend Claude Lemieux is driving a significant negative sentiment shift, heavily entangled with the Canadiens, Devils, and Avalanche. Pause any aggressive or “gritty” hockey-related ad creative and avoid any association with this news.",
+          note: "Avoid using official FIFA trademarks, player names, or team IP in any marketing materials without proper authorization.",
         },
       ],
     },
@@ -2395,140 +2418,186 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "02",
       headline:
-        "A standoff between Canada Soccer and Bayern Munich over Alphonso Davies' World Cup fitness dominates a day of otherwise positive news.",
+        "Severe injury setbacks to talisman Alphonso Davies and defender Moïse Bombito have shifted fan sentiment from individual superstar hype to a collective, anxiety-tinged rallying cry for squad depth.",
       spikes: [
         {
-          title: "Club vs. Country — The Davies / Bayern Battle",
-          type: "Club vs. Country",
+          title: "Alphonso Davies' Opening-Match Absence & Mental Health Vulnerability",
+          type: "Player Narrative",
           signal:
-            "High-velocity growth on Twitter/X — 10% of total tournament-related hot topics.",
+            "High-volume spike on Twitter/X — 40% keyword mention rate for “Davies,” 38% topic share for “Alphonso Davies Injury Recovery Status.” Sentiment heavily split, register-shifting from initial panic into protective empathy, driving a dominant “Hope” emotion (48% of overall conversation).",
           context:
-            "Manager Jesse Marsch confidently confirmed captain Alphonso Davies will play in the World Cup. Bayern Munich issued a sharp warning claiming they — not Canada Soccer — will make the final call on his recovery timeline. Ignited a passionate “home soil” debate about player autonomy and national pride.",
+            "Davies officially confirmed he will miss the highly anticipated opening World Cup match against Bosnia on June 12. More than the physical setback, fans are deeply moved by his vulnerability in discussing the mental “hole” he fell into during his recent injury recoveries. This raw honesty has endeared him further to Canadian supporters, shifting the digital narrative from frustration to unconditional support.",
           voice:
-            "Marsch says Phonzie is playing, but Bayern is acting like they own him. He's our captain — they can't lock him in a closet for Canada's biggest moment in history.",
-          hook: "Will Bayern actually try to legally block Davies on the eve of the tournament, or will Marsch's diplomatic “Maple Pressing” keep our captain on the pitch?",
-          volume: 10,
-          sentiment: 55,
+            "It's absolutely gutting that Phonsie is missing the opener against Bosnia, but hearing him speak so openly about his mental struggles makes me respect him even more. This team has to play for him.",
+          hook: "How will Jesse Marsch tactically reconfigure Canada's left flank to compensate for the tournament's most explosive fullback being sidelined?",
+          volume: 40,
+          sentiment: 48,
           tone: "neutral",
         },
         {
-          title: "The Cleared Slate — Buchanan's Appeal Triumph",
-          type: "Player Eligibility",
+          title: "Moïse Bombito's Tibia Sensitivity Sparking Defensive Anxiety",
+          type: "Player Fitness",
           signal:
-            "Explosive positive trajectory on Twitter/X — primary driver behind the day's 90% positive sentiment score.",
+            "Rapid growth in negative-leaning sentiment — 30% sentiment value, 25% topic share under “Moïse Bombito Fitness Concerns.” Mentioned in 28% of all national-team conversations.",
           context:
-            "Canada Soccer successfully appealed Tajon Buchanan's three-game “violent misconduct” red card. Because he served his suspension during the Tunisia match, he is officially cleared to play against Uzbekistan.",
+            "After a shaky performance in the 2-0 rain-soaked friendly win over Uzbekistan in Edmonton, head coach Jesse Marsch revealed that Bombito has been experiencing sensitivity in his previously broken tibia. With Bombito undergoing modified, non-contact training in Montreal alongside Alfie Jones, fans are expressing severe anxiety over Canada's central defensive stability just days out from the tournament kickoff.",
           voice:
-            "Absolute masterclass by Canada Soccer's legal team. Getting Tajon cleared for Uzbekistan completely changes our group stage math — we have a real shot.",
-          hook: "What specific evidence did Canada Soccer present to FIFA to get a violent-misconduct red card overturned so quickly?",
+            "Bombito didn't look right against Uzbekistan, and now we find out his tibia is still giving him trouble. If he's not at 100%, our backline is going to get exposed instantly.",
+          hook: "Can Canada's defensive structure survive the group stage if forced to rely on secondary depth options?",
+          volume: 25,
+          sentiment: 30,
+          tone: "caution",
+        },
+        {
+          title: "Midfield Depth Crisis Compounded by Marcelo Flores' ACL Rupture",
+          type: "Squad Depth",
+          signal:
+            "High-velocity spike in tragic / sympathetic sentiment on Twitter/X, driving the #CanMNT hashtag to a dominant 32% share.",
+          context:
+            "Emerging midfielder Marcelo Flores has been ruled out of the entire World Cup campaign after suffering a devastating ACL rupture. Coming on the heels of the Davies and Bombito training updates, fans are feeling a mounting sense of doom regarding the squad's physical durability, while simultaneously debating who Marsch will call up as an emergency replacement.",
+          voice:
+            "Losing Flores to an ACL tear is completely tragic. Our midfield depth is getting pushed to its absolute limits before the tournament even starts. Cruel luck.",
+          hook: "Who will grab the final roster spot to salvage Canada's creative midfield rotation?",
           volume: 32,
-          sentiment: 90,
-          tone: "positive",
-        },
-        {
-          title: "The Defensive Anchor — Moïse Bombito Declares “100% Fitness”",
-          type: "Player Narrative",
-          signal:
-            "#1 Hot Topic of the last 24 hours, capturing 12% of overall conversation volume.",
-          context:
-            "Center-back Moïse Bombito declared himself 100% fit and ready for the June 12 opener against Bosnia. Analysts and fans note Bombito's recovery is the linchpin of Jesse Marsch's high-energy, high-pressing defensive transition system.",
-          voice:
-            "Our defense did okay without him, but Bombito is literally built for a Jesse Marsch system. Knowing he's 100% ready for Bosnia is a massive relief.",
-          hook: "Can Bombito jump straight into Marsch's high-octane press for a full 90 minutes without risking a re-injury?",
-          volume: 12,
-          sentiment: 88,
-          tone: "positive",
-        },
-        {
-          title: "Digital Home Soil — BMO Field's EA Sports Debut",
-          type: "Venue & Digital",
-          signal:
-            "Steady volume growth across gaming and soccer sub-communities.",
-          context:
-            "EA Sports FC 26 announced that Toronto's BMO Field (expanded to 45,000 capacity) will be officially included in the upcoming World Cup update. Intense local pride — fans sharing the lakeside venue, the skyline view, and how Toronto's multicultural soccer culture translates both digitally and physically.",
-          voice:
-            "Playing at BMO Field right on the shore of Lake Ontario with the CN Tower in the background is going to look unreal on global TV and in-game. Toronto is ready.",
-          hook: "How will BMO Field's digital likeness compare to the real-world atmosphere when the tournament officially kicks off on June 12?",
-          volume: 22,
-          sentiment: 82,
-          tone: "positive",
+          sentiment: 22,
+          tone: "caution",
         },
       ],
       flags: [
         {
-          tag: "Sensitive Territory",
+          tag: "Likeness",
           color: "red",
-          note: "Alphonso Davies / Bayern Munich likeness — HIGH risk. Avoid creative that explicitly guarantees Davies' start or mocks club-level medical decisions.",
+          note: "Alphonso Davies & Moïse Bombito likeness — digital campaigns must avoid direct images of Davies and Bombito in active match-day promotional materials that imply physical dominance; doing so conflicts with their current injury statuses and could draw fan backlash.",
         },
         {
-          tag: "Likeness",
-          color: "amber",
-          note: "Tajon Buchanan incident imagery — MEDIUM risk. Avoid using any broadcast footage, still images, or direct text references to the physical elbow incident against Iceland.",
+          tag: "Sensitive Territory",
+          color: "red",
+          note: "Mental health messaging — given the sensitive nature of Davies' comments regarding his mental “hole,” ad copy must not exploit or commercialize mental health struggles. Keep brand messaging strictly focused on “collective strength” and “unity.”",
         },
         {
           tag: "Trademarks",
           color: "amber",
-          note: "EA Sports / FIFA intellectual property — LOW-MEDIUM risk. Do not use “EA Sports FC 26” or “FIFA” trademarks in promotional headlines without proper co-branding clearance.",
+          note: "Official marks — per strict FIFA guidelines, campaigns should abstract official event references. Use “The June Summer Tournament” instead of “FIFA World Cup 2026,” and “Canada's Men's National Squad” instead of “#CanMNT” in non-editorial paid channels.",
         },
       ],
     },
     storyboards: [
       {
         number: "01",
-        title: "The Loudest Anthem",
+        title: "The Poutine Purity Test",
         sourceSignal: "Cultural Conversation",
         sourceDetail:
-          "Montreal Playoff Energy & Anthem Harmonization — viral four-women harmony at the Bell Centre",
-        audienceCut: "Diaspora Fan",
-        bucket: "Cultural Pride + Team Lore",
+          "Poutine discourse is spiking hard — mentions of “real poutine,” “squeaky curds,” and debates over gravy are up 300% on social media.",
+        audienceCut: "Bandwagon Fan",
+        bucket: "Cultural Pride",
+        unmetNeed:
+          "How can I join the poutine conversation during the game without sounding like a tourist who gets it wrong?",
+        prompts: [
+          {
+            key: "A",
+            type: "Observational",
+            text: "why are there so many unwritten rules about what makes a 'real' poutine",
+          },
+          {
+            key: "B",
+            type: "Participatory",
+            text: "help me find a sports bar with authentic poutine that won't get me roasted",
+          },
+          {
+            key: "C",
+            type: "Fusion/Planning",
+            text: "what's a fun, unexpected twist I can put on poutine for my watch party",
+          },
+        ],
         prompt:
-          "My family came to Canada in the 90s — what role do diaspora communities play in making a national anthem actually feel national?",
+          "why are there so many unwritten rules about what makes a 'real' poutine",
         whyPrompt:
-          "Channels the viral Montreal anthem-harmony moment into a question about how Canada's diaspora communities literally shape what “home soil” sounds like — inverts the usual outsider framing of diaspora fandom into authorship of the tournament's atmosphere.",
+          "This trio allows fans to engage at any level: understand the debate, find the authentic experience, or creatively remix the classic for their own party.",
         ipCheck: {
           status: "clear",
-          note: "No specific players, songs, or league trademarks. Focuses on cultural ritual and community.",
+          note: "Confirmed clean. All prompts are free of protected terms.",
         },
+        verdict: "Strong Fit.",
         footage:
-          "Slow montage — community-hall choirs (Filipino, Haitian, Punjabi, Polish), hands on hearts in stadium light, an anthem rehearsal at a Montreal high school. Audio crossfades layered languages resolving into a single chorus.",
+          "Quick cuts of friends sharing different, delicious-looking plates of poutine at a bar and at home. Close-up on cheese curds stretching.",
       },
       {
         number: "02",
-        title: "Clean Slate",
+        title: "The New National Anthem",
         sourceSignal: "Match Event",
         sourceDetail:
-          "Buchanan's appeal triumph — the first violent-misconduct red card overturned this cycle",
+          "During the CAN-BEL match, the crowd's coordinated “Eh!” chant — replacing the typical “Olé!” — was picked up on the broadcast and is now trending.",
         audienceCut: "Core Fan",
-        bucket: "Soccer Fandom + Canadian Fan Preparedness",
+        bucket: "Fan Preparedness",
+        unmetNeed:
+          "I heard that chant last night and want to be ready to join in for the next match. How does it work?",
+        prompts: [
+          {
+            key: "A",
+            type: "Observational",
+            text: "why do some stadium chants sound so simple but are hard to get right",
+          },
+          {
+            key: "B",
+            type: "Participatory",
+            text: "what's the rhythm and timing for the new Canadian 'Eh' soccer chant",
+          },
+          {
+            key: "C",
+            type: "Fusion/Planning",
+            text: "help me come up with more funny Canadian versions of classic stadium songs",
+          },
+        ],
         prompt:
-          "What's the actual standard a national federation has to meet to get a violent-misconduct red card overturned on appeal?",
+          "why do some stadium chants sound so simple but are hard to get right",
         whyPrompt:
-          "Turns the wave of optimism around the Buchanan clearance into a procedural curiosity question — lets core fans appreciate the legal masterclass without re-litigating the incident itself.",
+          "It captures a real-time trend, giving fans a tool to understand the phenomenon, learn how to participate, and even build on it creatively.",
         ipCheck: {
           status: "clear",
-          note: "Avoids the elbow-incident imagery and doesn't name the opponent. Procedural framing on disciplinary process, not the play that triggered it.",
+          note: "Confirmed clean. All prompts are free of protected terms.",
         },
+        verdict: "Strong Fit.",
         footage:
-          "Animated disciplinary timeline. Close-ups on stamped paperwork, a legal team's whiteboard, redacted match-report excerpts. Final beat: a tactics whiteboard with the full 26-man squad back in play, one name slotted into a starting XI.",
+          "A phone screen showing a group chat buzzing about the chant. Cuts to fans in a living room practicing the chant, laughing. Audio of the chant is prominent.",
       },
       {
         number: "03",
-        title: "On the Lake",
-        sourceSignal: "Cultural Conversation + Match Event",
+        title: "The Formalwear of Fans",
+        sourceSignal: "Cultural Conversation",
         sourceDetail:
-          "Host City Showcase rivalry + BMO Field's lakeside Toronto identity",
+          "The “Canadian Tuxedo” (denim on denim) is being reclaimed by younger fans as a source of national pride for watch parties.",
         audienceCut: "Bandwagon Fan",
-        bucket: "Cultural Pride + Team Lore",
-        prompt:
-          "I'm flying into Toronto for a match — what's the one detail about BMO Field that locals brag about that no one outside the city knows?",
+        bucket: "Style Seeker",
+        unmetNeed:
+          "I want to show my Canadian pride with a cool outfit for the game, not a generic jersey. How do I pull this off?",
+        prompts: [
+          {
+            key: "A",
+            type: "Observational",
+            text: "why is an all-denim outfit called a Canadian tuxedo anyway",
+          },
+          {
+            key: "B",
+            type: "Participatory",
+            text: "what are some stylish ways to wear denim on denim for a game day party",
+          },
+          {
+            key: "C",
+            type: "Fusion/Planning",
+            text: "what are some DIY ways to customize a denim jacket for Canada game day",
+          },
+        ],
+        prompt: "why is an all-denim outfit called a Canadian tuxedo anyway",
         whyPrompt:
-          "Channels the host-city friendly-rivalry surge into a curiosity-driven question that hands bandwagon fans local talking points and sets up Toronto's lakeside identity as a feature, not just a venue.",
+          "This speaks directly to the fashion-conscious fan, offering a path from cultural curiosity to practical style advice and creative personalization.",
         ipCheck: {
           status: "clear",
-          note: "Names BMO Field (the public venue name) but avoids EA Sports / FIFA trademarks and avoids direct host-city comparisons.",
+          note: "Confirmed clean. All prompts are free of protected terms.",
         },
+        verdict:
+          "Fit with refinement. The audience has been adjusted to “Bandwagon Fan / Style Seeker” and Prompt C has been rewritten to better align with the core trend. The original diaspora angle has been noted for future, more dedicated exploration.",
         footage:
-          "Drone shot rising from Lake Ontario toward BMO Field with the CN Tower and skyline behind. Cut to ferry commuters watching the stadium light up at sunset. Quick cut to a street-corner sandwich shop's match-day chalkboard. End on the grass field meeting the water.",
+          "A creator-style GRWM (Get Ready With Me) video showing someone putting together a stylish denim-on-denim outfit with red and white accessories.",
       },
     ],
   },
@@ -2867,63 +2936,49 @@ window.FORMATION_DATA = {
           if (e.key === "Escape") window.closeModal();
         });
 
-        // Every storyboard has the same 4-frame structure:
-        // 1 — Google Search lockup (static)
-        // 2 — "One country, many fans, many questions" (static)
-        // 3 — Query hero + footage direction popup (dynamic per storyboard)
-        // 4 — "Ask more with Google Search" (static)
-        const STORYBOARD_BEATS = [
-          {
-            kind: "image",
-            name: "Google Search lockup",
-            src: "assets/storyboard/frame-1-search-lockup.png",
-          },
-          {
-            kind: "image",
-            name: "One Country. Many Fans. Many Questions.",
-            src: "assets/storyboard/frame-2-many-questions.png",
-          },
-          { kind: "query", name: "Query" },
-          {
-            kind: "image",
-            name: "Ask more with Google Search",
-            src: "assets/storyboard/frame-4-ask-more.png",
-          },
-        ];
+        // Every storyboard's phone shows ONE screen — the query frame — and
+        // cycles through the storyboard's three prompts (A → B → C). The old
+        // static frames (search lockup / many-questions / ask-more) were
+        // identical on every storyboard, so they're no longer click-through
+        // frames.
+        function promptList(sb) {
+          const ps = Array.isArray(sb.prompts)
+            ? sb.prompts.filter((p) => p && typeof p.text === "string")
+            : [];
+          // Legacy single-prompt storyboards still render — as a one-prompt cycle.
+          return ps.length ? ps : [{ key: "A", type: "", text: sb.prompt }];
+        }
 
-        function renderFrame(beat, sb, sbIdx) {
-          if (beat.kind === "image") {
-            return `
-              <div class="frame" data-beat="image">
-                <div class="frame-bg" style="background-image:url('${beat.src}')"></div>
-              </div>
-            `;
-          }
-          // query frame — pure search-bar mock; footage direction lives in
-          // the modal's right column (always visible there).
+        function renderPromptFrame(p, i) {
+          const key = p.key || String.fromCharCode(65 + i);
+          const kind = p.type ? " · " + escHtml(p.type) : "";
           return `
             <div class="frame" data-beat="query">
               <div class="frame-bg"></div>
-              <div class="query-label">Today's query</div>
+              <div class="query-label">Prompt ${escHtml(key)}${kind}</div>
               <div class="query-search">
                 <span class="g-icon"></span>
-                <span class="q-text">${sb.prompt}</span>
+                <span class="q-text">${escHtml(p.text)}</span>
               </div>
             </div>
           `;
         }
 
         // Inline play card — the phone mock is shown by default (no modal).
-        // Query + Why + IP dropdowns sit alongside the mock so the strategist
-        // can scan the rationale while looking at the creative.
+        // Unmet need + Why + IP dropdowns sit alongside the mock so the
+        // strategist can scan the rationale while looking at the creative.
         function renderPlayCard(sb, idx) {
-          const framesHTML = STORYBOARD_BEATS.map((b) =>
-            renderFrame(b, sb, idx),
-          ).join("");
-          const segments = STORYBOARD_BEATS.map(
-            (_, i) =>
-              `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
-          ).join("");
+          const prompts = promptList(sb);
+          const framesHTML = prompts.map(renderPromptFrame).join("");
+          const segments = prompts
+            .map(
+              (_, i) =>
+                `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
+            )
+            .join("");
+          const promptLetters = prompts
+            .map((p, i) => p.key || String.fromCharCode(65 + i))
+            .join(" · ");
           return `
             <div class="play-card" data-sb="${idx}">
               <div class="play-card-head">
@@ -2931,7 +2986,7 @@ window.FORMATION_DATA = {
                 <span class="play-card-source">${sb.sourceSignal}</span>
               </div>
               <div class="play-card-title">${sb.title}</div>
-              <div class="play-card-query">${sb.prompt}</div>
+              <div class="play-card-query">${escHtml(sb.unmetNeed || sb.prompt)}</div>
 
               <div class="play-phone-wrap">
                 <div class="phone">
@@ -2948,17 +3003,17 @@ window.FORMATION_DATA = {
                   </div>
                 </div>
                 <div class="phone-controls">
-                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous frame">‹</button>
-                  <span class="phone-hint">Tap mock to advance</span>
-                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next frame">›</button>
+                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous prompt">‹</button>
+                  <span class="phone-hint">Cycle prompts ${promptLetters}</span>
+                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next prompt">›</button>
                 </div>
               </div>
 
               <div class="footage-block">
                 <div class="footage-block-head">
                   <span class="glyph">▣</span>
-                  <span class="lbl">Footage direction · Frame 3</span>
-                  <span class="now-showing">Now showing</span>
+                  <span class="lbl">Footage direction</span>
+                  <span class="now-showing">All prompts</span>
                 </div>
                 <div class="footage-block-body">${sb.footage}</div>
               </div>
@@ -2969,7 +3024,7 @@ window.FORMATION_DATA = {
               </div>
               <details class="spec-drop spec-why">
                 <summary>
-                  <span class="drop-label">Why this prompt</span>
+                  <span class="drop-label">Why these prompts</span>
                   <span class="drop-peek">${sb.whyPrompt}</span>
                   <span class="drop-caret">▾</span>
                 </summary>
@@ -2984,61 +3039,18 @@ window.FORMATION_DATA = {
                 </summary>
                 <div class="drop-body">${sb.ipCheck.note}</div>
               </details>
-            </div>
-          `;
-        }
-
-        // Expanded view — full storyboard modal with phone mock + spec details
-        function renderStoryboardModal(sb, idx) {
-          const framesHTML = STORYBOARD_BEATS.map((b) =>
-            renderFrame(b, sb, idx),
-          ).join("");
-          const segments = STORYBOARD_BEATS.map(
-            (_, i) =>
-              `<div class="seg" data-i="${i}"><div class="fill"></div></div>`,
-          ).join("");
-
-          return `
-            <div class="sb-modal" data-sb="${idx}" onclick="event.stopPropagation()">
-              <button class="sb-modal-close" onclick="closeStoryboardModal()" aria-label="Close">×</button>
-              <div class="sb-modal-head">
-                <div class="sb-modal-num">Play ${sb.number} · ${sb.sourceSignal}</div>
-                <div class="sb-modal-title">${sb.title}</div>
-                <div class="sb-modal-pills">
-                  <span class="chip" data-kind="source"><strong>Source</strong>${sb.sourceDetail || sb.sourceSignal}</span>
-                  <span class="chip" data-kind="audience"><strong>Audience</strong>${sb.audienceCut}</span>
-                  <span class="chip" data-kind="bucket"><strong>Bucket</strong>${sb.bucket}</span>
-                </div>
-              </div>
-              <div class="sb-modal-body">
-                <div class="sb-modal-phone-col">
-                  <button class="sb-arrow prev" onclick="frameStep(${idx},-1)" aria-label="Previous frame">‹</button>
-                  <div class="phone">
-                    <div class="phone-island"></div>
-                    <div class="phone-screen">
-                      <div class="reels-progress">${segments}</div>
-                      <div class="frames">${framesHTML}</div>
-                      <div class="reels-rail">
-                        <div class="reels-rail-item"><div class="reels-rail-icon">♥</div><div class="reels-rail-label">12.4K</div></div>
-                        <div class="reels-rail-item"><div class="reels-rail-icon">💬</div><div class="reels-rail-label">247</div></div>
-                        <div class="reels-rail-item"><div class="reels-rail-icon">↗</div><div class="reels-rail-label">Share</div></div>
-                        <div class="reels-rail-item"><div class="reels-rail-icon">⊙</div><div class="reels-rail-label">Save</div></div>
-                      </div>
-                    </div>
-                  </div>
-                  <button class="sb-arrow next" onclick="frameStep(${idx},1)" aria-label="Next frame">›</button>
-                </div>
-                <div class="sb-modal-right">
-                  <div class="footage-block">
-                    <div class="footage-block-head">
-                      <span class="glyph">▣</span>
-                      <span class="lbl">Footage direction · Frame 3</span>
-                      <span class="now-showing">Now showing</span>
-                    </div>
-                    <div class="footage-block-body">${sb.footage}</div>
-                  </div>
-                </div>
-              </div>
+              ${
+                sb.verdict
+                  ? `<details class="spec-drop spec-why">
+                <summary>
+                  <span class="drop-label">Fan Agent verdict</span>
+                  <span class="drop-peek">${escHtml(sb.verdict)}</span>
+                  <span class="drop-caret">▾</span>
+                </summary>
+                <div class="drop-body">${escHtml(sb.verdict)}</div>
+              </details>`
+                  : ""
+              }
             </div>
           `;
         }
@@ -3048,11 +3060,10 @@ window.FORMATION_DATA = {
           (sb, i) => renderPlayCard(sb, i),
         ).join("");
 
-        const frameState = STORYBOARDS.map(() => ({
+        const frameState = STORYBOARDS.map((sb) => ({
           idx: 0,
-          total: STORYBOARD_BEATS.length,
+          total: promptList(sb).length,
         }));
-        let activeSbIdx = -1;
 
         function setFrames(sbIdx) {
           if (sbIdx == null) return;
@@ -3061,11 +3072,12 @@ window.FORMATION_DATA = {
           );
           if (!card) return;
           const state = frameState[sbIdx];
-          const currentBeat = STORYBOARD_BEATS[state.idx].kind;
-          card.setAttribute("data-current-beat", currentBeat);
+          // Every frame is a query frame now — keeps the footage block lit
+          // and the social rail hidden (clean search lockup).
+          card.setAttribute("data-current-beat", "query");
           const phoneScreen = card.querySelector(".phone-screen");
           if (phoneScreen)
-            phoneScreen.setAttribute("data-current-beat", currentBeat);
+            phoneScreen.setAttribute("data-current-beat", "query");
           card
             .querySelectorAll(".frame")
             .forEach((f, j) => f.classList.toggle("active", j === state.idx));
@@ -3073,15 +3085,12 @@ window.FORMATION_DATA = {
             s.classList.toggle("active", j === state.idx);
             s.classList.toggle("done", j < state.idx);
           });
-          const prevBtn = card.querySelector(".sb-arrow.prev");
-          const nextBtn = card.querySelector(".sb-arrow.next");
-          if (prevBtn) prevBtn.disabled = state.idx === 0;
-          if (nextBtn) nextBtn.disabled = state.idx === state.total - 1;
         }
 
+        // Arrows cycle the prompts: stepping past C wraps back around to A.
         window.frameStep = function (sbIdx, dir) {
           const s = frameState[sbIdx];
-          s.idx = Math.max(0, Math.min(s.total - 1, s.idx + dir));
+          s.idx = (s.idx + dir + s.total) % s.total;
           setFrames(sbIdx);
         };
 
@@ -3102,46 +3111,6 @@ window.FORMATION_DATA = {
           setFrames(i);
         });
 
-        window.openStoryboardModal = function (sbIdx) {
-          activeSbIdx = sbIdx;
-          const overlay = document.getElementById("sbModal");
-          overlay.innerHTML = renderStoryboardModal(STORYBOARDS[sbIdx], sbIdx);
-          overlay.classList.add("open");
-          document.body.style.overflow = "hidden";
-          // Wire up the in-phone tap-to-advance for the freshly-mounted phone.
-          const screen = overlay.querySelector(".phone-screen");
-          if (screen) {
-            screen.addEventListener("click", (e) => {
-              if (e.target.closest(".reels-rail")) return;
-              const rect = screen.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              if (x > rect.width / 2) window.frameStep(sbIdx, 1);
-              else window.frameStep(sbIdx, -1);
-            });
-          }
-          setFrames();
-        };
-
-        window.closeStoryboardModal = function () {
-          const overlay = document.getElementById("sbModal");
-          overlay.classList.remove("open");
-          overlay.innerHTML = "";
-          document.body.style.overflow = "";
-          activeSbIdx = -1;
-        };
-
-        document
-          .getElementById("sbModal")
-          .addEventListener("click", (e) => {
-            if (e.target.id === "sbModal") window.closeStoryboardModal();
-          });
-
-        document.addEventListener("keydown", (e) => {
-          if (activeSbIdx < 0) return;
-          if (e.key === "Escape") return window.closeStoryboardModal();
-          if (e.key === "ArrowRight") window.frameStep(activeSbIdx, 1);
-          if (e.key === "ArrowLeft") window.frameStep(activeSbIdx, -1);
-        });
       }
 
       // ============================================================================
@@ -3408,8 +3377,9 @@ window.FORMATION_DATA = {
       //  publish log / audit log) and disables live auto-refresh so the archive
       //  stays put.
       //
-      //  isNewShape guard: a payload whose storyboards lack `footage` is pre-
-      //  migration; it's ignored in favour of the bundled defaults.
+      //  isNewShape guard: a payload whose storyboards lack `footage` or the
+      //  `prompts` A/B/C array is pre-migration; it's ignored in favour of the
+      //  bundled defaults.
       // ============================================================================
       (function () {
         const SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
@@ -3436,7 +3406,9 @@ window.FORMATION_DATA = {
             sb &&
             typeof sb === "object" &&
             typeof sb.footage === "string" &&
-            typeof sb.prompt === "string"
+            Array.isArray(sb.prompts) &&
+            sb.prompts.length > 0 &&
+            sb.prompts.every((p) => p && typeof p.text === "string")
           );
         }
 
