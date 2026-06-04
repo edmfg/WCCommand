@@ -350,6 +350,7 @@
 
       /* While capturing, hide controls that shouldn't appear in the export. */
       body.exporting .export-wrap,
+      body.exporting .hero-export-btn,
       body.exporting .modal-overlay,
       body.exporting #bootGate {
         visibility: hidden !important;
@@ -397,6 +398,46 @@
         margin-bottom: 36px;
         padding-bottom: 28px;
         border-bottom: 1px solid var(--border);
+      }
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+      .hero-top .date-strip {
+        margin-bottom: 0;
+      }
+      .hero-export-btn {
+        font-family: "Oswald", sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+        color: var(--text);
+        background: var(--surface-2);
+        border: 1px solid rgba(204, 0, 0, 0.55);
+        border-radius: 999px;
+        padding: 9px 18px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition:
+          background 0.18s ease,
+          border-color 0.18s ease,
+          color 0.18s ease;
+      }
+      .hero-export-btn:hover {
+        background: var(--red);
+        border-color: var(--red);
+        color: #fff;
+      }
+      .hero-export-btn[disabled] {
+        opacity: 0.6;
+        cursor: progress;
       }
       .date-strip {
         display: inline-flex;
@@ -2077,10 +2118,11 @@
         border: 1px solid var(--border);
       }
 
+      /* Embed mode hides the redundant chrome — but NOT the export toast,
+         which is the only download feedback once the header is gone. */
       body.embed > header,
       body.embed > footer,
-      body.embed > .export-wrap,
-      body.embed > .export-toast {
+      body.embed > .export-wrap {
         display: none !important;
       }
       body.embed main {
@@ -2271,11 +2313,21 @@
 
     <main>
       <section class="hero">
-        <div class="date-strip">
-          <span class="pulse-dot"></span>
-          <span class="seg" id="hero-date"></span>
-          <span class="seg" id="hero-market"></span>
-          <span class="seg" id="hero-window"></span>
+        <div class="hero-top">
+          <div class="date-strip">
+            <span class="pulse-dot"></span>
+            <span class="seg" id="hero-date"></span>
+            <span class="seg" id="hero-market"></span>
+            <span class="seg" id="hero-window"></span>
+          </div>
+          <button
+            id="exportPdfHero"
+            class="hero-export-btn"
+            type="button"
+            title="Download today's report as a one-page PDF"
+          >
+            ⤓ Export PDF
+          </button>
         </div>
         <h1>Today's <span class="stroke">reactive</span>.</h1>
         <p class="lede">
@@ -3177,7 +3229,21 @@ window.FORMATION_DATA = {
         const btn = document.getElementById("exportBtn");
         const menu = document.getElementById("exportMenu");
         const toast = document.getElementById("exportToast");
+        // Prominent hero button — the only export control visible in embed
+        // mode (the header dropdown is hidden inside the dashboard iframe).
+        const heroBtn = document.getElementById("exportPdfHero");
         if (!btn || !menu) return;
+
+        // Mirror busy state across both export controls during any capture.
+        function setBusy(busy, label) {
+          btn.disabled = busy;
+          if (busy) btn.textContent = label;
+          else btn.innerHTML = '⤓ Export <span class="caret">▾</span>';
+          if (heroBtn) {
+            heroBtn.disabled = busy;
+            heroBtn.textContent = busy ? label : "⤓ Export PDF";
+          }
+        }
 
         // html2canvas-pro is the maintained fork that supports modern color
         // functions (oklch / color() / display-p3) — the original html2canvas
@@ -3299,8 +3365,7 @@ window.FORMATION_DATA = {
         }
 
         async function exportJpg() {
-          btn.disabled = true;
-          btn.textContent = "Capturing…";
+          setBusy(true, "Capturing…");
           showToast("Capturing report…");
           try {
             const canvas = await captureCanvas();
@@ -3311,14 +3376,12 @@ window.FORMATION_DATA = {
             console.error("export jpg failed", err);
             showToast("Export failed: " + (err.message || err), "error");
           } finally {
-            btn.disabled = false;
-            btn.innerHTML = '⤓ Export <span class="caret">▾</span>';
+            setBusy(false);
           }
         }
 
         async function exportPdf() {
-          btn.disabled = true;
-          btn.textContent = "Building PDF…";
+          setBusy(true, "Building PDF…");
           showToast("Building one-page PDF…");
           try {
             const canvas = await captureCanvas();
@@ -3370,8 +3433,7 @@ window.FORMATION_DATA = {
             console.error("export pdf failed", err);
             showToast("Export failed: " + (err.message || err), "error");
           } finally {
-            btn.disabled = false;
-            btn.innerHTML = '⤓ Export <span class="caret">▾</span>';
+            setBusy(false);
           }
         }
 
@@ -3382,6 +3444,13 @@ window.FORMATION_DATA = {
           if (target.dataset.export === "pdf") exportPdf();
           else if (target.dataset.export === "jpg") exportJpg();
         });
+
+        if (heroBtn) {
+          heroBtn.addEventListener("click", () => {
+            if (heroBtn.disabled) return;
+            exportPdf();
+          });
+        }
       })();
     </script>
       <script>
