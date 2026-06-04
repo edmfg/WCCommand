@@ -169,6 +169,7 @@
         margin: 0 auto;
         padding: 20px var(--pad) var(--pad);
         display: grid;
+        perspective: 1400px;
         grid-template-columns: repeat(12, 1fr);
         grid-template-rows: repeat(5, var(--rowh));
         gap: var(--gap);
@@ -209,8 +210,8 @@
         transition:
           transform 0.26s cubic-bezier(0.2, 0.7, 0.3, 1),
           box-shadow 0.26s ease;
-        opacity: 0;
-        animation: rise 0.62s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+        opacity: 1;
+        animation: tileDrop 0.58s cubic-bezier(0.3, 1.35, 0.5, 1) backwards;
       }
       .tile.gemini {
         background: var(--gemini);
@@ -557,9 +558,19 @@
       .arrow {
         display: inline-block;
         transition: transform 0.18s ease;
+        animation: arrowJiggle 5s ease-in-out infinite;
       }
       a.tile:hover .arrow {
+        animation: none;
         transform: translate(2px, -2px);
+      }
+      /* gentle, infrequent nudge so link arrows feel alive — not distracting */
+      @keyframes arrowJiggle {
+        0%, 86%, 100% { transform: translate(0, 0); }
+        89% { transform: translate(2.5px, -2.5px); }
+        92% { transform: translate(0, 0); }
+        95% { transform: translate(2.5px, -2.5px); }
+        98% { transform: translate(0, 0); }
       }
 
       /* footer */
@@ -589,26 +600,32 @@
         display: inline-block;
       }
 
-      @keyframes rise {
-        from {
+      /* tiles drop in from above the surface, toward the viewer, and settle */
+      @keyframes tileDrop {
+        0% {
           opacity: 0;
-          transform: translateY(16px) scale(0.985);
+          transform: translate3d(0, -120px, 260px) rotateX(17deg) scale(1.07);
         }
-        to {
+        60% {
           opacity: 1;
-          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotateX(0deg) scale(1);
         }
       }
-      .tile:nth-child(1) { animation-delay: 0.02s; }
-      .tile:nth-child(2) { animation-delay: 0.07s; }
-      .tile:nth-child(3) { animation-delay: 0.12s; }
-      .tile:nth-child(4) { animation-delay: 0.17s; }
-      .tile:nth-child(5) { animation-delay: 0.22s; }
-      .tile:nth-child(6) { animation-delay: 0.27s; }
-      .tile:nth-child(7) { animation-delay: 0.32s; }
-      .tile:nth-child(8) { animation-delay: 0.37s; }
-      .tile:nth-child(9) { animation-delay: 0.42s; }
-      .tile:nth-child(10) { animation-delay: 0.47s; }
+      /* drop order: Campaign first, Insight 2nd, AI 3rd, then the rest fast */
+      .a-hero { animation-delay: 0s; }
+      .a-cult { animation-delay: 0.24s; }
+      .a-gpc  { animation-delay: 0.48s; }
+      .a-ocr  { animation-delay: 0.66s; }
+      .a-agen { animation-delay: 0.72s; }
+      .a-dooh { animation-delay: 0.78s; }
+      .a-reac { animation-delay: 0.84s; }
+      .a-copt { animation-delay: 0.9s; }
+      .a-halo { animation-delay: 0.96s; }
+      .a-mark { animation-delay: 1.02s; }
+      .a-dash { animation-delay: 1.08s; }
 
       @media (prefers-reduced-motion: reduce) {
         .tile {
@@ -618,6 +635,9 @@
         .tile::before {
           animation: none;
           opacity: 0.85;
+        }
+        .arrow {
+          animation: none;
         }
       }
 
@@ -693,9 +713,10 @@
             <b>1.6B</b> global fans watching the beautiful game
           </p>
           <p class="hero-copy">
-            World Cup Engine injects Google Search at the epicenter of the
+            World Cup Engine injects Search's AI Mode at the epicenter of the
             world's biggest sports moment by bringing together AI, media and
-            creative to answer fans' questions.
+            creative to answer fans' complex, personalized and, often, strange
+            questions.
           </p>
         </div>
       </article>
