@@ -21,6 +21,19 @@ const TILE_QUERIES = {
   halo: "data visualization glowing network",
   copt: "abstract flowing gradient light motion",
   markets: "world map glowing connections night",
+
+  // --- genius.html: fans watching the World Cup from home on TV ---
+  gen_hero: "excited friends watching soccer world cup on tv at home",
+  gen_gpc: "family cheering watching football match television living room",
+  gen_cult: "fans celebrating goal watching soccer on tv at home",
+  gen_ocr: "young people watching world cup on tv reacting",
+  gen_halo: "group of friends watching sports television excited",
+  gen_copt: "couple watching soccer match on tv cheering at home",
+  gen_reac: "fans jumping celebrating watching football on tv living room",
+  gen_dooh: "crowd watching world cup soccer on big screen",
+  gen_agen: "friends watching football game living room tv night",
+  gen_mark: "diverse soccer fans watching tv celebrating",
+  gen_dash: "man watching sports highlights on tv at home couch",
 };
 
 function readTileKey(req) {
