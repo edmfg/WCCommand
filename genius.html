@@ -177,12 +177,12 @@
         grid-template-rows: repeat(6, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero hero gpc  gpc  gpc  cult cult cult free free"
-          "hero hero hero hero gpc  gpc  gpc  cult cult cult free free"
-          "hero hero hero hero gpc  gpc  gpc  agen agen agen free free"
-          "dooh dooh dooh dooh reac reac copt copt copt ocr  ocr  ocr"
-          "dooh dooh dooh dooh reac reac copt copt copt ocr  ocr  ocr"
-          "dash dash dash dash mark mark halo halo halo ocr  ocr  ocr";
+          "hero hero hero hero gpc  gpc  gpc  free free cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  free free cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  free free agen agen agen"
+          "dooh dooh dooh reac reac reac copt copt copt ocr  ocr  ocr"
+          "dooh dooh dooh reac reac reac copt copt copt ocr  ocr  ocr"
+          "mark mark mark halo halo halo dash dash dash dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
@@ -240,30 +240,29 @@
       .tile-photo.failed {
         display: none;
       }
-      /* Self-contained ad mockups (full creative + logo + CTA baked in):
-         show the WHOLE ad, no crop, no scrim, no overlaid copy. The dark
-         tile background frames the square creative inside a landscape tile. */
+      /* Self-contained ad creatives shown as "mounted cards": dark tile to
+         match the board, the ad floated as a rounded, drop-shadowed card with
+         its gradient eyebrow on top. drop-shadow() (not box-shadow) hugs the
+         actual creative even when object-fit leaves a thin letterbox. Tiles are
+         sized to each ad's aspect (square / portrait) so the card nearly fills. */
       .tile-mockup {
         background: #141414;
       }
-      /* Match each tile's background to its ad's own background so the
-         letterbox margins blend in (some creatives are white, some dark). */
-      .a-dooh.tile-mockup {
-        background: #212121;
+      .tile-mockup .tile-scrim,
+      .tile-mockup .tile-head,
+      .tile-mockup .tile-sub {
+        display: none;
       }
-      .a-reac.tile-mockup,
-      .a-free.tile-mockup {
-        background: #fff;
+      .tile-mockup .tile-body {
+        inset: 0;
+        justify-content: flex-start;
+        padding: 13px 16px 0;
       }
       .tile-mockup .tile-photo {
         object-fit: contain;
-        filter: none;
-        padding: 10px;
+        padding: 38px 16px 16px;
         box-sizing: border-box;
-      }
-      .tile-mockup .tile-scrim,
-      .tile-mockup .tile-body {
-        display: none;
+        filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
       }
       .tile-scrim {
         position: absolute;
@@ -704,20 +703,19 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(13, var(--rowh));
+          grid-template-rows: repeat(12, var(--rowh));
           grid-template-areas:
             "hero hero hero gpc  gpc  gpc"
             "hero hero hero gpc  gpc  gpc"
             "cult cult cult gpc  gpc  gpc"
-            "cult cult cult ocr  ocr  ocr"
+            "cult cult cult agen agen agen"
             "free free free ocr  ocr  ocr"
-            "free free free reac reac reac"
-            "free free free reac reac reac"
-            "dooh dooh dooh dooh dooh dooh"
-            "dooh dooh dooh dooh dooh dooh"
-            "agen agen agen copt copt copt"
-            "agen agen agen copt copt copt"
-            "halo halo halo mark mark mark"
+            "free free free ocr  ocr  ocr"
+            "free free free dooh dooh dooh"
+            "free free free dooh dooh dooh"
+            "reac reac reac copt copt copt"
+            "reac reac reac copt copt copt"
+            "mark mark mark halo halo halo"
             "dash dash dash dash dash dash";
         }
       }
