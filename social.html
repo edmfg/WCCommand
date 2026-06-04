@@ -1292,63 +1292,64 @@
       .play-phone-wrap .phone {
         margin: 0 auto;
       }
-      /* In-phone prompt cycling — arrows flank the search bar inside the
-         query frame; the next arrow bobs to advertise that there are more
-         prompt options to click through. */
-      .query-row {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-      }
-      .query-row .query-search {
-        margin-bottom: 0;
-      }
+      /* In-phone prompt cycling — carousel arrows float at the screen edges,
+         vertically centred on the query card, so the text keeps full width.
+         The next arrow bobs to advertise the extra prompt options. */
       .q-cycle {
+        position: absolute;
+        top: 50%;
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.14);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        color: white;
-        font-size: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(12, 14, 22, 0.6);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
         line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        flex-shrink: 0;
         padding: 0;
         pointer-events: auto;
+        z-index: 12;
         transition: background 0.2s var(--t);
       }
       .q-cycle:hover {
-        background: rgba(255, 255, 255, 0.32);
+        background: rgba(255, 255, 255, 0.22);
+      }
+      /* Only the visible frame's arrows are interactive — inactive frames are
+         opacity-0 overlays and must not catch clicks. */
+      .frame:not(.active) .q-cycle {
+        pointer-events: none;
+      }
+      .q-cycle.prev {
+        left: 5px;
+        transform: translateY(-50%);
       }
       .q-cycle.next {
+        right: 5px;
         animation: qBounce 1.5s ease-in-out infinite;
       }
       @keyframes qBounce {
         0%,
         100% {
-          transform: translateX(0);
+          transform: translate(0, -50%);
         }
         50% {
-          transform: translateX(4px);
+          transform: translate(3px, -50%);
         }
       }
-      .q-cycle.next:hover {
-        animation-play-state: paused;
-      }
       .q-more {
-        margin-top: 10px;
+        margin-top: 8px;
         font-family: "Oswald", sans-serif;
-        font-size: 8.5px;
-        letter-spacing: 0.2em;
+        font-size: 7.5px;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.55);
+        color: rgba(255, 255, 255, 0.5);
+        white-space: nowrap;
       }
       /* Footage block lights up on the query frame — inline variant
          (mirrors the modal's .sb-modal[data-current-beat="query"] rules). */
@@ -1779,50 +1780,78 @@
         font-size: 9px;
         letter-spacing: 0.22em;
         text-transform: uppercase;
-        color: rgba(180, 142, 245, 0.95);
-        margin-bottom: 10px;
+        color: rgba(196, 164, 250, 0.95);
         font-weight: 700;
+        padding: 4px 11px;
+        border: 1px solid rgba(180, 142, 245, 0.35);
+        background: rgba(180, 142, 245, 0.12);
+        border-radius: 999px;
+        margin-bottom: 12px;
       }
+      /* Gemini-style AI Mode query card — dark glass with a gradient border */
       .query-search {
         width: 100%;
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 20px;
-        padding: 11px 13px;
-        display: flex;
-        gap: 9px;
-        align-items: flex-start;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+        background:
+          linear-gradient(180deg, rgba(28, 31, 48, 0.95), rgba(13, 15, 24, 0.95))
+            padding-box,
+          linear-gradient(135deg, #4285f4, #9b72cb 55%, #d96570) border-box;
+        border: 1px solid transparent;
+        border-radius: 18px;
+        padding: 11px 18px 12px;
+        text-align: left;
+        box-shadow:
+          0 12px 36px rgba(0, 0, 0, 0.55),
+          0 0 24px rgba(155, 114, 203, 0.18);
         margin-bottom: 10px;
       }
-      .query-search .g-icon {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        flex-shrink: 0;
-        margin-top: 2px;
-        background: conic-gradient(
-          from -45deg,
-          #4285f4 0% 25%,
-          #34a853 25% 50%,
-          #fbbc05 50% 75%,
-          #ea4335 75% 100%
-        );
-        position: relative;
+      .query-search-head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 7px;
       }
-      .query-search .g-icon::after {
-        content: "";
-        position: absolute;
-        inset: 4px;
-        border-radius: 50%;
-        background: white;
+      .query-search .ai-spark {
+        font-size: 13px;
+        line-height: 1;
+        background: linear-gradient(135deg, #4285f4, #9b72cb 55%, #d96570);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .query-search .ai-mode-lbl {
+        font-family: "Oswald", sans-serif;
+        font-size: 8.5px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.45);
+        font-weight: 600;
       }
       .query-search .q-text {
-        flex: 1;
-        text-align: left;
-        font-size: 12.5px;
-        line-height: 1.4;
-        color: #1f1f1f;
+        font-size: 13px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.96);
         font-weight: 500;
+      }
+      /* Blinking input caret after the query — reads as a live search */
+      .query-search .q-text::after {
+        content: "";
+        display: inline-block;
+        width: 1.5px;
+        height: 0.95em;
+        margin-left: 3px;
+        vertical-align: -0.12em;
+        background: rgba(255, 255, 255, 0.85);
+        animation: qBlink 1.1s steps(1) infinite;
+      }
+      @keyframes qBlink {
+        0%,
+        49% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
       }
       .query-caret {
         font-size: 11px;
@@ -2964,33 +2993,37 @@ window.FORMATION_DATA = {
         function renderPromptFrame(p, i, sbIdx, total) {
           const key = p.key || String.fromCharCode(65 + i);
           const kind = p.type ? " · " + escHtml(p.type) : "";
-          // Single-prompt (legacy) storyboards get a plain search bar — no
-          // cycle arrows, nothing to cycle to.
+          // Gemini-style AI Mode query card — full-width dark glass with a
+          // gradient border; the query text gets the whole line.
+          const bar = `
+            <div class="query-search">
+              <div class="query-search-head">
+                <span class="ai-spark">✦</span>
+                <span class="ai-mode-lbl">AI Mode</span>
+              </div>
+              <div class="q-text">${escHtml(p.text)}</div>
+            </div>
+          `;
+          // Single-prompt (legacy) storyboards — no arrows, nothing to cycle.
           if (total <= 1) {
             return `
               <div class="frame" data-beat="query">
                 <div class="frame-bg"></div>
                 <div class="query-label">Prompt ${escHtml(key)}${kind}</div>
-                <div class="query-search">
-                  <span class="g-icon"></span>
-                  <span class="q-text">${escHtml(p.text)}</span>
-                </div>
+                ${bar}
               </div>
             `;
           }
+          // Cycle arrows float at the screen edges (carousel-style) so they
+          // never squeeze the query text.
           return `
             <div class="frame" data-beat="query">
               <div class="frame-bg"></div>
               <div class="query-label">Prompt ${escHtml(key)}${kind}</div>
-              <div class="query-row">
-                <button class="q-cycle prev" onclick="event.stopPropagation();frameStep(${sbIdx},-1)" aria-label="Previous prompt">‹</button>
-                <div class="query-search">
-                  <span class="g-icon"></span>
-                  <span class="q-text">${escHtml(p.text)}</span>
-                </div>
-                <button class="q-cycle next" onclick="event.stopPropagation();frameStep(${sbIdx},1)" aria-label="Next prompt">›</button>
-              </div>
-              <div class="q-more">${total - 1} more prompt options · tap to cycle</div>
+              ${bar}
+              <div class="q-more">${total - 1} more prompts · tap to cycle</div>
+              <button class="q-cycle prev" onclick="event.stopPropagation();frameStep(${sbIdx},-1)" aria-label="Previous prompt">‹</button>
+              <button class="q-cycle next" onclick="event.stopPropagation();frameStep(${sbIdx},1)" aria-label="Next prompt">›</button>
             </div>
           `;
         }
