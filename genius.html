@@ -329,6 +329,24 @@
         color: transparent;
         filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.55));
       }
+      /* partner / campaign brand lockups — white chip so the logo reads on the photo */
+      .brand-logo {
+        display: inline-block;
+        align-self: flex-start;
+        background: #fff;
+        border-radius: 10px;
+        padding: 9px 13px;
+        margin: 0 0 10px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      }
+      .brand-logo img {
+        display: block;
+        height: 24px;
+        width: auto;
+      }
+      .a-hero .brand-logo img {
+        height: 28px;
+      }
       .tile-head {
         margin: 0;
         font-weight: 800;
@@ -695,9 +713,12 @@
 
     <main class="bento">
       <article class="tile a-hero hero-story" style="--accent: var(--g-blue)">
-        <img class="tile-photo" src="/api/pexels?t=gen_hero&i=0" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_hero&i=1" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
+          <span class="brand-logo"
+            ><img src="./assets/youtube-tv-logo.png" alt="YouTube TV"
+          /></span>
           <span class="kick">Campaign</span>
           <h1 class="tile-head">YouTube TV × Genius Sports Pilot</h1>
           <p class="hero-stats">Faster than Social Listening</p>
@@ -709,11 +730,13 @@
       </article>
 
       <article class="tile a-gpc gemini">
-        <img class="tile-photo" src="/api/pexels?t=gen_gpc&i=4" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_gpc&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Partner</span>
-          <h2 class="tile-head">Genius Sports</h2>
+          <span class="brand-logo"
+            ><img src="./assets/genius-sports-logo.png" alt="Genius Sports"
+          /></span>
           <p class="tile-sub">
             Genius Sports is the official data partner of the NFL, EPL and
             dozens of betting platforms, providing billions of in-game signals
@@ -723,7 +746,7 @@
       </article>
 
       <article class="tile a-cult" style="--accent: var(--g-red)">
-        <img class="tile-photo" src="/api/pexels?t=gen_cult&i=2" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_cult&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Sample Execution</span>
@@ -733,7 +756,7 @@
       </article>
 
       <article class="tile a-ocr" style="--accent: var(--g-green)">
-        <img class="tile-photo" src="/api/pexels?t=gen_ocr&i=1" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_ocr&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Assets</span>
@@ -746,7 +769,7 @@
       </article>
 
       <article class="tile a-halo" style="--accent: var(--g-yellow)">
-        <img class="tile-photo" src="/api/pexels?t=gen_halo&i=3" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_halo&i=1" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Eyebrow</span>
@@ -756,7 +779,7 @@
       </article>
 
       <article class="tile a-copt gemini">
-        <img class="tile-photo" src="/api/pexels?t=gen_copt&i=5" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_copt&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">AI</span>
@@ -768,7 +791,7 @@
       </article>
 
       <article class="tile a-reac" style="--accent: var(--g-blue)">
-        <img class="tile-photo" src="/api/pexels?t=gen_reac&i=6" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_reac&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Eyebrow</span>
@@ -778,7 +801,7 @@
       </article>
 
       <article class="tile a-dooh" style="--accent: var(--g-red)">
-        <img class="tile-photo" src="/api/pexels?t=gen_dooh&i=2" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_dooh&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Sample Execution</span>
@@ -788,7 +811,7 @@
       </article>
 
       <article class="tile a-agen" style="--accent: var(--g-green)">
-        <img class="tile-photo" src="/api/pexels?t=gen_agen&i=7" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_agen&i=3" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Eyebrow</span>
@@ -798,7 +821,7 @@
       </article>
 
       <article class="tile a-mark" style="--accent: var(--g-yellow)">
-        <img class="tile-photo" src="/api/pexels?t=gen_mark&i=4" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_mark&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Eyebrow</span>
@@ -808,7 +831,7 @@
       </article>
 
       <article class="tile a-dash" style="--accent: var(--g-blue)">
-        <img class="tile-photo" src="/api/pexels?t=gen_dash&i=2" alt="" onerror="this.classList.add('failed')" />
+        <img class="tile-photo" src="/api/pexels?t=gen_dash&i=5" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">WPP Integration</span>

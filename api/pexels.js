@@ -22,18 +22,18 @@ const TILE_QUERIES = {
   copt: "abstract flowing gradient light motion",
   markets: "world map glowing connections night",
 
-  // --- genius.html: fans watching the World Cup from home on TV ---
-  gen_hero: "excited friends watching soccer world cup on tv at home",
-  gen_gpc: "family cheering watching football match television living room",
-  gen_cult: "fans celebrating goal watching soccer on tv at home",
-  gen_ocr: "young people watching world cup on tv reacting",
-  gen_halo: "group of friends watching sports television excited",
-  gen_copt: "couple watching soccer match on tv cheering at home",
-  gen_reac: "fans jumping celebrating watching football on tv living room",
-  gen_dooh: "crowd watching world cup soccer on big screen",
-  gen_agen: "friends watching football game living room tv night",
-  gen_mark: "diverse soccer fans watching tv celebrating",
-  gen_dash: "man watching sports highlights on tv at home couch",
+  // --- genius.html: mix of at-home viewing, big soccer moments, + one AI tile ---
+  gen_hero: "excited friends watching soccer world cup on tv at home", // home
+  gen_gpc: "soccer stadium floodlights night match aerial", // stadium (logo on top)
+  gen_cult: "soccer player celebrating goal stadium emotion", // moment
+  gen_ocr: "soccer team celebrating victory trophy crowd", // moment
+  gen_halo: "family watching world cup soccer on television cheering", // home
+  gen_copt: "artificial intelligence generative abstract colorful digital art", // AI
+  gen_reac: "soccer player sliding knees celebrating goal", // moment
+  gen_dooh: "crowd of fans watching soccer on big outdoor screen", // big screen
+  gen_agen: "friends celebrating watching football on tv living room night", // home
+  gen_mark: "diverse soccer fans waving flags celebration", // moment
+  gen_dash: "man watching sports on tv at home couch reaction", // home
 };
 
 function readTileKey(req) {
