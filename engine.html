@@ -820,12 +820,16 @@
 
       <!-- 12 · Digital OOH (local billboard image) -->
       <article class="tile a-dooh" style="--accent: var(--g-blue)">
-        <img
+        <video
           class="tile-photo"
-          src="./assets/digital-ooh.jpg"
-          alt="Digital out-of-home billboard"
-          onerror="this.classList.add('failed')"
-        />
+          src="./assets/ooh-sankofa.mp4"
+          poster="./assets/ooh-sankofa.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Out-of-Home</span>
