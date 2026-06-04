@@ -304,19 +304,21 @@
       .header-nav {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
+        flex-wrap: nowrap;
       }
       .tab-btn {
         font-family:
           "Oswald", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
           "Twemoji Mozilla", sans-serif;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.76rem;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        padding: 9px 22px;
+        letter-spacing: 0.7px;
+        padding: 8px 14px;
         border-radius: 999px;
         cursor: pointer;
+        white-space: nowrap;
         background: linear-gradient(
           180deg,
           rgba(255, 255, 255, 0.55),
@@ -381,11 +383,14 @@
           0 12px 28px rgba(204, 0, 0, 0.5),
           inset 0 1px 0 rgba(255, 255, 255, 0.45);
       }
-      /* ── Shiny "What is World Cup Engine?" pill (Gemini gradient) ── */
+      /* ── Shiny campaign pills (compact so the row fits) ── */
       .tab-btn.engine-pill {
         text-decoration: none;
         color: #fff;
         border: 1px solid rgba(255, 255, 255, 0.55);
+        font-size: 0.7rem;
+        letter-spacing: 0.3px;
+        padding: 8px 13px;
         background: linear-gradient(
           74deg,
           #4285f4 0%,
@@ -398,6 +403,21 @@
           0 2px 8px rgba(217, 101, 112, 0.3),
           inset 0 1px 0 rgba(255, 255, 255, 0.45);
         animation: enginePulse 4.5s ease-in-out infinite;
+      }
+      /* YouTube-red variant for the Genius Sports pill */
+      .tab-btn.genius-pill {
+        background: linear-gradient(74deg, #ff0000 0%, #ff4d4d 50%, #cc0000 100%);
+        animation: none;
+        box-shadow:
+          0 6px 18px rgba(255, 0, 0, 0.42),
+          0 2px 8px rgba(204, 0, 0, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      }
+      .tab-btn.genius-pill:hover {
+        box-shadow:
+          0 12px 30px rgba(255, 0, 0, 0.55),
+          0 4px 14px rgba(204, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.55);
       }
       .tab-btn.engine-pill::before {
         opacity: 0.18;
@@ -6016,6 +6036,14 @@
             rel="noopener"
           >
             What is World Cup Engine?
+          </a>
+          <a
+            class="tab-btn engine-pill genius-pill"
+            href="/genius.html"
+            target="_blank"
+            rel="noopener"
+          >
+            What is YouTube TV × Genius Sports?
           </a>
           <!-- ARCHIVED 2026-05-29: Creative tab hidden for now. Panel markup and
                all logic remain below; un-comment this button (and the keyboard
