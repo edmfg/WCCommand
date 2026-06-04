@@ -174,14 +174,15 @@
         padding: 20px var(--pad) var(--pad);
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(5, var(--rowh));
+        grid-template-rows: repeat(6, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero hero gpc  gpc  gpc  cult cult cult cult cult"
-          "hero hero hero hero gpc  gpc  gpc  cult cult cult cult cult"
-          "hero hero hero hero gpc  gpc  gpc  agen agen ocr  ocr  ocr"
+          "hero hero hero hero gpc  gpc  gpc  cult cult cult free free"
+          "hero hero hero hero gpc  gpc  gpc  cult cult cult free free"
+          "hero hero hero hero gpc  gpc  gpc  agen agen agen free free"
           "dooh dooh dooh dooh reac reac copt copt copt ocr  ocr  ocr"
-          "dooh dooh dooh dooh mark mark halo halo dash dash dash dash";
+          "dooh dooh dooh dooh reac reac copt copt copt ocr  ocr  ocr"
+          "dash dash dash dash mark mark halo halo halo ocr  ocr  ocr";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
@@ -194,6 +195,7 @@
       .a-halo { grid-area: halo; }
       .a-mark { grid-area: mark; }
       .a-dash { grid-area: dash; }
+      .a-free { grid-area: free; }
 
       /* ============ photo card ============ */
       .tile {
@@ -673,6 +675,7 @@
       .a-halo { animation-delay: 1.33s; }
       .a-mark { animation-delay: 1.4s; }
       .a-dash { animation-delay: 1.47s; }
+      .a-free { animation-delay: 1.05s; }
 
       @media (prefers-reduced-motion: reduce) {
         .tile {
@@ -692,18 +695,21 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(10, var(--rowh));
+          grid-template-rows: repeat(13, var(--rowh));
           grid-template-areas:
             "hero hero hero gpc  gpc  gpc"
             "hero hero hero gpc  gpc  gpc"
             "cult cult cult gpc  gpc  gpc"
             "cult cult cult ocr  ocr  ocr"
-            "reac reac reac ocr  ocr  ocr"
+            "free free free ocr  ocr  ocr"
+            "free free free reac reac reac"
+            "free free free reac reac reac"
             "dooh dooh dooh dooh dooh dooh"
             "dooh dooh dooh dooh dooh dooh"
             "agen agen agen copt copt copt"
             "agen agen agen copt copt copt"
-            "halo halo mark mark dash dash";
+            "halo halo halo mark mark mark"
+            "dash dash dash dash dash dash";
         }
       }
       @media (max-width: 600px) {
@@ -750,6 +756,7 @@
     <main class="bento">
       <article class="tile a-hero hero-story" style="--accent: var(--g-blue)">
         <img class="tile-photo" src="/api/pexels?t=gen_hero&i=1" alt="" onerror="this.classList.add('failed')" />
+        <span class="flag-first">⚡ Innovation</span>
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Campaign</span>
@@ -879,6 +886,16 @@
           <h2 class="tile-head">
             Made in Collaboration with<br />WPP Scaled Content Production Team
           </h2>
+          <p class="tile-sub">Supporting line</p>
+        </div>
+      </article>
+
+      <article class="tile a-free tile-mockup" style="--accent: var(--g-green)">
+        <img class="tile-photo" src="./assets/yt-freekick-iceland-france.png" alt="YouTube TV sample ad — 'A free kick straight into the top corner', Iceland vs France" onerror="this.classList.add('failed')" />
+        <div class="tile-scrim"></div>
+        <div class="tile-body">
+          <span class="kick">Sample Execution</span>
+          <h2 class="tile-head">Headline goes here</h2>
           <p class="tile-sub">Supporting line</p>
         </div>
       </article>
