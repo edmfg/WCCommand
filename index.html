@@ -9187,6 +9187,9 @@
       function setupTabs() {
         const btns = document.querySelectorAll(".tab-btn");
         btns.forEach((btn) => {
+          // Skip pills that aren't real tabs (e.g. the engine-pill link) —
+          // they navigate via their own href, not the tab switcher.
+          if (!btn.dataset.tab) return;
           btn.addEventListener("click", () => {
             // Today's Reactive: pop the market chooser before activating
             // the tab. Once a market is chosen the iframe is loaded with
@@ -9452,6 +9455,10 @@
 
       function switchTab(tab, opts) {
         opts = opts || {};
+        // Fall back to Live for any unknown/undefined tab (e.g. a stray
+        // "#undefined" hash) so we never blank the page.
+        const VALID_TABS = ["live", "reactive", "calendar", "creativevault"];
+        if (!VALID_TABS.includes(tab)) tab = "live";
         // CREATIVE is not a tab panel — it opens the Drive folder in a new
         // tab (gated). Route every switchTab("creativevault") to that action
         // and never activate a panel.
