@@ -403,8 +403,21 @@
         line-height: 1.05;
       }
       .a-halo .tile-head {
-        font-size: clamp(14px, 1.4vw, 18px);
-        line-height: 1.06;
+        font-size: clamp(13px, 1.3vw, 16px);
+        line-height: 1.05;
+      }
+      /* Halo is a compact slot — tighten type/spacing so it breathes */
+      .a-halo .tile-body {
+        padding: 14px;
+        gap: 2px;
+      }
+      .a-halo .kick {
+        margin-bottom: 3px;
+        font-size: 9.5px;
+      }
+      .a-halo .tile-sub {
+        font-size: 11px;
+        line-height: 1.2;
       }
       /* feature tiles — bigger, bolder */
       .a-gpc .tile-head {
