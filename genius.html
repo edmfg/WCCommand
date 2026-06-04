@@ -737,11 +737,13 @@
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Campaign</span>
-          <h1 class="tile-head">YouTube TV × Genius Sports Pilot</h1>
-          <p class="hero-stats">Faster than Social Listening</p>
+          <h1 class="tile-head">
+            <span style="color: #ff0000">YouTube TV</span> is Faster Than Social
+          </h1>
+          <p class="hero-stats">From Goal to Contextual Ad in Minutes</p>
           <p class="hero-copy">
-            YouTube TV partners with Genius Sports to use in-game data and
-            analytics to trigger contextual social ads.
+            YouTube TV partners with Genius Sports to use in-game World Cup data
+            and analytics to trigger contextual social ads… in minutes.
           </p>
         </div>
       </article>
@@ -767,9 +769,13 @@
         <img class="tile-photo" src="/api/pexels?t=gen_cult&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <span class="kick">Sample Execution</span>
-          <h2 class="tile-head">Headline goes here</h2>
-          <p class="tile-sub">Supporting line</p>
+          <span class="kick">Insight</span>
+          <h2 class="tile-head">So Many Matches. All At Once.</h2>
+          <p class="tile-sub">
+            There are 13 days where 48 matches will be played concurrently — a
+            fan's nightmare, because they're always missing something. YouTube
+            TV Multi-View to the rescue.
+          </p>
         </div>
       </article>
 
@@ -778,7 +784,7 @@
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Assets</span>
-          <h2 class="tile-head">100+ Social Assets Ready to Go</h2>
+          <h2 class="tile-head">100+ Social Assets<br />Ready to Go</h2>
           <p class="tile-sub">
             Triggered and activated minutes after a game event like a goal,
             foul, VAR, upset, etc.
@@ -812,8 +818,8 @@
         <img class="tile-photo" src="/api/pexels?t=gen_reac&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <span class="kick">Eyebrow</span>
-          <h2 class="tile-head">Headline</h2>
+          <span class="kick">Timing</span>
+          <h2 class="tile-head">Knock-Out</h2>
           <p class="tile-sub">Supporting line</p>
         </div>
       </article>
@@ -854,7 +860,7 @@
         <div class="tile-body">
           <span class="kick">WPP Integration</span>
           <h2 class="tile-head">
-            Made in Collaboration with WPP Scaled Content Production Team
+            Made in Collaboration with<br />WPP Scaled Content Production Team
           </h2>
           <p class="tile-sub">Supporting line</p>
         </div>
@@ -1000,74 +1006,116 @@
             } catch (e) {}
             save();
           };
-          // ── formatting toolbar (top-centre) ──
+          // wrap the current selection in a styled span (no nesting build-up)
+          const wrapStyle = (props, strip) => {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            const frag = range.extractContents();
+            if (strip)
+              frag.querySelectorAll("span[style*='font-size']").forEach((s) => {
+                s.style.fontSize = "";
+                if (!s.getAttribute("style")) s.replaceWith(...s.childNodes);
+              });
+            const span = document.createElement("span");
+            Object.assign(span.style, props);
+            span.appendChild(frag);
+            range.insertNode(span);
+            save();
+          };
+          const bump = (factor) => {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+            let node = sel.getRangeAt(0).startContainer;
+            if (node.nodeType === 3) node = node.parentElement;
+            const cur = parseFloat(getComputedStyle(node).fontSize) || 16;
+            wrapStyle({ fontSize: Math.max(8, Math.round(cur * factor)) + "px" }, true);
+          };
+          // ── Google-Docs-style toolbar ──
           const bar = document.createElement("div");
           bar.style.cssText =
-            "position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:99999;display:flex;flex-wrap:wrap;gap:5px;align-items:center;max-width:96vw;background:#13131a;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:7px 9px;font:600 12px/1 system-ui;color:#fff;box-shadow:0 12px 34px rgba(0,0,0,.55)";
-          const btn = (label, title, fn, css) => {
+            "position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99999;display:flex;flex-wrap:wrap;gap:1px;align-items:center;max-width:96vw;background:#fff;border:1px solid #dadce0;border-radius:10px;padding:5px 7px;font:500 13px/1 'Roboto',system-ui,sans-serif;color:#3c4043;box-shadow:0 8px 26px rgba(0,0,0,.3)";
+          const ico = (html, title, fn) => {
             const b = document.createElement("button");
-            b.textContent = label;
+            b.innerHTML = html;
             b.title = title;
             b.style.cssText =
-              "min-width:30px;height:30px;padding:0 9px;border:1px solid rgba(255,255,255,.18);background:#1e1e26;color:#fff;border-radius:8px;cursor:pointer;font:700 14px system-ui;" +
-              (css || "");
+              "min-width:32px;height:30px;padding:0 8px;border:0;background:transparent;color:#3c4043;border-radius:6px;cursor:pointer;font:600 15px 'Roboto',system-ui";
+            b.onmouseenter = () => (b.style.background = "#f1f3f4");
+            b.onmouseleave = () => (b.style.background = "transparent");
             b.addEventListener("mousedown", (e) => e.preventDefault());
             b.addEventListener("click", fn);
             return b;
           };
-          bar.appendChild(btn("B", "Bold", () => exec("bold")));
-          bar.appendChild(btn("I", "Italic", () => exec("italic"), "font-style:italic"));
-          bar.appendChild(btn("U", "Underline", () => exec("underline"), "text-decoration:underline"));
-          // font size (relative)
-          const bump = (factor) => {
-            const sel = window.getSelection();
-            if (!sel || !sel.rangeCount || sel.isCollapsed) return;
-            const range = sel.getRangeAt(0);
-            let node = range.startContainer;
-            if (node.nodeType === 3) node = node.parentElement;
-            const cur = parseFloat(getComputedStyle(node).fontSize) || 16;
-            const span = document.createElement("span");
-            span.style.fontSize = Math.max(8, Math.round(cur * factor)) + "px";
-            try {
-              span.appendChild(range.extractContents());
-              range.insertNode(span);
-            } catch (e) {}
-            save();
+          const divider = () => {
+            const d = document.createElement("span");
+            d.style.cssText = "width:1px;height:22px;background:#dadce0;margin:0 5px";
+            bar.appendChild(d);
           };
-          bar.appendChild(btn("A−", "Smaller", () => bump(0.9)));
-          bar.appendChild(btn("A+", "Larger", () => bump(1.13)));
-          // colour picker
+          bar.appendChild(ico("A<sub style='font-size:10px'>−</sub>", "Smaller text", () => bump(0.9)));
+          bar.appendChild(ico("A<sup style='font-size:10px'>+</sup>", "Larger text", () => bump(1.13)));
+          divider();
+          bar.appendChild(ico("<b>B</b>", "Bold", () => exec("bold")));
+          bar.appendChild(ico("<i>I</i>", "Italic", () => exec("italic")));
+          bar.appendChild(ico("<u>U</u>", "Underline", () => exec("underline")));
+          divider();
+          const colorWrap = document.createElement("label");
+          colorWrap.title = "Text colour";
+          colorWrap.style.cssText =
+            "position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:30px;border-radius:6px;cursor:pointer;font:700 15px 'Roboto';color:#3c4043";
+          colorWrap.innerHTML = "A";
+          const colorBar = document.createElement("span");
+          colorBar.style.cssText =
+            "position:absolute;left:8px;right:8px;bottom:4px;height:3px;border-radius:2px;background:#ff0000;pointer-events:none";
+          colorWrap.appendChild(colorBar);
           const color = document.createElement("input");
           color.type = "color";
-          color.value = "#ffffff";
-          color.title = "Text colour";
-          color.style.cssText =
-            "width:30px;height:30px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:#1e1e26;cursor:pointer;padding:2px";
+          color.value = "#ff0000";
+          color.style.cssText = "position:absolute;inset:0;opacity:0;cursor:pointer";
           color.addEventListener("input", () => {
             restore();
+            colorBar.style.background = color.value;
             exec("foreColor", color.value);
           });
-          bar.appendChild(color);
-          // preset swatches
-          ["#ffffff", "#ff0000", "#1f6bff", "#ffd000", "#19c37d", "#0a0a0a"].forEach((c) => {
+          colorWrap.appendChild(color);
+          colorWrap.onmouseenter = () => (colorWrap.style.background = "#f1f3f4");
+          colorWrap.onmouseleave = () => (colorWrap.style.background = "transparent");
+          bar.appendChild(colorWrap);
+          ["#000000", "#ffffff", "#ff0000", "#1f6bff", "#19c37d", "#ffd000"].forEach((c) => {
             const sw = document.createElement("button");
             sw.title = c;
             sw.style.cssText =
-              "width:22px;height:22px;border:1px solid rgba(255,255,255,.28);border-radius:6px;cursor:pointer;background:" + c;
+              "width:18px;height:18px;margin:0 1px;border:1px solid #dadce0;border-radius:4px;cursor:pointer;background:" + c;
             sw.addEventListener("mousedown", (e) => e.preventDefault());
             sw.addEventListener("click", () => exec("foreColor", c));
             bar.appendChild(sw);
           });
-          bar.appendChild(btn("⤬", "Clear formatting", () => exec("removeFormat")));
-          const sep = document.createElement("span");
-          sep.style.cssText =
-            "width:1px;height:22px;background:rgba(255,255,255,.18);margin:0 3px";
-          bar.appendChild(sep);
-          // copy (innerHTML so formatting survives) + reset
+          divider();
+          // capitalization (overrides forced-uppercase on kicks etc.)
+          const caseSel = document.createElement("select");
+          caseSel.title = "Capitalization";
+          caseSel.style.cssText =
+            "height:30px;border:1px solid #dadce0;background:#fff;color:#3c4043;border-radius:6px;cursor:pointer;font:500 13px 'Roboto';padding:0 6px";
+          [["", "Case"], ["none", "Normal"], ["uppercase", "UPPERCASE"], ["lowercase", "lowercase"], ["capitalize", "Capitalize"]].forEach(([v, l]) => {
+            const o = document.createElement("option");
+            o.value = v;
+            o.textContent = l;
+            caseSel.appendChild(o);
+          });
+          caseSel.addEventListener("change", () => {
+            if (caseSel.value) {
+              restore();
+              wrapStyle({ textTransform: caseSel.value });
+            }
+            caseSel.selectedIndex = 0;
+          });
+          bar.appendChild(caseSel);
+          bar.appendChild(ico("⌫", "Clear formatting", () => exec("removeFormat")));
+          divider();
           const copyBtn = document.createElement("button");
           copyBtn.textContent = "Copy edits";
           copyBtn.style.cssText =
-            "border:0;border-radius:8px;padding:7px 13px;font:700 12px system-ui;color:#fff;cursor:pointer;background:linear-gradient(74deg,#ff0000,#cc0000)";
+            "border:0;border-radius:6px;padding:7px 13px;font:600 12px 'Roboto';color:#fff;cursor:pointer;background:#1a73e8";
           copyBtn.addEventListener("mousedown", (e) => e.preventDefault());
           copyBtn.addEventListener("click", () => {
             const lines = els.map((el) => {
@@ -1087,7 +1135,7 @@
           const resetBtn = document.createElement("button");
           resetBtn.textContent = "Reset";
           resetBtn.style.cssText =
-            "border:1px solid rgba(255,255,255,.2);background:transparent;border-radius:8px;padding:7px 10px;font:600 12px system-ui;color:#bbb;cursor:pointer";
+            "border:1px solid #dadce0;background:#fff;border-radius:6px;padding:7px 10px;font:500 12px 'Roboto';color:#5f6368;cursor:pointer";
           resetBtn.addEventListener("click", () => {
             localStorage.removeItem(KEY);
             location.reload();
