@@ -169,7 +169,6 @@
         margin: 0 auto;
         padding: 20px var(--pad) var(--pad);
         display: grid;
-        perspective: 1400px;
         grid-template-columns: repeat(12, 1fr);
         grid-template-rows: repeat(5, var(--rowh));
         gap: var(--gap);
@@ -211,7 +210,7 @@
           transform 0.26s cubic-bezier(0.2, 0.7, 0.3, 1),
           box-shadow 0.26s ease;
         opacity: 1;
-        animation: tileDrop 0.58s cubic-bezier(0.3, 1.35, 0.5, 1) backwards;
+        animation: tileDrop 0.5s cubic-bezier(0.2, 0.8, 0.25, 1) backwards;
       }
       .tile.gemini {
         background: var(--gemini);
@@ -596,14 +595,11 @@
       @keyframes tileDrop {
         0% {
           opacity: 0;
-          transform: translate3d(0, -120px, 260px) rotateX(17deg) scale(1.07);
-        }
-        60% {
-          opacity: 1;
+          transform: translateY(-48px);
         }
         100% {
           opacity: 1;
-          transform: translate3d(0, 0, 0) rotateX(0deg) scale(1);
+          transform: translateY(0);
         }
       }
       /* drop order: Campaign first (a beat longer), Insight 2nd, AI 3rd, then
