@@ -592,14 +592,16 @@
       }
 
       /* tiles drop in from above the surface, toward the viewer, and settle */
+      /* bird's-eye drop: tile starts larger (closer to the eye / above the
+         surface) and falls onto it, settling to its resting size */
       @keyframes tileDrop {
         0% {
           opacity: 0;
-          transform: translateY(-48px);
+          transform: scale(1.18);
         }
         100% {
           opacity: 1;
-          transform: translateY(0);
+          transform: scale(1);
         }
       }
       /* drop order: Campaign first (a beat longer), Insight 2nd, AI 3rd, then
