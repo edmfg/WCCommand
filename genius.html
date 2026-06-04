@@ -248,7 +248,7 @@
       .insight .tile-scrim {
         background: var(--scrim-heavy);
       }
-      /* thin rainbow border on EVERY tile — gently animated so it feels alive */
+      /* YouTube-red border on EVERY tile — gently animated so it feels alive */
       .tile::before {
         content: "";
         position: absolute;
@@ -257,11 +257,9 @@
         padding: 2.2px;
         background: linear-gradient(
           74deg,
-          #4285f4,
-          #9b72cb,
-          #d96570,
-          #9b72cb,
-          #4285f4
+          #ff0000,
+          #ff4d4d 50%,
+          #cc0000
         );
         -webkit-mask:
           linear-gradient(#000 0 0) content-box,
@@ -282,9 +280,9 @@
       }
       .a-hero {
         box-shadow:
-          0 0 0 1px rgba(155, 114, 203, 0.4),
-          0 0 36px rgba(123, 104, 200, 0.42),
-          0 22px 54px rgba(123, 104, 200, 0.42);
+          0 0 0 1px rgba(255, 0, 0, 0.4),
+          0 0 36px rgba(255, 0, 0, 0.4),
+          0 22px 54px rgba(255, 0, 0, 0.38);
       }
       /* opacity-only pulse = GPU-cheap (no per-frame repaint / filter) */
       @keyframes tileGlow {
