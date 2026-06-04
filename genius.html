@@ -246,6 +246,15 @@
       .tile-mockup {
         background: #141414;
       }
+      /* Match each tile's background to its ad's own background so the
+         letterbox margins blend in (some creatives are white, some dark). */
+      .a-dooh.tile-mockup {
+        background: #212121;
+      }
+      .a-reac.tile-mockup,
+      .a-free.tile-mockup {
+        background: #fff;
+      }
       .tile-mockup .tile-photo {
         object-fit: contain;
         filter: none;
