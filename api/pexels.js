@@ -30,7 +30,7 @@ const TILE_QUERIES = {
   gen_halo: "family watching world cup soccer on television cheering", // home
   gen_copt: "artificial intelligence generative abstract colorful digital art", // AI
   gen_reac: "soccer player sliding knees celebrating goal", // moment
-  gen_dooh: "crowd of fans watching soccer on big outdoor screen", // big screen
+  gen_dooh: "soccer fans crowd celebrating stadium", // moment / crowd
   gen_agen: "friends celebrating watching football on tv living room night", // home
   gen_mark: "diverse soccer fans waving flags celebration", // moment
   gen_dash: "man watching sports on tv at home couch reaction", // home
