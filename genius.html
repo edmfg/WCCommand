@@ -347,6 +347,26 @@
       .a-hero .brand-logo img {
         height: 28px;
       }
+      /* round corner badge (e.g. the Genius "G" mark on the partner tile) */
+      .corner-mark {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 6;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      }
+      .corner-mark img {
+        width: 28px;
+        height: 28px;
+        display: block;
+      }
       .tile-head {
         margin: 0;
         font-weight: 800;
@@ -716,9 +736,6 @@
         <img class="tile-photo" src="/api/pexels?t=gen_hero&i=1" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <span class="brand-logo"
-            ><img src="./assets/youtube-tv-logo.png" alt="YouTube TV"
-          /></span>
           <span class="kick">Campaign</span>
           <h1 class="tile-head">YouTube TV × Genius Sports Pilot</h1>
           <p class="hero-stats">Faster than Social Listening</p>
@@ -731,12 +748,13 @@
 
       <article class="tile a-gpc gemini">
         <img class="tile-photo" src="/api/pexels?t=gen_gpc&i=0" alt="" onerror="this.classList.add('failed')" />
+        <span class="corner-mark"
+          ><img src="./assets/genius-sports-mark.png" alt="Genius Sports"
+        /></span>
         <div class="tile-scrim"></div>
         <div class="tile-body">
           <span class="kick">Partner</span>
-          <span class="brand-logo"
-            ><img src="./assets/genius-sports-logo.png" alt="Genius Sports"
-          /></span>
+          <h2 class="tile-head">Genius Sports</h2>
           <p class="tile-sub">
             Genius Sports is the official data partner of the NFL, EPL and
             dozens of betting platforms, providing billions of in-game signals
