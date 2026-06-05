@@ -169,21 +169,25 @@
 
       /* ============ bento grid — one gap-free rectangle ============ */
       .bento {
-        max-width: 1320px;
+        /* wider board + shorter rows => the overall board is ~16:9 landscape,
+           so the JPEG export drops into a slide with minimal letterboxing.
+           Cells are ~square at full width, so the square creative tiles
+           (reac/dooh) and the tall one (free) fit their assets cleanly. */
+        max-width: 1600px;
         margin: 0 auto;
         padding: 20px var(--pad) var(--pad);
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: repeat(7, var(--rowh));
+        grid-template-rows: repeat(7, 116px);
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult"
-          "hero hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult"
-          "hero hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult"
-          "ocr  ocr  ocr  reac reac reac dooh dooh dooh copt copt copt"
-          "ocr  ocr  ocr  reac reac reac dooh dooh dooh copt copt copt"
-          "mark mark mark mark free free halo halo dash dash dash dash"
-          "mark mark mark mark free free halo halo dash dash dash dash";
+          "hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult cult"
+          "hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult cult"
+          "free free reac reac dooh dooh ocr  ocr  ocr  copt copt copt"
+          "free free reac reac dooh dooh ocr  ocr  ocr  copt copt copt"
+          "free free halo halo halo mark mark mark dash dash dash dash"
+          "free free halo halo halo mark mark mark dash dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
