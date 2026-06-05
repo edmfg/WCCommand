@@ -33,7 +33,7 @@ const TILE_QUERIES = {
   gen_dooh: "soccer fans crowd celebrating stadium", // moment / crowd
   gen_agen: "friends celebrating watching football on tv living room night", // home
   gen_mark: "diverse soccer fans waving flags celebration", // moment
-  gen_dash: "man watching sports on tv at home couch reaction", // home
+  gen_team: "diverse creative team collaborating brainstorm modern office", // creative production team
 };
 
 function readTileKey(req) {
