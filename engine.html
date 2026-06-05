@@ -1003,6 +1003,8 @@
         const KEY = "wce_edit_v1";
         function start() {
           const els = [...document.querySelectorAll(SEL)];
+          // Capture the file's own copy first — this is "main", the source of truth.
+          const originals = els.map((el) => el.innerHTML);
           let saved = {};
           try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
           let saveTimer = null;
@@ -1010,12 +1012,20 @@
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
               const out = {};
-              els.forEach((el, i) => (out[i] = el.innerHTML));
+              // Persist only genuine edits, tagged with the file content they were made against.
+              els.forEach((el, i) => {
+                if (el.innerHTML !== originals[i])
+                  out[i] = { base: originals[i], html: el.innerHTML };
+              });
               localStorage.setItem(KEY, JSON.stringify(out));
             }, 300);
           };
           els.forEach((el, i) => {
-            if (saved[i] != null) el.innerHTML = saved[i];
+            const rec = saved[i];
+            // Replay a saved edit ONLY if the file is unchanged since it was made.
+            // If main changed (edit baked in, or tiles added/removed), show main.
+            if (rec && typeof rec === "object" && rec.base === originals[i])
+              el.innerHTML = rec.html;
             el.setAttribute("contenteditable", "true");
             el.style.outline = "1px dashed rgba(155,114,203,0.55)";
             el.style.outlineOffset = "2px";
