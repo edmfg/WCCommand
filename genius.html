@@ -177,12 +177,12 @@
         grid-template-rows: repeat(6, var(--rowh));
         gap: var(--gap);
         grid-template-areas:
-          "hero hero hero gpc  gpc  gpc  gpc  free free cult cult cult"
-          "hero hero hero gpc  gpc  gpc  gpc  free free cult cult cult"
-          "hero hero hero gpc  gpc  gpc  gpc  free free dooh dooh dooh"
-          "ocr  ocr  reac reac reac copt copt agen agen dooh dooh dooh"
-          "ocr  ocr  reac reac reac copt copt agen agen mark mark mark"
-          "ocr  ocr  halo halo halo copt copt agen agen dash dash dash";
+          "hero hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult"
+          "hero hero hero hero hero gpc  gpc  gpc  gpc  cult cult cult"
+          "hero hero hero hero hero gpc  gpc  gpc  gpc  dooh dooh dooh"
+          "ocr  ocr  ocr  copt copt copt copt halo halo dooh dooh dooh"
+          "ocr  ocr  ocr  copt copt copt copt halo halo mark mark mark"
+          "reac reac reac reac free free free  halo halo dash dash dash";
       }
       .a-hero { grid-area: hero; }
       .a-gpc  { grid-area: gpc; }
@@ -190,12 +190,12 @@
       .a-ocr  { grid-area: ocr; }
       .a-reac { grid-area: reac; }
       .a-dooh { grid-area: dooh; }
-      .a-agen { grid-area: agen; }
       .a-copt { grid-area: copt; }
       .a-halo { grid-area: halo; }
       .a-mark { grid-area: mark; }
       .a-dash { grid-area: dash; }
       .a-free { grid-area: free; }
+      /* a-agen tile removed */
 
       /* ============ photo card ============ */
       .tile {
@@ -494,11 +494,6 @@
         letter-spacing: -0.02em;
         line-height: 1.04;
       }
-      .a-agen .tile-head {
-        font-size: clamp(14px, 1.4vw, 17px);
-        letter-spacing: -0.02em;
-        line-height: 1.06;
-      }
       .tile-sub b {
         color: #fff;
         font-weight: 700;
@@ -591,27 +586,6 @@
         opacity: 0.92;
         filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.55));
       }
-      /* the agentic tile is a compact slot — shrink everything so the
-         social logos fit inside instead of being clipped at the top */
-      .a-agen .tile-body {
-        padding: 12px;
-        gap: 2px;
-      }
-      .a-agen .social-logos {
-        gap: 8px;
-        margin-bottom: 3px;
-      }
-      .a-agen .social-logos img {
-        width: 15px;
-        height: 15px;
-      }
-      .a-agen .kick {
-        margin-bottom: 2px;
-      }
-      .a-agen .tile-sub {
-        font-size: 11px;
-        line-height: 1.2;
-      }
 
       .arrow {
         display: inline-block;
@@ -677,7 +651,6 @@
       .a-cult { animation-delay: 0.5s; }
       .a-gpc  { animation-delay: 0.78s; }
       .a-ocr  { animation-delay: 0.98s; }
-      .a-agen { animation-delay: 1.05s; }
       .a-dooh { animation-delay: 1.12s; }
       .a-reac { animation-delay: 1.19s; }
       .a-copt { animation-delay: 1.26s; }
@@ -704,20 +677,19 @@
       @media (max-width: 980px) {
         .bento {
           grid-template-columns: repeat(6, 1fr);
-          grid-template-rows: repeat(12, var(--rowh));
+          grid-template-rows: repeat(11, var(--rowh));
           grid-template-areas:
             "hero hero hero gpc  gpc  gpc"
             "hero hero hero gpc  gpc  gpc"
-            "cult cult cult gpc  gpc  gpc"
-            "cult cult cult agen agen agen"
-            "free free free ocr  ocr  ocr"
-            "free free free ocr  ocr  ocr"
-            "free free free dooh dooh dooh"
-            "free free free dooh dooh dooh"
-            "reac reac reac copt copt copt"
-            "reac reac reac copt copt copt"
-            "mark mark mark halo halo halo"
-            "dash dash dash dash dash dash";
+            "hero hero hero gpc  gpc  gpc"
+            "cult cult cult ocr  ocr  ocr"
+            "cult cult cult ocr  ocr  ocr"
+            "copt copt copt halo halo halo"
+            "copt copt copt halo halo halo"
+            "reac reac reac dooh dooh dooh"
+            "reac reac reac dooh dooh dooh"
+            "mark mark mark free free free"
+            "mark mark mark dash dash dash";
         }
       }
       @media (max-width: 600px) {
@@ -830,9 +802,9 @@
         <img class="tile-photo" src="/api/pexels?t=gen_halo&i=1" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <span class="kick">Eyebrow</span>
-          <h2 class="tile-head">Headline</h2>
-          <p class="tile-sub">Supporting line</p>
+          <span class="kick">Timing</span>
+          <h2 class="tile-head">FOCUSED ON THE MOST INTENSE STAGES OF THE TOURNAMENT</h2>
+          <p class="tile-sub">June 24 to July 8 / Group and Knock-Out</p>
         </div>
       </article>
 
@@ -868,23 +840,13 @@
         </div>
       </article>
 
-      <article class="tile a-agen" style="--accent: var(--g-green)">
-        <img class="tile-photo" src="/api/pexels?t=gen_agen&i=3" alt="" onerror="this.classList.add('failed')" />
-        <div class="tile-scrim"></div>
-        <div class="tile-body">
-          <span class="kick">Eyebrow</span>
-          <h2 class="tile-head">Headline</h2>
-          <p class="tile-sub">Supporting line</p>
-        </div>
-      </article>
-
       <article class="tile a-mark" style="--accent: var(--g-yellow)">
         <img class="tile-photo" src="/api/pexels?t=gen_mark&i=0" alt="" onerror="this.classList.add('failed')" />
         <div class="tile-scrim"></div>
         <div class="tile-body">
-          <span class="kick">Eyebrow</span>
-          <h2 class="tile-head">Headline</h2>
-          <p class="tile-sub">Supporting line</p>
+          <span class="kick">Messaging</span>
+          <h2 class="tile-head">Messaging Targeting Pre, During, and Post-Match</h2>
+          <p class="tile-sub">Covering anything that could&nbsp;<span>happen around the matches</span></p>
         </div>
       </article>
 
