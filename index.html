@@ -10497,7 +10497,7 @@
       function buildDashboardSnapshot() {
         const D = typeof DASHBOARD_DATA !== "undefined" ? DASHBOARD_DATA : {};
         const today = new Date().toISOString().slice(0, 10);
-        const slimNews = (D.news || []).slice(0, 25).map((n) => ({
+        const slimNews = (D.news || []).slice(0, 60).map((n) => ({
           id: n.id,
           headline: n.headline,
           source: n.source,
@@ -10506,30 +10506,31 @@
           summary: n.summary,
           url: n.url,
         }));
-        const slimSocial = (D.social || []).slice(0, 25).map((s) => ({
+        const slimSocial = (D.social || []).slice(0, 60).map((s) => ({
           id: s.id,
           topic: s.topic,
           category: s.category,
           volume: s.volume,
           sentiment: s.sentiment,
           summary: s.summary,
-          quotesCount: (s.quotes && s.quotes.length) || 0,
           sampleQuote:
             s.sampleQuote || (s.quotes && s.quotes[0] && s.quotes[0].text),
           platforms: s.platforms,
         }));
-        const upcoming = (D.matches || [])
-          .filter((m) => m.date >= today)
-          .slice(0, 12)
-          .map((m) => ({
-            date: m.date,
-            kickoff: m.kickoff,
-            stage: m.stage,
-            home: m.home && m.home.name,
-            away: m.away && m.away.name,
-            venue: m.venue,
-          }));
-        const slimAssets = (D.assets || []).slice(0, 10).map((a) => ({
+        // ALL fixtures (the whole tournament) with status + score, so the
+        // assistant can answer any schedule OR result question — not just the
+        // next handful of upcoming matches.
+        const fixtures = (D.matches || []).map((m) => ({
+          date: m.date,
+          kickoff: m.kickoff,
+          stage: m.stage,
+          home: m.home && m.home.name,
+          away: m.away && m.away.name,
+          venue: m.venue,
+          status: m.status,
+          score: m.score || null,
+        }));
+        const slimAssets = (D.assets || []).slice(0, 20).map((a) => ({
           headline: a.headline,
           market: a.market,
           status: a.status,
@@ -10539,10 +10540,10 @@
         return {
           lastUpdated: D.lastUpdated,
           today,
-          ticker: (D.ticker || []).slice(0, 15),
+          ticker: D.ticker || [],
           news: slimNews,
           social: slimSocial,
-          upcomingMatches: upcoming,
+          fixtures,
           assets: slimAssets,
         };
       }
@@ -10721,8 +10722,9 @@ You are a **2026 FIFA World Cup analyst**. Stay strictly inside this scope:
 
 ${window.WCC_HOW_TO_GUIDE || ""}
 
-# DASHBOARD DATA (live snapshot — trimmed for context budget)
-${JSON.stringify(buildDashboardSnapshot(), null, 2)}`;
+# DASHBOARD DATA (complete current content — every news, social & ticker item, plus the FULL tournament fixtures with status & scores)
+This is your source of truth for what's on the dashboard. Answer content/schedule/result questions from this directly; only use Google Search for anything newer than \`lastUpdated\` or not covered here.
+${JSON.stringify(buildDashboardSnapshot())}`;
 
             const payload = {
               system_instruction: { parts: [{ text: systemInstruction }] },

@@ -132,6 +132,73 @@
     window.WCC_HOW_TO_GUIDE = HOW_TO_GUIDE;
   } catch (e) {}
 
+  // Snapshot of the live dashboard content (DASHBOARD_DATA is loaded on both
+  // index.html and mfg.html). Mirrors index.html's buildDashboardSnapshot so
+  // the MFG-mode assistant knows the same news / social / ticker / fixtures.
+  function buildDashboardSnapshot() {
+    var D =
+      (typeof window !== "undefined" && window.DASHBOARD_DATA) || {};
+    var today = new Date().toISOString().slice(0, 10);
+    function take(arr, n, fn) {
+      return (arr || []).slice(0, n).map(fn);
+    }
+    return {
+      lastUpdated: D.lastUpdated,
+      today: today,
+      ticker: D.ticker || [],
+      news: take(D.news, 60, function (n) {
+        return {
+          id: n.id,
+          headline: n.headline,
+          source: n.source,
+          tag: n.tag,
+          timestamp: n.timestamp,
+          summary: n.summary,
+          url: n.url,
+        };
+      }),
+      social: take(D.social, 60, function (s) {
+        return {
+          id: s.id,
+          topic: s.topic,
+          category: s.category,
+          volume: s.volume,
+          sentiment: s.sentiment,
+          summary: s.summary,
+          sampleQuote:
+            s.sampleQuote || (s.quotes && s.quotes[0] && s.quotes[0].text),
+          platforms: s.platforms,
+        };
+      }),
+      fixtures: (D.matches || []).map(function (m) {
+        return {
+          date: m.date,
+          kickoff: m.kickoff,
+          stage: m.stage,
+          home: m.home && m.home.name,
+          away: m.away && m.away.name,
+          venue: m.venue,
+          status: m.status,
+          score: m.score || null,
+        };
+      }),
+    };
+  }
+
+  function buildSnapshotBlock() {
+    try {
+      var snap = buildDashboardSnapshot();
+      if (!snap.news.length && !snap.fixtures.length) return "";
+      return (
+        "\n## DASHBOARD DATA (complete current content — news, social, ticker, full fixtures)\n" +
+        "This is the live dashboard content, already loaded on this page. Treat it as your source of truth for what's on the dashboard; never tell the user you don't have it. Use Google Search only for anything newer than `lastUpdated` or not covered here.\n" +
+        JSON.stringify(snap)
+      );
+    } catch (e) {
+      return "";
+    }
+  }
+
   function buildSystemInstruction(mode) {
     var modeBlock =
       mode === "mfg"
@@ -141,9 +208,9 @@
           "Prompts Tracker, and Daily Update tools to run reactive content during the 2026 FIFA World Cup. " +
           "Optimize answers for **production decisions**: assign tags, prioritize triage items, draft " +
           "briefs, surface gaps, propose prompt experiments, and turn raw news/social into structured " +
-          "updates for the Live Dashboard. The Live Dashboard data lives on the index.html page; you " +
-          "don't have it loaded here, so when the user asks about specific dashboard cards or trends, " +
-          "either use Google Search (you have it) or ask them to paste the relevant snippet."
+          "updates for the Live Dashboard. The full Live Dashboard content (news, social, ticker, and " +
+          "the complete tournament fixtures) is loaded on this page and included below under DASHBOARD " +
+          "DATA — use it directly to answer questions about specific cards, trends, fixtures, or results."
         : "## MODE: Live Dashboard\n" +
           "You are inside the public-facing Live Dashboard at /index.html — News carousel, Social " +
           "Trends, Fixtures, Creative pipeline. The user is consuming intel rather than producing " +
@@ -199,7 +266,8 @@
       "\n" +
       "- Mode: " +
       (mode === "mfg" ? "MFG (production)" : "Dashboard (consumption)") +
-      "\n"
+      "\n" +
+      buildSnapshotBlock()
     );
   }
 
