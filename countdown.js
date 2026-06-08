@@ -4,6 +4,13 @@
   // World Cup 2026 opener: Mexico vs South Africa, Estadio Azteca, June 11, 2026.
   // Approximating kickoff at 18:00 UTC (1pm ET / noon CT / 12pm CDMX).
   var KICKOFF_UTC = Date.UTC(2026, 5, 11, 18, 0, 0); // month is 0-indexed: 5 = June
+  // Tournament runs June 11 – July 19, 2026 (39 days). Day boundaries are keyed
+  // off UTC midnight — approximate for a North American event, but fine for a
+  // glanceable pill. TOURNAMENT_END is July 20 00:00 UTC so July 19 is Day 39.
+  var TOURNAMENT_START = Date.UTC(2026, 5, 11); // June 11 00:00 UTC = Day 1
+  var TOURNAMENT_END = Date.UTC(2026, 6, 20); // July 20 00:00 UTC (after the final)
+  var TOURNAMENT_DAYS = 39;
+  var DAY_MS = 86400000;
 
   function pad(n) {
     return n < 10 ? "0" + n : "" + n;
@@ -88,28 +95,68 @@
     return pill;
   }
 
-  function tick(pill) {
-    var els = {
-      d: pill.querySelector("[data-d]"),
-      h: pill.querySelector("[data-h]"),
-      m: pill.querySelector("[data-m]"),
-    };
-    function update() {
-      var f = fmt(KICKOFF_UTC - Date.now());
-      if (f.kickedOff) {
-        pill.innerHTML =
-          '<span class="wcc-emoji" aria-hidden="true">⚽</span><span class="wcc-num">' +
-          f.text +
-          "</span>";
-        return;
-      }
-      els.d.textContent = f.d;
-      els.h.textContent = pad(f.h);
-      els.m.textContent = pad(f.m);
+  // Render the pill for whatever phase we're in. Rebuilds innerHTML each tick
+  // so phase transitions (kickoff, day rollover, final) happen with no stale
+  // cached nodes — time only moves forward, so the cost is trivial.
+  function render(pill) {
+    var now = Date.now();
+
+    // Phase 1 — counting down to the opener.
+    if (now < KICKOFF_UTC) {
+      var f = fmt(KICKOFF_UTC - now);
+      pill.setAttribute("aria-label", "Countdown to World Cup 2026 kickoff");
+      pill.title = "Countdown to WC 2026 kickoff";
+      pill.innerHTML =
+        '<span class="wcc-emoji" aria-hidden="true">🕐</span>' +
+        '<span class="wcc-label">WC 2026</span>' +
+        '<span class="wcc-num">' + f.d + '</span><span class="wcc-unit">d</span>' +
+        '<span class="wcc-num">' + pad(f.h) + '</span><span class="wcc-unit">h</span>' +
+        '<span class="wcc-num">' + pad(f.m) + '</span><span class="wcc-unit">m</span>';
+      return;
     }
-    update();
-    // Tick once per minute since seconds are no longer displayed.
-    setInterval(update, 30 * 1000);
+
+    // Phase 4 — after the final: the tournament is over.
+    if (now >= TOURNAMENT_END) {
+      pill.setAttribute("aria-label", "World Cup 2026 complete");
+      pill.title = "World Cup 2026 — that's a wrap";
+      pill.innerHTML =
+        '<span class="wcc-emoji" aria-hidden="true">🏆</span>' +
+        '<span class="wcc-num">Champions crowned</span>';
+      return;
+    }
+
+    // Phase 2 — opening-day kickoff celebration (first ~4 hours after kickoff).
+    if (now < KICKOFF_UTC + 4 * 3600 * 1000) {
+      pill.setAttribute("aria-label", "World Cup 2026 kick off");
+      pill.title = "World Cup 2026 is underway";
+      pill.innerHTML =
+        '<span class="wcc-emoji" aria-hidden="true">⚽</span>' +
+        '<span class="wcc-num">KICK OFF!</span>';
+      return;
+    }
+
+    // Phase 3 — tournament is live: show the matchday counter.
+    var day = Math.floor((now - TOURNAMENT_START) / DAY_MS) + 1;
+    if (day < 1) day = 1;
+    if (day > TOURNAMENT_DAYS) day = TOURNAMENT_DAYS;
+    pill.setAttribute(
+      "aria-label",
+      "World Cup 2026 — day " + day + " of " + TOURNAMENT_DAYS
+    );
+    pill.title = "World Cup 2026 — day " + day + " of " + TOURNAMENT_DAYS;
+    pill.innerHTML =
+      '<span class="wcc-emoji" aria-hidden="true">⚽</span>' +
+      '<span class="wcc-label">World Cup</span>' +
+      '<span class="wcc-num">Day ' + day + '</span>' +
+      '<span class="wcc-unit">/ ' + TOURNAMENT_DAYS + '</span>';
+  }
+
+  function tick(pill) {
+    render(pill);
+    // Tick once per ~30s since seconds are no longer displayed.
+    setInterval(function () {
+      render(pill);
+    }, 30 * 1000);
   }
 
   function init() {
