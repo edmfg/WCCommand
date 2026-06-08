@@ -2,8 +2,15 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-05-29T17:00:00.000Z",
+  lastUpdated: "2026-06-08T16:00:00.000Z",
   ticker: [
+    "🌎 Mexico face South Africa to open WC26 at the Estadio Azteca on Thu Jun 11, 3PM CT — the Azteca becomes the first venue ever to host three World Cup openers (Jun 8)",
+    "🦁 England edge New Zealand 1-0 in their Miami warm-up and face Costa Rica on Jun 10 before basing in Kansas City (Jun 7)",
+    "🇩🇪 Manuel Neuer, 40, returns in goal for Germany's fifth-World-Cup campaign — they open vs debutants Curaçao on Jun 14 (Jun 6)",
+    "🇨🇦 Canada lose Moïse Bombito to injury days before their Jun 12 opener vs Bosnia at BMO Field — Marsch reshuffles the back line (Jun 7)",
+    "🇺🇸 USMNT open Jun 12 vs Paraguay at SoFi in Group D, alongside Australia & Türkiye (Jun 8)",
+    "🐐 Messi progressing from hamstring fatigue, in line to feature in Argentina's final warm-up vs Honduras at Kyle Field (Jun 7)",
+    "🎉 FIFA Fan Festivals open across host cities — LA Jun 11–14, Boston Jun 12–27, plus a NY/NJ road tour (Jun 8)",
     "🇨🇦 Canada name their final 26 today — Marsch locks the host roster ahead of the June 12 opener vs Bosnia at BMO (May 29)",
     "🇺🇸 USMNT final 26 revealed at Pier 17 NYC — Pochettino's World Cup roster is locked (May 26)",
     "🇧🇷 Neymar suffers a grade-2 calf tear — out of Brazil's warm-ups vs Panama & Egypt, cleared in 2-3 weeks (May 28)",
@@ -77,6 +84,94 @@ window.DASHBOARD_DATA = {
     "🏟️ FIFA Fan Festivals confirmed in 14 cities — Toronto, Vancouver, CDMX, GDL, MTY + 9 US",
   ],
   news: [
+    {
+      id: "n144",
+      headline:
+        "🌎 Azteca Makes History: Mexico v South Africa Opens WC26 on Thursday",
+      source: "FIFA",
+      timestamp: "2026-06-08T15:00:00Z",
+      summary:
+        "The tournament kicks off Thursday June 11 when hosts Mexico face South Africa at the Estadio Azteca (3PM CT) — the first venue ever to stage three World Cup openers, after 1970 and 1986. With 80,000+ inside and a global audience tuning in, this is the single biggest reactive window of the group stage: opening-whistle, anthem and first-goal moments will spike everywhere at once. Have Mexico and 'opening day of the World Cup' creative cued to ship the instant the ball rolls 🇲🇽",
+      url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/estadio-azteca-mexico-city-host-opening-match-world-cup-2026",
+      tag: "Global",
+    },
+    {
+      id: "n143",
+      headline:
+        "🦁 England Beat New Zealand 1-0 in Miami Warm-Up; Costa Rica Next Before KC Base",
+      source: "ESPN",
+      timestamp: "2026-06-07T12:00:00Z",
+      summary:
+        "Thomas Tuchel's England edged New Zealand 1-0 in their first pre-tournament friendly in south Florida on June 6, with the late-arriving Arsenal contingent (Rice, Saka, Madueke, Eze) still to integrate after the Champions League final. A second tune-up against Costa Rica follows on June 10 before the squad settles into its tournament base in Kansas City on June 13. Heat acclimatization is the quiet story — expect 'Three Lions in the sun' angles and Kane-captaincy content from UK fans 🦁",
+      url: "https://www.espn.com/soccer/story/_/id/48870079/world-cup-2026-england-pre-tournament-friendlies-do-play-dates-venues-how-watch",
+      tag: "UK",
+    },
+    {
+      id: "n142",
+      headline:
+        "🇩🇪 Neuer, 40, Returns in Goal as Germany Open Against Debutants Curaçao",
+      source: "FIFA",
+      timestamp: "2026-06-06T11:00:00Z",
+      summary:
+        "Julian Nagelsmann's headline call is Manuel Neuer — back at 40 for a record-equalling fifth World Cup and named first choice ahead of Baumann and Nübel. Germany open June 14 against Curaçao, the smallest nation ever to reach a World Cup, instantly setting up a David-vs-Goliath storyline. With Musiala, Wirtz and Kimmich around the veteran keeper, German feeds are torn between 'respect the legend' nostalgia and 'why Neuer at 40' debate — both are strong reactive lanes 🧤",
+      url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/germany-squad-neuer-nagelsmann-named",
+      tag: "Germany",
+    },
+    {
+      id: "n141",
+      headline:
+        "🇨🇦 Canada Lose Bombito to Injury Days Before the Opener — Marsch Reshuffles",
+      source: "Yahoo Sports",
+      timestamp: "2026-06-07T16:00:00Z",
+      summary:
+        "Host nation Canada were dealt a late blow as defender Moïse Bombito was ruled out of World Cup consideration with a leg injury that hasn't healed in time, forcing Jesse Marsch into a back-line reshuffle just days before the June 12 opener vs Bosnia & Herzegovina at BMO Field. As one of three hosts, Canada carry home-soil pressure and a passionate Toronto crowd — keep contingency creative ready for both the injury-news cycle and the opening-day hype 🍁",
+      url: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-updates-injuries-squads-storylines-as-the-tournament-looms-200000776.html",
+      tag: "Canada",
+    },
+    {
+      id: "n140",
+      headline:
+        "🇺🇸 USMNT Open June 12 vs Paraguay at SoFi — Group D With Australia & Türkiye",
+      source: "ESPN",
+      timestamp: "2026-06-08T14:00:00Z",
+      summary:
+        "The host United States begin their campaign June 12 against Paraguay at SoFi Stadium in Inglewood (9PM ET), drawn into Group D alongside Australia and Türkiye. Pochettino's home-soil side carries the biggest domestic spotlight of the tournament, and the LA opening festivities (Fan Festival June 11–14) wrap the match in a citywide moment. This is the marquee US reactive window — have USMNT and 'football comes home to America' creative locked 🇺🇸",
+      url: "https://www.espn.com/soccer/story/_/id/48939282/2026-fifa-world-cup-fixtures-results-match-schedule-group-stage-knockout-rounds-bracket",
+      tag: "USA",
+    },
+    {
+      id: "n139",
+      headline:
+        "🐐 Messi Progressing From Hamstring Fatigue, in Line for Honduras Warm-Up",
+      source: "Yahoo Sports",
+      timestamp: "2026-06-07T10:00:00Z",
+      summary:
+        "Argentina boss Lionel Scaloni says Lionel Messi — managing left-hamstring fatigue since late May — is progressing well and could feature in the final warm-up against Honduras at Kyle Field, Texas. With this set to be Messi's record sixth and final World Cup, every fitness update moves the needle and the 'Last Dance' narrative is already dominant. Stay ready to react to his first appearance, but keep the tone about the football, not the GOAT debate 🐐",
+      url: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-updates-injuries-squads-storylines-as-the-tournament-looms-200000776.html",
+      tag: "Global",
+    },
+    {
+      id: "n138",
+      headline:
+        "🎉 FIFA Fan Festivals Open Across Host Cities as Kickoff Nears",
+      source: "FIFA",
+      timestamp: "2026-06-08T13:00:00Z",
+      summary:
+        "The official FIFA Fan Festivals are switching on across North America: Los Angeles runs June 11–14 with live matches, food and music tied to the US opener, Boston's festival runs June 12–27 with a local cultural showcase, and a 'Skyline to Shoreline' road tour brings the tournament to NY/NJ communities. These free fan zones are where culture, food and football collide — prime territory for on-the-ground, city-tagged content that isn't just match reactions 🥳",
+      url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/fifa-fan-festival",
+      tag: "USA",
+    },
+    {
+      id: "n137",
+      headline:
+        "🌡️ Summer Heat Becomes a Tournament Storyline as Teams Acclimatize",
+      source: "Yahoo Sports",
+      timestamp: "2026-06-06T18:00:00Z",
+      summary:
+        "With matches across a North American summer, heat and humidity are shaping preparation: England based their warm-ups in south Florida specifically to acclimatize, and afternoon kickoffs in cities like Mexico City, Dallas and Monterrey raise real player-welfare questions. Expect water-break tactics, lineup rotation and 'is it too hot for football' debate to recur all tournament — a steady, cross-market angle that pairs well with hydration and endurance creative ☀️",
+      url: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-updates-injuries-squads-storylines-as-the-tournament-looms-200000776.html",
+      tag: "Macro",
+    },
     {
       id: "n136",
       headline:
@@ -3099,6 +3194,120 @@ window.DASHBOARD_DATA = {
     },
   ],
   social: [
+    {
+      id: "s137",
+      topic: "🧤 Neuer at 40 — 'Respect Your Elders' Takes Over Keeper Twitter",
+      category: "memes",
+      volume: "🔥🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "Manuel Neuer's recall at 40 has set off a wave of affectionate 'grandpa in goal' and 'respect your elders' content. Fans are splicing his sweeper-keeper highlights with captions about a fifth World Cup, while others meme the age gap with his Musiala/Wirtz teammates. Largely warm and cross-generational — a clean lane for legacy/longevity-coded creative without wading into selection debates 🧤",
+      sampleQuote:
+        "\"Neuer at 40 still has a higher top speed than my entire fantasy backline.\"",
+      quotes: [
+        { platform: "X", text: "40 years old and still rushing out past the halfway line. never change king" },
+        { platform: "TikTok", text: "POV: the keeper is older than half the group chat watching the game" },
+        { platform: "Reddit", text: "r/soccer collectively tipping its cap to Neuer one more time" },
+      ],
+      platforms: ["X", "TikTok", "Reddit"],
+      sourceUrl: "https://www.bundesliga.com/en/bundesliga/news/germany-squad-world-cup-2026-manuel-neuer-nagelsmann-37487",
+      timestamp: "2026-06-06T12:00:00Z",
+    },
+    {
+      id: "s136",
+      topic: "🇨🇼 Curaçao Mania — Smallest Nation Ever at a World Cup Wins the Internet",
+      category: "fandom",
+      volume: "🔥🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "Curaçao's arrival as the smallest nation by population ever to reach a World Cup has made them everyone's adopted second team. Underdog edits, 'population smaller than the stadium' stats and Caribbean-pride content are spreading fast ahead of their June 14 opener vs Germany. A feel-good, low-risk bandwagon — great for underdog/David-vs-Goliath storytelling that travels across every market 🐦",
+      sampleQuote:
+        "\"Curaçao has fewer people than show up to a single match and they made the World Cup. football is beautiful.\"",
+      quotes: [
+        { platform: "X", text: "everyone's second team is Curaçao now, i don't make the rules" },
+        { platform: "TikTok", text: "the Curaçao squad celebrating qualification is the best video on here" },
+        { platform: "Reddit", text: "drawing Germany first is brutal but let them cook" },
+      ],
+      platforms: ["X", "TikTok", "Reddit"],
+      sourceUrl: "https://www.aljazeera.com/sports/2026/5/31/germany-world-cup-2026-team-preview-players-to-watch-group-and-squad-list",
+      timestamp: "2026-06-06T15:00:00Z",
+    },
+    {
+      id: "s135",
+      topic: "🌡️ 'It's Going to Cook' — Summer-Heat Discourse Heats Up Pre-Kickoff",
+      category: "game",
+      volume: "🔥🔥🔥",
+      sentiment: "caution",
+      summary:
+        "As teams acclimatize to North American summer conditions, fans are split between memeing brutal afternoon kickoffs ('3PM in Dallas is a war crime') and genuine concern over player welfare and water breaks. The discourse spans every market and will recur each match day. Useful for hydration/endurance brand angles — keep it playful but acknowledge the real welfare conversation 💦",
+      sampleQuote:
+        "\"A 3pm kickoff in Monterrey in June? They're going to need oxygen tanks on the bench.\"",
+      quotes: [
+        { platform: "X", text: "cooling breaks about to be the most important tactic of the tournament" },
+        { platform: "Reddit", text: "afternoon kickoffs for the TV money, players left to melt. classic" },
+        { platform: "TikTok", text: "me watching my team play at 1pm local: 🥵" },
+      ],
+      platforms: ["X", "Reddit", "TikTok"],
+      sourceUrl: "https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-updates-injuries-squads-storylines-as-the-tournament-looms-200000776.html",
+      timestamp: "2026-06-06T17:00:00Z",
+    },
+    {
+      id: "s134",
+      topic: "🌮 Fan Festival Food & Music — Host Cities Become the Backdrop",
+      category: "food",
+      volume: "🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "With official Fan Festivals opening in LA, Boston, NY/NJ and beyond, creators are previewing the food stalls, local-artist lineups and cultural showcases as much as the football. Expect a wave of 'what to eat at the World Cup', host-city guides and street-culture content all summer. A strong non-match lane — pair city-tagged food/music creative with the fan-zone moments rather than the scoreline 🎶",
+      sampleQuote:
+        "\"Going to the Fan Festival for the football, staying for the tacos and the DJ set.\"",
+      quotes: [
+        { platform: "TikTok", text: "World Cup food crawl through every host city, who's coming" },
+        { platform: "IG", text: "the Boston cultural showcase lineup is actually stacked" },
+        { platform: "X", text: "$10 GA for the LA Fan Fest is the best deal of the summer" },
+      ],
+      platforms: ["TikTok", "IG", "X"],
+      sourceUrl: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/fifa-fan-festival",
+      timestamp: "2026-06-08T11:00:00Z",
+    },
+    {
+      id: "s133",
+      topic: "🦁 England Snub Wars — Foden, Palmer & Trent Omissions Reignite the Debate",
+      category: "game",
+      volume: "🔥🔥🔥🔥",
+      sentiment: "neutral",
+      summary:
+        "Tuchel's ruthless 26 — leaving out Phil Foden, Cole Palmer and Trent Alexander-Arnold while handing Jarell Quansah the nod over Harry Maguire — is still fuelling UK debate as the warm-ups roll. 'Best XI left at home' takes, predicted-lineup arguments and Kane-captaincy content dominate English feeds. High-engagement but spicy — pick a lane carefully; the omissions drive more conversation than the inclusions 🦁",
+      sampleQuote:
+        "\"You could build a genuine knockout-round team out of the players England left at home.\"",
+      quotes: [
+        { platform: "X", text: "no Foden, no Palmer, no Trent... bold from Tuchel or mad?" },
+        { platform: "Reddit", text: "Quansah over Maguire is the call nobody had on their bingo card" },
+        { platform: "TikTok", text: "ranking every player England snubbed, part 1" },
+      ],
+      platforms: ["X", "Reddit", "TikTok"],
+      sourceUrl: "https://www.espn.com/soccer/story/_/id/48823863/meet-england-2026-world-cup-squad-26-players-picked-thomas-tuchel-why",
+      timestamp: "2026-06-07T09:00:00Z",
+    },
+    {
+      id: "s132",
+      topic: "🏟️ Azteca Trilogy — 1970, 1986 & Now 2026 Opening-Day Nostalgia",
+      category: "fandom",
+      volume: "🔥🔥🔥",
+      sentiment: "positive",
+      summary:
+        "As the Estadio Azteca prepares to become the first stadium to host three World Cup openers, football-history content is surging: Pelé in 1970, Maradona's 1986, and now 2026 stitched into 'hallowed ground' edits. Mexican pride and global ground-nostalgia overlap here. A rich heritage lane for opening-day creative — lean on the stadium's mythology, not just the Mexico–South Africa matchup 🏟️",
+      sampleQuote:
+        "\"Pelé, Maradona, and now whoever writes the next chapter. The Azteca has seen it all.\"",
+      quotes: [
+        { platform: "X", text: "three World Cup openers at one stadium. the Azteca is sacred ground" },
+        { platform: "IG", text: "1970 / 1986 / 2026 — same cathedral, three generations" },
+        { platform: "Reddit", text: "imagine the noise in there on Thursday" },
+      ],
+      platforms: ["X", "IG", "Reddit"],
+      sourceUrl: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/estadio-azteca-mexico-city-host-opening-match-world-cup-2026",
+      timestamp: "2026-06-08T10:00:00Z",
+    },
     {
       id: "s130",
       topic: "🐐 Messi's Sixth & Final World Cup — 'The Last Dance' Takes Over Feeds",
