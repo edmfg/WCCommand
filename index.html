@@ -2772,6 +2772,137 @@
         color: #b88200;
       }
 
+      /* ── Today's matches strip (Live tab) ── */
+      .today-strip {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 2px 2px 10px;
+        margin-bottom: 14px;
+        scrollbar-width: thin;
+      }
+      .today-strip[hidden] {
+        display: none;
+      }
+      .today-strip-label {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 0 0 auto;
+        padding-right: 4px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .today-strip-label small {
+        font-weight: 600;
+        font-size: 10px;
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .today-match {
+        flex: 0 0 auto;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 152px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.15s ease, transform 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .today-match:hover {
+        background: rgba(255, 255, 255, 0.09);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      .today-match-teams {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .today-match-teams .vs {
+        opacity: 0.45;
+        font-weight: 500;
+        font-size: 11px;
+      }
+      .today-match-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .today-match-time {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        font-variant-numeric: tabular-nums;
+      }
+      .today-badge {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .today-badge.upcoming {
+        background: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .today-badge.live {
+        background: #cc0000;
+        color: #fff;
+        animation: todayPulse 1.4s ease-in-out infinite;
+      }
+      .today-badge.final {
+        background: rgba(120, 200, 120, 0.18);
+        color: #aef0ae;
+      }
+      @keyframes todayPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.55;
+        }
+      }
+      .today-empty {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        font-size: 12.5px;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 8px 4px;
+      }
+      body.light .today-match {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.08);
+      }
+      body.light .today-match:hover {
+        background: rgba(0, 0, 0, 0.07);
+      }
+      body.light .today-match-teams,
+      body.light .today-strip-label {
+        color: #1a1a1a;
+      }
+      body.light .today-match-time,
+      body.light .today-empty {
+        color: rgba(0, 0, 0, 0.6);
+      }
+
       /* ── "What's new" tab badges ── */
       .whats-new-badge {
         display: inline-flex;
@@ -6113,6 +6244,10 @@
           </div>
           <div class="bookmarks-bar-list" id="bookmarksList"></div>
         </div>
+
+        <!-- Today's matches strip — today's full slate, glanceable (Live tab) -->
+        <div id="todayMatches" class="today-strip" hidden></div>
+
         <div class="live-filters" id="liveFilters"></div>
 
         <!-- Sentiment Heatmap -->
@@ -6850,6 +6985,7 @@
         renderTicker();
         renderTimestamp();
         renderCountdown();
+        renderTodayMatches();
         renderLiveFilters();
         renderNews();
         renderSocial();
@@ -6943,6 +7079,110 @@
         if (!window._lastUpdatedTicker) {
           window._lastUpdatedTicker = setInterval(renderTimestamp, 60000);
         }
+      }
+
+      // ── Today's matches strip: today's full slate at a glance (Live tab) ──
+      // Pre-tournament it shows "first kickoff in N days"; during the event it
+      // shows every match today with kickoff time / score and a LIVE / Full-time
+      // badge. Clicking a chip jumps to the Fixtures tab. Match data is static
+      // per page load, so this renders once at init alongside renderCountdown().
+      function renderTodayMatches() {
+        const el = document.getElementById("todayMatches");
+        if (!el) return;
+        const all = DASHBOARD_DATA.matches || [];
+        const today = new Date().toISOString().slice(0, 10);
+        const games = all.filter((m) => m.date === today);
+
+        // No matches today (e.g. before kickoff) — show a friendly placeholder.
+        if (!games.length) {
+          const future = all
+            .map((m) => m.date)
+            .filter((d) => d > today)
+            .sort();
+          if (!future.length) {
+            el.hidden = true;
+            return;
+          }
+          const days = Math.round(
+            (new Date(future[0] + "T12:00:00Z") -
+              new Date(today + "T12:00:00Z")) /
+              86400000,
+          );
+          el.hidden = false;
+          el.innerHTML =
+            '<div class="today-strip-label">Today<small>Matches</small></div>' +
+            '<div class="today-empty">No matches today — first kickoff in ' +
+            days +
+            (days === 1 ? " day" : " days") +
+            " ⚽</div>";
+          return;
+        }
+
+        // Live matches first, then keep the (chronological) data order.
+        const rank = { live: 0, upcoming: 1 };
+        const sorted = games
+          .slice()
+          .sort((a, b) => (rank[a.status] ?? 2) - (rank[b.status] ?? 2));
+
+        const chips = sorted
+          .map((m) => {
+            const isLive = m.status === "live";
+            const isFinal = m.status !== "live" && m.status !== "upcoming";
+            const badge = isLive
+              ? '<span class="today-badge live">● Live</span>'
+              : isFinal
+                ? '<span class="today-badge final">Full time</span>'
+                : '<span class="today-badge upcoming">' +
+                  (m.kickoff || "TBD") +
+                  "</span>";
+            const center = m.score
+              ? '<span class="today-match-time">' +
+                m.score.home +
+                " – " +
+                m.score.away +
+                "</span>"
+              : '<span class="today-match-time">' + (m.stage || "") + "</span>";
+            const label = m.home.name + " vs " + m.away.name + " — open Fixtures";
+            return (
+              '<div class="today-match" role="button" tabindex="0" ' +
+              "onclick=\"switchTab('calendar')\" " +
+              "onkeydown=\"if(event.key==='Enter'||event.key===' '){event.preventDefault();switchTab('calendar');}\" " +
+              'title="' +
+              label.replace(/"/g, "&quot;") +
+              '">' +
+              '<div class="today-match-teams">' +
+              "<span>" +
+              m.home.flag +
+              " " +
+              m.home.code +
+              "</span>" +
+              '<span class="vs">v</span>' +
+              "<span>" +
+              m.away.code +
+              " " +
+              m.away.flag +
+              "</span>" +
+              "</div>" +
+              '<div class="today-match-foot">' +
+              center +
+              badge +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+
+        const liveCount = games.filter((m) => m.status === "live").length;
+        const head =
+          '<div class="today-strip-label">Today<small>' +
+          games.length +
+          " match" +
+          (games.length === 1 ? "" : "es") +
+          (liveCount ? " · " + liveCount + " live" : "") +
+          "</small></div>";
+
+        el.hidden = false;
+        el.innerHTML = head + chips;
       }
 
       // ── Feature 1: Countdown to next match ──
