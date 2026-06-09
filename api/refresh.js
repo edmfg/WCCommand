@@ -435,3 +435,11 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: "Upstream unavailable" });
   }
 };
+
+// The grounded Gemini call (12+ Google searches + a generation) routinely
+// runs well past Vercel's short default function timeout. Without this the
+// cron path gets killed mid-flight on slow days — Gemini answers, but the
+// function dies before insertLiveUpdates() runs, so no rows land and the
+// daily refresh silently no-ops. Mirror api/gemini.js, which makes the same
+// grounded call and sets the same 60s ceiling (the Hobby-plan maximum).
+module.exports.config = { maxDuration: 60 };
