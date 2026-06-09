@@ -243,14 +243,14 @@ Deployment Protection: previously enabled, **currently OFF on Production** (the 
 
 ---
 
-## Daily auto-refresh (→ `/api/refresh`, once each morning)
+## Auto-refresh (→ `/api/refresh`, twice a day during the tournament)
 
-Two triggers fire `/api/refresh` with `Authorization: Bearer ${CRON_SECRET}`, for reliability — Vercel **Hobby** cron is best-effort with no SLA and was empirically skipping ~1 day in 4:
+Triggers fire `/api/refresh` with `Authorization: Bearer ${CRON_SECRET}`, for reliability — Vercel **Hobby** cron is best-effort with no SLA and was empirically skipping ~1 day in 4:
 
-- **Primary — GitHub Actions** (`.github/workflows/refresh-cron.yml`): once a day at **`0 9 * * *` UTC** (5am New York). Reliable; effectively never skips. `workflow_dispatch` lets you fire it on demand from the Actions tab. Requires repo secret `CRON_SECRET` (same value as the Vercel env var): `gh secret set CRON_SECRET --repo edmfg/WCCommand`.
-- **Backup — Vercel Cron** (`vercel.json` `crons`, `0 9 * * *` UTC): free, but best-effort.
+- **Primary — GitHub Actions** (`.github/workflows/refresh-cron.yml`): **twice a day at `0 9,23 * * *` UTC** (~5am + ~7pm New York) for the WC window — morning + post-evening-matches. Reliable; effectively never skips. Retries 3× on a transient Gemini 502 / 0-row response. `workflow_dispatch` fires it on demand from the Actions tab. Requires repo secret `CRON_SECRET` (same value as the Vercel env var): `gh secret set CRON_SECRET --repo edmfg/WCCommand`. **After the tournament, drop back to `0 9 * * *`.**
+- **Backup — Vercel Cron** (`vercel.json` `crons`, `0 9 * * *` UTC): morning run only. Free, best-effort. (Hobby caps a cron at one run/day, so the evening run is GitHub-only.)
 
-`refresh.js` has a `cronRanToday()` guard (queries `live_updates` for a `source_kind:"cron"` row dated today, UTC): whichever trigger fires first does the refresh, the other no-ops. So the dashboard refreshes **exactly once a day, in the morning**, with redundancy. The guard fails open — a query error can only cause a harmless double-write, never a skipped day. The manual MFG "Refresh Content" button is exempt from the guard (on-demand refreshes are intentional).
+`refresh.js` has a `cronRanRecently()` guard (queries `live_updates` for a `source_kind:"cron"` row within the last `RECENT_REFRESH_HOURS`=6h): it collapses same-slot doubles (the GitHub morning run + the Vercel backup fire within ~1h) while letting the two intended runs (14h / 10h apart) both land. The guard fails open — a query error can only cause a harmless double-write, never a skipped run. The manual MFG "Refresh Content" button is exempt (on-demand refreshes are intentional).
 
 The endpoint:
 

@@ -12,15 +12,15 @@
 //      key (same path /api/sb-write uses). Cron-sourced rows get
 //      payload.source = "cron" so the activity feed can distinguish them.
 //
-// Scheduling (two triggers, for reliability — Vercel Hobby cron skips ~1 day
-// in 4 with no SLA):
-//   * Primary:  GitHub Actions (.github/workflows/refresh-cron.yml), once a
-//     day at 09:00 UTC = 5am New York. Reliable.
-//   * Backup:   Vercel Cron (vercel.json `crons`, 0 9 * * * UTC). Free, but
-//     best-effort.
-// Both send Authorization: Bearer ${CRON_SECRET}. The cronRanToday() guard
-// below means whichever fires first writes; the other no-ops — so the
-// dashboard refreshes exactly once a day, in the morning.
+// Scheduling (for reliability — Vercel Hobby cron skips ~1 day in 4, no SLA):
+//   * Primary:  GitHub Actions (.github/workflows/refresh-cron.yml), TWICE a
+//     day during the tournament — 09:00 + 23:00 UTC (~5am + 7pm New York).
+//     Reliable. (Hobby caps a cron at one run/day, so the 2nd run is GH-only.)
+//   * Backup:   Vercel Cron (vercel.json `crons`, 0 9 * * * UTC) for the
+//     morning run only. Free, but best-effort.
+// All send Authorization: Bearer ${CRON_SECRET}. The cronRanRecently() guard
+// below collapses same-slot doubles (GH run + Vercel backup) while letting the
+// two intended daily runs land — so the dashboard refreshes morning + evening.
 
 const crypto = require("crypto");
 const {
@@ -221,22 +221,28 @@ function normalizeTicker(it) {
   return safeText(trimmed).slice(0, 200);
 }
 
-// Has the daily cron already written rows today (UTC)? Used to keep the
-// refresh to once a day even though two schedulers trigger it (GitHub Actions
-// primary + Vercel Cron backup, for reliability). FAIL-OPEN: any error or
-// missing key returns false, so a bug here can only cause a harmless
-// double-write — never a skipped day.
-async function cronRanToday() {
+// De-dupe window for the cron. The tournament schedule fires the refresh
+// twice a day (~09:00 + ~23:00 UTC), so we can't gate on "once per UTC day"
+// any more — the evening run is the same calendar day as the morning one and
+// would be wrongly skipped. Instead we suppress only a *recent* prior cron
+// write, which still collapses same-slot doubles (GitHub Actions run + Vercel
+// backup fire within ~1h) while letting the two intended runs (14h / 10h
+// apart) both land. FAIL-OPEN: any error or missing key returns false, so a
+// bug here can only cause a harmless double-write — never a skipped run.
+const RECENT_REFRESH_HOURS = 6;
+async function cronRanRecently() {
   const SUPABASE_URL =
     process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!SERVICE_KEY) return false;
-  const startOfDayUtc = new Date().toISOString().slice(0, 10) + "T00:00:00Z";
+  const cutoff = new Date(
+    Date.now() - RECENT_REFRESH_HOURS * 3600 * 1000,
+  ).toISOString();
   const url =
     SUPABASE_URL +
     "/rest/v1/live_updates?select=id&payload->>source_kind=eq.cron" +
     "&created_at=gte." +
-    encodeURIComponent(startOfDayUtc) +
+    encodeURIComponent(cutoff) +
     "&limit=1";
   const resp = await fetch(url, {
     headers: { apikey: SERVICE_KEY, Authorization: "Bearer " + SERVICE_KEY },
@@ -309,15 +315,15 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "GEMINI_API_KEY not configured" });
   }
 
-  // Cron path only: once-a-day guard. If a cron refresh already landed today,
-  // no-op instead of burning Gemini/Search quota on a duplicate. The manual
-  // MFG button is exempt — those refreshes are intentional and on demand.
+  // Cron path only: de-dupe guard. If a cron refresh landed in the last few
+  // hours, no-op instead of burning Gemini/Search quota on a duplicate. The
+  // manual MFG button is exempt — those refreshes are intentional and on demand.
   if (isCron) {
     try {
-      if (await cronRanToday()) {
+      if (await cronRanRecently()) {
         return res
           .status(200)
-          .json({ ok: true, mode: "cron", skipped: "already-refreshed-today" });
+          .json({ ok: true, mode: "cron", skipped: "refreshed-recently" });
       }
     } catch (e) {
       console.warn(

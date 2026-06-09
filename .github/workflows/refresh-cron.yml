@@ -12,10 +12,12 @@ name: Daily content refresh
 
 on:
   schedule:
-    # 09:00 UTC = 5am New York (EDT). Once a day, in the morning.
-    # GitHub may delay scheduled runs by a few minutes under load, but unlike
-    # Vercel Hobby cron it effectively never skips a day.
-    - cron: "0 9 * * *"
+    # Twice a day during the World Cup: 09:00 + 23:00 UTC = ~5am + ~7pm New
+    # York (EDT). GitHub may delay scheduled runs by a few minutes under load,
+    # but unlike Vercel Hobby cron it effectively never skips. (Hobby caps a
+    # cron at one run/day, so both runs go through here, not vercel.json.)
+    # After the tournament, drop back to a single "0 9 * * *".
+    - cron: "0 9,23 * * *"
   workflow_dispatch: {} # lets you fire a refresh on demand from the Actions tab
 
 jobs:
