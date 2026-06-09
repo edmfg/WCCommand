@@ -243,9 +243,16 @@ Deployment Protection: previously enabled, **currently OFF on Production** (the 
 
 ---
 
-## Daily auto-refresh (Vercel Cron → `/api/refresh`)
+## Daily auto-refresh (→ `/api/refresh`, once each morning)
 
-A Vercel Cron at **`0 9,16,22 * * *` UTC** (= 5am / 12pm / 6pm New York during EDT — three fires a day across the WC window) calls `GET /api/refresh` with `Authorization: Bearer ${CRON_SECRET}`. The endpoint:
+Two triggers fire `/api/refresh` with `Authorization: Bearer ${CRON_SECRET}`, for reliability — Vercel **Hobby** cron is best-effort with no SLA and was empirically skipping ~1 day in 4:
+
+- **Primary — GitHub Actions** (`.github/workflows/refresh-cron.yml`): once a day at **`0 9 * * *` UTC** (5am New York). Reliable; effectively never skips. `workflow_dispatch` lets you fire it on demand from the Actions tab. Requires repo secret `CRON_SECRET` (same value as the Vercel env var): `gh secret set CRON_SECRET --repo edmfg/WCCommand`.
+- **Backup — Vercel Cron** (`vercel.json` `crons`, `0 9 * * *` UTC): free, but best-effort.
+
+`refresh.js` has a `cronRanToday()` guard (queries `live_updates` for a `source_kind:"cron"` row dated today, UTC): whichever trigger fires first does the refresh, the other no-ops. So the dashboard refreshes **exactly once a day, in the morning**, with redundancy. The guard fails open — a query error can only cause a harmless double-write, never a skipped day. The manual MFG "Refresh Content" button is exempt from the guard (on-demand refreshes are intentional).
+
+The endpoint:
 
 1. Runs the same Gemini 2.5 Flash + Google Search grounding flow the manual button uses.
 2. **Server-side**, normalises the JSON payload (mirrors of `normalizeNews`/`normalizeSocial`/`normalizeTicker` from `mfg.html`) and inserts rows into Supabase `live_updates` using `SUPABASE_SERVICE_ROLE_KEY` (same RLS-bypass path as `/api/sb-write`).

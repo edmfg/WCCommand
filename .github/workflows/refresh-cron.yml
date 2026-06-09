@@ -1,0 +1,55 @@
+name: Daily content refresh
+
+# Reliable replacement for the Vercel Hobby cron, which was skipping ~1 day in
+# 4 (best-effort scheduling, no SLA). GitHub Actions runs the morning refresh by
+# hitting /api/refresh with the CRON_SECRET bearer — the same call Vercel Cron
+# makes. The Vercel cron in vercel.json stays on as a backup; refresh.js has an
+# "already refreshed today" guard so the two triggers can never double-write.
+#
+# Requires repo secret CRON_SECRET (same value as the Vercel env var of the
+# same name). Set it once with:
+#   gh secret set CRON_SECRET --repo edmfg/WCCommand
+
+on:
+  schedule:
+    # 09:00 UTC = 5am New York (EDT). Once a day, in the morning.
+    # GitHub may delay scheduled runs by a few minutes under load, but unlike
+    # Vercel Hobby cron it effectively never skips a day.
+    - cron: "0 9 * * *"
+  workflow_dispatch: {} # lets you fire a refresh on demand from the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger /api/refresh
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET secret is not set on the repo"
+            exit 1
+          fi
+          code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
+            -X POST "https://mfgworldcup.com/api/refresh" \
+            -H "Authorization: Bearer $CRON_SECRET")
+          echo "HTTP $code"
+          cat /tmp/resp.json || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::refresh returned HTTP $code"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open('/tmp/resp.json'))
+          if d.get('skipped'):
+              print('Skipped — already refreshed today. OK.')
+              sys.exit(0)
+          ins = d.get('inserted')
+          print('Inserted rows:', ins)
+          if isinstance(ins, int) and ins > 0:
+              sys.exit(0)
+          print('::error::refresh wrote 0 rows (Gemini returned nothing usable)')
+          sys.exit(1)
+          PY

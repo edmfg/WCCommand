@@ -12,9 +12,15 @@
 //      key (same path /api/sb-write uses). Cron-sourced rows get
 //      payload.source = "cron" so the activity feed can distinguish them.
 //
-// Configured via vercel.json `crons` at 0 9,16,22 * * * (UTC) = 5am / 12pm
-// / 6pm New York during EDT — fires three times a day so the dashboard
-// stays fresh through the WC2026 window (Jun 11 – Jul 19).
+// Scheduling (two triggers, for reliability — Vercel Hobby cron skips ~1 day
+// in 4 with no SLA):
+//   * Primary:  GitHub Actions (.github/workflows/refresh-cron.yml), once a
+//     day at 09:00 UTC = 5am New York. Reliable.
+//   * Backup:   Vercel Cron (vercel.json `crons`, 0 9 * * * UTC). Free, but
+//     best-effort.
+// Both send Authorization: Bearer ${CRON_SECRET}. The cronRanToday() guard
+// below means whichever fires first writes; the other no-ops — so the
+// dashboard refreshes exactly once a day, in the morning.
 
 const crypto = require("crypto");
 const {
@@ -215,6 +221,31 @@ function normalizeTicker(it) {
   return safeText(trimmed).slice(0, 200);
 }
 
+// Has the daily cron already written rows today (UTC)? Used to keep the
+// refresh to once a day even though two schedulers trigger it (GitHub Actions
+// primary + Vercel Cron backup, for reliability). FAIL-OPEN: any error or
+// missing key returns false, so a bug here can only cause a harmless
+// double-write — never a skipped day.
+async function cronRanToday() {
+  const SUPABASE_URL =
+    process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SERVICE_KEY) return false;
+  const startOfDayUtc = new Date().toISOString().slice(0, 10) + "T00:00:00Z";
+  const url =
+    SUPABASE_URL +
+    "/rest/v1/live_updates?select=id&payload->>source_kind=eq.cron" +
+    "&created_at=gte." +
+    encodeURIComponent(startOfDayUtc) +
+    "&limit=1";
+  const resp = await fetch(url, {
+    headers: { apikey: SERVICE_KEY, Authorization: "Bearer " + SERVICE_KEY },
+  });
+  if (!resp.ok) return false;
+  const rows = await resp.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
 // Server-side insert into Supabase live_updates using the service-role key.
 // Mirrors what /api/sb-write does for the manual button — same RLS bypass,
 // same payload shape — so cron-written rows render identically in the UI.
@@ -276,6 +307,24 @@ module.exports = async function handler(req, res) {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
     return res.status(500).json({ error: "GEMINI_API_KEY not configured" });
+  }
+
+  // Cron path only: once-a-day guard. If a cron refresh already landed today,
+  // no-op instead of burning Gemini/Search quota on a duplicate. The manual
+  // MFG button is exempt — those refreshes are intentional and on demand.
+  if (isCron) {
+    try {
+      if (await cronRanToday()) {
+        return res
+          .status(200)
+          .json({ ok: true, mode: "cron", skipped: "already-refreshed-today" });
+      }
+    } catch (e) {
+      console.warn(
+        "refresh cron dedup check failed, proceeding:",
+        e && e.message,
+      );
+    }
   }
 
   const body = {
