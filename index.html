@@ -5574,7 +5574,7 @@
         z-index: 1;
       }
 
-      /* Intro video — full-bleed Messi goal clip behind the title overlay */
+      /* Intro video — full-bleed Google DOOH boards clip behind the title overlay */
       .intro-video {
         position: absolute;
         inset: 0;
@@ -6098,7 +6098,7 @@
           });
       })();
     </script>
-    <!-- MESSI GOAL INTRO -->
+    <!-- GOOGLE DOOH INTRO -->
     <div class="intro-overlay" id="introOverlay" style="display: none">
       <video
         class="intro-video"
@@ -6106,7 +6106,7 @@
         muted
         playsinline
         preload="auto"
-        src="/assets/messi-goal.mp4"
+        src="/assets/google-dooh-intro.mp4"
       ></video>
       <div class="intro-scrim"></div>
       <div class="intro-title" id="introTitle">World Cup HQ</div>
@@ -10942,7 +10942,7 @@ ${JSON.stringify(buildDashboardSnapshot())}`;
         const title = document.getElementById("introTitle");
         overlay.style.display = "flex";
 
-        // Timeline (4.0-sec single-take clip — save + Messi arms raised):
+        // Timeline (uses the first ~3.6s of the Google DOOH boards clip):
         // 0.00s — overlay visible, video starts (muted autoplay), title fades in
         // 0.25s — title visible (CSS introTitleIn at 0.25s delay)
         // 3.40s — dashboard reveals (header/ticker/main stagger in behind overlay)
