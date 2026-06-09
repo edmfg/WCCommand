@@ -2785,12 +2785,19 @@ window.FORMATION_DATA = {
         set("hero-market", LABEL[key] || "—");
         set("hero-date", "No briefing published yet");
         set("hero-window", "");
+        const embed = document.body.classList.contains("embed");
+        const msg = embed
+          ? name +
+            "’s Today’s Reactive briefing isn’t live yet — more markets roll out across the tournament."
+          : "No Today’s Reactive briefing has been published for " +
+            name +
+            " yet. Switch markets above, or publish one from MFG mode.";
         const b = document.getElementById("briefings");
         if (b)
           b.innerHTML =
-            '<div style="padding:48px 24px;text-align:center;color:var(--text-dim);font-size:14px">No Today’s Reactive briefing has been published for ' +
-            name +
-            " yet. Switch markets above, or publish one from MFG mode.</div>";
+            '<div style="padding:48px 24px;text-align:center;color:var(--text-dim);font-size:14px">' +
+            msg +
+            "</div>";
         const s = document.getElementById("storyboards");
         if (s) s.innerHTML = "";
       }
@@ -2977,15 +2984,12 @@ window.FORMATION_DATA = {
             showReactiveLoading(key);
             return;
           }
-          // Fetch resolved with no briefing for this market. The embedded
-          // (public) view bounces home; the standalone view keeps the market
-          // switcher usable and shows an empty state, so an MFG reviewer who
-          // hops to an unpublished market isn't kicked back to the dashboard.
-          if (document.body.classList.contains("embed")) {
-            window.location.href = "index.html";
-            return;
-          }
-          wireMarketSwitcher(key);
+          // Fetch resolved with no briefing for this market. Show an empty
+          // state in place. The standalone (MFG) view also keeps the market
+          // switcher usable so a reviewer can hop to another market. We never
+          // bounce to index.html: inside the embedded iframe that would load
+          // the dashboard recursively within the frame.
+          if (!document.body.classList.contains("embed")) wireMarketSwitcher(key);
           showReactiveEmpty(key);
           return;
         }
