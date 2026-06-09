@@ -4,7 +4,7 @@
 window.DASHBOARD_DATA = {
   lastUpdated: "2026-06-08T16:00:00.000Z",
   ticker: [
-    "🌎 Mexico face South Africa to open WC26 at the Estadio Azteca on Thu Jun 11, 3PM CT — the Azteca becomes the first venue ever to host three World Cup openers (Jun 8)",
+    "🌎 Mexico face South Africa to open WC26 at the Estadio Azteca on Thu Jun 11, 3PM ET — the Azteca becomes the first venue ever to host three World Cup openers (Jun 8)",
     "🦁 England edge New Zealand 1-0 in their Miami warm-up and face Costa Rica on Jun 10 before basing in Kansas City (Jun 7)",
     "🇩🇪 Manuel Neuer, 40, returns in goal for Germany's fifth-World-Cup campaign — they open vs debutants Curaçao on Jun 14 (Jun 6)",
     "🇨🇦 Canada lose Moïse Bombito to injury days before their Jun 12 opener vs Bosnia at BMO Field — Marsch reshuffles the back line (Jun 7)",
@@ -33,7 +33,7 @@ window.DASHBOARD_DATA = {
       source: "FIFA",
       timestamp: "2026-06-08T15:00:00Z",
       summary:
-        "The tournament kicks off Thursday June 11 when hosts Mexico face South Africa at the Estadio Azteca (3PM CT) — the first venue ever to stage three World Cup openers, after 1970 and 1986. With 80,000+ inside and a global audience tuning in, this is the single biggest reactive window of the group stage: opening-whistle, anthem and first-goal moments will spike everywhere at once. Have Mexico and 'opening day of the World Cup' creative cued to ship the instant the ball rolls 🇲🇽",
+        "The tournament kicks off Thursday June 11 when hosts Mexico face South Africa at the Estadio Azteca (3PM ET) — the first venue ever to stage three World Cup openers, after 1970 and 1986. With 80,000+ inside and a global audience tuning in, this is the single biggest reactive window of the group stage: opening-whistle, anthem and first-goal moments will spike everywhere at once. Have Mexico and 'opening day of the World Cup' creative cued to ship the instant the ball rolls 🇲🇽",
       url: "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/estadio-azteca-mexico-city-host-opening-match-world-cup-2026",
       tag: "Global",
     },
