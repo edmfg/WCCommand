@@ -2273,9 +2273,9 @@
             <span class="market-switcher-label">Market</span>
             <select id="marketSwitcher" aria-label="Switch market">
               <option value="ca">🇨🇦 Canada</option>
+              <option value="de">🇩🇪 Germany</option>
               <option value="usa" data-tbd="1">🇺🇸 USA — Coming soon</option>
               <option value="brazil" data-tbd="1">🇧🇷 Brazil — Coming soon</option>
-              <option value="de" data-tbd="1">🇩🇪 Germany — Coming soon</option>
             </select>
           </label>
           <span class="live-pill"
@@ -2768,26 +2768,63 @@ window.FORMATION_DATA = {
         if (s) s.innerHTML = "";
       }
 
+      // Shown in the standalone view when a market has no briefing published yet.
+      function showReactiveEmpty(key) {
+        const LABEL = {
+          ca: "Canada",
+          brazil: "Brazil",
+          de: "Germany",
+          usa: "USA",
+          global: "Global",
+        };
+        const name = LABEL[key] || "this market";
+        const set = (id, txt) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = txt;
+        };
+        set("hero-market", LABEL[key] || "—");
+        set("hero-date", "No briefing published yet");
+        set("hero-window", "");
+        const b = document.getElementById("briefings");
+        if (b)
+          b.innerHTML =
+            '<div style="padding:48px 24px;text-align:center;color:var(--text-dim);font-size:14px">No Today’s Reactive briefing has been published for ' +
+            name +
+            " yet. Switch markets above, or publish one from MFG mode.</div>";
+        const s = document.getElementById("storyboards");
+        if (s) s.innerHTML = "";
+      }
+
       function wireMarketSwitcher(currentKey) {
         const sel = document.getElementById("marketSwitcher");
         if (!sel) return;
         sel.value = currentKey;
-        // Mark options as enabled/disabled based on whether FORMATION_DATA has them.
-        const data = window.FORMATION_DATA || {};
+        // Enable any market that isn't flagged "coming soon" (data-tbd). Markets
+        // ship NO bundled data — each one's briefing arrives from its own
+        // Supabase override on the destination page — so we gate on readiness
+        // (the data-tbd attribute), not on whether THIS page happens to already
+        // hold the data. The current market is always selectable.
         Array.from(sel.options).forEach((opt) => {
-          const has = !!data[opt.value];
-          opt.disabled = !has && opt.value !== currentKey;
+          opt.disabled = !!opt.dataset.tbd && opt.value !== currentKey;
         });
+        // boot() re-runs on every live refresh; only bind the change handler once.
+        if (sel.dataset.wired === "1") return;
+        sel.dataset.wired = "1";
         sel.addEventListener("change", () => {
           const next = sel.value;
           if (next === currentKey) return;
-          if (!data[next]) {
-            // Soft revert if the user managed to pick a TBD one anyway.
+          const opt = sel.options[sel.selectedIndex];
+          if (opt && opt.dataset.tbd) {
+            // Soft revert if a not-yet-ready market was picked anyway.
             sel.value = currentKey;
             return;
           }
           const u = new URL(window.location.href);
           u.searchParams.set("market", next);
+          // Drop any pinned ?record= — it belongs to the market we're leaving.
+          // Carrying it into another market trips the inter-market guard and
+          // leaves the destination stuck on its loading state.
+          u.searchParams.delete("record");
           window.location.href = u.toString();
         });
       }
@@ -2940,8 +2977,16 @@ window.FORMATION_DATA = {
             showReactiveLoading(key);
             return;
           }
-          // Fetch resolved with no data for this market — bounce home.
-          window.location.href = "index.html";
+          // Fetch resolved with no briefing for this market. The embedded
+          // (public) view bounces home; the standalone view keeps the market
+          // switcher usable and shows an empty state, so an MFG reviewer who
+          // hops to an unpublished market isn't kicked back to the dashboard.
+          if (document.body.classList.contains("embed")) {
+            window.location.href = "index.html";
+            return;
+          }
+          wireMarketSwitcher(key);
+          showReactiveEmpty(key);
           return;
         }
         wireMarketSwitcher(key);
