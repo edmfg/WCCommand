@@ -22,7 +22,7 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger /api/refresh
+      - name: Trigger /api/refresh (with retries)
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
@@ -30,26 +30,35 @@ jobs:
             echo "::error::CRON_SECRET secret is not set on the repo"
             exit 1
           fi
-          code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
-            -X POST "https://mfgworldcup.com/api/refresh" \
-            -H "Authorization: Bearer $CRON_SECRET")
-          echo "HTTP $code"
-          cat /tmp/resp.json || true
-          echo
-          if [ "$code" != "200" ]; then
-            echo "::error::refresh returned HTTP $code"
+          # Retry up to 3x: the grounded Gemini call occasionally returns a
+          # truncated/unparseable payload (502) or 0 usable rows. Each retry
+          # is a fresh generation, so a transient bad response self-heals. The
+          # refresh.js cronRanToday() guard makes repeats idempotent.
+          ok=0
+          for n in 1 2 3; do
+            echo "Attempt $n of 3…"
+            code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
+              -X POST "https://mfgworldcup.com/api/refresh" \
+              -H "Authorization: Bearer $CRON_SECRET")
+            echo "HTTP $code"
+            cat /tmp/resp.json 2>/dev/null || true
+            echo
+            if [ "$code" = "200" ]; then
+              skipped=$(jq -r 'if .skipped then "yes" else "no" end' /tmp/resp.json 2>/dev/null)
+              inserted=$(jq -r '.inserted // 0' /tmp/resp.json 2>/dev/null)
+              if [ "$skipped" = "yes" ]; then
+                echo "Skipped — already refreshed today. OK."
+                ok=1; break
+              fi
+              if [ "${inserted:-0}" -gt 0 ] 2>/dev/null; then
+                echo "Inserted $inserted rows. OK."
+                ok=1; break
+              fi
+              echo "200 but 0 usable rows — will retry"
+            fi
+            [ "$n" -lt 3 ] && { echo "retrying in 20s…"; sleep 20; }
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::refresh failed after 3 attempts"
             exit 1
           fi
-          python3 - <<'PY'
-          import json, sys
-          d = json.load(open('/tmp/resp.json'))
-          if d.get('skipped'):
-              print('Skipped — already refreshed today. OK.')
-              sys.exit(0)
-          ins = d.get('inserted')
-          print('Inserted rows:', ins)
-          if isinstance(ins, int) and ins > 0:
-              sys.exit(0)
-          print('::error::refresh wrote 0 rows (Gemini returned nothing usable)')
-          sys.exit(1)
-          PY
