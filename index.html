@@ -7431,8 +7431,14 @@
         return ((v || "").match(/🔥/g) || []).length;
       }
       function buildBriefing() {
-        const news = (window.DASHBOARD_DATA && DASHBOARD_DATA.news) || [];
-        const social = (window.DASHBOARD_DATA && DASHBOARD_DATA.social) || [];
+        // Same 7-day cap as the carousels — the Top report never surfaces news
+        // or social trends older than the Live window.
+        const news = ((window.DASHBOARD_DATA && DASHBOARD_DATA.news) || []).filter(
+          (n) => withinLiveWindow(n.timestamp),
+        );
+        const social = (
+          (window.DASHBOARD_DATA && DASHBOARD_DATA.social) || []
+        ).filter((s) => withinLiveWindow(s.timestamp));
         // Hottest social first.
         const pulse = [...social].sort(
           (a, b) => _fireCount(b.volume) - _fireCount(a.volume),
