@@ -7883,9 +7883,25 @@
         });
       }
 
+      // Live view shows only the trailing 7 days of news + social. Anchored to
+      // the viewer's current time (not lastUpdated) so "last 7 days" stays
+      // honest as the dashboard ages between refreshes. Fails OPEN on a
+      // missing/unparseable timestamp so a malformed live row is never silently
+      // hidden — only items we can positively date as >7d old get dropped.
+      const LIVE_WINDOW_DAYS = 7;
+      function withinLiveWindow(timestamp) {
+        if (!timestamp) return true;
+        const t = Date.parse(timestamp);
+        if (Number.isNaN(t)) return true;
+        return t >= Date.now() - LIVE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+      }
+
       function renderNews() {
         let filtered = DASHBOARD_DATA.news.filter(
-          (n) => matchesLiveFilter(n, "news") && matchesSearch(n),
+          (n) =>
+            withinLiveWindow(n.timestamp) &&
+            matchesLiveFilter(n, "news") &&
+            matchesSearch(n),
         );
         const pinned = loadPinned();
         filtered = [...filtered].sort(
@@ -8004,7 +8020,10 @@
           })
           .filter(Boolean);
         let filtered = DASHBOARD_DATA.social.filter(
-          (s) => matchesLiveFilter(s, "social") && matchesSearch(s),
+          (s) =>
+            withinLiveWindow(s.timestamp) &&
+            matchesLiveFilter(s, "social") &&
+            matchesSearch(s),
         );
         if (heatmapFilter.market) {
           filtered = filtered.filter(
@@ -8188,7 +8207,9 @@
             }),
         );
 
-        DASHBOARD_DATA.social.forEach((s) => {
+        DASHBOARD_DATA.social
+          .filter((s) => withinLiveWindow(s.timestamp))
+          .forEach((s) => {
           const m = classifySocialMarket(s);
           let sent = s.sentiment || "mixed";
           // Heatmap only knows positive / mixed / negative.
