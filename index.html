@@ -7012,7 +7012,7 @@
         if (!track) return;
         // Mix the static ticker with the latest news headlines so any market upload feeds the scroll.
         const newsHeadlines = (DASHBOARD_DATA.news || [])
-          .slice()
+          .filter((n) => withinLiveWindow(n.timestamp))
           .sort(
             (a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0),
           )
@@ -9631,9 +9631,17 @@
         const creativeTs = map.creative || 0;
         // Live = news + social created since last live-visit
         const liveCount =
-          countNewSince(DASHBOARD_DATA.news || [], liveTs, (n) => n.timestamp) +
           countNewSince(
-            DASHBOARD_DATA.social || [],
+            (DASHBOARD_DATA.news || []).filter((n) =>
+              withinLiveWindow(n.timestamp),
+            ),
+            liveTs,
+            (n) => n.timestamp,
+          ) +
+          countNewSince(
+            (DASHBOARD_DATA.social || []).filter((s) =>
+              withinLiveWindow(s.timestamp || s.sourceTimestamp),
+            ),
             liveTs,
             (s) => s.timestamp || s.sourceTimestamp,
           );
@@ -9662,11 +9670,17 @@
           bar.hidden = true;
           return;
         }
+        // Only resolve pins against in-window cards — a chip for a card the
+        // 7-day cap has aged out of the carousel would be a dead shortcut.
         const newsById = new Map(
-          (DASHBOARD_DATA.news || []).map((n) => [n.id, n]),
+          (DASHBOARD_DATA.news || [])
+            .filter((n) => withinLiveWindow(n.timestamp))
+            .map((n) => [n.id, n]),
         );
         const socialById = new Map(
-          (DASHBOARD_DATA.social || []).map((s) => [s.id, s]),
+          (DASHBOARD_DATA.social || [])
+            .filter((s) => withinLiveWindow(s.timestamp))
+            .map((s) => [s.id, s]),
         );
         const items = ids
           .map((id) => {
