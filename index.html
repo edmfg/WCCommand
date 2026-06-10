@@ -7248,7 +7248,7 @@
       const liveFilterDefs = [
         { id: "top", label: "🔥 Top" },
         { id: "all", label: "🌐 All" },
-        { id: "24h", label: "⏱ RECENT" },
+        { id: "24h", label: "⏱ T-24 HRS" },
         { id: "canada", label: "🇨🇦 Canada" },
         { id: "germany", label: "🇩🇪 Germany" },
         { id: "brazil", label: "🇧🇷 Brazil" },
@@ -7278,7 +7278,7 @@
         if (!isoTs) return false;
         const t = Date.parse(isoTs);
         if (isNaN(t)) return false;
-        return Date.now() - t <= 72 * 60 * 60 * 1000 && t <= Date.now();
+        return Date.now() - t <= 24 * 60 * 60 * 1000 && t <= Date.now();
       }
 
       // Per-pill match predicates. Each returns true if `item` (a news or
