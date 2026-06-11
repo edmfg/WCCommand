@@ -3847,6 +3847,34 @@
         letter-spacing: 0.3px;
         flex-shrink: 0;
       }
+      .cal-chip-score {
+        opacity: 1;
+        font-weight: 800;
+        font-size: 0.72rem;
+        letter-spacing: 0.5px;
+      }
+      .cal-chip-live {
+        color: #ff5252;
+      }
+      .cal-chip-live::before {
+        content: "●";
+        font-size: 0.55em;
+        margin-right: 2px;
+        vertical-align: middle;
+        animation: calLivePulse 1.4s ease-in-out infinite;
+      }
+      @keyframes calLivePulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .cal-chip-played .cal-chip-teams {
+        opacity: 0.82;
+      }
       .cal-chip-teams {
         font-weight: 700;
         letter-spacing: 0.3px;
@@ -8405,13 +8433,20 @@
           const games = byDate[dateStr] || [];
           const isToday = dateStr === today;
           const chips = games
-            .map(
-              (g) =>
-                `<div class="cal-chip ${stageColor(g.stage)}" data-match-id="${g.id}" title="${g.kickoff} • ${g.home.name} vs ${g.away.name} • ${g.venue}">
-        <span class="cal-chip-time">${g.kickoff.replace(" ET", "")}</span>
+            .map((g) => {
+              const played = g.score && g.status !== "upcoming";
+              const live = g.status === "live";
+              const lead = played
+                ? `<span class="cal-chip-time cal-chip-score${live ? " cal-chip-live" : ""}">${g.score.home}–${g.score.away}</span>`
+                : `<span class="cal-chip-time">${g.kickoff.replace(" ET", "")}</span>`;
+              const titleResult = played
+                ? ` • ${g.score.home}-${g.score.away}${live ? " (LIVE)" : " FT"}`
+                : "";
+              return `<div class="cal-chip ${stageColor(g.stage)}${played ? " cal-chip-played" : ""}" data-match-id="${g.id}" title="${g.kickoff} • ${g.home.name} vs ${g.away.name} • ${g.venue}${titleResult}">
+        ${lead}
         <span class="cal-chip-teams">${g.home.flag}${g.away.flag} ${g.home.code}-${g.away.code}</span>
-      </div>`,
-            )
+      </div>`;
+            })
             .join("");
           cells.push(`<div class="cal-cell${isToday ? " cal-today" : ""}${games.length ? " cal-has-games" : ""}">
       <div class="cal-day-num">${d}</div>${chips}
