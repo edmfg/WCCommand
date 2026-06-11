@@ -3759,6 +3759,7 @@
       .cal-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
+        grid-auto-rows: 1fr;
         gap: 4px;
         background: var(--surface);
         border: 1px solid var(--border);
@@ -3779,7 +3780,7 @@
         padding: 6px 0;
       }
       .cal-cell {
-        min-height: 96px;
+        min-height: 150px;
         padding: 6px;
         border-radius: 8px;
         background: rgba(255, 255, 255, 0.02);
@@ -8404,7 +8405,6 @@
           const games = byDate[dateStr] || [];
           const isToday = dateStr === today;
           const chips = games
-            .slice(0, 3)
             .map(
               (g) =>
                 `<div class="cal-chip ${stageColor(g.stage)}" data-match-id="${g.id}" title="${g.kickoff} • ${g.home.name} vs ${g.away.name} • ${g.venue}">
@@ -8413,12 +8413,8 @@
       </div>`,
             )
             .join("");
-          const more =
-            games.length > 3
-              ? `<div class="cal-more">+${games.length - 3} more</div>`
-              : "";
           cells.push(`<div class="cal-cell${isToday ? " cal-today" : ""}${games.length ? " cal-has-games" : ""}">
-      <div class="cal-day-num">${d}</div>${chips}${more}
+      <div class="cal-day-num">${d}</div>${chips}
     </div>`);
         }
         // Pad trailing
