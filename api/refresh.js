@@ -462,15 +462,31 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "GEMINI_API_KEY not configured" });
   }
 
+  // Cron only: scrape scores on EVERY invocation, BEFORE the news dedup guard.
+  // The upsert is idempotent (merge-duplicates), so a same-slot double just
+  // re-writes the same scores — cheap. Decoupling it from the news guard means
+  // a manual trigger (or the evening run) always refreshes scores even when the
+  // news refresh is skipped as a recent duplicate. Best-effort: errors → 0.
+  const scoresPromise = isCron
+    ? refreshScores(GEMINI_API_KEY).catch((e) => {
+        console.error("refresh cron scores error", e && e.message);
+        return { upserted: 0 };
+      })
+    : null;
+
   // Cron path only: de-dupe guard. If a cron refresh landed in the last few
   // hours, no-op instead of burning Gemini/Search quota on a duplicate. The
   // manual MFG button is exempt — those refreshes are intentional and on demand.
   if (isCron) {
     try {
       if (await cronRanRecently()) {
-        return res
-          .status(200)
-          .json({ ok: true, mode: "cron", skipped: "refreshed-recently" });
+        const scoresRes = scoresPromise ? await scoresPromise : { upserted: 0 };
+        return res.status(200).json({
+          ok: true,
+          mode: "cron",
+          skipped: "refreshed-recently",
+          scores: (scoresRes && scoresRes.upserted) || 0,
+        });
       }
     } catch (e) {
       console.warn(
@@ -489,16 +505,8 @@ module.exports = async function handler(req, res) {
     },
   };
 
-  // Cron only: scrape scores in PARALLEL with the news call so both grounded
-  // Gemini calls share the single 60s function budget instead of running back
-  // to back. Best-effort — a rejection resolves to 0 and never blocks news.
-  const scoresPromise = isCron
-    ? refreshScores(GEMINI_API_KEY).catch((e) => {
-        console.error("refresh cron scores error", e && e.message);
-        return { upserted: 0 };
-      })
-    : null;
-
+  // (scoresPromise was kicked off above, before the dedup guard, so it runs in
+  // parallel with this news call and also covers the deduped-skip path.)
   try {
     const upstream = await fetch(ENDPOINT, {
       method: "POST",
