@@ -7805,6 +7805,8 @@
             if (typeof fetchLiveUpdates === "function") fetchLiveUpdates(true);
             if (typeof fetchMarketContent === "function")
               fetchMarketContent(true);
+            if (typeof fetchMatchResults === "function")
+              fetchMatchResults(true);
           }
         } catch (e) {}
       }
@@ -10103,11 +10105,13 @@
             fetchMarketContent(true);
             fetchSharedAssets(true);
             fetchLiveUpdates(true);
+            fetchMatchResults(true);
           });
         fetchMfgLatest(true);
         fetchMarketContent(true);
         fetchSharedAssets(true);
         fetchLiveUpdates(true);
+        fetchMatchResults(true);
         if (mfgPollTimer) clearInterval(mfgPollTimer);
         mfgPollTimer = setInterval(
           () => {
@@ -10120,6 +10124,7 @@
             fetchMarketContent(true);
             fetchSharedAssets(true);
             fetchLiveUpdates(true);
+            fetchMatchResults(true);
           },
           5 * 60 * 1000,
         );
@@ -10334,6 +10339,89 @@
           }
         } catch (e) {
           if (!silent) console.warn("live updates fetch failed", e);
+        }
+      }
+
+      // ── Match results overlay (cron-scraped scores → fixtures) ──
+      // The /api/refresh cron writes final/live scores into Supabase
+      // `match_results`. Here we pull them with the publishable key and stamp
+      // score/status onto the matching DASHBOARD_DATA.matches fixture (by date
+      // + FIFA tricodes, tolerant of home/away order), so the Fixtures Calendar
+      // and Standings show results without a redeploy. Mirrors the plain-fetch
+      // pattern fetchLiveUpdates uses (supabase-js may not be ready on boot).
+      let _matchResultsSig = "";
+      function applyMatchResults(rows) {
+        if (!Array.isArray(rows) || !rows.length) return false;
+        let changed = false;
+        rows.forEach((r) => {
+          const hs = r.home_score;
+          const as = r.away_score;
+          if (hs == null || as == null) return;
+          const hc = String(r.home_code || "").toUpperCase();
+          const ac = String(r.away_code || "").toUpperCase();
+          const status = r.status === "live" ? "live" : "final";
+          const m = DASHBOARD_DATA.matches.find((mm) => {
+            if (mm.date !== r.match_date) return false;
+            const mh = (mm.home.code || "").toUpperCase();
+            const ma = (mm.away.code || "").toUpperCase();
+            return (mh === hc && ma === ac) || (mh === ac && ma === hc);
+          });
+          if (!m) return;
+          // Keep the score in OUR fixture's home/away orientation.
+          const flip = (m.home.code || "").toUpperCase() !== hc;
+          const score = flip
+            ? { home: as, away: hs }
+            : { home: hs, away: as };
+          const prevSig = m.score
+            ? m.score.home + "-" + m.score.away + ":" + m.status
+            : "";
+          const nextSig = score.home + "-" + score.away + ":" + status;
+          if (prevSig !== nextSig) {
+            m.score = score;
+            m.status = status;
+            changed = true;
+          }
+        });
+        return changed;
+      }
+
+      async function fetchMatchResults(silent = false) {
+        try {
+          const url =
+            MFG_SUPABASE_URL +
+            "/rest/v1/match_results?select=match_date,home_code,away_code,home_score,away_score,status" +
+            "&order=match_date.asc&limit=200";
+          let data = null;
+          try {
+            const resp = await fetch(url, {
+              headers: {
+                apikey: MFG_SUPABASE_KEY,
+                Authorization: "Bearer " + MFG_SUPABASE_KEY,
+              },
+            });
+            if (!resp.ok) {
+              if (!silent)
+                console.warn("match results: select failed " + resp.status);
+              return;
+            }
+            data = await resp.json();
+          } catch (e) {
+            if (!silent) console.warn("match results: fetch failed", e);
+            return;
+          }
+          if (!Array.isArray(data)) return;
+          const sig = JSON.stringify(data);
+          const changed = applyMatchResults(data);
+          // Re-render the fixtures surfaces when scores changed, or on the
+          // first successful fetch of the session (sig differs from "").
+          if (changed || sig !== _matchResultsSig) {
+            _matchResultsSig = sig;
+            if (typeof renderTodayMatches === "function") renderTodayMatches();
+            if (window._matchesRendered && typeof renderMatches === "function")
+              renderMatches();
+          }
+        } catch (e) {
+          if (!silent) console.warn("match results fetch failed", e);
         }
       }
 

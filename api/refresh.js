@@ -281,6 +281,153 @@ async function insertLiveUpdates(rows) {
   }
 }
 
+// ── Scores: cron-scraped World Cup results → Supabase match_results ──
+// A second, focused Gemini+Google-Search call that pulls the final / live
+// score of every match that has kicked off, keyed by FIFA tricode so the
+// client can stamp it onto the matching fixture. Independent + best-effort:
+// any failure here is logged and swallowed so it never blocks the news refresh.
+function buildScoresPrompt() {
+  const isoDate = new Date().toISOString().slice(0, 10);
+  return [
+    "You are a results scraper for the 2026 FIFA World Cup",
+    "(June 11 – July 19, 2026; hosts Canada / Mexico / USA).",
+    "Today is " + isoDate + ".",
+    "",
+    "Use Google Search to find the FINAL or current LIVE score of EVERY 2026",
+    "World Cup match that has kicked off from 2026-06-11 through today (" +
+      isoDate +
+      ").",
+    "Check reliable live sources (FIFA, ESPN, BBC Sport, Google's match cards).",
+    "Do NOT include matches that have not kicked off yet.",
+    "",
+    "Return ONLY a single JSON object (no prose, no markdown, no code fences):",
+    "{",
+    '  "results": [',
+    "    {",
+    '      "date": "YYYY-MM-DD (the match kickoff date)",',
+    '      "homeCode": "FIFA 3-letter tricode of the home team",',
+    '      "awayCode": "FIFA 3-letter tricode of the away team",',
+    '      "home": "home team common English name",',
+    '      "away": "away team common English name",',
+    '      "homeScore": <integer goals, home>,',
+    '      "awayScore": <integer goals, away>,',
+    '      "status": "final" (match over) | "live" (in progress)',
+    "    }",
+    "  ]",
+    "}",
+    "",
+    "Use standard FIFA tricodes — e.g. Saudi Arabia=KSA, South Korea=KOR,",
+    "Czechia=CZE, Curaçao=CUW, DR Congo=COD, Ivory Coast=CIV, Cape Verde=CPV,",
+    "Bosnia & Herzegovina=BIH, South Africa=RSA, United States=USA.",
+    "homeScore/awayScore MUST be non-negative integers. Keep home/away in the",
+    "actual fixture order. If you cannot confirm a score, OMIT that match.",
+  ].join("\n");
+}
+
+function normalizeScore(it) {
+  if (!it || typeof it !== "object") return null;
+  const date = String(it.date || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const homeCode = String(it.homeCode || "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 4);
+  const awayCode = String(it.awayCode || "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 4);
+  if (!homeCode || !awayCode) return null;
+  const hs = Number(it.homeScore);
+  const as = Number(it.awayScore);
+  if (!Number.isInteger(hs) || !Number.isInteger(as) || hs < 0 || as < 0) {
+    return null;
+  }
+  return {
+    match_date: date,
+    home_code: homeCode,
+    away_code: awayCode,
+    home_team: safeText(it.home || "").slice(0, 60),
+    away_team: safeText(it.away || "").slice(0, 60),
+    home_score: hs,
+    away_score: as,
+    status: it.status === "live" ? "live" : "final",
+    updated_at: new Date().toISOString(),
+  };
+}
+
+// Upsert into match_results on the (match_date, home_code, away_code) key so
+// re-runs overwrite the previous score in place rather than duplicating rows.
+async function upsertMatchResults(rows) {
+  const SUPABASE_URL =
+    process.env.SUPABASE_URL || "https://ypisjfefbccgtxesteja.supabase.co";
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SERVICE_KEY) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY not configured");
+  }
+  const url =
+    SUPABASE_URL +
+    "/rest/v1/match_results?on_conflict=match_date,home_code,away_code";
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: "Bearer " + SERVICE_KEY,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(rows),
+  });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(
+      "match_results upsert failed: " + resp.status + " " + text.slice(0, 300),
+    );
+  }
+}
+
+async function refreshScores(apiKey) {
+  const body = {
+    contents: [{ role: "user", parts: [{ text: buildScoresPrompt() }] }],
+    tools: [{ google_search: {} }],
+    generationConfig: { temperature: 0, maxOutputTokens: 8192 },
+  };
+  const upstream = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify(body),
+  });
+  const data = await upstream.json();
+  if (!upstream.ok) {
+    throw new Error(
+      "scores upstream " +
+        upstream.status +
+        " " +
+        JSON.stringify(data).slice(0, 200),
+    );
+  }
+  const parts =
+    (data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts) ||
+    [];
+  const text = parts
+    .map((p) => p.text || "")
+    .join("")
+    .trim();
+  const parsed = extractJson(text);
+  const raw =
+    parsed && Array.isArray(parsed.results)
+      ? parsed.results
+      : Array.isArray(parsed)
+        ? parsed
+        : [];
+  const rows = raw.map(normalizeScore).filter(Boolean);
+  if (!rows.length) return { upserted: 0 };
+  await upsertMatchResults(rows);
+  return { upserted: rows.length };
+}
+
 module.exports = async function handler(req, res) {
   // Vercel Cron invokes the path as GET; manual button uses POST. Accept both.
   if (req.method !== "POST" && req.method !== "GET") {
@@ -342,6 +489,16 @@ module.exports = async function handler(req, res) {
     },
   };
 
+  // Cron only: scrape scores in PARALLEL with the news call so both grounded
+  // Gemini calls share the single 60s function budget instead of running back
+  // to back. Best-effort — a rejection resolves to 0 and never blocks news.
+  const scoresPromise = isCron
+    ? refreshScores(GEMINI_API_KEY).catch((e) => {
+        console.error("refresh cron scores error", e && e.message);
+        return { upserted: 0 };
+      })
+    : null;
+
   try {
     const upstream = await fetch(ENDPOINT, {
       method: "POST",
@@ -358,6 +515,9 @@ module.exports = async function handler(req, res) {
         upstream.status,
         JSON.stringify(data).slice(0, 600),
       );
+      // Let the parallel scores upsert finish before we respond — the function
+      // can freeze after returning, abandoning the in-flight promise.
+      if (scoresPromise) await scoresPromise;
       return res.status(upstream.status).json({
         error:
           (data && data.error && data.error.message) ||
@@ -377,6 +537,7 @@ module.exports = async function handler(req, res) {
       .trim();
     const payload = extractJson(text);
     if (!payload) {
+      if (scoresPromise) await scoresPromise;
       return res.status(502).json({
         error: "Could not parse Gemini JSON",
         sample: text.slice(0, 400),
@@ -409,6 +570,10 @@ module.exports = async function handler(req, res) {
     // return a compact summary. No browser is listening; the response
     // body is only read by Vercel's cron log viewer.
     if (isCron) {
+      const scoresRes = scoresPromise
+        ? await scoresPromise
+        : { upserted: 0 };
+      const scoresUpserted = (scoresRes && scoresRes.upserted) || 0;
       const now = Date.now();
       const rawNews = Array.isArray(payload.news) ? payload.news : [];
       const rawSocial = Array.isArray(payload.social) ? payload.social : [];
@@ -451,6 +616,7 @@ module.exports = async function handler(req, res) {
           news: 0,
           social: 0,
           ticker: 0,
+          scores: scoresUpserted,
         });
       }
 
@@ -472,6 +638,7 @@ module.exports = async function handler(req, res) {
         news: news.length,
         social: social.length,
         ticker: ticker.length,
+        scores: scoresUpserted,
         sourceCount: sources.length,
       });
     }
@@ -487,6 +654,11 @@ module.exports = async function handler(req, res) {
     });
   } catch (e) {
     console.error("refresh exception", e);
+    if (scoresPromise) {
+      try {
+        await scoresPromise;
+      } catch (_) {}
+    }
     return res.status(502).json({ error: "Upstream unavailable" });
   }
 };
