@@ -2,8 +2,9 @@
 // All dashboard content lives here. Edit this file (not index.html) on refresh.
 
 window.DASHBOARD_DATA = {
-  lastUpdated: "2026-06-08T16:00:00.000Z",
+  lastUpdated: "2026-06-17T17:00:00.000Z",
   ticker: [
+    "🧹 Japan's fans clean the Dallas stands again after a 2-2 thriller with the Netherlands — Kamada's 88th-minute equaliser, then bin bags out (Jun 14)",
     "🌎 Mexico face South Africa to open WC26 at the Estadio Azteca on Thu Jun 11, 3PM ET — the Azteca becomes the first venue ever to host three World Cup openers (Jun 8)",
     "🦁 England edge New Zealand 1-0 in their Miami warm-up and face Costa Rica on Jun 10 before basing in Kansas City (Jun 7)",
     "🇩🇪 Manuel Neuer, 40, returns in goal for Germany's fifth-World-Cup campaign — they open vs debutants Curaçao on Jun 14 (Jun 6)",
@@ -740,8 +741,8 @@ window.DASHBOARD_DATA = {
         flag: "🇯🇵",
       },
       venue: "AT&T Stadium, Dallas",
-      status: "upcoming",
-      score: null,
+      status: "final",
+      score: { home: 2, away: 2 },
     },
     {
       id: "m32",
@@ -2132,6 +2133,36 @@ window.DASHBOARD_DATA = {
     },
   ],
   social: [
+    {
+      "id": "s138",
+      "topic": "🧹 Japanese Fans Clean the Dallas Stands Again After Japan 2-2 Netherlands",
+      "category": "fandom",
+      "volume": "🔥🔥🔥🔥🔥",
+      "sentiment": "positive",
+      "summary": "After Japan's 2-2 Group F opener with the Netherlands at Dallas Stadium in Arlington on June 14 — Daichi Kamada's 88th-minute equaliser capping a comeback from two down — Japanese supporters stayed behind to pick up bottles and food wrappers and leave the stands spotless, continuing the viral tradition seen since 2018 and 2022. Sophia University's Koichi Nakano framed it as cultural muscle memory: fans 'behaving much the same way they did when they learned how to enjoy sports as school boys and girls,' echoing the proverb 'tatsu tori ato wo nigosazu' — leave a place the way you found it. A pure feel-good, brand-safe lane for respect/sportsmanship-coded creative that travels across every market 🧹",
+      "sampleQuote": "\"Down 2-0, grab a late equaliser, THEN stay to clean the stadium. Japan are just built different.\"",
+      "quotes": [
+        {
+          "platform": "X",
+          "text": "japanese fans cleaning the stands in arlington after a 2-2 thriller. every tournament, never fails to wholesome me"
+        },
+        {
+          "platform": "TikTok",
+          "text": "POV: your team draws the netherlands and you still leave your section cleaner than you found it 🧹🇯🇵"
+        },
+        {
+          "platform": "Reddit",
+          "text": "r/soccer doing its every-four-years tradition of falling in love with Japan's fans all over again"
+        }
+      ],
+      "platforms": [
+        "X",
+        "TikTok",
+        "Reddit"
+      ],
+      "sourceUrl": "https://www.fox4news.com/news/japanese-fans-clean-dallas-stadium-after-world-cup-opener-against-netherlands",
+      "timestamp": "2026-06-14T23:30:00Z"
+    },
     {
       "id": "s137",
       "topic": "🧤 Neuer at 40 — 'Respect Your Elders' Takes Over Keeper Twitter",
