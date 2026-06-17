@@ -36,11 +36,20 @@ jobs:
           # truncated/unparseable payload (502) or 0 usable rows. Each retry
           # is a fresh generation, so a transient bad response self-heals. The
           # refresh.js cronRanToday() guard makes repeats idempotent.
+          #
+          # A manual run from the Actions tab (workflow_dispatch) forces a fresh
+          # scrape via ?force=1, bypassing the 6h de-dupe guard — that's the
+          # whole point of firing it by hand. Scheduled runs keep the guard.
+          URL="https://mfgworldcup.com/api/refresh"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            URL="$URL?force=1"
+            echo "Manual dispatch — forcing refresh (bypassing de-dupe guard)"
+          fi
           ok=0
           for n in 1 2 3; do
             echo "Attempt $n of 3…"
             code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
-              -X POST "https://mfgworldcup.com/api/refresh" \
+              -X POST "$URL" \
               -H "Authorization: Bearer $CRON_SECRET")
             echo "HTTP $code"
             cat /tmp/resp.json 2>/dev/null || true

@@ -496,6 +496,19 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
   const isCron = cronAuthOk(req);
+  // ?force=1 (cron-authed only) bypasses the cronRanRecently() de-dupe guard so
+  // the owner can force a fresh deep scrape on demand from the Actions tab /
+  // curl. Manual MFG-cookie refreshes already skip the guard.
+  const forceRefresh = (() => {
+    try {
+      const q = req.query || {};
+      if (q.force === "1" || q.force === "true" || q.force === true) return true;
+      const u = req.url || "";
+      return /[?&]force=(1|true)\b/.test(u);
+    } catch (e) {
+      return false;
+    }
+  })();
   if (!isCron && !mfgGateOk(req)) {
     return res
       .status(401)
@@ -539,7 +552,7 @@ module.exports = async function handler(req, res) {
   // Cron path only: de-dupe guard. If a cron refresh landed in the last few
   // hours, no-op instead of burning Gemini/Search quota on a duplicate. The
   // manual MFG button is exempt — those refreshes are intentional and on demand.
-  if (isCron) {
+  if (isCron && !forceRefresh) {
     try {
       if (await cronRanRecently()) {
         const scoresRes = scoresPromise ? await scoresPromise : { upserted: 0 };
