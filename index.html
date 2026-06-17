@@ -1387,6 +1387,13 @@
         background: rgba(255, 255, 255, 0.12);
         color: #fff;
       }
+      /* Pause toggle goes gold while auto-scroll is held off, so the paused
+         state is obvious at a glance. */
+      .carousel-nav button.carousel-pause.is-paused {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #0a0c14;
+      }
       body.light .carousel-nav button {
         background: rgba(0, 0, 0, 0.04);
         color: #666;
@@ -6316,6 +6323,15 @@
               <div style="display: flex; align-items: center; gap: 10px">
                 <div class="carousel-dots" id="newsDots"></div>
                 <div class="carousel-nav">
+                  <button
+                    id="newsPauseBtn"
+                    class="carousel-pause"
+                    title="Pause auto-scroll"
+                    aria-label="Pause auto-scroll"
+                    onclick="toggleCarouselPause('news', this)"
+                  >
+                    ⏸
+                  </button>
                   <button onclick="newsCarousel.prev()">‹</button>
                   <button onclick="newsCarousel.next()">›</button>
                 </div>
@@ -6331,6 +6347,15 @@
               <div style="display: flex; align-items: center; gap: 10px">
                 <div class="carousel-dots" id="socialDots"></div>
                 <div class="carousel-nav">
+                  <button
+                    id="socialPauseBtn"
+                    class="carousel-pause"
+                    title="Pause auto-scroll"
+                    aria-label="Pause auto-scroll"
+                    onclick="toggleCarouselPause('social', this)"
+                  >
+                    ⏸
+                  </button>
                   <button onclick="socialCarousel.prev()">‹</button>
                   <button onclick="socialCarousel.next()">›</button>
                 </div>
@@ -7670,7 +7695,8 @@
         let page = 0,
           pageCount = 0,
           timer = null,
-          hoverPaused = false;
+          hoverPaused = false,
+          manualPaused = false;
         const perPage = 3;
         const container = document.getElementById(containerId);
         const dotsEl = document.getElementById(dotsId);
@@ -7722,7 +7748,7 @@
 
         function resetTimer() {
           if (timer) clearInterval(timer);
-          if (pageCount > 1 && !hoverPaused)
+          if (pageCount > 1 && !hoverPaused && !manualPaused)
             timer = setInterval(() => showPage(page + 1, 1), interval);
         }
 
@@ -7780,7 +7806,28 @@
         function resume() {
           resetTimer();
         }
-        return { next, prev, goTo, setCards, pause, resume };
+        // User-driven pause toggle (the ⏸/▶ button). Distinct from hoverPaused
+        // and the visibility pause — it survives hover in/out until toggled off.
+        // Returns the new paused state so the button can update its label.
+        function toggleManual() {
+          manualPaused = !manualPaused;
+          if (manualPaused) pause();
+          else resetTimer();
+          return manualPaused;
+        }
+        function isManualPaused() {
+          return manualPaused;
+        }
+        return {
+          next,
+          prev,
+          goTo,
+          setCards,
+          pause,
+          resume,
+          toggleManual,
+          isManualPaused,
+        };
       }
 
       // Pause carousel timers when the page is backgrounded — saves CPU and
@@ -7814,6 +7861,19 @@
 
       let newsCarousel = createCarousel("newsCards", "newsDots", 2800);
       let socialCarousel = createCarousel("socialCards", "socialDots", 3200);
+
+      // ⏸/▶ toggle for each card carousel's auto-scroll. The button lives in the
+      // carousel-nav cluster next to ‹ ›. Pausing survives hover in/out until the
+      // user toggles it back on.
+      function toggleCarouselPause(which, btn) {
+        const carousel = which === "news" ? newsCarousel : socialCarousel;
+        const paused = carousel.toggleManual();
+        btn.textContent = paused ? "▶" : "⏸";
+        btn.classList.toggle("is-paused", paused);
+        const verb = paused ? "Resume" : "Pause";
+        btn.title = verb + " auto-scroll";
+        btn.setAttribute("aria-label", verb + " auto-scroll");
+      }
 
       // ── Entity auto-linking (Batch 3 #4) ──
       // Wraps known team / player / coach mentions inside news + social
