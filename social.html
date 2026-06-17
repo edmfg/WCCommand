@@ -2089,8 +2089,39 @@
       .elevations {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 26px;
         max-width: 780px;
+      }
+      /* Two lanes — Fan elevations + Game elevations — each a labelled stack.
+         Split per Ed: the approved library holds both kinds of asset, so the
+         drops are grouped by which one the moment is activating. */
+      .elev-lane {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .elev-lane-head {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .elev-lane-title {
+        font-family: "Oswald", sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--text);
+        margin: 0;
+      }
+      .elev-lane-count {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-dim);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 1px 8px;
       }
       .elev-drop {
         --accent: var(--gold);
@@ -2175,6 +2206,46 @@
         color: var(--gold);
         margin-bottom: 6px;
       }
+      /* Momentum / surging — per Ed: diff-colour any asset whose underlying
+         signal is spiking in volume right now. Swaps the muted gold for a warm
+         orange accent + a glowing left rail + a SURGING pill, so a surging
+         asset reads instantly against the quieter stack. */
+      .elev-drop.is-surging {
+        --accent: #ff8c42;
+        background: rgba(255, 140, 66, 0.06);
+        border-color: rgba(255, 140, 66, 0.35);
+        box-shadow: inset 3px 0 0 0 var(--accent);
+      }
+      .elev-drop.is-surging:hover {
+        background: rgba(255, 140, 66, 0.1);
+        border-color: rgba(255, 140, 66, 0.55);
+      }
+      .elev-drop.is-surging .elev-rank {
+        background: rgba(255, 140, 66, 0.16);
+        color: #ff8c42;
+      }
+      .elev-drop.is-surging .drop-caret,
+      .elev-drop.is-surging .elev-why-lbl {
+        color: #ff8c42;
+      }
+      .elev-momentum {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-family: "Oswald", sans-serif;
+        font-size: 9.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #ff8c42;
+        background: rgba(255, 140, 66, 0.14);
+        border: 1px solid rgba(255, 140, 66, 0.4);
+        border-radius: 20px;
+        padding: 2px 8px;
+        white-space: nowrap;
+      }
+
       /* In an export capture, reveal every rationale so the client PDF/JPG isn't
          a list of collapsed rows. (UA hides closed-details content via
          display:none; this wins on specificity.) */
@@ -2533,11 +2604,16 @@
 //                       verdict,       // optional Fan Agent verdict on fit
 //                       footage        // creative direction paired with the prompts
 //                     }
-//    assetElevations[] elevation { prompt, rationale }   // OPTIONAL. Approved
-//                       library prompts today's signals move up. Lower weight
-//                       than storyboards — rendered as a ranked dropdown stack
-//                       under "03 · Elevations". Array order = priority. Section
-//                       hides itself entirely when this array is empty/absent.
+//    assetElevations[] elevation { lane, momentum, prompt, rationale } // OPTIONAL.
+//                       Approved library prompts today's signals move up. Lower
+//                       weight than storyboards — rendered as a ranked dropdown
+//                       stack under "03 · Elevations", SPLIT into two lanes:
+//                       lane:"fan" (culture/fandom) + lane:"game" (match/tactical/
+//                       player). lane is optional — untagged items default to the
+//                       fan lane. momentum:true diff-colours a surging asset
+//                       (orange rail + "↑ Surging" pill). Array order = priority
+//                       WITHIN each lane (each numbers from 01). Section hides
+//                       itself entirely when this array is empty/absent.
 //
 //  The phone mock shows ONE screen — the query frame — and cycles through the
 //  three prompts (A → B → C) via the arrows / tap. The old static frames
@@ -2823,36 +2899,46 @@ window.FORMATION_DATA = {
     ],
     // Asset elevations — approved prompts from the content library that today's
     // signals move to the front of the queue. Lower weight than the storyboards
-    // above: the asset already exists, the moment just made it relevant. Array
-    // order = priority (index 0 is the top pick). Transcribe verbatim from the
-    // uploaded elevation list; prompt = the approved query in the fan's voice,
-    // rationale = the strategist's case for why it's ready to put into market.
+    // above: the asset already exists, the moment just made it relevant.
+    // Split into two lanes: lane:"fan" (culture/fandom assets) + lane:"game"
+    // (match/tactical/player assets); untagged → fan lane. Array order =
+    // priority WITHIN a lane (each numbers from 01). momentum:true diff-colours
+    // a surging asset. Transcribe verbatim from the uploaded elevation list;
+    // prompt = the approved query in the fan's voice, rationale = the
+    // strategist's case for why it's ready to put into market.
     assetElevations: [
       {
+        lane: "fan",
+        momentum: true,
         prompt:
           "what do the specific patterns on the robes worn by ghanaian soccer fans mean",
         rationale:
           "This is the top recommendation as it directly taps into the most significant cultural conversation spike of the last 24 hours: the Royal Pride in Toronto surrounding the Asantehene of Ghana's watch party. This asset meets the moment by providing a direct answer to the curiosity generated by this high-sentiment, high-volume event. It serves the engaged Diaspora audience and also draws in casual fans who are seeing these cultural symbols in their feeds.",
       },
       {
+        lane: "fan",
         prompt:
           "whats the symbolism of the fast leg-kicking dance that senegalese fans do",
         rationale:
           "This asset aligns perfectly with the Fan Zone Fever & Francophone Fervour spike. With the France vs. Senegal match driving a 50% increase in “fan zone” mentions in French-speaking Canada, there is a clear appetite for content related to these two teams. This question allows us to engage with the vibrant culture of the Senegalese fanbase, providing a rich, relevant story for the highly engaged Francophone audience.",
       },
       {
+        lane: "game",
+        momentum: true,
         prompt:
           "how do soccer players train for different altitudes and can it be an advantage",
         rationale:
           "This asset connects to the dominant Match Event narrative: the intense fan conversation around player fitness, specifically the defense of Alphonso Davies and the debate over Jonathan David. While avoiding direct commentary on these sensitive topics, this question addresses the underlying theme of player preparation and the physical challenges of elite training. It's a smart, adjacent topic that will resonate with fans who are already deeply invested in the players' well-being and performance.",
       },
       {
+        lane: "game",
         prompt:
           "i heard qatar has falcons at soccer matches, whats the history of this",
         rationale:
           "This is a timely, forward-looking asset. The briefings identified that Canada's next match is against Qatar and that tactical conversations are already emerging. This question taps into the natural pre-match curiosity about an upcoming opponent. It allows us to introduce a unique cultural element about the opposing team, feeding the “curiosity hook” and building anticipation for the game.",
       },
       {
+        lane: "fan",
         prompt:
           "why do panama fans eat bowls of hot soup at soccer games",
         rationale:
@@ -3445,19 +3531,39 @@ window.FORMATION_DATA = {
           if (elevWrap) elevWrap.innerHTML = "";
         } else {
           if (elevSection) elevSection.hidden = false;
-          if (elevWrap)
-            elevWrap.innerHTML = ELEVATIONS.map(
-              (e, i) => `
-            <details class="elev-drop">
+          // Split into the two lanes Ed asked for: GAME assets (match /
+          // tactical / player) vs FAN assets (culture / fandom / ritual).
+          // `lane` is optional per item; anything untagged lands in the fan
+          // lane — the approved library skews cultural. Each lane numbers from
+          // 01 independently (its own priority order). `momentum: true` flags a
+          // surging asset → orange diff treatment + a "↑ Surging" pill.
+          const drop = (e, i) => `
+            <details class="elev-drop${e.momentum ? " is-surging" : ""}">
               <summary>
                 <span class="elev-rank">${String(i + 1).padStart(2, "0")}</span>
                 <span class="elev-prompt">${escHtml(e.prompt)}</span>
+                ${e.momentum ? '<span class="elev-momentum">↑ Surging</span>' : ""}
                 <span class="drop-caret">▾</span>
               </summary>
               <div class="drop-body"><span class="elev-why-lbl">Rationale</span>${escHtml(e.rationale)}</div>
-            </details>
-          `,
-            ).join("");
+            </details>`;
+          const lane = (title, items) =>
+            items.length
+              ? `
+            <div class="elev-lane">
+              <div class="elev-lane-head">
+                <h3 class="elev-lane-title">${title}</h3>
+                <span class="elev-lane-count">${items.length}</span>
+              </div>
+              ${items.map(drop).join("")}
+            </div>`
+              : "";
+          const fanLane = ELEVATIONS.filter((e) => (e.lane || "fan") !== "game");
+          const gameLane = ELEVATIONS.filter((e) => e.lane === "game");
+          if (elevWrap)
+            elevWrap.innerHTML =
+              lane("Fan elevations", fanLane) +
+              lane("Game elevations", gameLane);
         }
       }
 
