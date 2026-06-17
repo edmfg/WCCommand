@@ -127,6 +127,27 @@ Spike: `{ title, type, signal, context, voice, hook?, volume, sentiment, tone: "
 
 To enable UK / DE / USA, populate the matching key with the same shape and remove the `disabled` attribute from the corresponding `.market-card` button in `index.html`.
 
+#### Asset elevations (`03 · Elevations`)
+
+A **lower-weight** third section under the Plays, for the daily "what from the approved prompt library can go into market today" list. Surface lives in **`social.html`** (the live Today's Reactive surface — the bundled `window.FORMATION_DATA` block there, NOT `formation-data.js`). Rendered as a narrow, gold-accented stack of collapsed dropdowns — rank badge + the approved prompt always visible, rationale behind the caret. It is deliberately quieter than the reactive Plays: **Plays = build new today; Elevations = activate an already-approved asset the moment made relevant.**
+
+**Shape** — an optional array on the market entry, alongside `storyboards`:
+```js
+assetElevations: [
+  { prompt: "<approved query, verbatim, in the fan's voice>",
+    rationale: "<strategist's case for why it's ready to put into market now>" },
+  // …
+]
+```
+
+**Ingest rules — every refresh:**
+- The client uploads an elevation list (prompt + rationale per item) alongside the three storyboards. Transcribe each item **verbatim** into `assetElevations` on the market entry; silently fix only obvious mechanical typos.
+- **Array order = priority.** Index 0 is the top pick — match the source list's ranking. Rationales often reference each other ("counterpoint to our top-ranked recommendation"), so order matters.
+- `prompt` is the approved library query in the fan's lowercase voice (same register as a storyboard `prompts[].text`). `rationale` is the why — ties the asset to a specific spike/narrative from today's briefings.
+- Optional + self-hiding: omit the field (or an empty array) and the whole `03 · Elevations` section disappears. No placeholder.
+- Survives the Supabase override — a published `today_reactive` payload may carry `assetElevations`; `applyPayload` in `social.html` copies it through (decoupled from the storyboard `isNewShape` guard). To ship elevations on the live site, publish a row whose payload includes the array; otherwise the bundled defaults show.
+- Export-safe: PDF/JPG capture force-expands every elevation so the client deliverable shows all rationales.
+
 ---
 
 ## Serverless functions (`api/`)
