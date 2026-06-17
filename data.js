@@ -4,6 +4,7 @@
 window.DASHBOARD_DATA = {
   lastUpdated: "2026-06-17T17:00:00.000Z",
   ticker: [
+    "🧤 Vozinha, 40, makes 7 saves to keep Spain scoreless — Cape Verde grab a historic 0-0 on their World Cup debut and a new cult hero is born (Jun 15)",
     "🧹 Japan's fans clean the Dallas stands again after a 2-2 thriller with the Netherlands — Kamada's 88th-minute equaliser, then bin bags out (Jun 14)",
     "🌎 Mexico face South Africa to open WC26 at the Estadio Azteca on Thu Jun 11, 3PM ET — the Azteca becomes the first venue ever to host three World Cup openers (Jun 8)",
     "🦁 England edge New Zealand 1-0 in their Miami warm-up and face Costa Rica on Jun 10 before basing in Kansas City (Jun 7)",
@@ -27,6 +28,24 @@ window.DASHBOARD_DATA = {
     "🇨🇳 FIFA-CCTV deal still dead 5 weeks out — China blackout looms over 2B+ fans (May 11)",
   ],
   news: [
+    {
+      "id": "n146",
+      "headline": "🧤 Vozinha, 40, Blanks Spain — Cape Verde's Keeper Becomes the World Cup's Breakout Star",
+      "source": "NPR",
+      "timestamp": "2026-06-16T12:00:00Z",
+      "summary": "Cape Verde's 40-year-old goalkeeper Vozinha kept European champions Spain scoreless in a stunning 0-0 draw on June 15 in Atlanta, making seven saves from 27 Spanish shots on the nation's World Cup debut to earn Man of the Match. The Chaves keeper, winning his 89th cap, went viral overnight — his Instagram following rocketing from around 50,000 to more than two million within hours. A perfect underdog-hero, age-defiance and 'everyone's second team' story that travels across every market 🧤",
+      "url": "https://www.npr.org/2026/06/16/nx-s1-5859915/cape-verde-goalkeeper",
+      "tag": "Global"
+    },
+    {
+      "id": "n145",
+      "headline": "🇨🇦 Davies Still Sidelined as Canada Open at Home — MRI 'Healing Incredibly Well'",
+      "source": "ESPN",
+      "timestamp": "2026-06-16T10:00:00Z",
+      "summary": "Captain Alphonso Davies remains out as Canada open their home World Cup, with Jesse Marsch confirming he wasn't ready for the June 12 opener vs Bosnia in Toronto and is unlikely to face Qatar. Davies is working back from a run of hamstring/muscle strains following ACL surgery, but an MRI showed he's 'healing incredibly well' and he made the 26-man roster in hope of a tournament return. Canada are nursing their talisman carefully — expect 'is Phonzie back?' watch-content before every matchday 🇨🇦",
+      "url": "https://www.espn.com/soccer/story/_/id/48944438/alphonso-davies-joins-canada-world-cup-prep-unclear-play",
+      "tag": "Canada"
+    },
     {
       "id": "n144",
       "headline": "🌎 Azteca Makes History: Mexico v South Africa Opens WC26 on Thursday",
@@ -969,8 +988,8 @@ window.DASHBOARD_DATA = {
         flag: "🇨🇻",
       },
       venue: "Mercedes-Benz Stadium, Atlanta",
-      status: "upcoming",
-      score: null,
+      status: "final",
+      score: { home: 0, away: 0 },
     },
     {
       id: "m44",

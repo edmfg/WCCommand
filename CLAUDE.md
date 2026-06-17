@@ -274,7 +274,7 @@ When the user types **"refresh everything"** (or "refresh content" / "do the dai
 
 - Search the web AND Reddit (r/soccer, r/worldcup, team-specific subs) for the past 24–48h of WC2026 news, fan reactions, and cultural moments. Reddit is a first-class source, not an afterthought.
 - Edit `data.js` (the `window.DASHBOARD_DATA` object lives there now):
-  - `news[]` — prepend ~5–10 items, each with the right `tag` (Canada / USA / Germany / UK / Macro / Global).
+  - `news[]` — prepend ~5–10 items, each with the right `tag` (Canada / USA / Germany / UK / Macro / Global). **Always include at least one standout individual-performance / named-player story** — a breakout or hero display (e.g. Cape Verde keeper Vozinha shutting out Spain) or a star player's injury / fitness / return / milestone (e.g. Alphonso Davies). Put the player's name in the headline; the cron prompt in `api/refresh.js` (angle 14) requires ≥2 of these per auto-refresh.
   - `social[]` — prepend ~5 items, each with the right `category`, `volume`, `sentiment`, AND a non-empty `platforms` array (mandatory — the renderer crashes if it's missing — see footguns below). **Always include at least one wholesome/viral fan-culture moment** (`category: 'fandom'` or `'memes'`) — e.g. fans cleaning the stadium / picking up garbage, choreographed tifos, viral chants, cross-rival fan kindness, fan fashion/costumes going viral. This genre is a first-class social trend, not an afterthought; the cron prompt in `api/refresh.js` (angle 13) requires ≥2 of them per auto-refresh.
   - `ticker[]` — prepend ~5 items.
   - Trim items older than ~14 days.
