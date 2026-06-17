@@ -5338,6 +5338,27 @@
         border-color: rgba(0, 0, 0, 0.1);
         color: #1a1a2e;
       }
+      /* Dedicated Live-view search bar — reuses .global-search styling but is
+         scoped to the Live panel and searches News + Social only. */
+      .live-search {
+        max-width: 100%;
+        margin-bottom: 14px;
+      }
+      .live-search input {
+        padding-right: 88px;
+      }
+      .live-search-count {
+        position: absolute;
+        right: 38px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: "Inter", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        pointer-events: none;
+        white-space: nowrap;
+      }
 
       /* ── NEWS CARD CLICKABLE ── */
       .news-card-link {
@@ -6284,6 +6305,26 @@
         <!-- Today's matches strip — today's full slate, glanceable (Live tab) -->
         <div id="todayMatches" class="today-strip" hidden></div>
 
+        <!-- Dedicated Live search — filters News + Social only -->
+        <div class="global-search live-search">
+          <span class="search-icon">🔎</span>
+          <input
+            type="text"
+            id="liveSearch"
+            placeholder="Search news & social trends…"
+            autocomplete="off"
+          />
+          <span class="live-search-count" id="liveSearchCount"></span>
+          <button
+            class="search-clear"
+            id="liveSearchClear"
+            onclick="clearLiveSearch()"
+            aria-label="Clear Live search"
+          >
+            &times;
+          </button>
+        </div>
+
         <div class="live-filters" id="liveFilters"></div>
 
         <!-- Sentiment Heatmap -->
@@ -7052,6 +7093,7 @@
         setupGemini();
         setupKeyboard();
         setupSearch();
+        setupLiveSearch();
         setupCardExpand();
         setupCreativePlayer();
         setupAssetUpload();
@@ -7998,7 +8040,8 @@
           (n) =>
             withinLiveWindow(n.timestamp) &&
             matchesLiveFilter(n, "news") &&
-            matchesSearch(n),
+            matchesSearch(n) &&
+            matchesLiveSearch(n),
         );
         const pinned = loadPinned();
         filtered = [...filtered].sort(
@@ -8120,7 +8163,8 @@
           (s) =>
             withinLiveWindow(s.timestamp) &&
             matchesLiveFilter(s, "social") &&
-            matchesSearch(s),
+            matchesSearch(s) &&
+            matchesLiveSearch(s),
         );
         if (heatmapFilter.market) {
           filtered = filtered.filter(
@@ -11126,6 +11170,81 @@ ${JSON.stringify(buildDashboardSnapshot())}`;
           item.sampleQuote,
         ].filter(Boolean);
         return fields.some((f) => f.toLowerCase().includes(searchQuery));
+      }
+
+      // ── Dedicated Live-view search (News + Social only) ──
+      // Independent of the global search box above. searchQuery (global) and
+      // liveSearchQuery are AND-ed in the renderNews/renderSocial filter chains.
+      let liveSearchQuery = "";
+      function matchesLiveSearch(item) {
+        if (!liveSearchQuery) return true;
+        const fields = [
+          item.headline,
+          item.summary,
+          item.source,
+          item.tag, // news
+          item.topic,
+          item.category,
+          item.sampleQuote, // social
+        ];
+        if (Array.isArray(item.platforms))
+          fields.push(item.platforms.join(" "));
+        if (Array.isArray(item.quotes))
+          item.quotes.forEach((q) => {
+            if (q) fields.push(q.text, q.platform);
+          });
+        return fields
+          .filter(Boolean)
+          .some((f) => String(f).toLowerCase().includes(liveSearchQuery));
+      }
+      function liveSearchMatchCount() {
+        const news = (DASHBOARD_DATA.news || []).filter(
+          (n) =>
+            withinLiveWindow(n.timestamp) &&
+            matchesLiveFilter(n, "news") &&
+            matchesSearch(n) &&
+            matchesLiveSearch(n),
+        ).length;
+        const social = (DASHBOARD_DATA.social || []).filter(
+          (s) =>
+            withinLiveWindow(s.timestamp) &&
+            matchesLiveFilter(s, "social") &&
+            matchesSearch(s) &&
+            matchesLiveSearch(s),
+        ).length;
+        return news + social;
+      }
+      function updateLiveSearchCount() {
+        const el = document.getElementById("liveSearchCount");
+        if (!el) return;
+        if (!liveSearchQuery) {
+          el.textContent = "";
+          return;
+        }
+        const n = liveSearchMatchCount();
+        el.textContent = n === 1 ? "1 result" : n + " results";
+      }
+      function setupLiveSearch() {
+        const input = document.getElementById("liveSearch");
+        if (!input) return;
+        const clearBtn = document.getElementById("liveSearchClear");
+        input.addEventListener("input", () => {
+          liveSearchQuery = input.value.trim().toLowerCase();
+          clearBtn.classList.toggle("visible", liveSearchQuery.length > 0);
+          renderNews();
+          renderSocial();
+          updateLiveSearchCount();
+        });
+      }
+      function clearLiveSearch() {
+        liveSearchQuery = "";
+        const input = document.getElementById("liveSearch");
+        if (input) input.value = "";
+        const clearBtn = document.getElementById("liveSearchClear");
+        if (clearBtn) clearBtn.classList.remove("visible");
+        renderNews();
+        renderSocial();
+        updateLiveSearchCount();
       }
 
       // Theme toggle
