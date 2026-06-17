@@ -2083,6 +2083,105 @@
         flex-shrink: 0;
       }
 
+      /* ===== Elevations — approved-library prompts, lower weight than plays =====
+         Reuses the dropdown language of .spec-drop but stays a narrow, muted
+         gold stack so it never competes with the reactive plays above. */
+      .elevations {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 780px;
+      }
+      .elev-drop {
+        --accent: var(--gold);
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        overflow: hidden;
+        transition:
+          background 0.18s var(--t),
+          border-color 0.18s var(--t);
+      }
+      .elev-drop:hover {
+        background: rgba(255, 255, 255, 0.045);
+        border-color: var(--border-2);
+      }
+      .elev-drop > summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 14px;
+        user-select: none;
+      }
+      .elev-drop > summary::-webkit-details-marker {
+        display: none;
+      }
+      .elev-rank {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: rgba(255, 215, 0, 0.12);
+        color: var(--gold);
+        font-family: "Oswald", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .elev-prompt {
+        flex: 1;
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: var(--text);
+        font-weight: 500;
+      }
+      .elev-drop > summary .drop-caret {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        transition: transform 0.18s var(--t);
+      }
+      .elev-drop[open] > summary .drop-caret {
+        transform: rotate(180deg);
+      }
+      .elev-drop .drop-body {
+        padding: 4px 16px 15px 50px;
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--text-dim);
+        border-top: 1px dashed var(--border);
+        margin-top: 2px;
+      }
+      .elev-why-lbl {
+        display: block;
+        font-size: 9.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--gold);
+        margin-bottom: 6px;
+      }
+      /* In an export capture, reveal every rationale so the client PDF/JPG isn't
+         a list of collapsed rows. (UA hides closed-details content via
+         display:none; this wins on specificity.) */
+      body.exporting .elev-drop:not([open]) > .drop-body {
+        display: block;
+      }
+
       /* Why this prompt — purple */
       .spec-why {
         --accent: var(--purple);
@@ -2363,6 +2462,20 @@
         </div>
         <div class="plays-grid" id="storyboards"></div>
       </section>
+
+      <section class="section" id="elevations-section" hidden>
+        <div class="section-head">
+          <span class="section-num">03 ·</span>
+          <h2 class="section-title">Elevations</h2>
+        </div>
+        <p class="section-sub">
+          Approved prompts already in the content library that today's signals
+          move to the front of the queue — ready to put into market now. Lower
+          lift than the plays above: the asset exists, the moment just made it
+          relevant. Open any row for the rationale.
+        </p>
+        <div class="elevations" id="elevations"></div>
+      </section>
     </main>
 
     <footer>
@@ -2375,7 +2488,8 @@
       <span class="dot">·</span>
       <span
         >Data block: <code>FORMATION</code> + <code>CULTURAL</code> +
-        <code>MATCH</code> + <code>STORYBOARDS</code></span
+        <code>MATCH</code> + <code>STORYBOARDS</code> +
+        <code>ELEVATIONS</code></span
       >
     </footer>
 
@@ -2419,6 +2533,11 @@
 //                       verdict,       // optional Fan Agent verdict on fit
 //                       footage        // creative direction paired with the prompts
 //                     }
+//    assetElevations[] elevation { prompt, rationale }   // OPTIONAL. Approved
+//                       library prompts today's signals move up. Lower weight
+//                       than storyboards — rendered as a ranked dropdown stack
+//                       under "03 · Elevations". Array order = priority. Section
+//                       hides itself entirely when this array is empty/absent.
 //
 //  The phone mock shows ONE screen — the query frame — and cycles through the
 //  three prompts (A → B → C) via the arrows / tap. The old static frames
@@ -2702,6 +2821,44 @@ window.FORMATION_DATA = {
           "Queries are displayed over sweeping, sunny shots of a diverse crowd gathering in a public park, setting up chairs, and sharing snacks with a communal, anticipatory vibe.",
       },
     ],
+    // Asset elevations — approved prompts from the content library that today's
+    // signals move to the front of the queue. Lower weight than the storyboards
+    // above: the asset already exists, the moment just made it relevant. Array
+    // order = priority (index 0 is the top pick). Transcribe verbatim from the
+    // uploaded elevation list; prompt = the approved query in the fan's voice,
+    // rationale = the strategist's case for why it's ready to put into market.
+    assetElevations: [
+      {
+        prompt:
+          "what do the specific patterns on the robes worn by ghanaian soccer fans mean",
+        rationale:
+          "This is the top recommendation as it directly taps into the most significant cultural conversation spike of the last 24 hours: the Royal Pride in Toronto surrounding the Asantehene of Ghana's watch party. This asset meets the moment by providing a direct answer to the curiosity generated by this high-sentiment, high-volume event. It serves the engaged Diaspora audience and also draws in casual fans who are seeing these cultural symbols in their feeds.",
+      },
+      {
+        prompt:
+          "whats the symbolism of the fast leg-kicking dance that senegalese fans do",
+        rationale:
+          "This asset aligns perfectly with the Fan Zone Fever & Francophone Fervour spike. With the France vs. Senegal match driving a 50% increase in “fan zone” mentions in French-speaking Canada, there is a clear appetite for content related to these two teams. This question allows us to engage with the vibrant culture of the Senegalese fanbase, providing a rich, relevant story for the highly engaged Francophone audience.",
+      },
+      {
+        prompt:
+          "how do soccer players train for different altitudes and can it be an advantage",
+        rationale:
+          "This asset connects to the dominant Match Event narrative: the intense fan conversation around player fitness, specifically the defense of Alphonso Davies and the debate over Jonathan David. While avoiding direct commentary on these sensitive topics, this question addresses the underlying theme of player preparation and the physical challenges of elite training. It's a smart, adjacent topic that will resonate with fans who are already deeply invested in the players' well-being and performance.",
+      },
+      {
+        prompt:
+          "i heard qatar has falcons at soccer matches, whats the history of this",
+        rationale:
+          "This is a timely, forward-looking asset. The briefings identified that Canada's next match is against Qatar and that tactical conversations are already emerging. This question taps into the natural pre-match curiosity about an upcoming opponent. It allows us to introduce a unique cultural element about the opposing team, feeding the “curiosity hook” and building anticipation for the game.",
+      },
+      {
+        prompt:
+          "why do panama fans eat bowls of hot soup at soccer games",
+        rationale:
+          "This asset provides a culturally interesting counterpoint to our top-ranked recommendation. Panama is the opponent in the Ghana match that is the focus of the Toronto watch party. By highlighting a unique tradition of Panamanian fans, we can broaden the cultural narrative around the game. This demonstrates a holistic appreciation for fan culture and provides another point of entry for fans curious about the day's matchups beyond just the teams themselves.",
+      },
+    ],
   },
 
   brazil: null,
@@ -2766,6 +2923,8 @@ window.FORMATION_DATA = {
             '<div style="padding:48px 24px;text-align:center;color:var(--text-dim);font-size:14px">Loading today’s reactive briefing…</div>';
         const s = document.getElementById("storyboards");
         if (s) s.innerHTML = "";
+        const es = document.getElementById("elevations-section");
+        if (es) es.hidden = true;
       }
 
       // Shown in the standalone view when a market has no briefing published yet.
@@ -2800,6 +2959,8 @@ window.FORMATION_DATA = {
             "</div>";
         const s = document.getElementById("storyboards");
         if (s) s.innerHTML = "";
+        const es = document.getElementById("elevations-section");
+        if (es) es.hidden = true;
       }
 
       function wireMarketSwitcher(currentKey) {
@@ -3269,6 +3430,35 @@ window.FORMATION_DATA = {
           setFrames(i);
         });
 
+        // ── Elevations — approved-library prompts today's signals move up. ──
+        // Optional + lower weight: a ranked dropdown stack, collapsed by
+        // default. The whole section hides when no elevations are published.
+        const ELEVATIONS = Array.isArray(market.assetElevations)
+          ? market.assetElevations.filter(
+              (e) => e && typeof e.prompt === "string" && e.prompt.trim(),
+            )
+          : [];
+        const elevSection = document.getElementById("elevations-section");
+        const elevWrap = document.getElementById("elevations");
+        if (!ELEVATIONS.length) {
+          if (elevSection) elevSection.hidden = true;
+          if (elevWrap) elevWrap.innerHTML = "";
+        } else {
+          if (elevSection) elevSection.hidden = false;
+          if (elevWrap)
+            elevWrap.innerHTML = ELEVATIONS.map(
+              (e, i) => `
+            <details class="elev-drop">
+              <summary>
+                <span class="elev-rank">${String(i + 1).padStart(2, "0")}</span>
+                <span class="elev-prompt">${escHtml(e.prompt)}</span>
+                <span class="drop-caret">▾</span>
+              </summary>
+              <div class="drop-body"><span class="elev-why-lbl">Rationale</span>${escHtml(e.rationale)}</div>
+            </details>
+          `,
+            ).join("");
+        }
       }
 
       // ============================================================================
@@ -3605,6 +3795,11 @@ window.FORMATION_DATA = {
           if (payload.cultural) entry.cultural = payload.cultural;
           if (payload.match) entry.match = payload.match;
           if (sbs.length) entry.storyboards = sbs;
+          // Asset elevations are optional + decoupled from the storyboard
+          // isNewShape guard. An empty array explicitly clears them (section
+          // hides); an absent field leaves any bundled defaults untouched.
+          if (Array.isArray(payload.assetElevations))
+            entry.assetElevations = payload.assetElevations;
           return true;
         }
 
