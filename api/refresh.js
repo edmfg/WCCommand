@@ -164,6 +164,11 @@ function buildPrompt() {
     "Every news item MUST have a working URL. Every social item MUST have a",
     "non-empty platforms array. Do not invent quotes; only use ones Google found.",
     "Spread `tag` across all six values — do not let any one market dominate.",
+    "EMOJI: in headlines/topics use only widely-supported emoji. NEVER use",
+    "subdivision/regional 'tag' flags such as the England, Scotland or Wales",
+    "flags (🏴󠁧󠁢󠁥󠁮󠁧󠁿 / 🏴󠁧󠁢󠁳󠁣󠁴󠁿 / 🏴󠁧󠁢󠁷󠁬󠁳󠁿) — they render as a black box on most",
+    "devices. Use 🦁 for England, a generic ⚽/🏟️/🎉, or the country's national",
+    "flag emoji (🇬🇧) instead. National-flag emoji are fine.",
   ].join("\n");
 }
 
@@ -194,8 +199,13 @@ function extractJson(text) {
 // Strip raw "<" / ">" from text rendered as HTML on the public dashboard.
 // Defense-in-depth: the client renderer already runs escapeHtml, but with
 // Gemini-generated content this is cheap insurance.
+// Also strip subdivision/regional "tag" flag sequences (England/Scotland/Wales
+// etc. = U+1F3F4 + tag chars + cancel) which render as a black box on most
+// devices — a backstop in case the prompt's no-tag-flags rule is ignored.
 function safeText(s) {
-  return String(s == null ? "" : s).replace(/[<>]/g, "");
+  return String(s == null ? "" : s)
+    .replace(/\u{1F3F4}[\u{E0020}-\u{E007F}]+/gu, "")
+    .replace(/[<>]/g, "");
 }
 
 // Mirror of the client-side normalizers in mfg.html so the cron path
