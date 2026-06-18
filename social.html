@@ -2627,7 +2627,7 @@
 window.FORMATION_DATA = {
   ca: {
     formation: {
-      date: "June 4, 2026",
+      date: "June 18, 2026",
       market: "Canada",
       window: "Last 24h",
     },
@@ -2637,58 +2637,71 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "01",
       headline:
-        "Francophone diaspora mobilization and viral multicultural street dances ignite Canada's pre-tournament excitement — while kit aesthetics spark “Fashion Week” debates.",
+        "A surge in localized cultural expressions — from Ghanaian drumming in Toronto to hyper-local backyard fan zones — is defining Canada's World Cup conversation.",
       spikes: [
         {
-          title: "Francophone Diaspora Mobilization (“Coupe du Monde” Buzz)",
+          title: "Kete Rhythms in Toronto",
           type: "Cultural Pride",
           signal:
-            "High-volume spike on Twitter/X driven by Francophone diaspora communities — particularly Haitian and Egyptian fans in Montreal and Toronto — dominated by the French keyword “coupe du monde.”",
+            "A massive surge in highly positive cultural pride sentiment (90% positive) and localized video sharing. The Ghanaian diaspora's celebrations in Toronto are dominating regional conversations, driven by cultural accounts sharing traditional drum performances.",
           context:
-            "The conversation is overwhelmingly positive, with fans expressing pride and hope as they rally around their home nations' warm-up campaigns. Official outreach from organizations like the Haitian Ministry of Tourism is further energizing local fan bases.",
+            "Ahead of the Ghana vs. Panama match, Toronto's Ghanaian community gathered to honour Otumfuo Osei Tutu II, blending traditional Kete rhythms with modern football energy. This has ignited a broader conversation about how multicultural diaspora communities are redefining what “Canadian soccer culture” looks like during the tournament.",
           voice:
-            "Seeing the Haitian Ministry of Tourism actively rallying the diaspora for the Coupe du Monde gets me so proud. Montreal is ready to show up!",
-          volume: 40,
+            "Toronto is completely lit up right now. The way the community is blending traditional Kete drumming with World Cup hype is beautiful. Pure diaspora pride!",
+          volume: 42,
+          sentiment: 90,
+          tone: "positive",
+        },
+        {
+          title: "House Music Is the Tournament Soundtrack",
+          type: "Sound & Style",
+          signal:
+            "“Music” (18.2% keyword share) and “Style” (13.62% keyword share) are emerging as the dominant non-sporting topics. Posts about Vancouver-based electronic music events and official FIFA player-curated house sets are quickly gaining traction.",
+          context:
+            "FIFA's decision to crown house music as the official sound of the 2026 tournament — featuring Vancouver showcases by Kx5 (Deadmau5 & Kaskade) and a closing set by Kaytranada — has united soccer fans and Canadian electronic music culture.",
+          voice:
+            "I love that house music is officially the soundtrack for this World Cup. Getting Kx5 in Vancouver and Kaytranada for the finale is an elite vibe.",
+          volume: 32,
+          sentiment: 82,
+          tone: "positive",
+        },
+        {
+          title: "Hyper-Local Backyard Fan Zones",
+          type: "Host City Pride",
+          signal:
+            "“Fan Zone” keywords dominated 54.56% of total global and regional conversation, with 55% of overall hot-topic volume centred on community watch parties. Combined joy and delight metrics above 90% reflect a highly receptive audience.",
+          context:
+            "Beyond the major urban stadiums, local Canadian municipalities and suburban communities (such as Ajax, Ontario) are hosting highly successful grassroots fan zones. Sponsored by domestic brands, these events draw families and young fans who prefer local community vibes over massive downtown venues.",
+          voice:
+            "The local energy at the Ajax Fan Zone kickoff for Canada vs. Bosnia was incredible. It's so nice to have a family-friendly space right in our neighbourhood.",
+          volume: 55,
           sentiment: 92,
           tone: "positive",
         },
         {
-          title: "“Fashion Week” Kit and Apparel Debates",
-          type: "Kit Culture",
+          title: "The Flag Debate: What Is “Canadian”?",
+          type: "Identity & Symbols",
           signal:
-            "A velocity spike on Twitter/X around the stylish, streetwear-inspired aesthetic of modern kits as squads reveal their official gear.",
+            "A sudden, highly cynical framing shift around Canadian national symbols. While overall tournament sentiment stays high (85% positive), regional Canadian accounts are dissecting the geographic origins of the maple leaf.",
           context:
-            "A playful debate has started, with some fans mocking highly stylized players for treating the World Cup like “Fashion Week.” It's a lighthearted, mixed-sentiment conversation — purists want a focus on sport, others embrace the fusion of football and fashion.",
+            "Amid peak national pride, critical and pedantic counter-narratives are surfacing. Users are pointing out that the sugar maple leaf on the flag is biologically native primarily to the northeastern US and only a tiny portion of Southern Ontario/Quebec — triggering debates about inclusivity and national branding.",
           voice:
-            "Some of these squads are treating this like Fashion Week. You can't win a Coupe du Monde looking like you're on a runway! 😂😂",
-          volume: 30,
-          sentiment: 55,
+            "People forget the sugar maple leaf on our flag doesn't even grow in most of Canada. It's mostly an Ontario/Quebec and Northeast US thing.",
+          volume: 24,
+          sentiment: 48,
           tone: "neutral",
-        },
-        {
-          title: "Yonge-Dundas Square South Asian Dance Takeover",
-          type: "Host City Pride",
-          signal:
-            "A viral video from Toronto's Yonge-Dundas Square has caused a sharp volume spike — a large, synchronized group dance by South Asian-Canadians in traditional attire.",
-          context:
-            "The video has become a symbol of Toronto's multiculturalism and public celebration style ahead of the tournament. The emotion is overwhelmingly one of joy and delight.",
-          voice:
-            "This massive dance circle in Yonge-Dundas Square is beautiful! This is the exact cultural energy we need in Toronto for the fan zones.",
-          volume: 28,
-          sentiment: 94,
-          tone: "positive",
         },
       ],
       flags: [
         {
-          tag: "Player & Brand IP",
+          tag: "National Identity Cynicism",
           color: "amber",
-          note: "The “Fashion Week” conversation involves specific teams and players. Brands should be cautious to not align with the “style over substance” critique.",
+          note: "The Maple Leaf Identity Debate touches regionalism and the historical exclusion of Western and Northern Canada from national symbology. Avoid overtly “maple syrup and Ontario-centric” imagery that could trigger regional online debates.",
         },
         {
-          tag: "Language & Immigrant Discussions",
+          tag: "Brand & Player IP",
           color: "amber",
-          note: "Conversations about new immigrants are currently positive, but should be monitored to ensure they remain inclusive.",
+          note: "The House Music Soundtrack spike leans on active artists (David Guetta, Kaytranada, Kx5/Deadmau5) and FIFA branding. Lean into the broader genre of Canadian house music and summer-party aesthetics rather than copyrighted likenesses or trademarked event titles without clearance.",
         },
       ],
     },
@@ -2698,203 +2711,189 @@ window.FORMATION_DATA = {
       flag: "🇨🇦",
       watermark: "02",
       headline:
-        "A series of injuries to key players has caused a spike in fan anxiety — shifting the conversation from pre-tournament excitement to tactical and emotional resilience.",
+        "Anticipation and protective pride surge across Canada as fans rally behind the CANMNT ahead of the crucial Qatar clash at BC Place — while fiercely condemning the racist online abuse targeting key national players.",
       spikes: [
         {
-          title: "Davies' Absence and Mental Health Candor",
-          type: "Player Narrative",
+          title: "Outrage & Solidarity Over Racist Online Abuse",
+          type: "Solidarity",
           signal:
-            "Exceptionally high volume on X, with “Davies” appearing in 40% of keyword mentions. The tone is a mix of negative and sympathetic.",
+            "Intense negative spike on X and domestic digital sports channels (10% sentiment, dominated by Anger at 8% topic share) following a TSN broadcast highlighting online hate.",
           context:
-            "Captain Alphonso Davies has confirmed he will miss the opening match against Bosnia & Herzegovina due to injury. His honest comments about the emotional toll of his recovery have shifted the conversation to athlete mental health, creating a more empathetic, but worried, fan base.",
+            "TSN aired a segment highlighting vile, racist online abuse directed at Canadian national team players including Moïse Bombito, Liam Millar, Richie Laryea, and Promise David. This triggered a massive, protective counter-response, bolstered by manager Jesse Marsch publicly condemning the behaviour. Fandoms on X and Reddit are rallying to support the players, transforming anger into a unified campaign of solidarity.",
           voice:
-            "It's a side of Davies Canada should see more of.",
-          hook: "How will Davies' absence and his candidness about his mental health struggles impact the team's performance and the broader conversation around athlete well-being?",
-          volume: 40,
+            "Absolutely disgusting to see the hate directed at Bombito, Laryea, Millar, and Promise David on TSN. These guys are representing our country on the world stage. Soccer is about unity, and we need to stand behind our players and stomp this garbage out.",
+          hook: "How will this rallying cry of solidarity translate to the stands at BC Place, and will we see organized fan demonstrations supporting these players in the opening minutes?",
+          volume: 38,
+          sentiment: 30,
+          tone: "caution",
+        },
+        {
+          title: "The Jonathan David Tactical Conundrum",
+          type: "Tactics",
+          signal:
+            "High volume on X with mixed sentiment (45% positive, heavy anxiety), driving 23% of the hot-topic share.",
+          context:
+            "As Canada prepares for their crucial Group B fixture against Qatar in Vancouver, fans are deeply divided over striker Jonathan David's role. Some argue he is Canada's best striker and needs the start to build confidence in Marsch's dual CF/CAM system; others feel he should be on a “short leash” after a quiet opening performance.",
+          voice:
+            "Jonathan David is still our elite option up front even if he plays that hybrid CF/CAM role under Marsch. He needs this start against Qatar to find his confidence — but he's on a short leash if he doesn't produce early.",
+          hook: "Will Jesse Marsch adapt his formation to unlock David's clinical club-level finishing, or will a short leash lead to an early benching in front of the home crowd?",
+          volume: 30,
           sentiment: 45,
           tone: "neutral",
         },
         {
-          title: "Roster Fragility With Bombito and Flores Injuries",
-          type: "Squad Depth",
+          title: "Alphonso Davies' Hopeful Return & Fitness Watch",
+          type: "Player Narrative",
           signal:
-            "High volume on X, with “Bombito” in 28% of keyword mentions. The tone is highly anxious.",
+            "Strong positive growth (“Hope” at 53.85% on the emotion index) on X and Canadian soccer podcasts, marking 23% of hot topics.",
           context:
-            "The fan base is panicking over the team's defensive and midfield depth. Moïse Bombito is on modified training due to tibia sensitivity, and midfielder Marcelo Flores is out of the tournament with a ruptured ACL.",
+            "Alphonso Davies is rumoured to be returning to the starting XI after missing training segments, with TSN's Matthew Scianitti reporting only Alfie Jones was absent from the latest session. Fans are highly optimistic that a fit Davies will exploit a Qatar defence that conceded 26 shots in its opening match.",
           voice:
-            "With the injuries to Alphonso Davies and Marcelo Flores, it's scary for the tournament.",
-          hook: "Who will step up to fill the significant gaps left by these injuries, and can the team's depth withstand these losses?",
-          volume: 28,
-          sentiment: 25,
-          tone: "caution",
-        },
-        {
-          title: "Marsch's Tactical Dilemma Post-Uzbekistan Win",
-          type: "Tactics",
-          signal:
-            "Moderate volume on X, linked to the #canmnt and #ourgamenow hashtags. The tone is constructive but skeptical.",
-          context:
-            "While Canada secured a 2-0 victory against Uzbekistan, the conversation has focused on head coach Jesse Marsch's tactics. With Davies out, fans are demanding a plan to better utilize star forward Jonathan David.",
-          voice:
-            "Jonathan David is a world class player and one of CanMNT biggest assets. Bigger question is why they can't use David effectively? That's on Marsch to figure out.",
-          hook: "What tactical adjustments will Jesse Marsch make to compensate for the injuries and finally unlock Jonathan David's scoring potential?",
-          volume: 22,
-          sentiment: 50,
-          tone: "neutral",
-        },
-        {
-          title: "Venue and Fan Zone Anticipation Builds",
-          type: "Venue & Fan Zones",
-          signal:
-            "Moderate-to-high volume on X and local forums, with a highly positive and anticipatory tone.",
-          context:
-            "Despite the injury news, excitement for the June 12 opener at BMO Field is growing. Municipalities like Ajax are announcing large-scale “Fan Zone” watch parties, and the announcement of Ghanaian royalty attending a match at BMO Field is driving global interest.",
-          voice:
-            "Ajax is your matchday destination! The Town turns into a Fan Zone for the official kickoff event… Big screen action. Global flavours. Non-stop energy.",
-          hook: "Can the energy from the fan zones and the home crowd at BMO Field provide the emotional lift the team needs to overcome its recent setbacks?",
-          volume: 26,
-          sentiment: 90,
+            "Hearing that only Alfie Jones missed training means Phonsie is ready to fly against Qatar! With Qatar's defence leaking 26 shots last game, a fit Davies is going to tear them apart down the wing.",
+          hook: "Can a partially recovered Davies go the full 90 under Marsch's high-pressing system, or will his minutes be heavily managed to avoid a tournament-ending setback?",
+          volume: 30,
+          sentiment: 75,
           tone: "positive",
         },
       ],
       flags: [
         {
-          tag: "Likeness",
+          tag: "Player Likeness & Names",
           color: "red",
-          note: "Alphonso Davies' likeness in Matchday 1 creative — creatives featuring Davies for the opening match should be paused or revised to avoid backlash.",
+          note: "Moïse Bombito, Richie Laryea, Liam Millar, and Promise David are at the centre of highly sensitive conversations about online racial abuse. Avoid using these players' images or names in any commercial context that could read as capitalizing on or trivializing the issue.",
         },
         {
-          tag: "Roster Status",
-          color: "red",
-          note: "Roster changes & “active” status — all marketing assets featuring Marcelo Flores must be removed from active campaigns.",
+          tag: "Davies & David Likeness",
+          color: "amber",
+          note: "These high-profile stars are driving major commercial narratives. Campaigns using their likenesses must align with up-to-date fitness and squad-selection news to avoid outdated creative — e.g., featuring Davies as a starter if his fitness stays a late-match decision.",
         },
         {
           tag: "Trademarks",
           color: "amber",
-          note: "FIFA World Cup IP — ensure all regional campaign copy using official hashtags remains compliant with FIFA's brand guidelines.",
+          note: "Strict FIFA World Cup 2026 brand protection applies to official logos and names (like “Group B,” “BC Place,” and official match graphics) in non-sponsor digital ads.",
         },
       ],
     },
     storyboards: [
       {
         number: "01",
-        title: "The Spontaneous Street Dance",
+        title: "The Rhythm of the North",
         sourceSignal: "Cultural Conversation",
         sourceDetail:
-          "“Yonge-Dundas Square South Asian Dance Takeover” — the viral synchronized group dance video out of downtown Toronto.",
+          "“Kete Rhythms in Toronto” — the Ghanaian diaspora's drumming celebrations ahead of Ghana vs. Panama.",
         audienceCut: "Diaspora Fan",
         bucket: "Cultural Pride",
         unmetNeed:
-          "I keep seeing these dances all over my feed — what is this, and how do I get in on it?",
+          "A fan sees these incredible, vibrant drumming circles and wants to understand the cultural meaning and energy behind the music.",
         prompts: [
           {
             key: "A",
             type: "Observational",
-            text: "what's the story behind the synchronized group dances I'm seeing all over downtown Toronto",
+            text: "why do Ghanaian fans use specific drum rhythms to celebrate their team's matches",
           },
           {
             key: "B",
             type: "Participatory",
-            text: "teach me some basic Bhangra moves for a party",
+            text: "what are the basic hand patterns for a traditional Ghanaian kete drum rhythm",
           },
           {
             key: "C",
-            type: "Community",
-            text: "find public spaces in Brampton with drop-in dance classes",
+            type: "Fusion/Planning",
+            text: "help me plan a party that fuses Ghanaian drumming with Canadian electronic music",
           },
         ],
         prompt:
-          "what's the story behind the synchronized group dances I'm seeing all over downtown Toronto",
+          "why do Ghanaian fans use specific drum rhythms to celebrate their team's matches",
         whyPrompt:
-          "The Yonge-Dundas dance video is pure joy at volume — these prompts move fans from watching the moment to learning it to finding it in their own neighbourhood.",
+          "Kete drumming is Toronto's most joyful signal right now — these prompts move fans from watching the rhythm to learning it to remixing it with Canadian sound.",
         ipCheck: {
           status: "clear",
-          note: "No team, player, or event marks. Prompts refined to be direct and community-oriented — cultural specificity without stereotyping.",
+          note: "Clean — prompts are free of all brand, player, and tournament IP. Production must feature authentic Kete drumming and involve Toronto's Ghanaian community; a human check with community leaders is non-negotiable.",
         },
         verdict:
-          "Strong fit for the Diaspora audience — transforms a moment of passive observation into active cultural engagement.",
+          "Strong fit — celebrates a specific community and taps into genuine fan curiosity.",
         footage:
-          "Queries are displayed over energetic, UGC-style shots of diverse groups dancing joyfully in public squares. The focus is on spontaneity and rhythm.",
+          "Energetic, tight shots of hands on drums, intercut with joyful faces in a crowd wearing vibrant Ghanaian colours on a recognizable Toronto street.",
       },
       {
         number: "02",
-        title: "The Francophone Fan Connection",
+        title: "The Backyard Stadium",
         sourceSignal: "Cultural Conversation",
         sourceDetail:
-          "Francophone Diaspora Mobilization (“Coupe du Monde” Buzz) — Haitian and Egyptian fans rallying in Montreal and Toronto.",
-        audienceCut: "Core Fan",
-        bucket: "Cultural Pride",
-        unmetNeed:
-          "I hear French chants for African and Caribbean teams all over Montreal — I want in on that energy.",
-        prompts: [
-          {
-            key: "A",
-            type: "Observational",
-            text: "why are fans in Montreal chanting in French for teams from Africa and the Caribbean",
-          },
-          {
-            key: "B",
-            type: "Participatory",
-            text: "what are some classic French-language soccer chants I can learn for the big game",
-          },
-          {
-            key: "C",
-            type: "Fusion/Planning",
-            text: "plan a game day menu for my friends that fuses classic Haitian and Egyptian street food",
-          },
-        ],
-        prompt:
-          "why are fans in Montreal chanting in French for teams from Africa and the Caribbean",
-        whyPrompt:
-          "The “coupe du monde” buzz is Montreal's bilingual reality — these prompts let core fans decode the moment, learn the chants, and cook the menu.",
-        ipCheck: {
-          status: "watch",
-          note: "Generic “coupe du monde” fan language only — keep the fan-made signage (“Montreal is watching” / “La Coupe du Monde vit ici aussi”) clearly unofficial and off FIFA marks.",
-        },
-        verdict:
-          "Strong concept with high cultural literacy — taps the bilingual reality of Canadian fandom and the ties between Francophone Canadians and teams from Africa and the Caribbean.",
-        footage:
-          "Queries are displayed over atmospheric shots of a vibrant Montreal neighborhood. For local authenticity, a fan-made sign reads “Montreal is watching” or “La Coupe du Monde vit ici aussi” — acknowledging the city's passion despite not being an official host.",
-      },
-      {
-        number: "03",
-        title: "The Fan Fest Survival Guide",
-        sourceSignal: "Match Event",
-        sourceDetail:
-          "“Venue and fan zone anticipation builds” — Ajax Fan Zone watch parties and the June 12 BMO Field opener.",
+          "“Hyper-Local Backyard Fan Zones” — grassroots community watch parties dominating 54.56% of the conversation.",
         audienceCut: "Bandwagon Fan",
         bucket: "Fan Preparedness",
         unmetNeed:
-          "My first big fan fest is coming up — how do I do it right?",
+          "I want to host my own watch party — how do I make my backyard feel like a special, memorable event space for my friends and family?",
         prompts: [
           {
             key: "A",
             type: "Observational",
-            text: "why do people go to huge outdoor fan parties instead of just watching at home",
+            text: "how to create a big stadium feel in a small town backyard",
           },
           {
             key: "B",
             type: "Participatory",
-            text: "what are the unwritten rules for surviving and enjoying a massive all-day fan festival",
+            text: "what are some simple but creative ways to decorate my backyard for a soccer party",
           },
           {
             key: "C",
             type: "Fusion/Planning",
-            text: "build me the ultimate fan zone survival kit for a long hot day, keep it under $50",
+            text: "plan a family-friendly soccer watch party menu with a fun Canadian twist",
           },
         ],
         prompt:
-          "why do people go to huge outdoor fan parties instead of just watching at home",
+          "how to create a big stadium feel in a small town backyard",
         whyPrompt:
-          "Fan-zone anticipation is spiking ahead of the June 12 opener — these prompts turn first-timer anxiety into confident, prepared excitement.",
+          "Fan-zone fever is going hyper-local — these prompts turn an ordinary backyard into the neighbourhood's stadium, with a modern multicultural Canadian menu.",
         ipCheck: {
           status: "clear",
-          note: "Generic fan-zone framing — no venue partnerships implied, no official event marks in any prompt.",
+          note: "Clean — prompts are free of all brand, player, and tournament IP. For Prompt C, guide the “fun Canadian twist” toward modern, multicultural Canada (butter chicken poutine, jerk chicken skewers with maple glaze) and away from clichés.",
         },
         verdict:
-          "Strong fit for the growing Bandwagon and Casual segments — avoids overreaching patriotism and offers genuine, helpful guidance for new fans to join the celebration authentically.",
+          "Fit with refinement — correctly identifies how most Canadians actually watch the tournament.",
         footage:
-          "Queries are displayed over sweeping, sunny shots of a diverse crowd gathering in a public park, setting up chairs, and sharing snacks with a communal, anticipatory vibe.",
+          "Sun-drenched, slow-motion shots of a suburban backyard party: kids kicking a ball, someone hanging red and white streamers, a shared plate of food being passed around.",
+      },
+      {
+        number: "03",
+        title: "The Twelfth Man's Roar",
+        sourceSignal: "Match Event",
+        sourceDetail:
+          "“Outrage & Solidarity Over Racist Online Abuse” — the protective counter-movement rallying behind the CANMNT players.",
+        audienceCut: "Core Fan",
+        bucket: "Predictions & Reactions",
+        unmetNeed:
+          "Seeing the negativity online, a fan wants to know how they can be part of the positive counter-movement and tangibly support the team's morale.",
+        prompts: [
+          {
+            key: "A",
+            type: "Observational",
+            text: "is there any science to how a crowd's energy can actually impact players' performance",
+          },
+          {
+            key: "B",
+            type: "Participatory",
+            text: "what are some powerful, positive chants I can learn to support the home team",
+          },
+          {
+            key: "C",
+            type: "Fusion/Planning",
+            text: "design a massive, respectful tifo display that shows overwhelming support for our players",
+          },
+        ],
+        prompt:
+          "is there any science to how a crowd's energy can actually impact players' performance",
+        whyPrompt:
+          "The solidarity wave needs an outlet — these prompts redirect fan anger into chants, tifo, and crowd energy that lift the players, not the hate.",
+        ipCheck: {
+          status: "clear",
+          note: "Clean — carefully abstracted away from the specific sensitive event and player names. Chants in Prompt B must be sourced from real Canadian supporter groups, and the tifo must feel fan-driven, not like a corporate art project.",
+        },
+        verdict:
+          "Strong fit — channels fan anger into the constructive, positive energy that defines Canadian supporter culture.",
+        footage:
+          "A powerful montage of positive fan support: fans painting a huge banner, a stadium-wide card stunt revealing a heart, a massive crowd singing in unison with faces full of pride.",
       },
     ],
     // Asset elevations — approved prompts from the content library that today's
@@ -2913,36 +2912,36 @@ window.FORMATION_DATA = {
         prompt:
           "what do the specific patterns on the robes worn by ghanaian soccer fans mean",
         rationale:
-          "This is the top recommendation as it directly taps into the most significant cultural conversation spike of the last 24 hours: the Royal Pride in Toronto surrounding the Asantehene of Ghana's watch party. This asset meets the moment by providing a direct answer to the curiosity generated by this high-sentiment, high-volume event. It serves the engaged Diaspora audience and also draws in casual fans who are seeing these cultural symbols in their feeds.",
-      },
-      {
-        lane: "fan",
-        prompt:
-          "whats the symbolism of the fast leg-kicking dance that senegalese fans do",
-        rationale:
-          "This asset aligns perfectly with the Fan Zone Fever & Francophone Fervour spike. With the France vs. Senegal match driving a 50% increase in “fan zone” mentions in French-speaking Canada, there is a clear appetite for content related to these two teams. This question allows us to engage with the vibrant culture of the Senegalese fanbase, providing a rich, relevant story for the highly engaged Francophone audience.",
+          "This is the top recommendation as it directly taps into the most powerful and positive signal from the Cultural Conversation briefing: the surge of pride around Ghanaian diaspora celebrations in Toronto. It serves the observed curiosity about specific, authentic cultural expressions that are defining the Canadian fan experience right now. This asset is timely, culturally celebratory, and aligns perfectly with the theme of multiculturalism shaping the tournament's identity in Canada.",
       },
       {
         lane: "game",
         momentum: true,
         prompt:
-          "how do soccer players train for different altitudes and can it be an advantage",
+          "why do some people call soccer the 'universal language'",
         rationale:
-          "This asset connects to the dominant Match Event narrative: the intense fan conversation around player fitness, specifically the defense of Alphonso Davies and the debate over Jonathan David. While avoiding direct commentary on these sensitive topics, this question addresses the underlying theme of player preparation and the physical challenges of elite training. It's a smart, adjacent topic that will resonate with fans who are already deeply invested in the players' well-being and performance.",
-      },
-      {
-        lane: "game",
-        prompt:
-          "i heard qatar has falcons at soccer matches, whats the history of this",
-        rationale:
-          "This is a timely, forward-looking asset. The briefings identified that Canada's next match is against Qatar and that tactical conversations are already emerging. This question taps into the natural pre-match curiosity about an upcoming opponent. It allows us to introduce a unique cultural element about the opposing team, feeding the “curiosity hook” and building anticipation for the game.",
+          "This asset is critically relevant as a positive counter-narrative to the racism highlighted in the Match Event briefing. While our creative work avoids that sensitive topic directly, this asset allows us to reinforce the message of unity and global connection that is at the heart of the fan-led solidarity movement. It's a high-level, positive message that feels particularly necessary and resonant at this moment.",
       },
       {
         lane: "fan",
         prompt:
-          "why do panama fans eat bowls of hot soup at soccer games",
+          "give me some appetizer ideas for a german canadian fusion party menu",
         rationale:
-          "This asset provides a culturally interesting counterpoint to our top-ranked recommendation. Panama is the opponent in the Ghana match that is the focus of the Toronto watch party. By highlighting a unique tradition of Panamanian fans, we can broaden the cultural narrative around the game. This demonstrates a holistic appreciation for fan culture and provides another point of entry for fans curious about the day's matchups beyond just the teams themselves.",
+          "This asset is highly contextual and useful, directly supporting the “Hyper-Local Backyard Fan Zones” trend. With fans gathering at home for the upcoming matches, providing practical and creative ideas for party planning is a strong utility play. The “fusion” aspect aligns perfectly with the broader theme of Canada's multicultural identity and the Fan Agent's recommendation to embrace modern, diverse Canadian culture over clichés.",
+      },
+      {
+        lane: "fan",
+        prompt:
+          "why do brazilian soccer fans bring so many drums to their matches",
+        rationale:
+          "This asset cleverly builds on the “Kete Rhythms” signal without being limited to it. It broadens the conversation from a specific community's tradition to the universal power of rhythm in soccer culture. It allows us to engage with the “sound” of fandom in a way that feels authentic and global, tapping into the energy of the tournament beyond just one cultural expression.",
+      },
+      {
+        lane: "game",
+        prompt:
+          "is there any science to support that superstitions actually help soccer teams win",
+        rationale:
+          "This asset connects directly with the high-stakes emotion detailed in the Match Event briefing. Fan anxiety is high regarding player form and fitness. This question taps into the irrational, hopeful, and superstitious side of being a supporter during a crucial match. It's a lighthearted and relatable way to engage with the very real tension and protective pride fans are feeling.",
       },
     ],
   },
