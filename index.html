@@ -7179,7 +7179,11 @@
         const el = document.getElementById("todayMatches");
         if (!el) return;
         const all = DASHBOARD_DATA.matches || [];
-        const today = new Date().toISOString().slice(0, 10);
+        // "Today" in Eastern Time (kickoffs are all ET). Using UTC here rolled
+        // the date to tomorrow after ~8pm ET and showed tomorrow's slate.
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "America/New_York",
+        });
         const games = all.filter((m) => m.date === today);
 
         // No matches today (e.g. before kickoff) — show a friendly placeholder.
@@ -7207,11 +7211,17 @@
           return;
         }
 
-        // Live matches first, then keep the (chronological) data order.
-        const rank = { live: 0, upcoming: 1 };
+        // Sort chronologically by kickoff, AM → PM.
+        const kickoffMins = (k) => {
+          const t = /(\d+):(\d+)\s*(AM|PM)/i.exec(k || "");
+          if (!t) return 9999;
+          let h = Number(t[1]) % 12;
+          if (/PM/i.test(t[3])) h += 12;
+          return h * 60 + Number(t[2]);
+        };
         const sorted = games
           .slice()
-          .sort((a, b) => (rank[a.status] ?? 2) - (rank[b.status] ?? 2));
+          .sort((a, b) => kickoffMins(a.kickoff) - kickoffMins(b.kickoff));
 
         const chips = sorted
           .map((m) => {
