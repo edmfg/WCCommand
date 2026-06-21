@@ -190,6 +190,40 @@ function buildPrompt() {
   ].join("\n");
 }
 
+// Parse a JSON string, tolerating the two malformations Gemini commonly emits:
+// trailing commas before a } or ], and raw control characters (e.g. literal
+// newlines/tabs the model left unescaped inside a string value).
+function tryParseJson(s) {
+  try {
+    return JSON.parse(s);
+  } catch (e) {}
+  try {
+    return JSON.parse(s.replace(/,\s*([}\]])/g, "$1"));
+  } catch (e) {}
+  try {
+    // Escape raw control chars that only appear inside string values. We are
+    // outside a string only between tokens, where control chars are harmless
+    // whitespace, so a blanket escape of un-escaped controls is safe enough as
+    // a last-ditch repair.
+    const escaped = s.replace(/[\u0000-\u001f]/g, (c) => {
+      if (c === "\n") return "\\n";
+      if (c === "\r") return "\\r";
+      if (c === "\t") return "\\t";
+      return "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0");
+    });
+    return JSON.parse(escaped.replace(/,\s*([}\]])/g, "$1"));
+  } catch (e) {
+    return null;
+  }
+}
+
+// Reconstruct a valid JSON object from Gemini's text, surviving TRUNCATION.
+// The refresh prompt asks for a big haul (16–24 news + 8–14 social + 12–18
+// ticker), which can blow past maxOutputTokens and cut the JSON off mid-item.
+// A plain "first { … last }" slice is then unbalanced and JSON.parse throws.
+// Here we walk the text, remember the last point where the JSON-so-far could be
+// cleanly closed (right after any completed element), and on failure roll back
+// to it and append the missing closers — keeping every COMPLETE item.
 function extractJson(text) {
   if (!text || typeof text !== "string") return null;
   // Strip code fences if present.
@@ -197,21 +231,53 @@ function extractJson(text) {
   if (t.startsWith("```")) {
     t = t.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
   }
-  // Find first { ... last }.
   const first = t.indexOf("{");
+  if (first < 0) return null;
+  t = t.slice(first);
+
+  // Fast path: well-formed object (first { … last }).
   const last = t.lastIndexOf("}");
-  if (first < 0 || last < 0 || last < first) return null;
-  const slice = t.slice(first, last + 1);
-  try {
-    return JSON.parse(slice);
-  } catch (e) {
-    // Last-ditch: some models return trailing-comma'd JSON. Try a soft fix.
-    try {
-      return JSON.parse(slice.replace(/,\s*([}\]])/g, "$1"));
-    } catch (e2) {
-      return null;
+  if (last > 0) {
+    const direct = tryParseJson(t.slice(0, last + 1));
+    if (direct) return direct;
+  }
+
+  // Repair path: walk the text tracking string state + bracket stack, and
+  // snapshot the position/stack at every "between complete elements" boundary
+  // — immediately after a closing } or ], and just before any top-level comma.
+  const stack = []; // "}" or "]" closers, in open order
+  let inString = false;
+  let escaped = false;
+  let safeIndex = -1; // text length to keep
+  let safeStack = null; // stack snapshot at that point
+  const snapshot = (idx) => {
+    safeIndex = idx;
+    safeStack = stack.slice();
+  };
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') {
+      inString = true;
+    } else if (c === "{") {
+      stack.push("}");
+    } else if (c === "[") {
+      stack.push("]");
+    } else if (c === "}" || c === "]") {
+      stack.pop();
+      snapshot(i + 1); // a complete object/array just closed
+    } else if (c === ",") {
+      snapshot(i); // previous element is complete (drop the comma)
     }
   }
+  if (safeIndex < 0 || !safeStack || safeStack.length === 0) return null;
+  const closers = safeStack.slice().reverse().join("");
+  return tryParseJson(t.slice(0, safeIndex) + closers);
 }
 
 // Strip raw "<" / ">" from text rendered as HTML on the public dashboard.
@@ -621,11 +687,32 @@ module.exports = async function handler(req, res) {
       .map((p) => p.text || "")
       .join("")
       .trim();
+    // finishReason "MAX_TOKENS" means Gemini ran out of output budget and the
+    // JSON is truncated — extractJson's repair path recovers the complete items.
+    const finishReason =
+      (data.candidates && data.candidates[0] && data.candidates[0].finishReason) ||
+      "";
+    if (finishReason && finishReason !== "STOP") {
+      console.warn(
+        "refresh: Gemini finishReason=" +
+          finishReason +
+          " (textLen=" +
+          text.length +
+          ") — attempting truncation-tolerant parse",
+      );
+    }
     const payload = extractJson(text);
     if (!payload) {
       if (scoresPromise) await scoresPromise;
+      console.error(
+        "refresh: could not parse Gemini JSON; finishReason=" +
+          finishReason +
+          " textLen=" +
+          text.length,
+      );
       return res.status(502).json({
         error: "Could not parse Gemini JSON",
+        finishReason: finishReason,
         sample: text.slice(0, 400),
       });
     }
