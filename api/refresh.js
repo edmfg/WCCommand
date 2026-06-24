@@ -414,19 +414,46 @@ async function insertLiveUpdates(rows) {
 // score of every match that has kicked off, keyed by FIFA tricode so the
 // client can stamp it onto the matching fixture. Independent + best-effort:
 // any failure here is logged and swallowed so it never blocks the news refresh.
+// Rolling window (days) the scores scrape looks back over. Critically NOT the
+// whole tournament: asking for "every match since June 11" made the result list
+// grow without bound, and since the model emits matches chronologically the
+// JSON would blow past maxOutputTokens and get truncated at the TAIL — so the
+// most recent (still-unscored) days were perpetually dropped while old, already-
+// stored days re-landed. A short rolling window keeps the output small enough to
+// finish, and earlier scores already in match_results persist (upsert never
+// deletes). The window overlaps several days so a match scraped "live" gets a
+// later "final" pass, and any one missed run is backfilled by the next.
+const SCORES_LOOKBACK_DAYS = 5;
+
+// ET (America/New_York) date string for an offset number of days from now.
+// Matches the etTodayStr() convention used in index.html — the tournament's
+// "today" is anchored to New York, and a plain UTC date rolls forward a day
+// after ~8pm ET, which would skip same-evening matches.
+function etDateStr(offsetDays) {
+  const now = new Date();
+  const shifted = new Date(now.getTime() + offsetDays * 86400000);
+  return shifted.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+}
+
 function buildScoresPrompt() {
-  const isoDate = new Date().toISOString().slice(0, 10);
+  const isoDate = etDateStr(0);
+  const startDate = etDateStr(-(SCORES_LOOKBACK_DAYS - 1));
   return [
     "You are a results scraper for the 2026 FIFA World Cup",
     "(June 11 – July 19, 2026; hosts Canada / Mexico / USA).",
-    "Today is " + isoDate + ".",
+    "Today is " + isoDate + " (New York time).",
     "",
     "Use Google Search to find the FINAL or current LIVE score of EVERY 2026",
-    "World Cup match that has kicked off from 2026-06-11 through today (" +
+    "World Cup match that has kicked off from " +
+      startDate +
+      " through today (" +
       isoDate +
-      ").",
+      "), inclusive. Cover the MOST RECENT days first — today (" +
+      isoDate +
+      ") and yesterday are the priority; do not omit them.",
     "Check reliable live sources (FIFA, ESPN, BBC Sport, Google's match cards).",
     "Do NOT include matches that have not kicked off yet.",
+    "Order the results array from MOST RECENT date to oldest.",
     "",
     "Return ONLY a single JSON object (no prose, no markdown, no code fences):",
     "{",
@@ -517,7 +544,10 @@ async function refreshScores(apiKey) {
   const body = {
     contents: [{ role: "user", parts: [{ text: buildScoresPrompt() }] }],
     tools: [{ google_search: {} }],
-    generationConfig: { temperature: 0, maxOutputTokens: 8192 },
+    // Headroom so grounding/thinking tokens can't starve the JSON output and
+    // truncate the results tail. With the rolling window the real list is small;
+    // this is belt-and-suspenders. Stays well inside the 60s function budget.
+    generationConfig: { temperature: 0, maxOutputTokens: 16384 },
   };
   const upstream = await fetch(ENDPOINT, {
     method: "POST",
