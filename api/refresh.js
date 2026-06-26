@@ -190,6 +190,40 @@ function buildPrompt() {
   ].join("\n");
 }
 
+// Parse a JSON string, tolerating the two malformations Gemini commonly emits:
+// trailing commas before a } or ], and raw control characters (e.g. literal
+// newlines/tabs the model left unescaped inside a string value).
+function tryParseJson(s) {
+  try {
+    return JSON.parse(s);
+  } catch (e) {}
+  try {
+    return JSON.parse(s.replace(/,\s*([}\]])/g, "$1"));
+  } catch (e) {}
+  try {
+    // Escape raw control chars that only appear inside string values. We are
+    // outside a string only between tokens, where control chars are harmless
+    // whitespace, so a blanket escape of un-escaped controls is safe enough as
+    // a last-ditch repair.
+    const escaped = s.replace(/[\u0000-\u001f]/g, (c) => {
+      if (c === "\n") return "\\n";
+      if (c === "\r") return "\\r";
+      if (c === "\t") return "\\t";
+      return "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0");
+    });
+    return JSON.parse(escaped.replace(/,\s*([}\]])/g, "$1"));
+  } catch (e) {
+    return null;
+  }
+}
+
+// Reconstruct a valid JSON object from Gemini's text, surviving TRUNCATION.
+// The refresh prompt asks for a big haul (16–24 news + 8–14 social + 12–18
+// ticker), which can blow past maxOutputTokens and cut the JSON off mid-item.
+// A plain "first { … last }" slice is then unbalanced and JSON.parse throws.
+// Here we walk the text, remember the last point where the JSON-so-far could be
+// cleanly closed (right after any completed element), and on failure roll back
+// to it and append the missing closers — keeping every COMPLETE item.
 function extractJson(text) {
   if (!text || typeof text !== "string") return null;
   // Strip code fences if present.
@@ -197,21 +231,53 @@ function extractJson(text) {
   if (t.startsWith("```")) {
     t = t.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
   }
-  // Find first { ... last }.
   const first = t.indexOf("{");
+  if (first < 0) return null;
+  t = t.slice(first);
+
+  // Fast path: well-formed object (first { … last }).
   const last = t.lastIndexOf("}");
-  if (first < 0 || last < 0 || last < first) return null;
-  const slice = t.slice(first, last + 1);
-  try {
-    return JSON.parse(slice);
-  } catch (e) {
-    // Last-ditch: some models return trailing-comma'd JSON. Try a soft fix.
-    try {
-      return JSON.parse(slice.replace(/,\s*([}\]])/g, "$1"));
-    } catch (e2) {
-      return null;
+  if (last > 0) {
+    const direct = tryParseJson(t.slice(0, last + 1));
+    if (direct) return direct;
+  }
+
+  // Repair path: walk the text tracking string state + bracket stack, and
+  // snapshot the position/stack at every "between complete elements" boundary
+  // — immediately after a closing } or ], and just before any top-level comma.
+  const stack = []; // "}" or "]" closers, in open order
+  let inString = false;
+  let escaped = false;
+  let safeIndex = -1; // text length to keep
+  let safeStack = null; // stack snapshot at that point
+  const snapshot = (idx) => {
+    safeIndex = idx;
+    safeStack = stack.slice();
+  };
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') {
+      inString = true;
+    } else if (c === "{") {
+      stack.push("}");
+    } else if (c === "[") {
+      stack.push("]");
+    } else if (c === "}" || c === "]") {
+      stack.pop();
+      snapshot(i + 1); // a complete object/array just closed
+    } else if (c === ",") {
+      snapshot(i); // previous element is complete (drop the comma)
     }
   }
+  if (safeIndex < 0 || !safeStack || safeStack.length === 0) return null;
+  const closers = safeStack.slice().reverse().join("");
+  return tryParseJson(t.slice(0, safeIndex) + closers);
 }
 
 // Strip raw "<" / ">" from text rendered as HTML on the public dashboard.
@@ -348,19 +414,46 @@ async function insertLiveUpdates(rows) {
 // score of every match that has kicked off, keyed by FIFA tricode so the
 // client can stamp it onto the matching fixture. Independent + best-effort:
 // any failure here is logged and swallowed so it never blocks the news refresh.
+// Rolling window (days) the scores scrape looks back over. Critically NOT the
+// whole tournament: asking for "every match since June 11" made the result list
+// grow without bound, and since the model emits matches chronologically the
+// JSON would blow past maxOutputTokens and get truncated at the TAIL — so the
+// most recent (still-unscored) days were perpetually dropped while old, already-
+// stored days re-landed. A short rolling window keeps the output small enough to
+// finish, and earlier scores already in match_results persist (upsert never
+// deletes). The window overlaps several days so a match scraped "live" gets a
+// later "final" pass, and any one missed run is backfilled by the next.
+const SCORES_LOOKBACK_DAYS = 5;
+
+// ET (America/New_York) date string for an offset number of days from now.
+// Matches the etTodayStr() convention used in index.html — the tournament's
+// "today" is anchored to New York, and a plain UTC date rolls forward a day
+// after ~8pm ET, which would skip same-evening matches.
+function etDateStr(offsetDays) {
+  const now = new Date();
+  const shifted = new Date(now.getTime() + offsetDays * 86400000);
+  return shifted.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+}
+
 function buildScoresPrompt() {
-  const isoDate = new Date().toISOString().slice(0, 10);
+  const isoDate = etDateStr(0);
+  const startDate = etDateStr(-(SCORES_LOOKBACK_DAYS - 1));
   return [
     "You are a results scraper for the 2026 FIFA World Cup",
     "(June 11 – July 19, 2026; hosts Canada / Mexico / USA).",
-    "Today is " + isoDate + ".",
+    "Today is " + isoDate + " (New York time).",
     "",
     "Use Google Search to find the FINAL or current LIVE score of EVERY 2026",
-    "World Cup match that has kicked off from 2026-06-11 through today (" +
+    "World Cup match that has kicked off from " +
+      startDate +
+      " through today (" +
       isoDate +
-      ").",
+      "), inclusive. Cover the MOST RECENT days first — today (" +
+      isoDate +
+      ") and yesterday are the priority; do not omit them.",
     "Check reliable live sources (FIFA, ESPN, BBC Sport, Google's match cards).",
     "Do NOT include matches that have not kicked off yet.",
+    "Order the results array from MOST RECENT date to oldest.",
     "",
     "Return ONLY a single JSON object (no prose, no markdown, no code fences):",
     "{",
@@ -451,7 +544,10 @@ async function refreshScores(apiKey) {
   const body = {
     contents: [{ role: "user", parts: [{ text: buildScoresPrompt() }] }],
     tools: [{ google_search: {} }],
-    generationConfig: { temperature: 0, maxOutputTokens: 8192 },
+    // Headroom so grounding/thinking tokens can't starve the JSON output and
+    // truncate the results tail. With the rolling window the real list is small;
+    // this is belt-and-suspenders. Stays well inside the 60s function budget.
+    generationConfig: { temperature: 0, maxOutputTokens: 16384 },
   };
   const upstream = await fetch(ENDPOINT, {
     method: "POST",
@@ -621,11 +717,32 @@ module.exports = async function handler(req, res) {
       .map((p) => p.text || "")
       .join("")
       .trim();
+    // finishReason "MAX_TOKENS" means Gemini ran out of output budget and the
+    // JSON is truncated — extractJson's repair path recovers the complete items.
+    const finishReason =
+      (data.candidates && data.candidates[0] && data.candidates[0].finishReason) ||
+      "";
+    if (finishReason && finishReason !== "STOP") {
+      console.warn(
+        "refresh: Gemini finishReason=" +
+          finishReason +
+          " (textLen=" +
+          text.length +
+          ") — attempting truncation-tolerant parse",
+      );
+    }
     const payload = extractJson(text);
     if (!payload) {
       if (scoresPromise) await scoresPromise;
+      console.error(
+        "refresh: could not parse Gemini JSON; finishReason=" +
+          finishReason +
+          " textLen=" +
+          text.length,
+      );
       return res.status(502).json({
         error: "Could not parse Gemini JSON",
+        finishReason: finishReason,
         sample: text.slice(0, 400),
       });
     }

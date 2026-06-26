@@ -7179,7 +7179,11 @@
         const el = document.getElementById("todayMatches");
         if (!el) return;
         const all = DASHBOARD_DATA.matches || [];
-        const today = new Date().toISOString().slice(0, 10);
+        // "Today" in Eastern Time (kickoffs are all ET). Using UTC here rolled
+        // the date to tomorrow after ~8pm ET and showed tomorrow's slate.
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "America/New_York",
+        });
         const games = all.filter((m) => m.date === today);
 
         // No matches today (e.g. before kickoff) — show a friendly placeholder.
@@ -7207,11 +7211,17 @@
           return;
         }
 
-        // Live matches first, then keep the (chronological) data order.
-        const rank = { live: 0, upcoming: 1 };
+        // Sort chronologically by kickoff, AM → PM.
+        const kickoffMins = (k) => {
+          const t = /(\d+):(\d+)\s*(AM|PM)/i.exec(k || "");
+          if (!t) return 9999;
+          let h = Number(t[1]) % 12;
+          if (/PM/i.test(t[3])) h += 12;
+          return h * 60 + Number(t[2]);
+        };
         const sorted = games
           .slice()
-          .sort((a, b) => (rank[a.status] ?? 2) - (rank[b.status] ?? 2));
+          .sort((a, b) => kickoffMins(a.kickoff) - kickoffMins(b.kickoff));
 
         const chips = sorted
           .map((m) => {
@@ -8454,6 +8464,15 @@
         renderMatches();
       }
 
+      // Today's date as YYYY-MM-DD in Eastern Time. All match kickoffs are ET,
+      // so "today" must be anchored to ET — a plain new Date().toISOString()
+      // is UTC and rolls the date forward a day each evening after ~8pm ET.
+      function etTodayStr() {
+        return new Date().toLocaleDateString("en-CA", {
+          timeZone: "America/New_York",
+        });
+      }
+
       function renderMatchRow(m) {
         const statusClass =
           m.status === "live" ? "status-live" : "status-upcoming";
@@ -8461,7 +8480,7 @@
           "en-US",
           { weekday: "short", month: "short", day: "numeric" },
         );
-        const today = new Date().toISOString().slice(0, 10);
+        const today = etTodayStr();
         const isToday = m.date === today;
         const isLive = m.status === "live";
         const scoreOrTime = m.score
@@ -8509,7 +8528,7 @@
           month: "long",
           year: "numeric",
         });
-        const today = new Date().toISOString().slice(0, 10);
+        const today = etTodayStr();
 
         // Bucket matches by date
         const byDate = {};
@@ -8603,7 +8622,13 @@
         for (let i = 0; i < 7; i++) {
           const d = new Date(start);
           d.setDate(start.getDate() + i);
-          const ds = d.toISOString().slice(0, 10);
+          // Local date components (not toISOString, which is UTC and shifts).
+          const ds =
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
           const games = matches.filter((m) => m.date === ds);
           days.push({ d, ds, games });
         }
@@ -8615,7 +8640,7 @@
       ${days
         .map(
           ({ d, ds, games }) => `
-        <div class="week-day${ds === new Date().toISOString().slice(0, 10) ? " week-day-today" : ""}">
+        <div class="week-day${ds === etTodayStr() ? " week-day-today" : ""}">
           <div class="week-day-name">${d.toLocaleDateString("en-US", { weekday: "short" })}</div>
           <div class="week-day-num">${d.getDate()}</div>
           <div class="week-day-count">${games.length ? games.length + " game" + (games.length > 1 ? "s" : "") : "—"}</div>
@@ -8772,7 +8797,7 @@
             if (!byDate[m.date]) byDate[m.date] = [];
             byDate[m.date].push(m);
           });
-          const todayIso = new Date().toISOString().slice(0, 10);
+          const todayIso = etTodayStr();
           const dateKeys = Object.keys(byDate).sort();
           if (!dateKeys.length) {
             container.innerHTML =
@@ -8867,7 +8892,7 @@
           if (!byGroup[m.stage]) byGroup[m.stage] = [];
           byGroup[m.stage].push(m);
         });
-        const today = new Date().toISOString().slice(0, 10);
+        const today = etTodayStr();
         const groupKeys = Object.keys(byGroup).sort();
 
         const cards = groupKeys
@@ -9168,7 +9193,7 @@
         else if (endDate) dateStr = `Live until ${endDate}`;
         // Live-state classification: today vs deployDate/liveEndDate.
         // Dates are stored as YYYY-MM-DD strings; compare in local timezone.
-        const todayIso = new Date().toISOString().slice(0, 10);
+        const todayIso = etTodayStr();
         const hasStart = !!a.deployDate;
         const hasEnd = !!a.liveEndDate;
         const startedOrNoStart = !hasStart || a.deployDate <= todayIso;
@@ -10753,7 +10778,7 @@
       // Build a slim snapshot of dashboard data for Gemini context (avoids 32KB+ payloads)
       function buildDashboardSnapshot() {
         const D = typeof DASHBOARD_DATA !== "undefined" ? DASHBOARD_DATA : {};
-        const today = new Date().toISOString().slice(0, 10);
+        const today = etTodayStr();
         const slimNews = (D.news || []).slice(0, 60).map((n) => ({
           id: n.id,
           headline: n.headline,
@@ -10934,7 +10959,7 @@
 # Current user context
 - Active tab: **${activeTab}**
 - Active market filter: **${activeMarket}**
-- Today's date (per dashboard): **${new Date().toISOString().slice(0, 10)}**
+- Today's date (per dashboard): **${etTodayStr()}**
 
 # What you should do
 Answer questions about matches, fixtures, news, social trends, creative assets, campaign strategy. Be concise, actionable, and strategic. Reference specific data points (team names, dates, venues, source names, sentiment, volume) from the dashboard data below.

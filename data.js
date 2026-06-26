@@ -538,7 +538,7 @@ window.DASHBOARD_DATA = {
     {
       id: "m20",
       date: "2026-06-13",
-      kickoff: "12:00 AM ET",
+      kickoff: "12:00 PM ET",
       stage: "Group D",
       home: {
         name: "Australia",
@@ -576,7 +576,7 @@ window.DASHBOARD_DATA = {
     {
       id: "m22",
       date: "2026-06-19",
-      kickoff: "12:00 AM ET",
+      kickoff: "12:00 PM ET",
       stage: "Group D",
       home: {
         name: "Türkiye",
@@ -804,7 +804,7 @@ window.DASHBOARD_DATA = {
     {
       id: "m34",
       date: "2026-06-20",
-      kickoff: "12:00 AM ET",
+      kickoff: "12:00 PM ET",
       stage: "Group F",
       home: {
         name: "Tunisia",
@@ -1222,7 +1222,7 @@ window.DASHBOARD_DATA = {
     {
       id: "m56",
       date: "2026-06-16",
-      kickoff: "12:00 AM ET",
+      kickoff: "12:00 PM ET",
       stage: "Group J",
       home: {
         name: "Austria",
