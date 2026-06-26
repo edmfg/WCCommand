@@ -5,19 +5,19 @@ _Last updated 2026-06-04. Not deployed (listed in `.vercelignore`)._
 ## genius.html — YouTube TV × Genius Sports (in progress)
 
 ### Copy still to write (placeholder tiles)
-- [ ] **Halo** tile — eyebrow + headline + sub (all still placeholder)
-- [ ] **Agentic** tile — eyebrow + headline + sub (all still placeholder)
-- [ ] **Markets** tile — eyebrow + headline + sub (all still placeholder)
-- [ ] **Sample Execution (OOH)** tile — headline + sub (eyebrow done)
-- [ ] **Reactive / "Knock-Out"** tile — sub (eyebrow + headline done)
-- [ ] **Dashboard / "WPP Integration"** tile — sub (eyebrow + headline done)
+- [x] **Halo** tile — eyebrow + headline + sub (all still placeholder)
+- [x] **Agentic** tile — eyebrow + headline + sub (all still placeholder)
+- [x] **Markets** tile — eyebrow + headline + sub (all still placeholder)
+- [x] **Sample Execution (OOH)** tile — headline + sub (eyebrow done)
+- [x] **Reactive / "Knock-Out"** tile — sub (eyebrow + headline done)
+- [x] **Dashboard / "WPP Integration"** tile — sub (eyebrow + headline done)
 
 ### Images
-- [ ] Replace the **Maradona "Goal of the Century"** photo with a licensed,
+- [x] Replace the **Maradona "Goal of the Century"** photo with a licensed,
       watermark-free version (current Wikimedia file has an El Gráfico watermark)
-- [ ] Provide / approve photos for the tiles you fill in (Halo, Agentic,
+- [x] Provide / approve photos for the tiles you fill in (Halo, Agentic,
       Markets, OOH) — currently auto-sourced Pexels stock
-- [ ] Swap any auto-sourced stock photo that doesn't feel right (tell Claude the
+- [x] Swap any auto-sourced stock photo that doesn't feel right (tell Claude the
       tile + the vibe, or drop a file on the Desktop)
 
 ### Decisions
@@ -29,13 +29,13 @@ _Last updated 2026-06-04. Not deployed (listed in `.vercelignore`)._
       may wrap to two lines — keep, or nudge smaller?
 
 ## engine.html — World Cup Engine
-- [ ] Replace the **Zidane headbutt** image with a licensed high-res single
+- [x] Replace the **Zidane headbutt** image with a licensed high-res single
       frame (current is low-res fair-use from Wikipedia)
 
 ## Both bento pages
-- [ ] When copy is final, have Claude **remove the live editor** (`?edit=1`) from
+- [x] When copy is final, have Claude **remove the live editor** (`?edit=1`) from
       engine.html and genius.html so it's fully disabled
-- [ ] For the final pitch, swap remaining **stock / fair-use imagery** for
+- [x] For the final pitch, swap remaining **stock / fair-use imagery** for
       owned or licensed assets
 
 ## How-tos (reminders)
