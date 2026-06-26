@@ -410,6 +410,13 @@
       .hero-top .date-strip {
         margin-bottom: 0;
       }
+      .hero-export-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
       .hero-export-btn {
         font-family: "Oswald", sans-serif;
         font-size: 11px;
@@ -2490,14 +2497,24 @@
             <span class="seg" id="hero-market"></span>
             <span class="seg" id="hero-window"></span>
           </div>
-          <button
-            id="exportPdfHero"
-            class="hero-export-btn"
-            type="button"
-            title="Download today's report as a one-page PDF"
-          >
-            ⤓ Export PDF
-          </button>
+          <div class="hero-export-group">
+            <button
+              id="exportPdfHero"
+              class="hero-export-btn"
+              type="button"
+              title="Download today's report as a high-resolution one-page PDF"
+            >
+              ⤓ Export PDF
+            </button>
+            <button
+              id="exportJpgHero"
+              class="hero-export-btn"
+              type="button"
+              title="Download today's report as a high-resolution JPG image"
+            >
+              🖼 Export JPG
+            </button>
+          </div>
         </div>
         <h1>Today's <span class="stroke">reactive</span>.</h1>
         <p class="lede">
@@ -3576,9 +3593,10 @@ window.FORMATION_DATA = {
         // Prominent hero button — the only export control visible in embed
         // mode (the header dropdown is hidden inside the dashboard iframe).
         const heroBtn = document.getElementById("exportPdfHero");
+        const heroJpgBtn = document.getElementById("exportJpgHero");
         if (!btn || !menu) return;
 
-        // Mirror busy state across both export controls during any capture.
+        // Mirror busy state across all export controls during any capture.
         function setBusy(busy, label) {
           btn.disabled = busy;
           if (busy) btn.textContent = label;
@@ -3586,6 +3604,10 @@ window.FORMATION_DATA = {
           if (heroBtn) {
             heroBtn.disabled = busy;
             heroBtn.textContent = busy ? label : "⤓ Export PDF";
+          }
+          if (heroJpgBtn) {
+            heroJpgBtn.disabled = busy;
+            heroJpgBtn.textContent = busy ? label : "🖼 Export JPG";
           }
         }
 
@@ -3685,13 +3707,25 @@ window.FORMATION_DATA = {
             const target = document.querySelector("main") || document.body;
             const bg =
               getComputedStyle(document.body).backgroundColor || "#0a0c14";
+            // Render at 3× for a crisp, zoom-readable export. Clamp the scale
+            // so neither dimension blows past the browser's ~16k canvas limit
+            // on very long reports (rasterising past it silently blanks the
+            // canvas). 3× is a big jump from the old 2× cap and is what makes
+            // the PDF/JPG sharp instead of fuzzy.
+            const cssW = document.documentElement.scrollWidth;
+            const cssH = document.documentElement.scrollHeight;
+            const MAX_DIM = 12000;
+            const scale = Math.max(
+              1,
+              Math.min(3, MAX_DIM / Math.max(cssW, cssH)),
+            );
             const canvas = await window.html2canvas(target, {
               backgroundColor: bg,
-              scale: Math.min(2, window.devicePixelRatio || 1.5),
+              scale: scale,
               useCORS: true,
               logging: false,
-              windowWidth: document.documentElement.scrollWidth,
-              windowHeight: document.documentElement.scrollHeight,
+              windowWidth: cssW,
+              windowHeight: cssH,
             });
             return canvas;
           } finally {
@@ -3713,7 +3747,7 @@ window.FORMATION_DATA = {
           showToast("Capturing report…");
           try {
             const canvas = await captureCanvas();
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.97);
             downloadDataUrl(dataUrl, fileStem() + ".jpg");
             showToast("Downloaded JPG ✓");
           } catch (err) {
@@ -3760,17 +3794,10 @@ window.FORMATION_DATA = {
             // Fill page background to match the dark theme.
             pdf.setFillColor(10, 12, 20);
             pdf.rect(0, 0, pageW, pageH, "F");
-            const imgData = canvas.toDataURL("image/jpeg", 0.92);
-            pdf.addImage(
-              imgData,
-              "JPEG",
-              x,
-              y,
-              drawW,
-              drawH,
-              undefined,
-              "FAST",
-            );
+            // Embed the capture as lossless PNG so text edges stay crisp —
+            // JPEG compression was the other half of the "fuzzy PDF" problem.
+            const imgData = canvas.toDataURL("image/png");
+            pdf.addImage(imgData, "PNG", x, y, drawW, drawH, undefined, "FAST");
             pdf.save(fileStem() + ".pdf");
             showToast("Downloaded PDF ✓");
           } catch (err) {
@@ -3793,6 +3820,12 @@ window.FORMATION_DATA = {
           heroBtn.addEventListener("click", () => {
             if (heroBtn.disabled) return;
             exportPdf();
+          });
+        }
+        if (heroJpgBtn) {
+          heroJpgBtn.addEventListener("click", () => {
+            if (heroJpgBtn.disabled) return;
+            exportJpg();
           });
         }
       })();
