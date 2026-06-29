@@ -466,7 +466,8 @@ function buildScoresPrompt() {
     '      "away": "away team common English name",',
     '      "homeScore": <integer goals, home>,',
     '      "awayScore": <integer goals, away>,',
-    '      "status": "final" (match over) | "live" (in progress)',
+    '      "status": "final" (match over) | "live" (in progress),',
+    '      "venue": "stadium / host city of the match"',
     "    }",
     "  ]",
     "}",
@@ -476,6 +477,8 @@ function buildScoresPrompt() {
     "Bosnia & Herzegovina=BIH, South Africa=RSA, United States=USA.",
     "homeScore/awayScore MUST be non-negative integers. Keep home/away in the",
     "actual fixture order. If you cannot confirm a score, OMIT that match.",
+    "ALWAYS include the venue (host stadium or city). It is REQUIRED to place",
+    "knockout matches — whose teams are not known in advance — onto the bracket.",
   ].join("\n");
 }
 
@@ -506,6 +509,7 @@ function normalizeScore(it) {
     home_score: hs,
     away_score: as,
     status: it.status === "live" ? "live" : "final",
+    venue: safeText(it.venue || "").slice(0, 120) || null,
     updated_at: new Date().toISOString(),
   };
 }
@@ -522,16 +526,35 @@ async function upsertMatchResults(rows) {
   const url =
     SUPABASE_URL +
     "/rest/v1/match_results?on_conflict=match_date,home_code,away_code";
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: "Bearer " + SERVICE_KEY,
-      "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=minimal",
-    },
-    body: JSON.stringify(rows),
-  });
+  async function post(payload) {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        apikey: SERVICE_KEY,
+        Authorization: "Bearer " + SERVICE_KEY,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify(payload),
+    });
+  }
+  let resp = await post(rows);
+  // Graceful degrade: if the `venue` column hasn't been added to the table yet
+  // (supabase-match-results-venue.sql not run), PostgREST 400s with a "column …
+  // venue" error. Strip venue and retry so score scraping never breaks on the
+  // migration ordering — knockout binding just falls back to date-uniqueness
+  // until the column + venues exist.
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    if (/venue/i.test(text) && rows.some((r) => "venue" in r)) {
+      const stripped = rows.map(({ venue, ...rest }) => rest);
+      resp = await post(stripped);
+    } else {
+      throw new Error(
+        "match_results upsert failed: " + resp.status + " " + text.slice(0, 300),
+      );
+    }
+  }
   if (!resp.ok) {
     const text = await resp.text().catch(() => "");
     throw new Error(

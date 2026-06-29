@@ -10472,8 +10472,87 @@
       // and Standings show results without a redeploy. Mirrors the plain-fetch
       // pattern fetchLiveUpdates uses (supabase-js may not be ready on boot).
       let _matchResultsSig = "";
-      function applyMatchResults(rows) {
-        if (!Array.isArray(rows) || !rows.length) return false;
+
+      // code → { name, flag } for all 48 teams, harvested from the group-stage
+      // fixtures (every team appears there with its real tricode + flag). Used to
+      // turn a real result's tricode into a renderable team object when filling a
+      // knockout placeholder slot. Cached after first build.
+      let _codeMeta = null;
+      function buildCodeMeta() {
+        if (_codeMeta) return _codeMeta;
+        _codeMeta = {};
+        DASHBOARD_DATA.matches.forEach((m) => {
+          if (!/^Group/.test(m.stage || "")) return;
+          [m.home, m.away].forEach((t) => {
+            const c = String(t.code || "").toUpperCase();
+            if (c && !_codeMeta[c]) {
+              _codeMeta[c] = { name: t.name, code: c, flag: t.flag };
+            }
+          });
+        });
+        return _codeMeta;
+      }
+      // A fixture slot is still a PLACEHOLDER (A2 / 3rd / W73 / L101…) when its
+      // code isn't one of the 48 real tricodes.
+      function isRealTeam(code) {
+        return !!buildCodeMeta()[String(code || "").toUpperCase()];
+      }
+      function teamObjFor(code) {
+        const meta = buildCodeMeta()[String(code || "").toUpperCase()];
+        return meta ? { name: meta.name, code: meta.code, flag: meta.flag } : null;
+      }
+
+      // Distinctive lowercase tokens of a venue string, dropping generic words so
+      // "SoFi Stadium, Los Angeles" and a scraped "SoFi Stadium" or "Los Angeles"
+      // still overlap. Two venues are "the same fixture" when their token sets
+      // intersect (compared only among fixtures on the same date, so collisions
+      // across distant stadiums never matter).
+      const _VENUE_STOP = new Set([
+        "stadium",
+        "estadio",
+        "arena",
+        "field",
+        "park",
+        "the",
+        "los",
+        "new",
+      ]);
+      function venueTokens(s) {
+        return new Set(
+          String(s || "")
+            .toLowerCase()
+            .replace(/[^a-z]+/g, " ")
+            .split(" ")
+            .filter((w) => w.length >= 3 && !_VENUE_STOP.has(w)),
+        );
+      }
+      function venuesMatch(a, b) {
+        const ta = venueTokens(a);
+        const tb = venueTokens(b);
+        for (const w of ta) if (tb.has(w)) return true;
+        return false;
+      }
+
+      function setTeam(slot, team) {
+        // mutate in place so existing references stay valid
+        slot.name = team.name;
+        slot.code = team.code;
+        slot.flag = team.flag;
+      }
+      function applyScore(m, scoreHome, scoreAway, status) {
+        const prevSig = m.score
+          ? m.score.home + "-" + m.score.away + ":" + m.status
+          : "";
+        const nextSig = scoreHome + "-" + scoreAway + ":" + status;
+        if (prevSig === nextSig) return false;
+        m.score = { home: scoreHome, away: scoreAway };
+        m.status = status;
+        return true;
+      }
+
+      // Pass 1 — stamp scores onto fixtures whose REAL tricodes match a result
+      // (group games always; knockout games once their slots are resolved).
+      function stampByCode(rows, consumed) {
         let changed = false;
         rows.forEach((r) => {
           const hs = r.home_score;
@@ -10489,38 +10568,151 @@
             return (mh === hc && ma === ac) || (mh === ac && ma === hc);
           });
           if (!m) return;
-          // Keep the score in OUR fixture's home/away orientation.
           const flip = (m.home.code || "").toUpperCase() !== hc;
-          const score = flip
-            ? { home: as, away: hs }
-            : { home: hs, away: as };
-          const prevSig = m.score
-            ? m.score.home + "-" + m.score.away + ":" + m.status
-            : "";
-          const nextSig = score.home + "-" + score.away + ":" + status;
-          if (prevSig !== nextSig) {
-            m.score = score;
-            m.status = status;
-            changed = true;
-          }
+          const sh = flip ? as : hs;
+          const sa = flip ? hs : as;
+          if (applyScore(m, sh, sa, status)) changed = true;
+          if (consumed) consumed.add(r.match_date + "|" + hc + "|" + ac);
         });
+        return changed;
+      }
+
+      // Pass 2 — bind a real scraped result to a knockout fixture that's still a
+      // placeholder. Knockout fixtures ship as "A2 vs B2" / "E1 vs 3rd" etc. with
+      // no real teams; the (date, venue) pair is the fixture's stable identity, so
+      // we match the result's stadium to the fixture's. Falls back to a 1-to-1
+      // match when a date has exactly one unresolved fixture and one free result
+      // (covers rows scraped before venue was recorded).
+      function resolveKnockoutByVenue(rows, consumed) {
+        let changed = false;
+        const koFixtures = DASHBOARD_DATA.matches.filter(
+          (m) => !/^Group/.test(m.stage || "") && !isRealTeam(m.home.code),
+        );
+        koFixtures.forEach((m) => {
+          if (isRealTeam(m.home.code) && isRealTeam(m.away.code)) return;
+          const candidates = rows.filter((r) => {
+            if (r.match_date !== m.date) return false;
+            if (r.home_score == null || r.away_score == null) return false;
+            const hc = String(r.home_code || "").toUpperCase();
+            const ac = String(r.away_code || "").toUpperCase();
+            if (!isRealTeam(hc) || !isRealTeam(ac)) return false;
+            return !consumed.has(m.date + "|" + hc + "|" + ac);
+          });
+          if (!candidates.length) return;
+
+          // Prefer a unique venue match.
+          let pick = null;
+          const venueHits = candidates.filter((r) =>
+            venuesMatch(r.venue, m.venue),
+          );
+          if (venueHits.length === 1) {
+            pick = venueHits[0];
+          } else if (!m.venue || !venueHits.length) {
+            // Fallback: only when this date has exactly one unresolved fixture
+            // and exactly one free candidate — unambiguous.
+            const unresolvedOnDate = koFixtures.filter(
+              (f) => f.date === m.date && !isRealTeam(f.home.code),
+            );
+            if (unresolvedOnDate.length === 1 && candidates.length === 1) {
+              pick = candidates[0];
+            }
+          }
+          if (!pick) return;
+
+          const hc = String(pick.home_code || "").toUpperCase();
+          const ac = String(pick.away_code || "").toUpperCase();
+          const homeTeam = teamObjFor(hc);
+          const awayTeam = teamObjFor(ac);
+          if (!homeTeam || !awayTeam) return;
+          setTeam(m.home, homeTeam);
+          setTeam(m.away, awayTeam);
+          applyScore(
+            m,
+            pick.home_score,
+            pick.away_score,
+            pick.status === "live" ? "live" : "final",
+          );
+          consumed.add(m.date + "|" + hc + "|" + ac);
+          changed = true;
+        });
+        return changed;
+      }
+
+      // Pass 3 — propagate winners (and the Third-Place losers) into downstream
+      // slots. A slot coded "W73" = winner of fixture m73; "L101" = loser of m101.
+      // The bracket STRUCTURE (which match feeds which) is fixed and reliable even
+      // though the R32 entry slots weren't — so once a feeder is final with a
+      // decided result, its winner/loser flows forward. Ties (penalty shootouts,
+      // which we don't have a winner for) are skipped.
+      function propagateBracket() {
+        const byId = {};
+        DASHBOARD_DATA.matches.forEach((m) => (byId[m.id] = m));
+        let changed = false;
+        function resultTeam(feederId, wantWinner) {
+          const f = byId["m" + feederId];
+          if (!f || f.status !== "final" || !f.score) return null;
+          if (f.score.home === f.score.away) return null; // undecided (pens)
+          const homeWon = f.score.home > f.score.away;
+          const wantHome = wantWinner ? homeWon : !homeWon;
+          const slot = wantHome ? f.home : f.away;
+          return isRealTeam(slot.code) ? teamObjFor(slot.code) : null;
+        }
+        DASHBOARD_DATA.matches.forEach((m) => {
+          [m.home, m.away].forEach((slot) => {
+            const mw = /^W(\d+)$/.exec(slot.code || "");
+            const ml = /^L(\d+)$/.exec(slot.code || "");
+            if (!mw && !ml) return;
+            // Disambiguate from group-position codes: "L1"/"L2" are Group L
+            // slots, NOT "loser of match 1/2". Real W#/L# feeder codes always
+            // reference a knockout match id (73–104).
+            const feeder = Number(mw ? mw[1] : ml[1]);
+            if (feeder < 73) return;
+            const team = resultTeam(feeder, !!mw);
+            if (team && team.code !== slot.code) {
+              setTeam(slot, team);
+              changed = true;
+            }
+          });
+        });
+        return changed;
+      }
+
+      function applyMatchResults(rows) {
+        if (!Array.isArray(rows) || !rows.length) return false;
+        const consumed = new Set();
+        let changed = false;
+        // Iterate so resolutions cascade: R32 results resolve R32 fixtures →
+        // winners propagate into R16 slots → R16 results then stamp by code, etc.
+        for (let i = 0; i < 6; i++) {
+          let pass = false;
+          if (stampByCode(rows, consumed)) pass = true;
+          if (resolveKnockoutByVenue(rows, consumed)) pass = true;
+          if (propagateBracket()) pass = true;
+          if (pass) changed = true;
+          else break;
+        }
         return changed;
       }
 
       async function fetchMatchResults(silent = false) {
         try {
-          const url =
+          const base =
             MFG_SUPABASE_URL +
-            "/rest/v1/match_results?select=match_date,home_code,away_code,home_score,away_score,status" +
-            "&order=match_date.asc&limit=200";
+            "/rest/v1/match_results?select=match_date,home_code,away_code,home_score,away_score,status";
+          const tail = "&order=match_date.asc&limit=200";
           let data = null;
           try {
-            const resp = await fetch(url, {
-              headers: {
-                apikey: MFG_SUPABASE_KEY,
-                Authorization: "Bearer " + MFG_SUPABASE_KEY,
-              },
-            });
+            const headers = {
+              apikey: MFG_SUPABASE_KEY,
+              Authorization: "Bearer " + MFG_SUPABASE_KEY,
+            };
+            // Prefer the venue column (needed to bind knockout fixtures). If it
+            // doesn't exist yet (migration not run), PostgREST 400s — fall back
+            // to the venue-less select so scores keep flowing regardless.
+            let resp = await fetch(base + ",venue" + tail, { headers });
+            if (!resp.ok && resp.status === 400) {
+              resp = await fetch(base + tail, { headers });
+            }
             if (!resp.ok) {
               if (!silent)
                 console.warn("match results: select failed " + resp.status);
