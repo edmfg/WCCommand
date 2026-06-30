@@ -195,6 +195,86 @@ check("when no quotes given, the lead voice seeds quotes[]", () => {
   assert(sp.quotes.length >= 1 && sp.quotes[0].text === sp.voice);
 });
 
+// ── assetElevations (the "03 · Elevations" lanes) ──
+// Regression: api/reactive-convert.js never asked Gemini for assetElevations and
+// normalizePayload dropped the field entirely, so every published row lacked it.
+// social.html then kept showing the hardcoded bundle defaults indefinitely.
+console.log("\nasset elevations — assetElevations[] lanes:");
+const elevPayload = normalizePayload(
+  {
+    cultural: { headline: "h", spikes: [] },
+    storyboards: [],
+    assetElevations: [
+      {
+        lane: "fan",
+        momentum: true,
+        prompt: "why do portuguese fans twirl their scarves during corner kicks",
+        rationale: "Top pick — Eustáquio's heritage is the narrative spike.",
+      },
+      {
+        lane: "GAME", // case-insensitive
+        prompt: "how can I put a fun canadian twist on a croatian dish?",
+        rationale: "Rides the diaspora-food conversation.",
+      },
+      {
+        // lane omitted → defaults to fan; momentum falsey → omitted
+        prompt: "why do Canadian fans take shots of maple syrup before a game",
+        rationale: "Homegrown-identity angle.",
+        momentum: false,
+      },
+      { prompt: "", rationale: "no prompt → dropped" }, // dropped
+      "garbage", // non-object → dropped
+    ],
+  },
+  "Canada",
+  "June 30, 2026",
+);
+
+check("assetElevations is present and drops empty/garbage items", () => {
+  assert(Array.isArray(elevPayload.assetElevations), "assetElevations missing");
+  assert.strictEqual(elevPayload.assetElevations.length, 3);
+});
+
+check("prompt + rationale are carried through verbatim, in source order", () => {
+  assert.strictEqual(
+    elevPayload.assetElevations[0].prompt,
+    "why do portuguese fans twirl their scarves during corner kicks",
+  );
+  assert.strictEqual(
+    elevPayload.assetElevations[0].rationale,
+    "Top pick — Eustáquio's heritage is the narrative spike.",
+  );
+});
+
+check("lane normalizes to 'fan' | 'game' (case-insensitive, defaults fan)", () => {
+  assert.strictEqual(elevPayload.assetElevations[0].lane, "fan");
+  assert.strictEqual(elevPayload.assetElevations[1].lane, "game");
+  assert.strictEqual(elevPayload.assetElevations[2].lane, "fan"); // omitted → fan
+});
+
+check("momentum only set when truthy; otherwise the key is omitted", () => {
+  assert.strictEqual(elevPayload.assetElevations[0].momentum, true);
+  assert(!("momentum" in elevPayload.assetElevations[1]), "no momentum key when absent");
+  assert(!("momentum" in elevPayload.assetElevations[2]), "no momentum key when false");
+});
+
+check("no assetElevations in input → key omitted (bundle fallback preserved)", () => {
+  // `payload` (from geminiRaw at the top) had no assetElevations.
+  assert(
+    !("assetElevations" in payload),
+    "assetElevations must be omitted when the input has none, so social.html keeps the bundle",
+  );
+});
+
+check("an empty assetElevations array also omits the key", () => {
+  const empty = normalizePayload(
+    { cultural: { spikes: [] }, storyboards: [], assetElevations: [] },
+    "Canada",
+    "June 30, 2026",
+  );
+  assert(!("assetElevations" in empty), "empty array should omit the key, not wipe the bundle");
+});
+
 if (failures) {
   console.error("\n" + failures + " check(s) FAILED");
   process.exit(1);

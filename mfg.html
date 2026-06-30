@@ -10288,6 +10288,28 @@
               "</div>"
             );
           }
+          function elevationHtml(el) {
+            return (
+              '<div class="reactive-preview-storyboard">' +
+              '<div class="pv-num">' +
+              (el.lane === "game" ? "GAME" : "FAN") +
+              " ELEVATION" +
+              (el.momentum ? " · ↑ SURGING" : "") +
+              "</div>" +
+              '<div style="font-weight:600;font-size:14px">' +
+              escHtml(el.prompt) +
+              "</div>" +
+              (el.rationale
+                ? '<div class="pv-body" style="margin-top:6px">' +
+                  escHtml(el.rationale) +
+                  "</div>"
+                : "") +
+              "</div>"
+            );
+          }
+          const elevations = Array.isArray(p.assetElevations)
+            ? p.assetElevations
+            : [];
           e.reactivePreviewBody.innerHTML =
             '<div class="reactive-preview-section"><h4>Cultural briefing</h4>' +
             briefHtml(p.cultural) +
@@ -10299,7 +10321,14 @@
             (p.storyboards || []).length +
             ")</h4>" +
             (p.storyboards || []).map(storyHtml).join("") +
-            "</div>";
+            "</div>" +
+            (elevations.length
+              ? '<div class="reactive-preview-section"><h4>Elevations (' +
+                elevations.length +
+                ")</h4>" +
+                elevations.map(elevationHtml).join("") +
+                "</div>"
+              : "");
         }
 
         async function publishReactive() {

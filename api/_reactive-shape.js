@@ -148,6 +148,27 @@ function normalizePayload(raw, market, liveDate) {
     }
     return ps;
   }
+  // Asset elevations — the "03 · Elevations" lanes in social.html. Approved
+  // library prompts the client uploads alongside the storyboards; transcribed
+  // verbatim. Each item: { lane:'fan'|'game', momentum?:true, prompt, rationale }.
+  // prompt is REQUIRED by social.html's filter; items without one are dropped.
+  function elevation(o) {
+    const x = o && typeof o === "object" ? o : {};
+    const prompt = s(x.prompt);
+    if (!prompt) return null;
+    const out = {
+      lane: s(x.lane).toLowerCase() === "game" ? "game" : "fan",
+      prompt,
+      rationale: s(x.rationale),
+    };
+    // momentum is optional + diff-colours a surging asset. Only emit when truthy
+    // so a published payload never carries a stray `momentum:false`.
+    if (x.momentum === true || s(x.momentum).toLowerCase() === "true") {
+      out.momentum = true;
+    }
+    return out;
+  }
+
   function story(o, idx) {
     const x = o && typeof o === "object" ? o : {};
     const ps = prompts(x);
@@ -176,7 +197,12 @@ function normalizePayload(raw, market, liveDate) {
     return out;
   }
 
-  return {
+  const elevations = arr(rs.assetElevations)
+    .map(elevation)
+    .filter(Boolean)
+    .slice(0, 12);
+
+  const out = {
     formation: {
       date: s((rs.formation || {}).date) || dateLabel,
       market,
@@ -192,6 +218,11 @@ function normalizePayload(raw, market, liveDate) {
     match: brief(rs.match, "02", "Match-Event Pulse Reader", "mpr", "Match"),
     storyboards: arr(rs.storyboards).slice(0, 3).map(story),
   };
+  // Only attach the field when the input actually carried elevations. An empty
+  // array would override social.html's bundled defaults with nothing (hiding the
+  // section); omitting the key preserves the documented bundle fallback.
+  if (elevations.length) out.assetElevations = elevations;
+  return out;
 }
 
 module.exports = {

@@ -169,6 +169,14 @@ Schema:
       "verdict": "string — optional Fan Agent verdict on fit (omit if the input has none)",
       "footage": "string — creative direction for the storyboard's footage frame (what B-roll/visuals pair with the on-screen queries)"
     }
+  ],
+  "assetElevations": [
+    {
+      "lane": "string — 'fan' (culture / fandom / ritual asset) or 'game' (match / tactical / player asset)",
+      "momentum": "boolean — true ONLY if the input flags this asset as surging / trending / spiking right now; omit otherwise",
+      "prompt": "string — the approved library query VERBATIM from the input, in the fan's lowercase voice",
+      "rationale": "string — the strategist's case for why this already-approved asset is ready to put into market today (copy it from the input; tie it to a signal above if the input does)"
+    }
   ]
 }
 
@@ -178,6 +186,8 @@ Return exactly:
 - exactly 3 storyboards
 - exactly 3 "prompts" per storyboard — A (Observational) / B (Participatory) / C (Fusion/Planning)
 - a vivid one-to-two-sentence "footage" direction for every storyboard (never omit it)
+
+Asset elevations rule: if the input contains an "elevations" / "elevation recommendations" / "approved prompts to elevate" list (ranked prompts each with a rationale), transcribe EVERY item into "assetElevations" VERBATIM — copy the prompt and rationale word-for-word (fix only obvious mechanical typos), and KEEP THE INPUT'S RANKING as the array order (index 0 = top pick). Tag each item's "lane" as "game" (match / tactical / player asset) or "fan" (culture / fandom / ritual asset); when unsure, use "fan". Set "momentum": true only for items the input marks as surging / trending. Do NOT invent elevation prompts or rationales — if the input has no such list, return "assetElevations": [].
 
 Citations rule: include a "url" on a quote or source ONLY when that exact link is present in the raw input. NEVER invent URLs, and never cite a named outlet that does not appear in the input — synthesize platform tags (X / TikTok / Reddit / etc.) instead.
 
