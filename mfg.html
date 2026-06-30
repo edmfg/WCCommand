@@ -12388,6 +12388,125 @@
     </script>
     <script src="data.js"></script>
     <script src="calendar-data.js"></script>
+    <!-- Keep the MFG-mode Gemini assistant's snapshot current. index.html merges
+         Supabase live_updates + match_results into DASHBOARD_DATA at runtime, but
+         mfg.html doesn't render those carousels, so without this the MFG-mode
+         button fed Gemini ONLY the static (often days-old) data.js bundle. This
+         lean merge mirrors index.html's fetchLiveUpdates (news/social/ticker) +
+         stampByCode (fixture scores) so gemini-assistant.js's buildDashboardSnapshot
+         sees the same fresh content the dashboard does. Data-only, no rendering. -->
+    <script>
+      (function syncLiveContentForAssistant() {
+        var SB_URL = "https://ypisjfefbccgtxesteja.supabase.co";
+        var SB_KEY = "sb_publishable_n7wZ7lIFC-psij0qzmzT5g_p-itIu1d";
+        var MAX_AGE_DAYS = 14;
+        function D() {
+          return (typeof window !== "undefined" && window.DASHBOARD_DATA) || null;
+        }
+        // ── live_updates → news / social / ticker (prepend, dedupe by id) ──
+        function mergeLiveUpdates() {
+          var d = D();
+          if (!d) return Promise.resolve();
+          var cutoff = new Date(
+            Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
+          ).toISOString();
+          var url =
+            SB_URL +
+            "/rest/v1/live_updates?select=id,kind,payload,created_at&created_at=gte." +
+            encodeURIComponent(cutoff) +
+            "&order=created_at.desc&limit=60";
+          return fetch(url, {
+            headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY },
+          })
+            .then(function (r) {
+              return r.ok ? r.json() : [];
+            })
+            .then(function (rows) {
+              if (!Array.isArray(rows) || !rows.length) return;
+              // Oldest-first so the newest rows end up at the FRONT after unshift.
+              var fresh = rows.slice().reverse();
+              var newsIds = {};
+              (d.news || []).forEach(function (n) {
+                newsIds[n.id] = 1;
+              });
+              var socialIds = {};
+              (d.social || []).forEach(function (s) {
+                socialIds[s.id] = 1;
+              });
+              var tickerSeen = {};
+              (d.ticker || []).forEach(function (t) {
+                tickerSeen[t] = 1;
+              });
+              d.news = d.news || [];
+              d.social = d.social || [];
+              d.ticker = d.ticker || [];
+              fresh.forEach(function (row) {
+                var p = row.payload;
+                if (!p) return;
+                if (p.tag === "UK") p.tag = "Brazil"; // legacy label forward-map
+                if (row.kind === "news" && !newsIds[p.id]) {
+                  newsIds[p.id] = 1;
+                  d.news.unshift(p);
+                } else if (row.kind === "social" && !socialIds[p.id]) {
+                  socialIds[p.id] = 1;
+                  d.social.unshift(p);
+                } else if (row.kind === "ticker" && p.text && !tickerSeen[p.text]) {
+                  tickerSeen[p.text] = 1;
+                  d.ticker.unshift(p.text);
+                }
+              });
+              // Bump the freshness stamp forward only (never backwards).
+              var newest = rows[0].created_at;
+              var cur = Date.parse(d.lastUpdated || 0) || 0;
+              if ((Date.parse(newest) || 0) > cur) d.lastUpdated = newest;
+            })
+            .catch(function () {});
+        }
+        // ── match_results → fixture score/status (by date + tricodes) ──
+        function mergeMatchResults() {
+          var d = D();
+          if (!d || !Array.isArray(d.matches)) return Promise.resolve();
+          var url =
+            SB_URL +
+            "/rest/v1/match_results?select=match_date,home_code,away_code,home_score,away_score,status";
+          return fetch(url, {
+            headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY },
+          })
+            .then(function (r) {
+              return r.ok ? r.json() : [];
+            })
+            .then(function (rows) {
+              if (!Array.isArray(rows)) return;
+              rows.forEach(function (rr) {
+                var hs = rr.home_score,
+                  as = rr.away_score;
+                if (hs == null || as == null) return;
+                var hc = String(rr.home_code || "").toUpperCase();
+                var ac = String(rr.away_code || "").toUpperCase();
+                var status = rr.status === "live" ? "live" : "final";
+                var m = d.matches.find(function (mm) {
+                  if (mm.date !== rr.match_date) return false;
+                  var mh = (mm.home.code || "").toUpperCase();
+                  var ma = (mm.away.code || "").toUpperCase();
+                  return (mh === hc && ma === ac) || (mh === ac && ma === hc);
+                });
+                if (!m) return;
+                var flip = (m.home.code || "").toUpperCase() !== hc;
+                m.score = { home: flip ? as : hs, away: flip ? hs : as };
+                m.status = status;
+              });
+            })
+            .catch(function () {});
+        }
+        // Fire both; the assistant builds its snapshot at message-send time, by
+        // which point these have resolved. Failures are silent (button still works
+        // off the bundled data.js, just as before).
+        try {
+          mergeLiveUpdates();
+          mergeMatchResults();
+        } catch (e) {}
+      })();
+    </script>
     <script src="countdown.js" defer></script>
     <script src="gemini-assistant.js" defer></script>
     <script src="konami.js" defer></script>
