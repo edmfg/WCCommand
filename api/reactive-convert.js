@@ -37,7 +37,10 @@ const MAX_BODY_BYTES = 512 * 1024;
 const MAX_INPUT_CHARS = 24_000;
 const RATE_LIMIT_WINDOW_SEC = 60;
 const RATE_LIMIT_MAX = 12;
-const UPSTREAM_TIMEOUT_MS = 30_000;
+// This conversion generates a large structured payload (spikes + 3 storyboards
+// + elevations), which can take well over 30s on a big brief. Give it nearly
+// the full 60s function budget so the abort doesn't fire mid-generation.
+const UPSTREAM_TIMEOUT_MS = 55_000;
 
 const memHits = new Map();
 function memRateLimit(key) {
@@ -310,7 +313,18 @@ export default async function handler(req, res) {
     );
   } catch (e) {
     clearTimeout(t);
-    res.status(502).json({ error: "Upstream Gemini call failed" });
+    const timedOut = e && e.name === "AbortError";
+    // Surface the real cause in Vercel logs (the client only sees a summary).
+    console.error(
+      "reactive-convert upstream fetch failed:",
+      e && e.name,
+      e && e.message,
+    );
+    res.status(502).json({
+      error: timedOut
+        ? "Gemini timed out (try a shorter brief or retry)"
+        : "Upstream Gemini call failed",
+    });
     return;
   }
   clearTimeout(t);
@@ -336,3 +350,6 @@ export default async function handler(req, res) {
   const payload = normalizePayload(parsed, market, liveDate);
   res.status(200).json({ payload });
 }
+
+// Match api/gemini.js — large structured generations need the full budget.
+export const config = { maxDuration: 60 };
