@@ -4041,5 +4041,590 @@ window.FORMATION_DATA = {
         }
       })();
     </script>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Reactive-aware Gemini assistant. Self-contained (no shared JS): its
+         system prompt is built from the briefing currently on screen
+         (window.FORMATION_DATA[getMarketKey()]) so it can reason about today's
+         spikes, storyboards, prompts, and elevations. Hidden during export.
+         When this surface is embedded in index.html's Today's Reactive tab,
+         index hides its own Gemini button so the two don't stack.
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <style>
+      #raToggle {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 999px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 13.5px;
+        color: #fff;
+        background: linear-gradient(135deg, #cc0000, #7b1fa2 55%, #1a73e8);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      #raToggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      }
+      #raToggle:active {
+        transform: translateY(0);
+      }
+      body:has(#raPanel.open) #raToggle {
+        opacity: 0;
+        pointer-events: none;
+      }
+      body.exporting #raToggle,
+      body.exporting #raPanel,
+      body.exporting #raOverlay {
+        visibility: hidden !important;
+      }
+      #raOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9590;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      #raOverlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #raPanel {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9700;
+        width: min(420px, calc(100vw - 32px));
+        height: min(620px, calc(100vh - 40px));
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #10131f;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        transform: translateY(16px) scale(0.98);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+      }
+      #raPanel.open {
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .ra-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(
+          135deg,
+          rgba(204, 0, 0, 0.18),
+          rgba(123, 31, 162, 0.12)
+        );
+      }
+      .ra-title {
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+      }
+      .ra-title small {
+        display: block;
+        font-weight: 600;
+        font-size: 11px;
+        color: var(--text-dim);
+        letter-spacing: 0;
+        margin-top: 2px;
+      }
+      .ra-close {
+        background: none;
+        border: 0;
+        color: var(--text-mid);
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .ra-close:hover {
+        color: var(--text);
+      }
+      .ra-msgs {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .ra-msg {
+        max-width: 88%;
+        padding: 10px 13px;
+        border-radius: 14px;
+        font-size: 13.5px;
+        line-height: 1.5;
+        word-wrap: break-word;
+      }
+      .ra-msg.user {
+        align-self: flex-end;
+        background: #cc0000;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+      .ra-msg.bot {
+        align-self: flex-start;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-bottom-left-radius: 4px;
+      }
+      .ra-msg.bot strong {
+        color: var(--gold);
+      }
+      .ra-msg.bot ul {
+        margin: 6px 0;
+        padding-left: 18px;
+      }
+      .ra-msg.bot li {
+        margin: 3px 0;
+      }
+      .ra-msg.bot div + div {
+        margin-top: 6px;
+      }
+      .ra-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 16px 10px;
+      }
+      .ra-chip {
+        font-size: 11.5px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-mid);
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .ra-chip:hover {
+        border-color: var(--gold);
+        color: var(--text);
+      }
+      .ra-input-row {
+        display: flex;
+        gap: 8px;
+        padding: 12px 14px;
+        border-top: 1px solid var(--border);
+      }
+      .ra-input {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 13.5px;
+        resize: none;
+        max-height: 90px;
+        line-height: 1.4;
+      }
+      .ra-input:focus {
+        outline: none;
+        border-color: rgba(255, 215, 0, 0.5);
+      }
+      .ra-send {
+        background: #cc0000;
+        border: 0;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 700;
+        font-family: inherit;
+        padding: 0 16px;
+        cursor: pointer;
+      }
+      .ra-send:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .ra-dots span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin: 0 2px;
+        border-radius: 50%;
+        background: var(--text-dim);
+        animation: raBlink 1.2s infinite;
+      }
+      .ra-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .ra-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes raBlink {
+        0%,
+        60%,
+        100% {
+          opacity: 0.25;
+        }
+        30% {
+          opacity: 1;
+        }
+      }
+      .ra-cite {
+        display: block;
+        font-size: 11px;
+        color: var(--text-dim);
+        margin-top: 6px;
+        text-decoration: none;
+      }
+      .ra-cite:hover {
+        color: var(--gold);
+      }
+    </style>
+
+    <button id="raToggle" type="button" aria-label="Ask Gemini about this briefing">
+      ✨ Gemini
+    </button>
+    <div id="raOverlay"></div>
+    <section id="raPanel" role="dialog" aria-modal="true" aria-label="Reactive assistant">
+      <div class="ra-header">
+        <div class="ra-title">
+          Reactive Assistant<small id="raSub">Today's Reactive</small>
+        </div>
+        <button class="ra-close" id="raClose" type="button" aria-label="Close">
+          &times;
+        </button>
+      </div>
+      <div class="ra-msgs" id="raMsgs"></div>
+      <div class="ra-chips" id="raChips"></div>
+      <div class="ra-input-row">
+        <textarea
+          class="ra-input"
+          id="raInput"
+          rows="1"
+          placeholder="Ask about today's spikes, plays, or elevations…"
+        ></textarea>
+        <button class="ra-send" id="raSend" type="button">Send</button>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        const toggle = document.getElementById("raToggle");
+        const overlay = document.getElementById("raOverlay");
+        const panel = document.getElementById("raPanel");
+        const closeBtn = document.getElementById("raClose");
+        const msgs = document.getElementById("raMsgs");
+        const chipsWrap = document.getElementById("raChips");
+        const input = document.getElementById("raInput");
+        const sendBtn = document.getElementById("raSend");
+        const sub = document.getElementById("raSub");
+        if (!toggle || !panel) return;
+
+        let busy = false;
+        let greeted = false;
+        const history = [];
+
+        const CHIPS = [
+          "Summarize today's top spike",
+          "Which play should we prioritize?",
+          "Draft an IG caption for Play 01",
+          "Sharpen the prompts for Play 02",
+        ];
+
+        function esc(s) {
+          return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+          });
+        }
+        // Tiny markdown: **bold**, - / • bullets, plain lines.
+        function md(s) {
+          let out = esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+          const lines = out.split(/\n/);
+          let html = "",
+            inList = false;
+          lines.forEach(function (ln) {
+            const t = ln.trim();
+            if (/^([-•*])\s+/.test(t)) {
+              if (!inList) {
+                html += "<ul>";
+                inList = true;
+              }
+              html += "<li>" + t.replace(/^([-•*])\s+/, "") + "</li>";
+            } else {
+              if (inList) {
+                html += "</ul>";
+                inList = false;
+              }
+              if (t) html += "<div>" + t + "</div>";
+            }
+          });
+          if (inList) html += "</ul>";
+          return html || "<div></div>";
+        }
+
+        function addMsg(role, text, citesHtml) {
+          const el = document.createElement("div");
+          el.className = "ra-msg " + (role === "user" ? "user" : "bot");
+          el.innerHTML =
+            role === "user" ? esc(text) : md(text) + (citesHtml || "");
+          msgs.appendChild(el);
+          msgs.scrollTop = msgs.scrollHeight;
+          return el;
+        }
+
+        // Build the on-screen briefing snapshot for the system prompt.
+        function context() {
+          try {
+            const key =
+              typeof getMarketKey === "function" ? getMarketKey() : "ca";
+            const fd = (window.FORMATION_DATA || {})[key] || {};
+            const trim = (spikes) =>
+              (spikes || []).map((s) => ({
+                title: s.title,
+                type: s.type,
+                signal: s.signal,
+                context: s.context,
+                voice: s.voice,
+                volume: s.volume,
+                sentiment: s.sentiment,
+                tone: s.tone,
+                hook: s.hook,
+              }));
+            return {
+              market: (fd.formation && fd.formation.market) || key,
+              date: (fd.formation && fd.formation.date) || "",
+              window: (fd.formation && fd.formation.window) || "",
+              cultural: fd.cultural
+                ? {
+                    headline: fd.cultural.headline,
+                    spikes: trim(fd.cultural.spikes),
+                  }
+                : null,
+              match: fd.match
+                ? { headline: fd.match.headline, spikes: trim(fd.match.spikes) }
+                : null,
+              storyboards: (fd.storyboards || []).map((sb) => ({
+                number: sb.number,
+                title: sb.title,
+                sourceSignal: sb.sourceSignal,
+                sourceDetail: sb.sourceDetail,
+                audienceCut: sb.audienceCut,
+                bucket: sb.bucket,
+                unmetNeed: sb.unmetNeed,
+                prompts: (sb.prompts || []).map((p) => ({
+                  key: p.key,
+                  type: p.type,
+                  text: p.text,
+                })),
+                whyPrompt: sb.whyPrompt,
+                footage: sb.footage,
+                ipCheck: sb.ipCheck,
+              })),
+              assetElevations: (fd.assetElevations || []).map((a) => ({
+                lane: a.lane,
+                momentum: a.momentum,
+                prompt: a.prompt,
+                rationale: a.rationale,
+              })),
+            };
+          } catch (e) {
+            return {};
+          }
+        }
+
+        function systemPrompt() {
+          const ctx = context();
+          return `You are the embedded strategic analyst on the **Today's Reactive** briefing surface of World Cup HQ — the daily reactive-content war room for the MFG strategy team running Instagram content during the 2026 FIFA World Cup (June 11 – July 19, 2026, hosted by Canada/Mexico/USA).
+
+# What's on screen right now
+This surface shows ONE market's reactive briefing for the day: two intelligence readers (Cultural Conversation + Match Event, each with "spikes"), three "plays" (storyboards, each with A/B/C search-style prompts), and an optional ranked "elevations" list (already-approved library prompts ready to put into market). The full briefing currently displayed is in the JSON below — treat it as your source of truth for on-screen content.
+
+# What you should do
+- Answer questions about today's spikes, plays, prompts, and elevations for this market.
+- Help the strategist act: summarize the top signal, prioritize which play to shoot first, draft IG captions/hooks in a fan-native voice, sharpen a play's prompts, or connect a spike to an elevation.
+- Reference specifics by name/number (spike titles, "Play 01", prompt A/B/C, elevation rank) so it's actionable.
+- You have live Google Search — use it when a question needs current info (scores, breaking news, fresh fan reactions) beyond the briefing.
+
+# Scope & brand safety (HARD)
+- Stay strictly inside the 2026 FIFA World Cup: matches, teams, players, fan culture, social trends, creative strategy for this briefing. Politely decline politics/religion/war/medical/legal/explicit/harassment and pivot to a WC angle.
+- Output may be quoted in IG content: stay neutral, factual, brand-safe. No profanity, no partisanship, no editorializing on sensitive stories — report only what reputable outlets have reported.
+
+# Format — bullets only (HARD)
+- Always answer in bullet points. No prose paragraphs, no "Sure!"/"Great question" preambles.
+- 3–5 bullets default, 7 max. Lead with the answer; **bold** key terms. Only write longer prose if the user explicitly asks ("draft the full caption", "dig deeper").
+
+# TODAY'S BRIEFING (on-screen JSON — this market only)
+${JSON.stringify(ctx)}`;
+        }
+
+        async function send(text) {
+          text = (text || "").trim();
+          if (!text || busy) return;
+          busy = true;
+          sendBtn.disabled = true;
+          addMsg("user", text);
+          input.value = "";
+          input.style.height = "auto";
+          const typing = addMsg("bot", "");
+          typing.innerHTML =
+            '<span class="ra-dots"><span></span><span></span><span></span></span>';
+          history.push({ role: "user", parts: [{ text: text }] });
+          try {
+            const res = await fetch("/api/gemini", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt() }] },
+                contents: history,
+                tools: [{ google_search: {} }],
+                generationConfig: {
+                  temperature: 0.4,
+                  maxOutputTokens: 2048,
+                  thinkingConfig: { thinkingBudget: 0 },
+                },
+              }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || (data && data.error)) {
+              const m =
+                (data && data.error && (data.error.message || data.error)) ||
+                "HTTP " + res.status;
+              throw new Error(typeof m === "string" ? m : JSON.stringify(m));
+            }
+            const cand = data && data.candidates && data.candidates[0];
+            let reply =
+              (
+                (cand && cand.content && cand.content.parts) ||
+                []
+              )
+                .map((p) => p.text)
+                .filter(Boolean)
+                .join("\n") || "";
+            if (!reply) {
+              const blk =
+                data && data.promptFeedback && data.promptFeedback.blockReason;
+              reply = blk
+                ? "Response blocked (" + blk + "). Try rephrasing."
+                : "No response generated.";
+            }
+            // Grounding citations
+            let citesHtml = "";
+            const gm = cand && cand.groundingMetadata;
+            const chunks = (gm && gm.groundingChunks) || [];
+            const cites = chunks
+              .map((c) =>
+                c.web && c.web.uri
+                  ? { uri: c.web.uri, title: c.web.title || c.web.uri }
+                  : null,
+              )
+              .filter(Boolean)
+              .slice(0, 5);
+            if (cites.length) {
+              citesHtml = cites
+                .map(
+                  (c, i) =>
+                    '<a class="ra-cite" href="' +
+                    c.uri +
+                    '" target="_blank" rel="noopener">[' +
+                    (i + 1) +
+                    "] " +
+                    esc(c.title) +
+                    "</a>",
+                )
+                .join("");
+            }
+            history.push({ role: "model", parts: [{ text: reply }] });
+            typing.remove();
+            addMsg("bot", reply, citesHtml);
+          } catch (e) {
+            typing.remove();
+            addMsg(
+              "bot",
+              "⚠ " + (e && e.message ? e.message : "Something went wrong."),
+            );
+          }
+          busy = false;
+          sendBtn.disabled = false;
+        }
+
+        function renderChips() {
+          chipsWrap.innerHTML = "";
+          CHIPS.forEach(function (c) {
+            const b = document.createElement("button");
+            b.className = "ra-chip";
+            b.type = "button";
+            b.textContent = c;
+            b.addEventListener("click", function () {
+              send(c);
+            });
+            chipsWrap.appendChild(b);
+          });
+        }
+
+        function open() {
+          const ctx = context();
+          if (sub)
+            sub.textContent =
+              (ctx.market || "Today's Reactive") +
+              (ctx.date ? " · " + ctx.date : "");
+          if (!greeted) {
+            addMsg(
+              "bot",
+              "Ask me about today's reactive briefing — the **spikes**, the three **plays**, or the **elevation** picks. I can summarize signals, prioritize plays, or draft captions.",
+            );
+            renderChips();
+            greeted = true;
+          }
+          overlay.classList.add("open");
+          panel.classList.add("open");
+          setTimeout(function () {
+            input.focus();
+          }, 150);
+        }
+        function close() {
+          overlay.classList.remove("open");
+          panel.classList.remove("open");
+        }
+
+        toggle.addEventListener("click", open);
+        overlay.addEventListener("click", close);
+        closeBtn.addEventListener("click", close);
+        sendBtn.addEventListener("click", function () {
+          send(input.value);
+        });
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            send(input.value);
+          }
+        });
+        input.addEventListener("input", function () {
+          input.style.height = "auto";
+          input.style.height = Math.min(input.scrollHeight, 90) + "px";
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && panel.classList.contains("open")) close();
+        });
+      })();
+    </script>
 </body>
 </html>
