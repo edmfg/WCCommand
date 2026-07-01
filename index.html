@@ -8498,7 +8498,7 @@
       }
 
       // ── Fixtures Calendar (month grid) ──
-      let calendarMonth = null; // YYYY-MM string; defaults to first match month if null
+      let calendarMonth = null; // YYYY-MM string; defaults to current month (clamped to Jun–Jul) if null
       function shiftCalendar(delta) {
         if (!calendarMonth) calendarMonth = "2026-06";
         const [y, m] = calendarMonth.split("-").map(Number);
@@ -8509,8 +8509,19 @@
       }
       function renderCalendarView(matches) {
         if (!calendarMonth) {
-          const first = matches.map((m) => m.date).sort()[0] || "2026-06-11";
-          calendarMonth = first.slice(0, 7);
+          // Open on the current month, clamped to the tournament window
+          // (June–July 2026) so it never lands on an empty month.
+          const nowMonth = etTodayStr().slice(0, 7);
+          const first =
+            matches.map((m) => m.date).sort()[0]?.slice(0, 7) || "2026-06";
+          const last =
+            matches
+              .map((m) => m.date)
+              .sort()
+              .slice(-1)[0]
+              ?.slice(0, 7) || "2026-07";
+          calendarMonth =
+            nowMonth < first ? first : nowMonth > last ? last : nowMonth;
         }
         const [y, mo] = calendarMonth.split("-").map(Number);
         const firstDay = new Date(y, mo - 1, 1);
