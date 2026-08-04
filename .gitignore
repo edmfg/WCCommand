@@ -2,3 +2,7 @@
 .env*
 node_modules
 .env*.local
+
+# local agent notes — never shipped
+CLAUDE.md
+.claude/
